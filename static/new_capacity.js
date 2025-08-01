@@ -1,8 +1,11 @@
 const form = document.querySelector("#editor-form");
+const formSubmitButton = form.querySelector("button[type='submit']");
+const loadingText = formSubmitButton.querySelector(".loading-text");
+const defaultText = formSubmitButton.querySelector(".loading-text + span:not(.loading-text)");
 const fields = document.querySelectorAll("input, textarea, select");
 
 
-const validateField = (event) => {
+function validateField(event) {
     const field = event.currentTarget;
     const isValid = field.checkValidity();
     const feedback = document.querySelector(`#${field.id} ~ .invalid-feedback`);
@@ -40,19 +43,51 @@ function displayValidationMessages(validationMessages) {
     }
 }
 
+function clearValidationMessages() {
+    const allErrorsList = document.querySelector("#all-errors-list");
+    allErrorsList.replaceChildren();
+    const allNotEmptyInvalidFeedbackElements = document.querySelectorAll(".invalid-feedback:not(:empty)");
+    allNotEmptyInvalidFeedbackElements.forEach((element) => {
+        element.replaceChildren();
+    });
+}
+
+function resetInvalidFields() {
+    const invalidFields = document.querySelectorAll(".is-invalid");
+    invalidFields.forEach((field) => {
+        field.classList.remove("is-invalid");
+    });
+}
+
+function showLoadingText() {
+    formSubmitButton.disabled = true;
+    loadingText.classList.remove("d-none");
+    defaultText.classList.add("d-none");
+}
+
+function hideLoadingText() {
+    formSubmitButton.disabled = false;
+    loadingText.classList.add("d-none");
+    defaultText.classList.remove("d-none");
+}
+
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    showLoadingText();
+    resetInvalidFields();
+    clearValidationMessages();
     const data = new URLSearchParams();
     for (const pair of new FormData(form)) {
         data.append(pair[0], pair[1]);
     }
-    const response = await fetch(form.action, {
+    const response = await fetch(`${form.action}?response_format=json`, {
         method: "POST",
         body: data,
     });
     if (response.ok) {
-        return window.location.href = response.url;
+        return window.location.href = form.action;
     }
+    hideLoadingText();
     const responseData = await response.json();
     const validationMessages = responseData.feedback || {};
     displayValidationMessages(validationMessages);

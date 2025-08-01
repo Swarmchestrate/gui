@@ -18,7 +18,13 @@
             {% include 'field_templates/field_template.html' %}
             {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-primary mb-3">Register Capacity</button>
+            <button type="submit" class="btn btn-primary mb-3">
+                <span class="d-none loading-text">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Registering
+                </span>
+                <span>Register Capacity</span>
+            </button>
             <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>
         </form>
     </div>
