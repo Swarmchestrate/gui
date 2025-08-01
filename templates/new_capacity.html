@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block scripts %}
+<script type="module" src="{% static 'new_capacity.js' %}"></script>
+{% endblock scripts %}
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-xl-6">
         <h1>{{ title }}</h1>
-        <p class="lead">Register a new capacity.</p>
+        <p class="lead">Register a new Swarmchestrate capacity.</p>
         <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
         <form id="editor-form" action="" method="POST">
             {% for field in form %}
