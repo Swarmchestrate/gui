@@ -5,7 +5,7 @@
         <h1>{{ title }}</h1>
         <form id="editor-form" action="" method="POST">
             {% for field in form %}
-            {% if field.widget.input_type == 'checkbox' %}
+            {% if field.field.widget.input_type == 'checkbox' %}
             {% include 'field_templates/checkbox_field_wrapper.html' %}
             {% else %}
             {% include 'field_templates/field_template.html' %}
