@@ -5,6 +5,19 @@ body {
     font-style: normal;
 }
 
+/* Skip to main content link */
+[href="#main"] {
+    position: absolute;
+    top: 0.5rem;
+    right: 100%; /* moves off screen */
+    z-index: 1;
+}
+
+[href="#main"]:focus {
+    left: 0.5rem;
+    right: auto;
+}
+
 label:has(~ :required)::after,
 :required ~ label::after {
     content: " *";
