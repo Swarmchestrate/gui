@@ -22,13 +22,15 @@
     <!-- A handy skip link for keyboard users -->
     <a href="#main" class="btn btn-light">Skip to main content</a>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a href="{% url 'index' %}" class="navbar-brand">Swarmchestrate</a>
+        <div class="container-xxl gx-sm-5 gx-4">
+            <a href="{% url 'index' %}" class="navbar-brand">
+                <img id="logo" src="https://www.swarmchestrate.eu/wp-content/uploads/2024/04/logo-horizontal.png" width="1425" height="300.45" alt="Swarmchestrate" id="logo" data-height-percentage="54" data-actual-width="1425" data-actual-height="300.45">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div id="navbar-content" class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <div id="navbar-content" class="collapse navbar-collapse flex-grow-0">
+                <ul class="navbar-nav mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a href="{% url 'new_capacity' %}" class="nav-link">New Capacity</a>
                     </li>

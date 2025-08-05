@@ -22,6 +22,13 @@ a {
     right: auto;
 }
 
+/* Navbar */
+#logo {
+    width: auto;
+    max-height: 53px;
+}
+
+/* Home page menu */
 #home-menu-links .card {
     border-width: 0.15rem;
 }
