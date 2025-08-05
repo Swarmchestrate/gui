@@ -24,7 +24,7 @@ class OpenApiFormat(Enum):
     UUID = 'uuid'
 
 
-class NewCapacityForm(forms.Form):
+class OpenApiSpecBasedForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
@@ -55,3 +55,11 @@ class NewCapacityForm(forms.Form):
                 return ConfiguredIntegerField(field_metadata, is_required=is_required).field_instance
             case _:
                 return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
+
+
+class NewCapacityForm(OpenApiSpecBasedForm):
+    pass
+
+
+class NewApplicationForm(OpenApiSpecBasedForm):
+    pass

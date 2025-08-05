@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('new-capacity/', views.CapacityEditorFormView.as_view(), name='new_capacity'),
+    path('new-application/', views.ApplicationEditorFormView.as_view(), name='new_application'),
 ]

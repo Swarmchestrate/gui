@@ -1,3 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
+<ul id="home-menu-links" class="row row-cols-1 g-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title">
+                    <a href="{% url 'new_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Capacity</a>
+                </div>
+                <p class="card-text">Register a new Swarmchestrate capacity.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title">
+                    <a href="{% url 'new_application' %}" class="fw-medium text-decoration-none stretched-link">Register a New Application</a>
+                </div>
+                <p class="card-text">Register a new Swarmchestrate application.</p>
+            </div>
+        </div>
+    </div>
+</ul>
 {% endblock content %}

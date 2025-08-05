@@ -5,6 +5,10 @@ body {
     font-style: normal;
 }
 
+a {
+    color: var(--swrmch-link-colour);
+}
+
 /* Skip to main content link */
 [href="#main"] {
     position: absolute;
@@ -18,8 +22,31 @@ body {
     right: auto;
 }
 
+#home-menu-links .card {
+    border-width: 0.15rem;
+}
+
+#home-menu-links .card a {
+    color: var(--bs-body-color);
+}
+
+#home-menu-links .card:has(a:hover),
+#home-menu-links .card:has(a:focus-visible) {
+    --bs-border-opacity: 1;
+    border-color: var(--swrmch-link-colour);
+}
+
+#home-menu-links .card a:hover,
+#home-menu-links .card a:focus-visible {
+    color: var(--swrmch-link-colour);
+}
+
 label:has(~ :required)::after,
 :required ~ label::after {
     content: " *";
     color: var(--bs-danger);
+}
+
+:root {
+    --swrmch-link-colour: #0455bf;
 }

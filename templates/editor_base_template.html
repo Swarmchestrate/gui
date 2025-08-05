@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-6">
+        <h1>{{ title }}</h1>
+        <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
+        <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+        <form id="editor-form" action="{{ request.path }}" method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+            {% include 'field_templates/checkbox_field_wrapper.html' %}
+            {% else %}
+            {% include 'field_templates/field_template.html' %}
+            {% endif %}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary mb-3">
+                <span class="d-none loading-text">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Registering
+                </span>
+                <span>{% block submit_text %}Register{% endblock submit_text %}</span>
+            </button>
+            <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>
+        </form>
+    </div>
+</div>
+{% endblock content %}
