@@ -13,9 +13,6 @@ from .form_utils import (
 )
 
 
-CAPACITY_PATH = '/model'
-
-
 class OpenApiFormat(Enum):
     BOOLEAN = 'boolean'
     CHARACTER_VARYING = 'character varying'
@@ -25,11 +22,13 @@ class OpenApiFormat(Enum):
 
 
 class OpenApiSpecBasedForm(forms.Form):
+    form_path = ''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        post_parameters_schema = next(iter(parser.specification.get('paths').get(CAPACITY_PATH).get('post').get('parameters'))).get('schema')
-        required_field_names = post_parameters_schema.get('required')
+        post_parameters_schema = next(iter(parser.specification.get('paths').get(self.form_path).get('post').get('parameters'))).get('schema')
+        required_field_names = post_parameters_schema.get('required', list())
         fields = post_parameters_schema.get('properties')
         for field_key, field_metadata in fields.items():
             is_required = field_key in required_field_names
@@ -58,8 +57,8 @@ class OpenApiSpecBasedForm(forms.Form):
 
 
 class NewCapacityForm(OpenApiSpecBasedForm):
-    pass
+    form_path = '/capacity'
 
 
 class NewApplicationForm(OpenApiSpecBasedForm):
-    pass
+    form_path = '/application'

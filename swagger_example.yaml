@@ -1,0 +1,70 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Sample API
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+paths:
+  /application:
+    post:
+      tags:
+        - application
+      parameters:
+        - $ref: '#/parameters/body.application'
+      responses:
+        '201':
+          description: Created
+  /capacity:
+    post:
+      tags:
+        - capacity
+      parameters:
+        - $ref: '#/parameters/body.capacity'
+      responses:
+        '201':
+          description: Created
+definitions:
+  application:
+    required:
+      - name
+      - description
+    properties:
+      name:
+        format: character varying
+        type: string
+        description: |
+          Name of the application
+      description:
+        format: character varying
+        type: string
+        description: |
+          Description of the application
+  capacity:
+    required:
+      - name
+      - description
+    properties:
+      name:
+        format: character varying
+        type: string
+        description: |
+          Name of the capacity
+      description:
+        format: character varying
+        type: string
+        description: |
+          Description of the capacity
+parameters:
+  body.application:
+    name: application
+    description: application
+    required: false
+    schema:
+      $ref: '#/definitions/application'
+    in: body
+  body.capacity:
+    name: capacity
+    description: capacity
+    required: false
+    schema:
+      $ref: '#/definitions/capacity'
+    in: body
