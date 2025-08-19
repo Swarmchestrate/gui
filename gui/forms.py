@@ -27,7 +27,11 @@ class OpenApiSpecBasedForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        post_parameters_schema = next(iter(parser.specification.get('paths').get(self.form_path).get('post').get('parameters'))).get('schema')
+        post_parameters_schema = next(iter(parser.specification
+                                    .get('paths')
+                                    .get(self.form_path)
+                                    .get('post')
+                                    .get('parameters'))).get('schema')
         required_field_names = post_parameters_schema.get('required', list())
         fields = post_parameters_schema.get('properties')
         for field_key, field_metadata in fields.items():
@@ -57,6 +61,14 @@ class OpenApiSpecBasedForm(forms.Form):
 
 
 class NewCapacityForm(OpenApiSpecBasedForm):
+    form_path = '/capacity'
+
+
+class NewCloudCapacityForm(OpenApiSpecBasedForm):
+    form_path = '/capacity'
+
+
+class NewEdgeCapacityForm(OpenApiSpecBasedForm):
     form_path = '/capacity'
 
 

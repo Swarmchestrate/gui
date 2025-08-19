@@ -23,5 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('new-capacity/', views.CapacityEditorFormView.as_view(), name='new_capacity'),
+    path('new-cloud-capacity/', views.CloudCapacityEditorFormView.as_view(), name='new_cloud_capacity'),
+    path('new-edge-capacity/', views.EdgeCapacityEditorFormView.as_view(), name='new_edge_capacity'),
     path('new-application/', views.ApplicationEditorFormView.as_view(), name='new_application'),
 ]
