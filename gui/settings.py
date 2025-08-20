@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'compressor',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +133,19 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = 'staticfiles/'
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# django-compressor
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'sass {infile} {outfile}'),
+)

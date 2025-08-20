@@ -4,6 +4,8 @@ certifi==2025.7.14
 chardet==5.2.0
 charset-normalizer==3.4.2
 Django==5.2.4
+django-appconf==1.1.0
+django-compressor==4.5.1
 idna==3.10
 jsonschema==4.25.0
 jsonschema-path==0.3.4
@@ -16,9 +18,11 @@ pathable==0.4.4
 prance==25.4.8.0
 python-dotenv==1.1.1
 PyYAML==6.0.2
+rcssmin==1.1.2
 referencing==0.36.2
 requests==2.32.4
 rfc3339-validator==0.1.4
+rjsmin==1.2.2
 rpds-py==0.26.0
 ruamel.yaml==0.18.14
 ruamel.yaml.clib==0.2.12
