@@ -1,35 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-<ul id="home-menu-links" class="row row-cols-1 g-4">
-    <div class="col">
-        <div class="card">
-            <div class="card-body">
-                <div class="card-title">
-                    <a href="{% url 'new_cloud_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Cloud Capacity</a>
+<section>
+    <h2 class="fs-6 text-body-secondary">Capacities</h2>
+    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
+        <li class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a href="{% url 'new_cloud_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Cloud Capacity</a>
+                    </div>
+                    <p class="card-text">Register a new Swarmchestrate Cloud Capacity.</p>
                 </div>
-                <p class="card-text">Register a new Swarmchestrate Cloud Capacity.</p>
             </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card">
-            <div class="card-body">
-                <div class="card-title">
-                    <a href="{% url 'new_edge_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Edge Capacity</a>
+        </li>
+        <li class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a href="{% url 'new_edge_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Edge Capacity</a>
+                    </div>
+                    <p class="card-text">Register a new Swarmchestrate Edge Capacity.</p>
                 </div>
-                <p class="card-text">Register a new Swarmchestrate Edge Capacity.</p>
             </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card">
-            <div class="card-body">
-                <div class="card-title">
-                    <a href="{% url 'new_application' %}" class="fw-medium text-decoration-none stretched-link">Register a New Application</a>
+        </li>
+    </ul>
+</section>
+<section>
+    <h2 class="fs-6 text-body-secondary">Applications</h2>
+    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
+        <li class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a href="{% url 'new_application' %}" class="fw-medium text-decoration-none stretched-link">Register a New Application</a>
+                    </div>
+                    <p class="card-text">Register a new Swarmchestrate application.</p>
                 </div>
-                <p class="card-text">Register a new Swarmchestrate application.</p>
             </div>
-        </div>
-    </div>
-</ul>
+        </li>
+    </ul>
+</section>
 {% endblock content %}

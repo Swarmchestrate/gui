@@ -1,4 +1,12 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
+    min-height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;
     font-family: "Overpass", sans-serif;
     font-optical-sizing: auto;
     /* font-weight: 400; */
@@ -6,7 +14,11 @@ body {
 }
 
 a {
-    color: var(--swrmch-link-colour);
+    color: var(--swrm-link-colour);
+}
+
+section {
+    padding-block: 1rem;
 }
 
 /* Skip to main content link */
@@ -28,24 +40,33 @@ a {
     max-height: 53px;
 }
 
+/* Footer */
+.footer {
+    grid-row-start: 2;
+    grid-row-end: 3;
+    padding-block: 2rem;
+    background-color: var(--swrm-footer-bg-colour);
+    color: rgb(var(--bs-light-rgb));
+}
+
 /* Home page menu */
-#home-menu-links .card {
+.home-menu-links .card {
     border-width: 0.15rem;
 }
 
-#home-menu-links .card a {
+.home-menu-links .card a {
     color: var(--bs-body-color);
 }
 
-#home-menu-links .card:has(a:hover),
-#home-menu-links .card:has(a:focus-visible) {
+.home-menu-links .card:has(a:hover),
+.home-menu-links .card:has(a:focus-visible) {
     --bs-border-opacity: 1;
-    border-color: var(--swrmch-link-colour);
+    border-color: var(--swrm-link-colour);
 }
 
-#home-menu-links .card a:hover,
-#home-menu-links .card a:focus-visible {
-    color: var(--swrmch-link-colour);
+.home-menu-links .card a:hover,
+.home-menu-links .card a:focus-visible {
+    color: var(--swrm-link-colour);
 }
 
 label:has(~ :required)::after,
@@ -55,5 +76,6 @@ label:has(~ :required)::after,
 }
 
 :root {
-    --swrmch-link-colour: #0455bf;
+    --swrm-link-colour: #0455bf;
+    --swrm-footer-bg-colour: #162d73;
 }
