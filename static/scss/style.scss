@@ -1,3 +1,21 @@
+// Required
+@import "../bootstrap/scss/functions";
+
+// Default variable overrides
+$primary: #0455bf;
+
+// Required
+@import "../bootstrap/scss/variables";
+@import "../bootstrap/scss/variables-dark";
+@import "../bootstrap/scss/maps";
+@import "../bootstrap/scss/mixins";
+@import "../bootstrap/scss/root";
+
+// Optional Bootstrap components here
+@import "../bootstrap/scss/buttons";
+@import "../bootstrap/scss/dropdown";
+@import "../bootstrap/scss/forms";
+
 html, body {
     height: 100%;
     margin: 0;
