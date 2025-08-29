@@ -1,3 +1,4 @@
+import json
 import os
 from django import forms
 from django.conf import settings
@@ -16,24 +17,20 @@ from .form_utils import (
 class OpenApiFormat(Enum):
     BOOLEAN = 'boolean'
     CHARACTER_VARYING = 'character varying'
-    DATE = 'date'
+    DATE = 'timestamp without time zone'
     INTEGER = 'integer'
     UUID = 'uuid'
 
 
 class OpenApiSpecBasedForm(forms.Form):
-    form_path = ''
+    definition_name = ''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        post_parameters_schema = next(iter(parser.specification
-                                    .get('paths')
-                                    .get(self.form_path)
-                                    .get('post')
-                                    .get('parameters'))).get('schema')
-        required_field_names = post_parameters_schema.get('required', list())
-        fields = post_parameters_schema.get('properties')
+        definition = parser.specification.get('definitions', {}).get(self.definition_name, {})
+        required_field_names = definition.get('required', list())
+        fields = definition.get('properties')
         for field_key, field_metadata in fields.items():
             is_required = field_key in required_field_names
             new_field = self._get_configured_field(field_metadata, is_required=is_required)
@@ -61,16 +58,16 @@ class OpenApiSpecBasedForm(forms.Form):
 
 
 class NewCapacityForm(OpenApiSpecBasedForm):
-    form_path = '/capacity'
+    definition_name = 'capacity'
 
 
 class NewCloudCapacityForm(OpenApiSpecBasedForm):
-    form_path = '/capacity'
+    definition_name = 'capacity'
 
 
 class NewEdgeCapacityForm(OpenApiSpecBasedForm):
-    form_path = '/capacity'
+    definition_name = 'capacity'
 
 
 class NewApplicationForm(OpenApiSpecBasedForm):
-    form_path = '/application'
+    definition_name = 'application'
