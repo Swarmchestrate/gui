@@ -52,6 +52,21 @@ class ConfiguredCharField(DefaultConfiguredField):
     field_class = forms.CharField
     widget_class = forms.TextInput
 
+    def get_field_kwargs(self) -> dict:
+        kwargs = super().get_field_kwargs()
+        max_length = self.field_properties.get('maxLength')
+        if not max_length:
+            return kwargs
+        kwargs.update({
+            'max_length': max_length,
+        })
+        return kwargs
+
+
+class ConfiguredChoiceField(DefaultConfiguredField):
+    field_class = forms.ChoiceField
+    widget_class = forms.Select
+
 
 class ConfiguredDateField(DefaultConfiguredField):
     field_class = forms.DateField
@@ -61,3 +76,13 @@ class ConfiguredDateField(DefaultConfiguredField):
 class ConfiguredIntegerField(DefaultConfiguredField):
     field_class = forms.IntegerField
     widget_class = forms.NumberInput
+
+
+class ConfiguredMultipleChoiceField(DefaultConfiguredField):
+    field_class = forms.MultipleChoiceField
+    widget_class = forms.SelectMultiple
+
+
+class ConfiguredTextField(DefaultConfiguredField):
+    field_class = forms.CharField
+    widget_class = forms.Textarea

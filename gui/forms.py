@@ -1,4 +1,3 @@
-import json
 import os
 from django import forms
 from django.conf import settings
@@ -11,6 +10,7 @@ from .form_utils import (
     ConfiguredCharField,
     ConfiguredDateField,
     ConfiguredIntegerField,
+    ConfiguredTextField,
 )
 
 
@@ -19,7 +19,8 @@ class OpenApiFormat(Enum):
     CHARACTER_VARYING = 'character varying'
     DATE = 'timestamp without time zone'
     INTEGER = 'integer'
-    UUID = 'uuid'
+    TEXT = 'text'
+    TEXT_ARRAY = 'text[]'
 
 
 class OpenApiSpecBasedForm(forms.Form):
@@ -47,12 +48,16 @@ class OpenApiSpecBasedForm(forms.Form):
         match field_format:
             case OpenApiFormat.BOOLEAN:
                 return ConfiguredBooleanField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.CHARACTER_VARYING | OpenApiFormat.UUID:
+            case OpenApiFormat.CHARACTER_VARYING:
                 return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
             case OpenApiFormat.DATE:
                 return ConfiguredDateField(field_metadata, is_required=is_required).field_instance
             case OpenApiFormat.INTEGER:
                 return ConfiguredIntegerField(field_metadata, is_required=is_required).field_instance
+            case OpenApiFormat.TEXT:
+                return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
+            case OpenApiFormat.TEXT_ARRAY:
+                return ConfiguredTextField(field_metadata, is_required=is_required).field_instance
             case _:
                 return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
 
