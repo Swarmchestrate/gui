@@ -10,9 +10,9 @@
             {% csrf_token %}
             {% for field in form %}
             {% if field.field.widget.input_type == 'checkbox' %}
-            {% include 'field_templates/checkbox_field_wrapper.html' %}
+            {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
             {% else %}
-            {% include 'field_templates/field_template.html' %}
+            {% include 'editor/field_templates/field_template.html' %}
             {% endif %}
             {% endfor %}
             <button type="submit" class="btn btn-primary mb-3">

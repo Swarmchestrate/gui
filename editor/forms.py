@@ -60,19 +60,3 @@ class OpenApiSpecBasedForm(forms.Form):
                 return ConfiguredTextField(field_metadata, is_required=is_required).field_instance
             case _:
                 return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
-
-
-class NewCapacityForm(OpenApiSpecBasedForm):
-    definition_name = 'capacity'
-
-
-class NewCloudCapacityForm(OpenApiSpecBasedForm):
-    definition_name = 'capacity'
-
-
-class NewEdgeCapacityForm(OpenApiSpecBasedForm):
-    definition_name = 'capacity'
-
-
-class NewApplicationForm(OpenApiSpecBasedForm):
-    definition_name = 'application'

@@ -1,8 +1,8 @@
-{% extends 'field_templates/field_wrapper_template.html' %}
+{% extends 'editor/field_templates/field_wrapper_template.html' %}
 {% block content %}
 {{ field }}
 <label class="form-check-label" for="{{ field.auto_id }}">
     {{ field.label }}
 </label>
-{% include 'field_templates/field_invalid_feedback.html' %}
+{% include 'editor/field_templates/field_invalid_feedback.html' %}
 {% endblock content %}

@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.forms',
     'compressor',
+    'applications.apps.ApplicationsConfig',
+    'capacities.apps.CapacitiesConfig',
+    'editor.apps.EditorConfig',
 ]
 
 MIDDLEWARE = [
