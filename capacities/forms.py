@@ -1,9 +1,9 @@
-from editor.forms import OpenApiSpecBasedForm
+from editor.forms import OpenApiSpecificationFieldFormatBasedForm
 
 
-class NewCloudCapacityForm(OpenApiSpecBasedForm):
+class NewCloudCapacityForm(OpenApiSpecificationFieldFormatBasedForm):
     definition_name = 'capacity'
 
 
-class NewEdgeCapacityForm(OpenApiSpecBasedForm):
+class NewEdgeCapacityForm(OpenApiSpecificationFieldFormatBasedForm):
     definition_name = 'capacity'

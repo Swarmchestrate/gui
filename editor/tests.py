@@ -1,3 +1,10 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-# Create your tests here.
+from editor.api_client import ApiClient
+
+
+class ApiClientTestCase(SimpleTestCase):
+    def test_get_schema(self):
+        client = ApiClient()
+        schema = client.get_openapi_spec()
+        self.assertIsInstance(schema, dict)

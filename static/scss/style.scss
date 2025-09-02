@@ -93,6 +93,19 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+/* Editor */
+.editor-toc-list {
+    list-style-type: none;
+}
+
+.editor-toc-list li + li {
+    padding-block-start: 0.25rem;
+}
+
+.editor-toc-list li > ul {
+    padding-block-start: 0.25rem;
+}
+
 :root {
     --swrm-link-colour: #0455bf;
     --swrm-footer-bg-colour: #162d73;

@@ -1,8 +1,6 @@
-import os
-from django import forms
-from django.conf import settings
 from enum import Enum
-from prance import ResolvingParser
+
+from django import forms
 
 from .form_utils import (
     DefaultConfiguredField,
@@ -12,6 +10,8 @@ from .form_utils import (
     ConfiguredIntegerField,
     ConfiguredTextField,
 )
+
+from editor.api_client import ApiClient
 
 
 class OpenApiFormat(Enum):
@@ -23,16 +23,21 @@ class OpenApiFormat(Enum):
     TEXT_ARRAY = 'text[]'
 
 
-class OpenApiSpecBasedForm(forms.Form):
+class OpenApiSpecificationBasedForm(forms.Form):
     definition_name = ''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, api_client: ApiClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        definition = parser.specification.get('definitions', {}).get(self.definition_name, {})
-        required_field_names = definition.get('required', list())
-        fields = definition.get('properties')
-        for field_key, field_metadata in fields.items():
+        self.api_client = api_client
+        field_data = self.get_data_for_form_fields()
+        required_field_names = self.api_client.get_required_field_names()
+        self.populate_form_fields(field_data, required_field_names)
+
+    def get_data_for_form_fields(self):
+        return self.api_client.get_all_fields()
+
+    def populate_form_fields(self, field_data: dict, required_field_names: list):
+        for field_key, field_metadata in field_data.items():
             is_required = field_key in required_field_names
             new_field = self._get_configured_field(field_metadata, is_required=is_required)
             self.fields.update({
@@ -60,3 +65,12 @@ class OpenApiSpecBasedForm(forms.Form):
                 return ConfiguredTextField(field_metadata, is_required=is_required).field_instance
             case _:
                 return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
+
+
+class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
+    def __init__(self, api_client: ApiClient, field_format: str, *args, **kwargs):
+        self.field_format = field_format
+        super().__init__(api_client, *args, **kwargs)
+
+    def get_data_for_form_fields(self):
+        return self.api_client.get_fields_with_format(self.field_format)

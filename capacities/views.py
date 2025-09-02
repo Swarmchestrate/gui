@@ -1,9 +1,11 @@
 from django.urls import reverse_lazy
 
+from .api_client import CapacityApiClient
 from .forms import (
     NewCloudCapacityForm,
     NewEdgeCapacityForm,
 )
+
 from editor.views import EditorFormView
 
 
@@ -11,6 +13,8 @@ class CloudCapacityEditorFormView(EditorFormView):
     template_name = 'capacities/new_cloud_capacity.html'
     form_class = NewCloudCapacityForm
     success_url = reverse_lazy('new_cloud_capacity')
+
+    api_client_class = CapacityApiClient
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
