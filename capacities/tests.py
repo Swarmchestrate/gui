@@ -2,7 +2,11 @@ import json
 
 from django.test import SimpleTestCase
 
-from .api_client import CapacityApiClient
+from .api_client import (
+    CapacityApiClient,
+    CloudCapacityApiClient,
+    EdgeCapacityApiClient,
+)
 
 
 class CapacityApiClientTestCase(SimpleTestCase):
@@ -24,3 +28,41 @@ class CapacityApiClientTestCase(SimpleTestCase):
         client = CapacityApiClient()
         field_formats = client.get_field_formats()
         self.assertIsInstance(field_formats, list)
+
+
+class CloudCapacityApiClientTestCase(SimpleTestCase):
+    def test_get_cloud_capacities(self):
+        client = CloudCapacityApiClient()
+        capacities = client.get_registered_cloud_capacities()
+        self.assertIsInstance(capacities, list)
+
+    def test_register_cloud_capacity(self):
+        client = CloudCapacityApiClient()
+        data = {
+            'capacity_id': 5,
+        }
+        client.register_cloud_capacity(data)
+
+    def test_delete_cloud_capacity(self):
+        client = CloudCapacityApiClient()
+        id = 5
+        client.delete_cloud_capacity(id)
+
+
+class EdgeCapacityApiClientTestCase(SimpleTestCase):
+    def test_get_edge_capacities(self):
+        client = EdgeCapacityApiClient()
+        capacities = client.get_registered_edge_capacities()
+        self.assertIsInstance(capacities, list)
+
+    def test_register_cloud_capacity(self):
+        client = EdgeCapacityApiClient()
+        data = {
+            'capacity_id': 5,
+        }
+        client.register_edge_capacity(data)
+
+    def test_delete_edge_capacity(self):
+        client = EdgeCapacityApiClient()
+        id = 5
+        client.delete_edge_capacity(id)

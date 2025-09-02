@@ -12,6 +12,10 @@ class ApiClient:
         self.api_url = os.environ.get('API_URL')
         self.openapi_spec_url = os.environ.get('OPENAPI_SPEC_URL')
 
+    @property
+    def endpoint_url(self):
+        return f'{self.api_url}/{self.endpoint}'
+
     def _get_definition(self):
         openapi_spec = self.get_openapi_spec()
         return (openapi_spec
@@ -47,3 +51,11 @@ class ApiClient:
             value.get('format')
             for value in definition_properties.values()
         ))
+
+    def get_fields_with_names(self, names: list[str]):
+        definition_properties = self._get_definition().get('properties', {})
+        return {
+            key: value
+            for key, value in definition_properties.items()
+            if key in names
+        }
