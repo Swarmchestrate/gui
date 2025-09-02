@@ -1,10 +1,12 @@
-<ul class="editor-toc-list list-unstyled">
-    <li>
+<ul class="nav flex-column">
+    <li class="nav-item">
         Configuration
-        <ul class="editor-toc-list">
+        <ul class="nav flex-column py-1">
             {% for list_item in toc_list_items %}
-            <li>
-                <a href="{% url request.resolver_match.url_name list_item %}">{{ list_item }}</a>
+            <li class="nav-item">
+                <a
+                    href="{% url request.resolver_match.url_name list_item %}"
+                    class="nav-link{% if current_field_format == list_item %} active{% endif %} py-1">{{ list_item }}</a>
             </li>
             {% endfor %}
         </ul>

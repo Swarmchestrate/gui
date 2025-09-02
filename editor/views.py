@@ -57,7 +57,7 @@ class EditorFormView(EditorView, FormView):
             'title': f'{self.title_base} | {self.field_format}',
             'main_subheading': self.title_base,
             'main_heading': self.field_format,
-            'field_format': self.field_format,
+            'current_field_format': self.field_format,
             'prev_list_item': prev_list_item,
             'next_list_item': next_list_item,
         })
