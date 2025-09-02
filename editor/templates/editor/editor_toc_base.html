@@ -1,0 +1,13 @@
+<ul class="editor-toc-list list-unstyled">
+    <li>
+        Configuration
+        <ul class="editor-toc-list">
+            {% for list_item in toc_list_items %}
+            <li>
+                <a href="{% url request.resolver_match.url_name list_item %}">{{ list_item }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
+    <li>Review & Submit</li>
+</ul>

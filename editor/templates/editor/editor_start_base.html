@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-3">
+        {% include 'editor/editor_toc_base.html' %}
+    </div>
+    <div class="col-xl-6">
+        <h1>{{ title }}</h1>
+        <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
+        <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+        <a href="{{ start_url }}" class="btn btn-primary">Start</a>
+    </div>
+</div>
+{% endblock content %}

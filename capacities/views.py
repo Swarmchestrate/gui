@@ -6,32 +6,36 @@ from .forms import (
     NewEdgeCapacityForm,
 )
 
-from editor.views import EditorFormView
+from editor.views import EditorView, EditorFormView, EditorStartTemplateView
 
 
-class CloudCapacityEditorFormView(EditorFormView):
+# Cloud Capacity
+class CloudCapacityEditorView(EditorView):
+    title_base = 'New Cloud Capacity'
+    api_client_class = CapacityApiClient
+
+
+class CloudCapacityEditorStartTemplateView(CloudCapacityEditorView, EditorStartTemplateView):
+    template_name = 'capacities/new_cloud_capacity_start.html'
+
+
+class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
     template_name = 'capacities/new_cloud_capacity.html'
     form_class = NewCloudCapacityForm
     success_url = reverse_lazy('new_cloud_capacity')
 
+
+# Edge Capacity
+class EdgeCapacityEditorView(EditorView):
+    title_base = 'New Edge Capacity'
     api_client_class = CapacityApiClient
 
-    def get_context_data(self, **kwargs) -> dict:
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'title': 'New Cloud Capacity',
-        }) 
-        return context
+
+class EdgeCapacityEditorStartTemplateView(EdgeCapacityEditorView, EditorStartTemplateView):
+    template_name = 'capacities/new_edge_capacity_start.html'
 
 
-class EdgeCapacityEditorFormView(EditorFormView):
+class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
     template_name = 'capacities/new_edge_capacity.html'
     form_class = NewEdgeCapacityForm
     success_url = reverse_lazy('new_edge_capacity')
-
-    def get_context_data(self, **kwargs) -> dict:
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'title': 'New Edge Capacity',
-        }) 
-        return context
