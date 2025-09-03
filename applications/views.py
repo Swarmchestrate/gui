@@ -1,9 +1,13 @@
 from django.urls import reverse_lazy
 
 from .api_client import ApplicationApiClient
-from .forms import ApplicationEditorForm
+from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 
-from editor.views import EditorView, EditorFormView, EditorStartTemplateView
+from editor.views import (
+    EditorView,
+    EditorFormView,
+    EditorStartFormView
+)
 
 
 class ApplicationEditorView(EditorView):
@@ -11,8 +15,9 @@ class ApplicationEditorView(EditorView):
     api_client_class = ApplicationApiClient
 
 
-class ApplicationEditorStartTemplateView(ApplicationEditorView, EditorStartTemplateView):
+class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):
     template_name = 'applications/new_application_start.html'
+    form_class = ApplicationRegistrationForm
 
 
 class ApplicationEditorFormView(ApplicationEditorView, EditorFormView):

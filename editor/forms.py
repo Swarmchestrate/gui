@@ -83,3 +83,8 @@ class OpenApiSpecificationSpecifiedFieldsBasedForm(OpenApiSpecificationBasedForm
 
     def get_data_for_form_fields(self):
         return self.api_client.get_fields_with_names(self.field_names)
+
+
+class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
+    def get_data_for_form_fields(self):
+        return self.api_client.get_required_fields()

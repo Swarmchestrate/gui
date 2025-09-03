@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic import FormView, TemplateView, View
+from django.views.generic import FormView, View
 
 from .api_client import ApiClient
 
@@ -21,7 +21,7 @@ class EditorView(View):
     
 
 
-class EditorStartTemplateView(EditorView, TemplateView):
+class EditorStartFormView(EditorView, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -29,6 +29,13 @@ class EditorStartTemplateView(EditorView, TemplateView):
             'start_url': reverse_lazy(self.request.resolver_match.url_name, kwargs={'field_format': next(iter(self.api_client_class().get_field_formats()))}),
         })
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'api_client': self.api_client_class(),
+        })
+        return kwargs
 
 
 class EditorFormView(EditorView, FormView):

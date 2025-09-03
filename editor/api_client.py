@@ -68,18 +68,27 @@ class ApiClient:
     def get_all_fields(self):
         return self._get_definition().get('properties', {})
 
-    def get_fields_with_format(self, format: str):
-        definition_properties = self._get_definition().get('properties', {})
+    def get_required_fields(self):
+        required_field_names = self.get_required_field_names()
+        all_fields = self.get_all_fields()
         return {
             key: value
-            for key, value in definition_properties.items()
+            for key, value in all_fields.items()
+            if key in required_field_names
+        }
+
+    def get_fields_with_format(self, format: str):
+        all_fields = self.get_all_fields()
+        return {
+            key: value
+            for key, value in all_fields.items()
             if value.get('format') == format
         }
 
     def get_fields_with_names(self, names: list[str]):
-        definition_properties = self._get_definition().get('properties', {})
+        all_fields = self.get_all_fields()
         return {
             key: value
-            for key, value in definition_properties.items()
+            for key, value in all_fields.items()
             if key in names
         }

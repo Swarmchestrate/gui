@@ -1,14 +1,18 @@
 from editor.forms import (
     OpenApiSpecificationFieldFormatBasedForm,
-    OpenApiSpecificationSpecifiedFieldsBasedForm,
+    OpenApiSpecificationBasedRegistrationForm,
 )
 
 
-class CloudCapacityRegistrationForm(OpenApiSpecificationSpecifiedFieldsBasedForm):
+class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
 
 
 class CloudCapacityEditorForm(OpenApiSpecificationFieldFormatBasedForm):
+    definition_name = 'capacity'
+
+
+class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
 
 
