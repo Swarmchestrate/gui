@@ -33,6 +33,16 @@ class ApiClient:
         # return response.json()
 
     # Registrations
+    def get(self, registration_id: int):
+        response = requests.get(
+            self.endpoint_url,
+            params={
+                self.id_field: registration_id,
+            }
+        )
+        response.raise_for_status()
+        return response.json()
+
     def get_registrations(self, params: dict = dict()):
         response = requests.get(
             self.endpoint_url,
@@ -42,8 +52,7 @@ class ApiClient:
         return response.json()
 
     def register(self, data: dict):
-        print('data', data)
-        response = requests.post(self.endpoint_url, data=data)
+        response = requests.post(self.endpoint_url, json=data)
         response.raise_for_status()
 
     def delete(self, registration_id: int, params: dict = dict()):
