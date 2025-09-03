@@ -23,7 +23,10 @@ class CapacityApiClient(BaseCapacityApiClient):
 
 class CloudCapacityApiClient(BaseCapacityApiClient):
     def get_registered_cloud_capacities(self):
-        response = requests.get(f'{self.endpoint_url}?resource_type=eq.Cloud')
+        response = requests.get(
+            self.endpoint_url,
+            params={'resource_type': 'eq.Cloud'}
+        )
         response.raise_for_status()
         return response.json()
 
@@ -35,13 +38,22 @@ class CloudCapacityApiClient(BaseCapacityApiClient):
         response.raise_for_status()
 
     def delete_cloud_capacity(self, id: int):
-        response = requests.delete(f'{self.endpoint_url}?capacity_id=eq.{id}&resource_type=eq.Cloud')
+        response = requests.delete(
+            self.endpoint_url,
+            params={
+                'capacity_id': f'eq.{id}',
+                'resource_type': 'eq.Cloud'
+            }
+        )
         response.raise_for_status()
 
 
 class EdgeCapacityApiClient(BaseCapacityApiClient):
     def get_registered_edge_capacities(self):
-        response = requests.get(f'{self.endpoint_url}?resource_type=eq.Edge')
+        response = requests.get(
+            self.endpoint_url,
+            params={'resource_type': 'eq.Edge'}
+        )
         response.raise_for_status()
         return response.json()
 
@@ -53,5 +65,11 @@ class EdgeCapacityApiClient(BaseCapacityApiClient):
         response.raise_for_status()
 
     def delete_edge_capacity(self, id: int):
-        response = requests.delete(f'{self.endpoint_url}?capacity_id=eq.{id}&resource_type=eq.Edge')
+        response = requests.delete(
+            self.endpoint_url,
+            params={
+                'capacity_id': f'eq.{id}',
+                'resource_type': 'eq.Edge'
+            }
+        )
         response.raise_for_status()
