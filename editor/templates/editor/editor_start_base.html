@@ -9,7 +9,19 @@
         <h1>{{ title }}</h1>
         <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
         <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-        <a href="{{ start_url }}" class="btn btn-primary">Start</a>
+        <form id="registration-form" action="{{ request.path }}" method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+            {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+            {% else %}
+            {% include 'editor/field_templates/field_template.html' %}
+            {% endif %}
+            {% endfor %}
+            <div class="pt-4">
+                <button class="btn btn-primary" type="submit">Start</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock content %}
