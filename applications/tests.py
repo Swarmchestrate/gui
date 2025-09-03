@@ -4,23 +4,24 @@ from django.test import SimpleTestCase
 
 from .api_client import ApplicationApiClient
 
+from editor.test_mixins import ApplicationApiClientTestCaseHelperMixin
 
-class ApplicationApiClientTestCase(SimpleTestCase):
+
+class ApplicationApiClientTestCase(ApplicationApiClientTestCaseHelperMixin, SimpleTestCase):
+    api_client_class = ApplicationApiClient
+
     def test_get_registrations(self):
-        client = ApplicationApiClient()
-        applications = client.get_registrations()
+        applications = self.api_client.get_registrations()
         self.assertIsInstance(applications, list)
 
     def test_register(self):
-        client = ApplicationApiClient()
         data = {
-            'application_id': 5,
+            'application_id': self.generate_random_id(),
             'name': 'Weather Analytics App',
             'container_image': 'https://hub.docker.com/myorg/weather-analytics:latest',
         }
-        client.register(data)
+        self.api_client.register(data)
 
     def test_delete(self):
-        client = ApplicationApiClient()
-        id = 5
-        client.delete(id)
+        id = self.generate_random_id()
+        self.api_client.delete(id)
