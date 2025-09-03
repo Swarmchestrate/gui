@@ -74,3 +74,12 @@ class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
 
     def get_data_for_form_fields(self):
         return self.api_client.get_fields_with_format(self.field_format)
+
+
+class OpenApiSpecificationSpecifiedFieldsBasedForm(OpenApiSpecificationBasedForm):
+    def __init__(self, api_client: ApiClient, field_names: list[str], *args, **kwargs):
+        self.field_names = field_names
+        super().__init__(api_client, *args, **kwargs)
+
+    def get_data_for_form_fields(self):
+        return self.api_client.get_fields_with_names(self.field_names)

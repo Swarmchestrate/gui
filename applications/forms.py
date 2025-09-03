@@ -1,5 +1,5 @@
 from editor.forms import OpenApiSpecificationFieldFormatBasedForm
 
 
-class NewApplicationForm(OpenApiSpecificationFieldFormatBasedForm):
+class ApplicationEditorForm(OpenApiSpecificationFieldFormatBasedForm):
     definition_name = 'application'

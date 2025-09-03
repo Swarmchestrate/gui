@@ -1,12 +1,18 @@
 from django.urls import reverse_lazy
+from django.views.generic import FormView
 
 from .api_client import CapacityApiClient
 from .forms import (
-    NewCloudCapacityForm,
-    NewEdgeCapacityForm,
+    CloudCapacityRegistrationForm,
+    CloudCapacityEditorForm,
+    EdgeCapacityEditorForm,
 )
 
-from editor.views import EditorView, EditorFormView, EditorStartTemplateView
+from editor.views import (
+    EditorView,
+    EditorFormView,
+    EditorStartTemplateView
+)
 
 
 # Cloud Capacity
@@ -15,13 +21,22 @@ class CloudCapacityEditorView(EditorView):
     api_client_class = CapacityApiClient
 
 
-class CloudCapacityEditorStartTemplateView(CloudCapacityEditorView, EditorStartTemplateView):
+class CloudCapacityEditorStartTemplateView(CloudCapacityEditorView, EditorStartTemplateView, FormView):
     template_name = 'capacities/new_cloud_capacity_start.html'
+    form_class = CloudCapacityRegistrationForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'api_client': self.api_client_class(),
+            'field_names': [],
+        })
+        return kwargs
 
 
 class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
     template_name = 'capacities/new_cloud_capacity.html'
-    form_class = NewCloudCapacityForm
+    form_class = CloudCapacityEditorForm
     success_url = reverse_lazy('new_cloud_capacity')
 
 
@@ -37,5 +52,5 @@ class EdgeCapacityEditorStartTemplateView(EdgeCapacityEditorView, EditorStartTem
 
 class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
     template_name = 'capacities/new_edge_capacity.html'
-    form_class = NewEdgeCapacityForm
+    form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('new_edge_capacity')
