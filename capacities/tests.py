@@ -10,9 +10,9 @@ from .api_client import (
 
 
 class CapacityApiClientTestCase(SimpleTestCase):
-    def test_get_capacities(self):
+    def test_get(self):
         client = CapacityApiClient()
-        capacities = client.get_registered_capacities()
+        capacities = client.get_registrations()
         self.assertIsInstance(capacities, list)
 
     def test_get_fields_with_format(self):
@@ -31,38 +31,38 @@ class CapacityApiClientTestCase(SimpleTestCase):
 
 
 class CloudCapacityApiClientTestCase(SimpleTestCase):
-    def test_get_cloud_capacities(self):
+    def test_get_registrations(self):
         client = CloudCapacityApiClient()
-        capacities = client.get_registered_cloud_capacities()
+        capacities = client.get_registrations()
         self.assertIsInstance(capacities, list)
 
-    def test_register_cloud_capacity(self):
+    def test_register(self):
         client = CloudCapacityApiClient()
         data = {
             'capacity_id': 5,
         }
-        client.register_cloud_capacity(data)
+        client.register(data)
 
-    def test_delete_cloud_capacity(self):
+    def test_delete(self):
         client = CloudCapacityApiClient()
         id = 5
-        client.delete_cloud_capacity(id)
+        client.delete(id)
 
 
 class EdgeCapacityApiClientTestCase(SimpleTestCase):
-    def test_get_edge_capacities(self):
+    def test_get_registrations(self):
         client = EdgeCapacityApiClient()
-        capacities = client.get_registered_edge_capacities()
+        capacities = client.get_registrations()
         self.assertIsInstance(capacities, list)
 
-    def test_register_cloud_capacity(self):
+    def test_register(self):
         client = EdgeCapacityApiClient()
         data = {
             'capacity_id': 5,
         }
-        client.register_edge_capacity(data)
+        client.register(data)
 
-    def test_delete_edge_capacity(self):
+    def test_delete(self):
         client = EdgeCapacityApiClient()
         id = 5
-        client.delete_edge_capacity(id)
+        client.delete(id)
