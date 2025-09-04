@@ -101,11 +101,6 @@ class ApiClient:
     def get_required_field_names(self):
         return self._get_definition().get('required', list())
 
-    def get_required_field_names_specified_by_user(self):
-        required_field_names = set(self.get_required_field_names())
-        auto_generated_field_names = set(self.auto_generated_field_names())
-        return list(required_field_names - auto_generated_field_names)
-
     def auto_generated_field_names(self):
         return list([self.id_field])
 
@@ -132,9 +127,15 @@ class ApiClient:
         field_names = self.get_required_field_names()
         return self._get_fields_with_names(field_names)
 
+    def get_fields_with_names(self, names: list[str]):
+        return self._get_fields_with_names(names)
+
+    # User-specifiable fields
+    def get_required_field_names_specified_by_user(self):
+        required_field_names = set(self.get_required_field_names())
+        auto_generated_field_names = set(self.auto_generated_field_names())
+        return list(required_field_names - auto_generated_field_names)
+
     def get_required_fields_specified_by_user(self):
         field_names = self.get_required_field_names_specified_by_user()
         return self._get_fields_with_names(field_names)
-
-    def get_fields_with_names(self, names: list[str]):
-        return self._get_fields_with_names(names)
