@@ -40,12 +40,12 @@ class CloudCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCas
 
     def test_register(self):
         data = {
-            'capacity_id': self.generate_random_id(),
+            'capacity_id': self.generate_random_id_and_add_to_test_ids(),
         }
         self.api_client.register(data)
 
     def test_delete(self):
-        id = self.generate_random_id()
+        id = self.generate_random_id_and_add_to_test_ids()
         self.api_client.delete(id)
 
 
@@ -58,10 +58,10 @@ class EdgeCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase
 
     def test_register(self):
         data = {
-            'capacity_id': self.generate_random_id(),
+            'capacity_id': self.generate_random_id_and_add_to_test_ids(),
         }
         self.api_client.register(data)
 
     def test_delete(self):
-        id = self.generate_random_id()
+        id = self.generate_random_id_and_add_to_test_ids()
         self.api_client.delete(id)

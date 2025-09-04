@@ -1,4 +1,5 @@
 import os
+import random
 import requests
 from prance import ResolvingParser
 
@@ -12,10 +13,33 @@ class ApiClient:
         self.id_field = None
         self.api_url = os.environ.get('API_URL')
         self.openapi_spec_url = os.environ.get('OPENAPI_SPEC_URL')
+        self.random_id_min_value = 0
+        self.random_id_max_value = 999999
 
     @property
     def endpoint_url(self):
         return f'{self.api_url}/{self.endpoint}'
+
+    def _get_existing_registration_ids(self):
+        params = {
+            'select': f'{self.id_field}'
+        }
+        return [
+            data.get(self.id_field)
+            for data in self.get_registrations(params=params)
+        ]
+
+    def _generate_random_id(self):
+        existing_registration_ids = self._get_existing_registration_ids()
+        # Credit for random_id solution: https://stackoverflow.com/a/70239671
+        possible_ids_set = set(range(
+            self.random_id_min_value,
+            self.random_id_max_value
+        ))
+        existing_ids_set = set(existing_registration_ids)
+        possible_ids_set = possible_ids_set - existing_ids_set
+        random_id = random.choice(list(possible_ids_set))
+        return random_id
 
     def _get_definition(self):
         openapi_spec = self.get_openapi_spec()
