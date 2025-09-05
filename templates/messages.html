@@ -1,0 +1,32 @@
+{% if messages %}
+<div class="container-xxl gx-sm-5 gx-4">
+    <div class="messages-container mt-4 mb-5">
+        {% for message in messages %}
+        {# Unstyled message, in case of no tags #}
+        {% if 'info' in message.tags or not message.tags %}
+        {% include 'message.html' %}
+        {% endif %}
+
+        {# Messages #}
+        {% if message.tags %}
+        {% if 'success' in message.tags %}
+        {# Success message #}
+        {% with alert_type='success' bi_font_class='bi-check-circle-fill' bi_title='Success' %}
+        {% include 'message.html' %}
+        {% endwith %}
+        {% elif 'error' in message.tags %}
+        {# Error message #}
+        {% with alert_type='danger' bi_font_class='bi-exclamation-diamond-fill' bi_title='Error' %}
+        {% include 'message.html' %}
+        {% endwith %}
+        {% elif 'warning' in message.tags %}
+        {# Warning message #}
+        {% with alert_type='warning' bi_font_class='bi-exclamation-triangle-fill' bi_title='Warning' %}
+        {% include 'message.html' %}
+        {% endwith %}
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

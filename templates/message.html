@@ -1,0 +1,4 @@
+<div role="alert" class="d-flex align-items-baseline column-gap-4 alert alert-{{ alert_type|default:'light' }}">
+    <i class="bi {{ bi_font_class|default:'bi-info-circle-fill' }}" title="{{ bi_title|default:'Message' }}"></i>
+    <div>{{ message|safe }}</div>
+</div>
