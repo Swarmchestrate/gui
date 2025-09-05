@@ -41,7 +41,7 @@ class UserSpecifiableOpenApiDefinition(OpenApiDefinition):
         return {
             key: value
             for key, value in all_fields.items()
-            if value.get('name') not in self.auto_generated_field_names
+            if key not in self.auto_generated_field_names
         }
 
     def _get_required_user_specifiable_field_names(self):
