@@ -1,6 +1,7 @@
 import json
 from http import HTTPStatus
 
+from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView, View
@@ -9,15 +10,21 @@ from .api_endpoint_client import ApiEndpointClient
 
 
 class EditorView(View):
+    api_endpoint_client: ApiEndpointClient
+
     title_base = ''
     api_endpoint_client_class = ApiEndpointClient
-
-    def dispatch(self, request, *args, **kwargs):
+    
+    def _get_editor_url_reverse_base(self):
         app_name = self.request.resolver_match.app_name
         url_name = self.request.resolver_match.url_name
-        self.editor_url_reverse_base = url_name
-        if app_name:
-            self.editor_url_reverse_base = f'{app_name}:{url_name}'
+        if not app_name:
+            return url_name
+        return f'{app_name}:{url_name}'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.editor_url_reverse_base = self._get_editor_url_reverse_base()
+        self.api_endpoint_client = self.api_endpoint_client_class()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -33,20 +40,23 @@ class EditorView(View):
 
 
 class EditorStartFormView(EditorView, FormView):
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            self._get_editor_url_reverse_base(),
+            kwargs={
+                'field_format': next(iter(
+                    self.api_endpoint_client_class()
+                    .endpoint_definition
+                    .get_user_specifiable_field_formats()
+                ))
+            }
+        )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title_base,
-            'start_url': reverse_lazy(
-                self.editor_url_reverse_base,
-                kwargs={
-                    'field_format': next(iter(
-                        self.api_endpoint_client_class()
-                        .endpoint_definition
-                        .get_user_specifiable_field_formats()
-                    ))
-                }
-            ),
         })
         return context
 
@@ -56,6 +66,11 @@ class EditorStartFormView(EditorView, FormView):
             'api_endpoint_client': self.api_endpoint_client_class(),
         })
         return kwargs
+
+    def form_valid(self, form):
+        self.api_endpoint_client.register(form.cleaned_data)
+        messages.success(self.request, f'New {self.api_endpoint_client.endpoint_definition.definition_name} registered.')
+        return super().form_valid(form)
 
 
 class EditorFormView(EditorView, FormView):

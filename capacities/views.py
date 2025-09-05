@@ -25,7 +25,6 @@ class CloudCapacityEditorView(EditorView):
 class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormView, FormView):
     template_name = 'capacities/new_cloud_capacity_start.html'
     form_class = CloudCapacityRegistrationForm
-    success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
 class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
@@ -43,7 +42,6 @@ class EdgeCapacityEditorView(EditorView):
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):
     template_name = 'capacities/new_edge_capacity_start.html'
     form_class = EdgeCapacityRegistrationForm
-    success_url = reverse_lazy('capacities:new_edge_capacity')
 
 
 class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
