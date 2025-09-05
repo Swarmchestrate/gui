@@ -30,11 +30,11 @@ class OpenApiSpecificationBasedForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.api_client = api_client
         field_data = self.get_data_for_form_fields()
-        required_field_names = self.api_client.get_required_field_names()
+        required_field_names = self.api_client.endpoint_definition.get_required_user_specifiable_fields()
         self.populate_form_fields(field_data, required_field_names)
 
     def get_data_for_form_fields(self):
-        return self.api_client.get_all_fields()
+        return self.api_client.endpoint_definition.get_all_user_specifiable_fields()
 
     def populate_form_fields(self, field_data: dict, required_field_names: list):
         for field_key, field_metadata in field_data.items():
@@ -73,18 +73,9 @@ class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
         super().__init__(api_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        return self.api_client.get_fields_with_format(self.field_format)
-
-
-class OpenApiSpecificationSpecifiedFieldsBasedForm(OpenApiSpecificationBasedForm):
-    def __init__(self, api_client: ApiClient, field_names: list[str], *args, **kwargs):
-        self.field_names = field_names
-        super().__init__(api_client, *args, **kwargs)
-
-    def get_data_for_form_fields(self):
-        return self.api_client.get_fields_with_names(self.field_names)
+        return self.api_client.endpoint_definition.get_user_specifiable_fields_with_format(self.field_format)
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
     def get_data_for_form_fields(self):
-        return self.api_client.get_required_fields_specified_by_user()
+        return self.api_client.endpoint_definition.get_required_user_specifiable_fields()

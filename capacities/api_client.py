@@ -1,14 +1,14 @@
-import requests
+from .definitions import CapacityUserSpecifiableOpenApiDefinition
 
 from editor.api_client import ApiClient
 
 
 class BaseCapacityApiClient(ApiClient):
+    endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
+
     def __init__(self) -> None:
-        super().__init__()
-        self.definition_name = 'capacity'
         self.endpoint = 'capacity'
-        self.id_field = 'capacity_id'
+        super().__init__()
 
 
 class CapacityApiClient(BaseCapacityApiClient):

@@ -18,16 +18,16 @@ class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
         capacities = self.api_client.get_registrations()
         self.assertIsInstance(capacities, list)
 
-    def test_get_fields_with_format(self):
+    def test_get_user_specifiable_fields_with_format(self):
         example_format = 'text'
-        fields = self.api_client.get_fields_with_format(example_format)
+        fields = self.api_client.endpoint_definition.get_user_specifiable_fields_with_format(example_format)
         self.assertIsInstance(fields, dict)
         self.assertGreater(len(fields.keys()), 0)
         for value in fields.values():
             self.assertEqual(value.get('format'), example_format)
 
-    def test_get_field_formats(self):
-        field_formats = self.api_client.get_field_formats()
+    def test_get_user_specifiable_field_formats(self):
+        field_formats = self.api_client.endpoint_definition.get_user_specifiable_field_formats()
         self.assertIsInstance(field_formats, list)
 
 

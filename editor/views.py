@@ -15,7 +15,7 @@ class EditorView(View):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'toc_list_items': self.api_client_class().get_field_formats(),
+            'toc_list_items': self.api_client_class().endpoint_definition.get_user_specifiable_field_formats(),
         })
         return context
     
@@ -26,7 +26,7 @@ class EditorStartFormView(EditorView, FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title_base,
-            'start_url': reverse_lazy(self.request.resolver_match.url_name, kwargs={'field_format': next(iter(self.api_client_class().get_field_formats()))}),
+            'start_url': reverse_lazy(self.request.resolver_match.url_name, kwargs={'field_format': next(iter(self.api_client_class().endpoint_definition.get_user_specifiable_field_formats()))}),
         })
         return context
 
@@ -44,7 +44,7 @@ class EditorFormView(EditorView, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        field_formats = self.api_client_class().get_field_formats()
+        field_formats = self.api_client_class().endpoint_definition.get_user_specifiable_field_formats()
         index_of_current_field_format = field_formats.index(self.field_format)
         prev_list_item = None
         try:
