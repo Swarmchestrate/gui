@@ -33,7 +33,11 @@ class UserSpecifiableOpenApiDefinition(OpenApiDefinition):
     # Properties
     @property
     def auto_generated_field_names(self):
-        return list([self.id_field])
+        return list([
+            self.id_field,
+            'created_at',
+            'updated_at',
+        ])
 
     # Non-public methods
     def _get_all_user_specifiable_fields(self):
