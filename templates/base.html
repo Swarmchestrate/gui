@@ -48,15 +48,15 @@
                             </a>
                             <ul class="dropdown-menu shadow">
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'new_cloud_capacity' %}">New Cloud Capacity</a>
+                                    <a class="dropdown-item" href="{% url 'capacities:new_cloud_capacity' %}">New Cloud Capacity</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'new_edge_capacity' %}">New Edge Capacity</a>
+                                    <a class="dropdown-item" href="{% url 'capacities:new_edge_capacity' %}">New Edge Capacity</a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'new_application' %}" class="nav-link">New Application</a>
+                            <a href="{% url 'applications:new_application' %}" class="nav-link">New Application</a>
                         </li>
                     </ul>
                 </div>

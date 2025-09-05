@@ -12,10 +12,21 @@ class EditorView(View):
     title_base = ''
     api_endpoint_client_class = ApiEndpointClient
 
+    def dispatch(self, request, *args, **kwargs):
+        app_name = self.request.resolver_match.app_name
+        url_name = self.request.resolver_match.url_name
+        self.editor_url_reverse_base = url_name
+        if app_name:
+            self.editor_url_reverse_base = f'{app_name}:{url_name}'
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'toc_list_items': self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats(),
+            'editor_url_reverse_base': self.editor_url_reverse_base,
+            'toc_list_items': (self.api_endpoint_client_class()
+                                .endpoint_definition
+                                .get_user_specifiable_field_formats()),
         })
         return context
     
@@ -27,10 +38,12 @@ class EditorStartFormView(EditorView, FormView):
         context.update({
             'title': self.title_base,
             'start_url': reverse_lazy(
-                self.request.resolver_match.url_name,
+                self.editor_url_reverse_base,
                 kwargs={
                     'field_format': next(iter(
-                        self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats()
+                        self.api_endpoint_client_class()
+                        .endpoint_definition
+                        .get_user_specifiable_field_formats()
                     ))
                 }
             ),
@@ -51,7 +64,9 @@ class EditorFormView(EditorView, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        field_formats = self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats()
+        field_formats = (self.api_endpoint_client_class()
+                        .endpoint_definition
+                        .get_user_specifiable_field_formats())
         index_of_current_field_format = field_formats.index(self.field_format)
         prev_list_item = None
         try:

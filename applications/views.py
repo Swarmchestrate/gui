@@ -18,9 +18,10 @@ class ApplicationEditorView(EditorView):
 class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):
     template_name = 'applications/new_application_start.html'
     form_class = ApplicationRegistrationForm
+    success_url = reverse_lazy('applications:new_application')
 
 
 class ApplicationEditorFormView(ApplicationEditorView, EditorFormView):
     template_name = 'applications/new_application.html'
     form_class = ApplicationEditorForm
-    success_url = reverse_lazy('new_application')
+    success_url = reverse_lazy('applications:new_application')

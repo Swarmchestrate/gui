@@ -29,12 +29,12 @@
             </button>
             <div class="d-flex align-items-center justify-content-between pt-4">
                 {% if prev_list_item %}
-                <a href="{% url request.resolver_match.url_name prev_list_item %}" class="btn btn-light">
+                <a href="{% url editor_url_reverse_base prev_list_item %}" class="btn btn-light">
                     Previous Step
                 </a>
                 {% endif %}
                 {% if next_list_item %}
-                <a href="{% url request.resolver_match.url_name next_list_item %}" class="btn btn-primary">
+                <a href="{% url editor_url_reverse_base next_list_item %}" class="btn btn-primary">
                     Next Step
                 </a>
                 {% endif %}

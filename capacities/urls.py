@@ -2,6 +2,9 @@ from django.urls import path
 
 from . import views
 
+
+app_name = 'capacities'
+
 urlpatterns = [
     path('new-cloud-capacity/', views.CloudCapacityEditorStartFormView.as_view(), name='new_cloud_capacity'),
     path('new-cloud-capacity/<field_format>/', views.CloudCapacityEditorFormView.as_view(), name='new_cloud_capacity'),
