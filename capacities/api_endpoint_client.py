@@ -1,9 +1,9 @@
 from .definitions import CapacityUserSpecifiableOpenApiDefinition
 
-from editor.api_client import ApiClient
+from editor.api_endpoint_client import ApiEndpointClient
 
 
-class BaseCapacityApiClient(ApiClient):
+class BaseCapacityApiEndpointClient(ApiEndpointClient):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
 
     def __init__(self) -> None:
@@ -11,11 +11,11 @@ class BaseCapacityApiClient(ApiClient):
         super().__init__()
 
 
-class CapacityApiClient(BaseCapacityApiClient):
+class CapacityApiEndpointClient(BaseCapacityApiEndpointClient):
     pass
 
 
-class CloudCapacityApiClient(BaseCapacityApiClient):
+class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
     def get_registrations(self, params: dict = dict()):
         params.update({'resource_type': 'eq.Cloud'})
         return super().get_registrations(params=params)
@@ -29,7 +29,7 @@ class CloudCapacityApiClient(BaseCapacityApiClient):
         return super().delete(registration_id, params)
 
 
-class EdgeCapacityApiClient(BaseCapacityApiClient):
+class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
     def get_registrations(self, params: dict = dict()):
         params.update({'resource_type': 'eq.Edge'})
         return super().get_registrations(params)

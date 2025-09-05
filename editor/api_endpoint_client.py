@@ -9,14 +9,27 @@ from .definitions import UserSpecifiableOpenApiDefinition
 
 
 class ApiClient:
+    def __init__(self) -> None:
+        self.api_url = os.environ.get('API_URL')
+
+    def get_openapi_spec(self):
+        # TEMP - API spec currently not parsing correctly
+        parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
+        return parser.specification
+        # response = requests.get(self.api_url)
+        # response.raise_for_status()
+        # return response.json()
+
+
+class ApiEndpointClient(ApiClient):
     endpoint: str
     endpoint_definition: UserSpecifiableOpenApiDefinition
     endpoint_definition_class: UserSpecifiableOpenApiDefinition
 
     def __init__(self) -> None:
+        super().__init__()
         openapi_spec = self.get_openapi_spec()
         self.endpoint_definition = self.endpoint_definition_class(openapi_spec)
-        self.api_url = os.environ.get('API_URL')
         self.openapi_spec_url = os.environ.get('OPENAPI_SPEC_URL')
         self.random_id_min_value = 0
         self.random_id_max_value = 999999
@@ -46,14 +59,6 @@ class ApiClient:
             data.get(self.endpoint_definition.id_field)
             for data in self.get_registrations(params=params)
         ]
-
-    def get_openapi_spec(self):
-        # TEMP - API spec currently not parsing correctly
-        parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        return parser.specification
-        # response = requests.get(self.api_url)
-        # response.raise_for_status()
-        # return response.json()
 
     # Registrations
     def get(self, registration_id: int):

@@ -5,17 +5,17 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView, View
 
-from .api_client import ApiClient
+from .api_endpoint_client import ApiEndpointClient
 
 
 class EditorView(View):
     title_base = ''
-    api_client_class = ApiClient
+    api_endpoint_client_class = ApiEndpointClient
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'toc_list_items': self.api_client_class().endpoint_definition.get_user_specifiable_field_formats(),
+            'toc_list_items': self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats(),
         })
         return context
     
@@ -26,14 +26,21 @@ class EditorStartFormView(EditorView, FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title_base,
-            'start_url': reverse_lazy(self.request.resolver_match.url_name, kwargs={'field_format': next(iter(self.api_client_class().endpoint_definition.get_user_specifiable_field_formats()))}),
+            'start_url': reverse_lazy(
+                self.request.resolver_match.url_name,
+                kwargs={
+                    'field_format': next(iter(
+                        self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats()
+                    ))
+                }
+            ),
         })
         return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'api_client': self.api_client_class(),
+            'api_endpoint_client': self.api_endpoint_client_class(),
         })
         return kwargs
 
@@ -44,7 +51,7 @@ class EditorFormView(EditorView, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        field_formats = self.api_client_class().endpoint_definition.get_user_specifiable_field_formats()
+        field_formats = self.api_endpoint_client_class().endpoint_definition.get_user_specifiable_field_formats()
         index_of_current_field_format = field_formats.index(self.field_format)
         prev_list_item = None
         try:
@@ -74,7 +81,7 @@ class EditorFormView(EditorView, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'api_client': self.api_client_class(),
+            'api_endpoint_client': self.api_endpoint_client_class(),
             'field_format': self.field_format,
         })
         return kwargs

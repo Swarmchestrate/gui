@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from .api_client import CapacityApiClient
+from .api_endpoint_client import CapacityApiEndpointClient
 from .forms import (
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
@@ -19,7 +19,7 @@ from editor.views import (
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
     title_base = 'New Cloud Capacity'
-    api_client_class = CapacityApiClient
+    api_endpoint_client_class = CapacityApiEndpointClient
 
 
 class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormView, FormView):
@@ -36,7 +36,7 @@ class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
     title_base = 'New Edge Capacity'
-    api_client_class = CapacityApiClient
+    api_endpoint_client_class = CapacityApiEndpointClient
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):

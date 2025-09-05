@@ -1,9 +1,9 @@
 from .definitions import ApplicationUserSpecifiableOpenApiDefinition
 
-from editor.api_client import ApiClient
+from editor.api_endpoint_client import ApiEndpointClient
 
 
-class ApplicationApiClient(ApiClient):
+class ApplicationApiEndpointClient(ApiEndpointClient):
     endpoint_definition_class = ApplicationUserSpecifiableOpenApiDefinition
 
     def __init__(self) -> None:

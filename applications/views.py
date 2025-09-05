@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .api_client import ApplicationApiClient
+from .api_endpoint_client import ApplicationApiEndpointClient
 from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 
 from editor.views import (
@@ -12,7 +12,7 @@ from editor.views import (
 
 class ApplicationEditorView(EditorView):
     title_base = 'New Application'
-    api_client_class = ApplicationApiClient
+    api_endpoint_client_class = ApplicationApiEndpointClient
 
 
 class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):

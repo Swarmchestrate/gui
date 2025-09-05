@@ -11,7 +11,7 @@ from .form_utils import (
     ConfiguredTextField,
 )
 
-from editor.api_client import ApiClient
+from editor.api_endpoint_client import ApiEndpointClient
 
 
 class OpenApiFormat(Enum):
@@ -26,15 +26,15 @@ class OpenApiFormat(Enum):
 class OpenApiSpecificationBasedForm(forms.Form):
     definition_name = ''
 
-    def __init__(self, api_client: ApiClient, *args, **kwargs):
+    def __init__(self, api_endpoint_client: ApiEndpointClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.api_client = api_client
+        self.api_endpoint_client = api_endpoint_client
         field_data = self.get_data_for_form_fields()
-        required_field_names = self.api_client.endpoint_definition.get_required_user_specifiable_fields()
+        required_field_names = self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
         self.populate_form_fields(field_data, required_field_names)
 
     def get_data_for_form_fields(self):
-        return self.api_client.endpoint_definition.get_all_user_specifiable_fields()
+        return self.api_endpoint_client.endpoint_definition.get_all_user_specifiable_fields()
 
     def populate_form_fields(self, field_data: dict, required_field_names: list):
         for field_key, field_metadata in field_data.items():
@@ -68,14 +68,14 @@ class OpenApiSpecificationBasedForm(forms.Form):
 
 
 class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
-    def __init__(self, api_client: ApiClient, field_format: str, *args, **kwargs):
+    def __init__(self, api_endpoint_client: ApiEndpointClient, field_format: str, *args, **kwargs):
         self.field_format = field_format
-        super().__init__(api_client, *args, **kwargs)
+        super().__init__(api_endpoint_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        return self.api_client.endpoint_definition.get_user_specifiable_fields_with_format(self.field_format)
+        return self.api_endpoint_client.endpoint_definition.get_user_specifiable_fields_with_format(self.field_format)
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
     def get_data_for_form_fields(self):
-        return self.api_client.endpoint_definition.get_required_user_specifiable_fields()
+        return self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
