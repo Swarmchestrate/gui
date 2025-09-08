@@ -40,19 +40,6 @@ class EditorView(View):
 
 
 class EditorStartFormView(EditorView, FormView):
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            self._get_editor_url_reverse_base(),
-            kwargs={
-                'field_format': next(iter(
-                    self.api_endpoint_client_class()
-                    .endpoint_definition
-                    .get_user_specifiable_field_formats()
-                ))
-            }
-        )
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -68,13 +55,25 @@ class EditorStartFormView(EditorView, FormView):
         return kwargs
 
     def form_valid(self, form):
-        self.api_endpoint_client.register(form.cleaned_data)
+        new_registration = self.api_endpoint_client.register(form.cleaned_data)
         messages.success(self.request, f'New {self.api_endpoint_client.endpoint_definition.definition_name} registered.')
+        self.success_url = reverse_lazy(
+            self._get_editor_url_reverse_base(),
+            kwargs={
+                'id': new_registration.get(self.api_endpoint_client.endpoint_definition.id_field),
+                'field_format': next(iter(
+                    self.api_endpoint_client_class()
+                    .endpoint_definition
+                    .get_user_specifiable_field_formats()
+                ))
+            }
+        )
         return super().form_valid(form)
 
 
 class EditorFormView(EditorView, FormView):
     def dispatch(self, request, *args, **kwargs):
+        self.registration_id = self.kwargs['id']
         self.field_format = self.kwargs['field_format']
         return super().dispatch(request, *args, **kwargs)
 
@@ -104,6 +103,7 @@ class EditorFormView(EditorView, FormView):
             'current_field_format': self.field_format,
             'prev_list_item': prev_list_item,
             'next_list_item': next_list_item,
+            'registration_id': self.registration_id,
         })
         return context
     
