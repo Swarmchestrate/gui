@@ -83,6 +83,11 @@ class ConfiguredMultipleChoiceField(DefaultConfiguredField):
     widget_class = forms.SelectMultiple
 
 
+class ConfiguredFloatField(DefaultConfiguredField):
+    field_class = forms.FloatField
+    widget_class = forms.NumberInput
+
+
 class ConfiguredTextField(DefaultConfiguredField):
     field_class = forms.CharField
     widget_class = forms.Textarea

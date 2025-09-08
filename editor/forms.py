@@ -7,6 +7,7 @@ from .form_utils import (
     ConfiguredBooleanField,
     ConfiguredCharField,
     ConfiguredDateField,
+    ConfiguredFloatField,
     ConfiguredIntegerField,
     ConfiguredTextField,
 )
@@ -14,11 +15,12 @@ from .form_utils import (
 from editor.api_endpoint_client import ApiEndpointClient
 
 
-class OpenApiFormat(Enum):
+class OpenApiPropertyFormat(Enum):
     BOOLEAN = 'boolean'
     CHARACTER_VARYING = 'character varying'
     DATE = 'timestamp without time zone'
     INTEGER = 'integer'
+    NUMERIC = 'numeric'
     TEXT = 'text'
     TEXT_ARRAY = 'text[]'
 
@@ -47,21 +49,23 @@ class OpenApiSpecificationBasedForm(forms.Form):
     def _get_configured_field(self, field_metadata: dict, is_required: bool = False):
         field_format = field_metadata.get('format')
         try:
-            field_format = OpenApiFormat(field_format)
+            field_format = OpenApiPropertyFormat(field_format)
         except ValueError:
             pass
         match field_format:
-            case OpenApiFormat.BOOLEAN:
+            case OpenApiPropertyFormat.BOOLEAN:
                 return ConfiguredBooleanField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.CHARACTER_VARYING:
+            case OpenApiPropertyFormat.CHARACTER_VARYING:
                 return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.DATE:
+            case OpenApiPropertyFormat.DATE:
                 return ConfiguredDateField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.INTEGER:
+            case OpenApiPropertyFormat.INTEGER:
                 return ConfiguredIntegerField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.TEXT:
+            case OpenApiPropertyFormat.NUMERIC:
+                return ConfiguredFloatField(field_metadata, is_required=is_required).field_instance
+            case OpenApiPropertyFormat.TEXT:
                 return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
-            case OpenApiFormat.TEXT_ARRAY:
+            case OpenApiPropertyFormat.TEXT_ARRAY:
                 return ConfiguredTextField(field_metadata, is_required=is_required).field_instance
             case _:
                 return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
