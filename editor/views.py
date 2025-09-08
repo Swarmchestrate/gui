@@ -62,7 +62,7 @@ class EditorStartFormView(EditorView, FormView):
         self.success_url = reverse_lazy(
             self._get_editor_url_reverse_base(),
             kwargs={
-                'id': new_registration.get(self.api_endpoint_client.endpoint_definition.id_field),
+                'registration_id': new_registration.get(self.api_endpoint_client.endpoint_definition.id_field),
                 'field_format': next(iter(
                     self.api_endpoint_client_class()
                     .endpoint_definition
@@ -75,7 +75,7 @@ class EditorStartFormView(EditorView, FormView):
 
 class EditorFormView(EditorView, FormView):
     def dispatch(self, request, *args, **kwargs):
-        self.registration_id = self.kwargs['id']
+        self.registration_id = self.kwargs['registration_id']
         self.field_format = self.kwargs['field_format']
         return super().dispatch(request, *args, **kwargs)
 
