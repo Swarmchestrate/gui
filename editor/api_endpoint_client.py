@@ -50,11 +50,14 @@ class ApiEndpointClient(ApiClient):
         response = requests.get(
             self.endpoint_url,
             params={
-                self.endpoint_definition.id_field: registration_id,
+                self.endpoint_definition.id_field: f'eq.{registration_id}',
             }
         )
         response.raise_for_status()
-        return response.json()
+        # Responses are returned as lists, so need
+        # to get the first list element.
+        registration = next(iter(response.json()))
+        return registration
 
     def get_registrations(self, params: dict = dict()):
         response = requests.get(
@@ -65,11 +68,14 @@ class ApiEndpointClient(ApiClient):
         return response.json()
 
     def register(self, data: dict):
+        new_id = self._generate_random_id()
         data.update({
-            self.endpoint_definition.id_field: self._generate_random_id(),
+            self.endpoint_definition.id_field: new_id,
         })
         response = requests.post(self.endpoint_url, json=data)
         response.raise_for_status()
+        new_registration = self.get(new_id)
+        return new_registration
 
     def delete(self, registration_id: int, params: dict = dict()):
         params.update({

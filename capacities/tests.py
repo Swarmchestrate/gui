@@ -60,7 +60,8 @@ class EdgeCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin
         data = {
             'capacity_id': self.generate_random_id_and_add_to_test_ids(),
         }
-        self.api_endpoint_client.register(data)
+        new_registration = self.api_endpoint_client.register(data)
+        self.assertIsInstance(new_registration, dict)
 
     def test_delete(self):
         id = self.generate_random_id_and_add_to_test_ids()
