@@ -2,14 +2,19 @@
 {% load static %}
 {% block content %}
 <div class="row justify-content-center gx-md-5">
-    <div class="col-xl-2">
+    {# High-level TOC #}
+    <div class="col-xl-3">
+        {% block high_level_toc %}
         <ul class="nav flex-column list-unstyled">
             <li class="nav-item">
                 <a href="#" class="nav-link pt-0">Overview</a>
             </li>
         </ul>
+        {% endblock high_level_toc %}
     </div>
-    <div class="col-xl-8">
+    {# Editor main content #}
+    <div class="col-xl-6">
+        {% block editor_main_content %}
         <hgroup class="d-flex flex-column-reverse row-gap-1">
             <h1>{{ main_heading }}</h1>
             <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }}</p>
@@ -50,9 +55,13 @@
             </div>
             <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>
         </form>
+        {% endblock editor_main_content %}
     </div>
-    <div class="col-xl-2">
+    {# In-editor TOC #}
+    <div class="col-xl-3">
+        {% block editor_toc %}
         {% include 'editor/toc/editor_toc_base.html' %}
+        {% endblock editor_toc %}
     </div>
 </div>
 {% endblock content %}

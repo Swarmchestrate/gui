@@ -1,27 +1,33 @@
-{% extends 'base.html' %}
+{% extends 'editor/editor_base.html' %}
 {% load static %}
-{% block content %}
-<div class="row justify-content-center column-gap-4">
-    <div class="col-xl-2">
-        {% include 'editor/toc/editor_toc_start.html' %}
+{# High-level TOC #}
+{% block high_level_toc %}
+<ul class="nav flex-column list-unstyled">
+    <li class="nav-item">
+        <a href="#" class="nav-link pt-0">Back to Capacities</a>
+    </li>
+</ul>
+{% endblock high_level_toc %}
+{# Editor main content #}
+{% block editor_main_content %}
+<h1>{{ title }}</h1>
+<p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
+<p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+<form id="registration-form" action="{{ request.path }}" method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.field.widget.input_type == 'checkbox' %}
+    {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+    {% else %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endif %}
+    {% endfor %}
+    <div class="pt-4">
+        <button class="btn btn-primary" type="submit">Start</button>
     </div>
-    <div class="col-xl-7">
-        <h1>{{ title }}</h1>
-        <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
-        <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-        <form id="registration-form" action="{{ request.path }}" method="POST">
-            {% csrf_token %}
-            {% for field in form %}
-            {% if field.field.widget.input_type == 'checkbox' %}
-            {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
-            {% else %}
-            {% include 'editor/field_templates/field_template.html' %}
-            {% endif %}
-            {% endfor %}
-            <div class="pt-4">
-                <button class="btn btn-primary" type="submit">Start</button>
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock content %}
+</form>
+{% endblock editor_main_content %}
+{# In-editor TOC #}
+{% block editor_toc %}
+{% include 'editor/toc/editor_toc_start.html' %}
+{% endblock editor_toc %}

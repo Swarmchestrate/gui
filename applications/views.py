@@ -11,6 +11,7 @@ from editor.views import (
 
 
 class ApplicationEditorView(EditorView):
+    editor_type = 'application'
     title_base = 'New Application'
     api_endpoint_client_class = ApplicationApiEndpointClient
 

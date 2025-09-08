@@ -21,6 +21,7 @@ from editor.views import (
 
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
+    editor_type = 'cloud capacity'
     title_base = 'New Cloud Capacity'
     api_endpoint_client_class = CloudCapacityApiEndpointClient
 
@@ -38,6 +39,7 @@ class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
 
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
+    editor_type = 'edge capacity'
     title_base = 'New Edge Capacity'
     api_endpoint_client_class = EdgeCapacityApiEndpointClient
 

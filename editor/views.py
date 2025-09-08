@@ -10,6 +10,7 @@ from .api_endpoint_client import ApiEndpointClient
 
 
 class EditorView(View):
+    editor_type = ''
     api_endpoint_client: ApiEndpointClient
 
     title_base = ''
@@ -30,6 +31,7 @@ class EditorView(View):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
+            'editor_type': self.editor_type,
             'editor_url_reverse_base': self.editor_url_reverse_base,
             'toc_list_items': (self.api_endpoint_client_class()
                                 .endpoint_definition
