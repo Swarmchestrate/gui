@@ -43,14 +43,10 @@
                 </a>
                 {% endif %}
                 {% if next_list_item %}
-                <a href="{% url editor_url_reverse_base registration_id next_list_item %}" class="btn btn-primary">
-                    Next Step
-                </a>
+                <button type="submit" class="btn btn-primary">Next Step</button>
                 {% endif %}
                 {% if not next_list_item %}
-                <a href="#" class="btn btn-primary">
-                    Finish & Review
-                </a>
+                <button type="submit" class="btn btn-primary">Finish & Review</button>
                 {% endif %}
             </div>
             <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>

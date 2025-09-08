@@ -74,12 +74,7 @@ class EditorStartFormView(EditorView, FormView):
 
 
 class EditorFormView(EditorView, FormView):
-    def dispatch(self, request, *args, **kwargs):
-        self.registration_id = self.kwargs['registration_id']
-        self.field_format = self.kwargs['field_format']
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
+    def get_prev_and_next_list_items(self):
         field_formats = (self.api_endpoint_client_class()
                         .endpoint_definition
                         .get_user_specifiable_field_formats())
@@ -97,6 +92,16 @@ class EditorFormView(EditorView, FormView):
             next_list_item = field_formats[index_of_current_field_format + 1]
         except IndexError:
             pass
+
+        return (prev_list_item, next_list_item)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.registration_id = self.kwargs['registration_id']
+        self.field_format = self.kwargs['field_format']
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
         context = super().get_context_data(**kwargs)
         context.update({
             'title': f'{self.title_base} | {self.field_format}',
@@ -130,4 +135,20 @@ class EditorFormView(EditorView, FormView):
         return super().form_invalid(form)
     
     def form_valid(self, form):
+        self.api_endpoint_client.update(
+            self.registration_id,
+            form.cleaned_data
+        )
+        messages.success(self.request, f'Updated {self.field_format}')
+        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
+        if not next_list_item:
+            self.success_url = self.request.path
+            return super().form_valid(form)
+        self.success_url = reverse_lazy(
+            self._get_editor_url_reverse_base(),
+            kwargs={
+                'registration_id': self.registration_id,
+                'field_format': next_list_item,
+            }
+        )
         return super().form_valid(form)
