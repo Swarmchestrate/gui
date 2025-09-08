@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="row justify-content-center column-gap-4">
+<div class="row justify-content-center gx-md-5">
     <div class="col-xl-2">
-        {% include 'editor/editor_toc_base.html' %}
+        <ul class="nav flex-column list-unstyled">
+            <li class="nav-item">
+                <a href="#" class="nav-link pt-0">Overview</a>
+            </li>
+        </ul>
     </div>
-    <div class="col-xl-7">
+    <div class="col-xl-8">
         <hgroup class="d-flex flex-column-reverse row-gap-1">
             <h1>{{ main_heading }}</h1>
             <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }}</p>
@@ -29,12 +33,12 @@
             </button>
             <div class="d-flex align-items-center justify-content-between pt-4">
                 {% if prev_list_item %}
-                <a href="{% url editor_url_reverse_base prev_list_item %}" class="btn btn-light">
+                <a href="{% url editor_url_reverse_base registration_id prev_list_item %}" class="btn btn-light">
                     Previous Step
                 </a>
                 {% endif %}
                 {% if next_list_item %}
-                <a href="{% url editor_url_reverse_base next_list_item %}" class="btn btn-primary">
+                <a href="{% url editor_url_reverse_base registration_id next_list_item %}" class="btn btn-primary">
                     Next Step
                 </a>
                 {% endif %}
@@ -46,6 +50,9 @@
             </div>
             <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>
         </form>
+    </div>
+    <div class="col-xl-2">
+        {% include 'editor/toc/editor_toc_base.html' %}
     </div>
 </div>
 {% endblock content %}
