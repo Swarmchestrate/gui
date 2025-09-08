@@ -39,14 +39,25 @@ class CloudCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixi
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        data = {
-            'capacity_id': self.generate_random_id_and_add_to_test_ids(),
-        }
-        self.api_endpoint_client.register(data)
+        new_registration = self.api_endpoint_client.register()
+        self.assertIsInstance(new_registration, dict)
 
     def test_delete(self):
-        id = self.generate_random_id_and_add_to_test_ids()
-        self.api_endpoint_client.delete(id)
+        registration_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_endpoint_client.delete(registration_id)
+
+    def test_update(self):
+        # Test setup
+        new_registration = self.register_with_api_endpoint_client_for_test()
+        self.assertEqual(new_registration.get('mobility'), None)
+        # Update
+        update_data = {
+            'mobility': True,
+        }
+        id_field = self.api_endpoint_client.endpoint_definition.id_field
+        self.api_endpoint_client.update(new_registration.get(id_field), update_data)
+        updated_registration = self.api_endpoint_client.get(new_registration.get(id_field))
+        self.assertEqual(updated_registration.get('mobility'), True)
 
 
 class EdgeCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin, SimpleTestCase):
@@ -57,12 +68,9 @@ class EdgeCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        data = {
-            'capacity_id': self.generate_random_id_and_add_to_test_ids(),
-        }
-        new_registration = self.api_endpoint_client.register(data)
+        new_registration = self.api_endpoint_client.register()
         self.assertIsInstance(new_registration, dict)
 
     def test_delete(self):
-        id = self.generate_random_id_and_add_to_test_ids()
-        self.api_endpoint_client.delete(id)
+        registration_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_endpoint_client.delete(registration_id)

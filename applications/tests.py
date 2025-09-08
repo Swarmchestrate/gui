@@ -16,12 +16,11 @@ class ApplicationApiEndpointClientTestCase(ApplicationApiEndpointClientTestCaseH
 
     def test_register(self):
         data = {
-            'application_id': self.generate_random_id_and_add_to_test_ids(),
             'name': 'Weather Analytics App',
             'container_image': 'https://hub.docker.com/myorg/weather-analytics:latest',
         }
         self.api_endpoint_client.register(data)
 
     def test_delete(self):
-        id = self.generate_random_id_and_add_to_test_ids()
-        self.api_endpoint_client.delete(id)
+        registration_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_endpoint_client.delete(registration_id)

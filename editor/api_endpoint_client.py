@@ -67,7 +67,7 @@ class ApiEndpointClient(ApiClient):
         response.raise_for_status()
         return response.json()
 
-    def register(self, data: dict):
+    def register(self, data: dict) -> dict:
         new_id = self._generate_random_id()
         data.update({
             self.endpoint_definition.id_field: new_id,
@@ -82,4 +82,15 @@ class ApiEndpointClient(ApiClient):
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         })
         response = requests.delete(self.endpoint_url, params=params)
+        response.raise_for_status()
+
+    def update(self, registration_id: int, data: dict):
+        params = {
+            self.endpoint_definition.id_field: f'eq.{registration_id}',
+        }
+        response = requests.patch(
+            self.endpoint_url,
+            params=params,
+            json=data
+        )
         response.raise_for_status()
