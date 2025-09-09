@@ -5,27 +5,13 @@ const defaultText = formSubmitButton.querySelector(".loading-text + span:not(.lo
 const fields = document.querySelectorAll("input, textarea, select");
 
 
-function validateField(event) {
-    const field = event.currentTarget;
-    const isValid = field.checkValidity();
-    const feedback = document.querySelector(`#${field.id} ~ .invalid-feedback`);
-    if (!isValid) {
-        field.classList.add("is-invalid");
-        return feedback.textContent = field.validationMessage;
-    }
-    return field.classList.remove("is-invalid");
-};
-
 function displayValidationMessages(validationMessages) {
-    if ("__all__" in validationMessages) {
-        const allErrorsList = document.querySelector("#all-errors-list");
-        for (const error of validationMessages.__all__) {
-            const errorItem = document.createElement("li");
-            errorItem.textContent = error.message;
-            allErrorsList.appendChild(errorItem);
-        }
-        allErrorsList.classList.remove("d-none");
-    }
+    /**
+     * Displays validation messages that apply to
+     * specific fields and/or the whole form.
+     */
+    // __all__ signifies validation feedback that applies
+    // to the whole form.
     for (const fieldName in validationMessages) {
         if (fieldName === "__all__") continue;
         const field = document.querySelector(`[name="${fieldName}"]`);
@@ -41,6 +27,18 @@ function displayValidationMessages(validationMessages) {
         feedback.appendChild(feedbackList);
         field.classList.add("is-invalid");
     }
+    if (!"__all__" in validationMessages) {
+        return;
+    }
+    // Display validation feedback that applies to the whole
+    // form.
+    const allErrorsList = document.querySelector("#all-errors-list");
+    for (const error of validationMessages.__all__) {
+        const errorItem = document.createElement("li");
+        errorItem.textContent = error.message;
+        allErrorsList.appendChild(errorItem);
+    }
+    allErrorsList.classList.remove("d-none");
 }
 
 function clearValidationMessages() {
@@ -70,6 +68,22 @@ function hideLoadingText() {
     loadingText.classList.add("d-none");
     defaultText.classList.remove("d-none");
 }
+
+// Field validation
+function validateField(event) {
+    /**
+     * Checks validity of a field and displays the
+     * validation message, if any.
+     */
+    const field = event.currentTarget;
+    const isValid = field.checkValidity();
+    const feedback = document.querySelector(`#${field.id} ~ .invalid-feedback`);
+    if (!isValid) {
+        field.classList.add("is-invalid");
+        return feedback.textContent = field.validationMessage;
+    }
+    return field.classList.remove("is-invalid");
+};
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
