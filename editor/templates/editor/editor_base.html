@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block scripts %}
+<script type="module" src="{% static 'editor.js' %}"></script>
+{% endblock scripts %}
 {% block content %}
 <div class="row justify-content-center gx-md-5">
     {# High-level TOC #}
@@ -29,27 +32,29 @@
             {% include 'editor/field_templates/field_template.html' %}
             {% endif %}
             {% endfor %}
-            <button type="submit" class="d-none btn btn-primary mb-3">
-                <span class="d-none loading-text">
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    Registering
-                </span>
-                <span>{% block submit_text %}Register{% endblock submit_text %}</span>
-            </button>
-            <div class="d-flex align-items-center justify-content-between pt-4">
+            <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
                 {% if prev_list_item %}
                 <a href="{% url editor_url_reverse_base registration_id prev_list_item %}" class="btn btn-light">
                     Previous Step
                 </a>
                 {% endif %}
-                {% if next_list_item %}
-                <button type="submit" class="btn btn-primary">Next Step</button>
-                {% endif %}
-                {% if not next_list_item %}
-                <button type="submit" class="btn btn-primary">Finish & Review</button>
-                {% endif %}
+                <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="d-none loading-text">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span class="status-text">Applying Changes</span>
+                        </span>
+                        <span class="default-text">
+                            {% if next_list_item %}
+                            Next Step
+                            {% else %}
+                            Finish & Review
+                            {% endif %}
+                        </span>
+                    </button>
+                    <ul id="form-messages-list" class="d-none text-danger text-center list-unstyled"></ul>
+                </div>
             </div>
-            <ul id="all-errors-list" class="d-none text-danger list-unstyled"></ul>
         </form>
         {% endblock editor_main_content %}
     </div>
