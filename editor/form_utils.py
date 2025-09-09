@@ -2,8 +2,9 @@ from django import forms
 
 
 class DefaultConfiguredField:
-    field_class = forms.CharField
-    widget_class = forms.Textarea
+    field_class: forms.Field
+    widget_class: forms.Widget
+    initial_value: any
 
     def __init__(
             self,
@@ -23,10 +24,18 @@ class DefaultConfiguredField:
         }
 
     def get_field_kwargs(self) -> dict:
+        if not hasattr(self, 'widget_class'):
+            self.widget_class = self.field_class.widget
         kwargs = {
             'required': self.is_required,
             'widget': self.widget_class(**self.get_widget_kwargs()),
         }
+        try:
+            kwargs.update({
+                'initial': self.initial_value,
+            })
+        except AttributeError:
+            pass
         field_description = self.field_properties.get('description')
         if not field_description:
             return kwargs
@@ -37,6 +46,8 @@ class DefaultConfiguredField:
 
     @property
     def field_instance(self) -> forms.Field:
+        if not hasattr(self, 'field_class'):
+            self.field_class = forms.CharField
         return self.field_class(**self.get_field_kwargs())
 
 
@@ -65,27 +76,26 @@ class ConfiguredCharField(DefaultConfiguredField):
 
 class ConfiguredChoiceField(DefaultConfiguredField):
     field_class = forms.ChoiceField
-    widget_class = forms.Select
 
 
 class ConfiguredDateField(DefaultConfiguredField):
     field_class = forms.DateField
-    widget_class = forms.DateInput
-
-
-class ConfiguredIntegerField(DefaultConfiguredField):
-    field_class = forms.IntegerField
-    widget_class = forms.NumberInput
-
-
-class ConfiguredMultipleChoiceField(DefaultConfiguredField):
-    field_class = forms.MultipleChoiceField
-    widget_class = forms.SelectMultiple
 
 
 class ConfiguredFloatField(DefaultConfiguredField):
     field_class = forms.FloatField
-    widget_class = forms.NumberInput
+
+
+class ConfiguredIntegerField(DefaultConfiguredField):
+    field_class = forms.IntegerField
+
+
+class ConfiguredJsonField(DefaultConfiguredField):
+    field_class = forms.JSONField
+
+
+class ConfiguredMultipleChoiceField(DefaultConfiguredField):
+    field_class = forms.MultipleChoiceField
 
 
 class ConfiguredTextField(DefaultConfiguredField):

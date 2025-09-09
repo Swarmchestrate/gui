@@ -98,6 +98,7 @@ class EditorFormView(EditorView, FormView):
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs['registration_id']
         self.field_format = self.kwargs['field_format']
+        self.success_url = self.request.path
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -124,31 +125,35 @@ class EditorFormView(EditorView, FormView):
         return kwargs
 
     def form_invalid(self, form):
-        if self.request.GET.get('response_format') == 'json':
-            return JsonResponse(
-                {
-                    'feedback': json.loads(form.errors.as_json()),
-                    'url': self.request.path,
-                },
-                status=HTTPStatus.BAD_REQUEST
-            )
-        return super().form_invalid(form)
+        response = super().form_invalid(form)
+        if self.request.accepts('text/html'):
+            messages.error(self.request, 'Some fields were invalid. Please see feedback below.')
+            return response
+        return JsonResponse({
+            'feedback': json.loads(form.errors.as_json()),
+            'url': self.request.path,
+        }, status=HTTPStatus.BAD_REQUEST)
     
     def form_valid(self, form):
+        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
+        if next_list_item:
+            self.success_url = reverse_lazy(
+                self._get_editor_url_reverse_base(),
+                kwargs={
+                    'registration_id': self.registration_id,
+                    'field_format': next_list_item,
+                }
+            )
+        response = super().form_valid(form)
         self.api_endpoint_client.update(
             self.registration_id,
             form.cleaned_data
         )
-        messages.success(self.request, f'Updated {self.field_format}')
-        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
-        if not next_list_item:
-            self.success_url = self.request.path
-            return super().form_valid(form)
-        self.success_url = reverse_lazy(
-            self._get_editor_url_reverse_base(),
-            kwargs={
-                'registration_id': self.registration_id,
-                'field_format': next_list_item,
-            }
-        )
-        return super().form_valid(form)
+        message = f'Updated {self.field_format}'
+        if self.request.accepts('text/html'):
+            messages.success(self.request, message)
+            return response
+        return JsonResponse({
+            'message': message,
+            'redirect': self.success_url,
+        })

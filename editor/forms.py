@@ -9,6 +9,7 @@ from .form_utils import (
     ConfiguredDateField,
     ConfiguredFloatField,
     ConfiguredIntegerField,
+    ConfiguredJsonField,
     ConfiguredTextField,
 )
 
@@ -20,12 +21,14 @@ class OpenApiPropertyFormat(Enum):
     CHARACTER_VARYING = 'character varying'
     DATE = 'timestamp without time zone'
     INTEGER = 'integer'
+    JSONB = 'jsonb'
     NUMERIC = 'numeric'
     TEXT = 'text'
     TEXT_ARRAY = 'text[]'
 
 
 class OpenApiSpecificationBasedForm(forms.Form):
+    error_css_class = 'is-invalid'
     definition_name = ''
 
     def __init__(self, api_endpoint_client: ApiEndpointClient, *args, **kwargs):
@@ -34,6 +37,21 @@ class OpenApiSpecificationBasedForm(forms.Form):
         field_data = self.get_data_for_form_fields()
         required_field_names = self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
         self.populate_form_fields(field_data, required_field_names)
+
+    def is_valid(self):
+        is_valid = super().is_valid()
+        errors = self.errors.as_data()
+        for field_name in errors:
+            try:
+                field = self.fields[field_name]
+                f_classes = field.widget.attrs.get('class', '').split(' ')
+                f_classes.append(self.error_css_class)
+                field.widget.attrs.update({
+                    'class': ' '.join(f_classes),
+                })
+            except KeyError:
+                continue
+        return is_valid
 
     def get_data_for_form_fields(self):
         return self.api_endpoint_client.endpoint_definition.get_all_user_specifiable_fields()
@@ -46,29 +64,41 @@ class OpenApiSpecificationBasedForm(forms.Form):
                 field_key: new_field,
             })
 
+    def _get_configured_field_class(self, field_format: str):
+        match field_format:
+            case OpenApiPropertyFormat.BOOLEAN:
+                return ConfiguredBooleanField
+            case OpenApiPropertyFormat.CHARACTER_VARYING:
+                return ConfiguredCharField
+            case OpenApiPropertyFormat.DATE:
+                return ConfiguredDateField
+            case OpenApiPropertyFormat.INTEGER:
+                return ConfiguredIntegerField
+            case OpenApiPropertyFormat.JSONB:
+                return ConfiguredJsonField
+            case OpenApiPropertyFormat.NUMERIC:
+                return ConfiguredFloatField
+            case OpenApiPropertyFormat.TEXT:
+                return ConfiguredTextField
+            case OpenApiPropertyFormat.TEXT_ARRAY:
+                return ConfiguredTextField
+            case _:
+                return DefaultConfiguredField
+
     def _get_configured_field(self, field_metadata: dict, is_required: bool = False):
         field_format = field_metadata.get('format')
         try:
             field_format = OpenApiPropertyFormat(field_format)
         except ValueError:
             pass
-        match field_format:
-            case OpenApiPropertyFormat.BOOLEAN:
-                return ConfiguredBooleanField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.CHARACTER_VARYING:
-                return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.DATE:
-                return ConfiguredDateField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.INTEGER:
-                return ConfiguredIntegerField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.NUMERIC:
-                return ConfiguredFloatField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.TEXT:
-                return ConfiguredCharField(field_metadata, is_required=is_required).field_instance
-            case OpenApiPropertyFormat.TEXT_ARRAY:
-                return ConfiguredTextField(field_metadata, is_required=is_required).field_instance
-            case _:
-                return DefaultConfiguredField(field_metadata, is_required=is_required).field_instance
+        configured_field_kwargs = {
+            'is_required': is_required,
+        }
+        configured_field_class = self._get_configured_field_class(field_format)
+        return configured_field_class(
+            field_metadata,
+            **configured_field_kwargs
+        ).field_instance
 
 
 class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
