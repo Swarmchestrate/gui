@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load dict_helpers %}
+{% block content %}
+<div class="d-flex flex-column row-gap-4">
+    <h1>{{ title }}</h1>
+    <p>{{ description }}</p>
+    {% if not registrations %}
+    <p class="text-body-secondary">No {{ registration_type_name_plural|title }} have been registered.</p>
+    {% else %}
+    <ul class="list-group">
+        {% for registration in registrations %}
+        <li class="list-group-item">
+            {% with registration_id=registration|get_key_value_or_blank_string:id_field %}
+            <a href="{% url editor_url_reverse_base registration_id %}">
+                {{ registration_type_name_singular|title }} {{ registration_id }}</a>
+            {% endwith %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock content %}

@@ -23,7 +23,7 @@
             <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }} ({{ registration_id }})</p>
         </hgroup>
         <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-        <form id="editor-form" action="{{ request.path }}" method="POST">
+        <form id="editor-form" action="{{ request.get_full_path }}" method="POST">
             {% csrf_token %}
             {% for field in form %}
             {% if field.field.widget.input_type == 'checkbox' %}
@@ -34,7 +34,7 @@
             {% endfor %}
             <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
                 {% if prev_list_item %}
-                <a href="{% url editor_url_reverse_base registration_id prev_list_item %}" class="btn btn-light">
+                <a href="{% url editor_url_reverse_base registration_id %}?format={{ prev_list_item }}" class="btn btn-light">
                     Previous Step
                 </a>
                 {% endif %}

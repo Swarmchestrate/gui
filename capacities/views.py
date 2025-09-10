@@ -15,12 +15,15 @@ from .forms import (
 from editor.views import (
     EditorView,
     EditorFormView,
-    EditorStartFormView
+    EditorStartFormView,
+    RegistrationsTemplateView,
 )
 
 
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
+    editor_url_reverse_base = 'capacities:cloud_capacity_editor'
+    editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
     registration_type_name_singular = 'cloud capacity'
     registration_type_name_plural = 'cloud capacities'
     title_base = 'New Cloud Capacity'
@@ -38,8 +41,14 @@ class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
+class CloudCapacityRegistrationsTemplateView(CloudCapacityEditorView, RegistrationsTemplateView):
+    pass
+
+
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
+    editor_url_reverse_base = 'capacities:edge_capacity_editor'
+    editor_start_url_reverse_base = 'capacities:new_edge_capacity'
     registration_type_name_singular = 'edge capacity'
     registration_type_name_plural = 'edge capacities'
     title_base = 'New Edge Capacity'
@@ -55,3 +64,7 @@ class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
     template_name = 'capacities/new_edge_capacity.html'
     form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('capacities:new_edge_capacity')
+
+
+class EdgeCapacityRegistrationsTemplateView(EdgeCapacityEditorView, RegistrationsTemplateView):
+    pass

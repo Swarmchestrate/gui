@@ -8,6 +8,11 @@ class OpenApiDefinition:
         self.definition_name = None
         self.id_field = None
 
+    # Properties
+    @property
+    def description(self) -> str:
+        return self._get_definition().get('description', '')
+
     # Non-public methods
     def _get_definition(self) -> dict:
         return (self.openapi_spec
