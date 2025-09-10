@@ -18,6 +18,7 @@ class EditorView(View):
     registration_type_name_plural: str
     api_endpoint_client: ApiEndpointClient
 
+    editor_registration_list_url_reverse: str
     editor_start_url_reverse_base: str
     editor_url_reverse_base: str
 
@@ -41,6 +42,7 @@ class EditorView(View):
             'description': self.api_endpoint_client.endpoint_definition.description,
             'registration_type_name_singular': self.registration_type_name_singular,
             'registration_type_name_plural': self.registration_type_name_plural,
+            'editor_registration_list_url_reverse': self.editor_registration_list_url_reverse,
             'editor_url_reverse_base': self.editor_url_reverse_base,
             'editor_start_url_reverse_base': self.editor_start_url_reverse_base,
             'id_field': self.api_endpoint_client.endpoint_definition.id_field,

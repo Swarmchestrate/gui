@@ -4,7 +4,7 @@
 {% block high_level_toc %}
 <ul class="nav flex-column list-unstyled">
     <li class="nav-item">
-        <a href="#" class="nav-link pt-0">Back to {{ registration_type_name_plural|title }}</a>
+        <a href="{% url editor_registration_list_url_reverse %}" class="nav-link pt-0">Back to {{ registration_type_name_plural|title }}</a>
     </li>
 </ul>
 {% endblock high_level_toc %}

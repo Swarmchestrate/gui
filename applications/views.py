@@ -12,6 +12,7 @@ from editor.views import (
 
 
 class ApplicationEditorView(EditorView):
+    editor_registration_list_url_reverse = 'applications:applications_list'
     editor_url_reverse_base = 'applications:application_editor'
     editor_start_url_reverse_base = 'applications:new_application'
     registration_type_name_singular = 'application'

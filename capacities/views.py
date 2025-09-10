@@ -22,6 +22,7 @@ from editor.views import (
 
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
+    editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
     editor_url_reverse_base = 'capacities:cloud_capacity_editor'
     editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
     registration_type_name_singular = 'cloud capacity'
@@ -47,6 +48,7 @@ class CloudCapacityRegistrationsTemplateView(CloudCapacityEditorView, Registrati
 
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
+    editor_registration_list_url_reverse = 'capacities:edge_capacities_list'
     editor_url_reverse_base = 'capacities:edge_capacity_editor'
     editor_start_url_reverse_base = 'capacities:new_edge_capacity'
     registration_type_name_singular = 'edge capacity'
