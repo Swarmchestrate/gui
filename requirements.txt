@@ -17,6 +17,7 @@ openapi-spec-validator==0.7.2
 packaging==25.0
 pathable==0.4.4
 prance==25.4.8.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 PyYAML==6.0.2
 rcssmin==1.1.2
