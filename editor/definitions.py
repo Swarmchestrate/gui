@@ -67,7 +67,7 @@ class UserSpecifiableOpenApiDefinition(OpenApiDefinition):
         return list(set(
             value.get('format')
             for key, value in all_fields.items()
-            if key not in self.auto_generated_field_names 
+            if key not in self.auto_generated_field_names
         ))
 
     def get_user_specifiable_fields_with_format(self, format: str):
@@ -81,3 +81,6 @@ class UserSpecifiableOpenApiDefinition(OpenApiDefinition):
     def get_required_user_specifiable_fields(self):
         field_names = self._get_required_user_specifiable_field_names()
         return self._get_fields_with_names(field_names)
+
+    def get_required_field_names(self):
+        return self._get_required_field_names()

@@ -35,7 +35,7 @@ class OpenApiSpecificationBasedForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.api_endpoint_client = api_endpoint_client
         field_data = self.get_data_for_form_fields()
-        required_field_names = self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
+        required_field_names = self.api_endpoint_client.endpoint_definition.get_required_field_names()
         self.populate_form_fields(field_data, required_field_names)
 
     def is_valid(self):
