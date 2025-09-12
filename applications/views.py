@@ -17,7 +17,6 @@ class ApplicationEditorView(EditorView):
     editor_start_url_reverse_base = 'applications:new_application'
     registration_type_name_singular = 'application'
     registration_type_name_plural = 'applications'
-    title_base = 'New Application'
     api_endpoint_client_class = ApplicationApiEndpointClient
 
 

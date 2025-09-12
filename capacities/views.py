@@ -27,7 +27,6 @@ class CloudCapacityEditorView(EditorView):
     editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
     registration_type_name_singular = 'cloud capacity'
     registration_type_name_plural = 'cloud capacities'
-    title_base = 'New Cloud Capacity'
     api_endpoint_client_class = CloudCapacityApiEndpointClient
 
 

@@ -23,7 +23,7 @@
         {% block editor_main_content %}
         <hgroup class="d-flex flex-column-reverse row-gap-1">
             <h1>{{ main_heading }}</h1>
-            <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }} ({{ registration_id }})</p>
+            <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }} <span class="text-body-tertiary">({{ registration_id }})</span></p>
         </hgroup>
         <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
         <form id="editor-form" action="{{ request.get_full_path }}" method="POST">

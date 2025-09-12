@@ -22,7 +22,6 @@ class EditorView(View):
     editor_start_url_reverse_base: str
     editor_url_reverse_base: str
 
-    title_base = ''
     api_endpoint_client_class = ApiEndpointClient
 
     def _get_first_field_format(self):
@@ -58,7 +57,7 @@ class EditorStartFormView(EditorView, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': self.title_base,
+            'title': f'New {self.registration_type_name_singular.title()}',
         })
         return context
 
@@ -82,6 +81,8 @@ class EditorStartFormView(EditorView, FormView):
 
 
 class EditorFormView(EditorView, FormView):
+    title_base = ''
+
     def get_prev_and_next_list_items(self):
         field_formats = (self.api_endpoint_client_class()
                         .endpoint_definition
@@ -110,6 +111,7 @@ class EditorFormView(EditorView, FormView):
             self._get_first_field_format()
         )
         self.success_url = self.request.path
+        self.title_base = f'{self.registration_type_name_singular.title()} {self.registration_id}'
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -117,7 +119,7 @@ class EditorFormView(EditorView, FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': f'{self.title_base} | {self.field_format}',
-            'main_subheading': self.title_base,
+            'main_subheading': self.registration_type_name_singular.title(),
             'main_heading': self.field_format,
             'current_field_format': self.field_format,
             'prev_list_item': prev_list_item,
