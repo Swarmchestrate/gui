@@ -113,3 +113,17 @@ class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
     def get_data_for_form_fields(self):
         return self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
+
+
+class RegistrationsListForm(forms.Form):
+    def __init__(self, registration_ids: list[int], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['registration_ids_to_delete'].choices = [(id, id) for id in registration_ids]
+
+    registration_ids_to_delete = forms.MultipleChoiceField(
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'form-check-input',
+            'aria-label': 'Select',
+        })
+    )

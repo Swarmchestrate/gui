@@ -1,46 +1,83 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block scripts %}
+<script src="{% static 'editor/registrations_list.js' %}" type="module"></script>
+{% endblock scripts %}
 {% load helpers %}
 {% block content %}
 <h1>{{ title }}</h1>
-<p>{{ description }}</p>
+<p class="pb-4">{{ description }}</p>
 {% if not registrations %}
 <p class="text-body-secondary">No {{ registration_type_name_plural|title }} have been registered.</p>
 {% else %}
-<div class="table-responsive">
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="align-baseline px-3"></th>
-                <th class="align-baseline px-3">ID</th>
-                <th class="align-baseline px-3">Date Created</th>
-                <th class="align-baseline px-3">Date Updated</th>
-                <th class="align-baseline px-3">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for registration in registrations %}
-            {% with registration_id=registration|get_key_value_or_blank_string:id_field %}
-            <tr>
-                <td class="align-baseline px-3">
-                    <input
-                        type="checkbox"
-                        id="id_checkbox_{{ registration_id }}"
-                        name="checkbox-{{ registration_id }}"
-                        class="form-check-input">
-                </td>
-                <td class="font-monospace align-baseline px-3">{{ registration_id }}</td>
-                <td class="align-baseline px-3">{{ registration.created_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
-                <td class="align-baseline px-3">{{ registration.updated_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
-                <td class="align-baseline px-3">
-                    <div class="d-flex column-gap-2">
-                        <a href="{% url editor_url_reverse_base registration_id %}" class="btn btn-light">Edit</a>
-                    </div>
-                </td>
-            </tr>
-            {% endwith %}
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<form id="registration-deletion-form" method="POST" action="{{ request.path }}">
+    {% csrf_token %}
+    <div>
+        <ul class="d-inline-flex column-gap-3 list-unstyled">
+            <li>
+                <button
+                    id="delete-checked-btn"
+                    class="invisible btn btn-outline-danger"
+                    type="submit">
+                    Delete selected (<span id="num-checked"></span>)
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="table-responsive">
+        <table id="registrations-table" class="table table-hover">
+            <thead>
+                <tr class="table-primary">
+                    <th class="align-baseline p-3">
+                        <input
+                            type="checkbox"
+                            id="select-all-registrations"
+                            class="form-check-input"
+                            aria-label="Select All">
+                    </th>
+                    <th class="align-baseline p-3">ID</th>
+                    <th class="align-baseline p-3">Date Created</th>
+                    <th class="align-baseline p-3">Date Updated</th>
+                    <th class="align-baseline p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for checkbox in form.registration_ids_to_delete %}
+                {% with registration_id=checkbox.data.value %}
+                {% with registration=registrations|get_key_value_or_blank_string:registration_id %}
+                {% if registration %}
+                <tr>
+                    <td class="align-baseline px-3">
+                        {{ checkbox.tag }}
+                    </td>
+                    <td class="font-monospace align-baseline px-3">{{ registration_id }}</td>
+                    <td class="align-baseline px-3">{{ registration.created_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
+                    <td class="align-baseline px-3">{{ registration.updated_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
+                    <td class="align-baseline px-3">
+                        <ul class="d-inline-flex column-gap-2 list-unstyled">
+                            <li>
+                                <a
+                                    href="{% url editor_url_reverse_base registration_id %}"
+                                    class="btn btn-light edit-btn">
+                                    Edit</a>
+                            </li>
+                            <li>
+                                <button
+                                    class="btn btn-danger delete-btn"
+                                    data-registration-id="{{ registration_id }}"
+                                    type="button">
+                                    Delete</button>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endwith %}
+                {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
 {% endif %}
 {% endblock content %}

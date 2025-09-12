@@ -7,7 +7,7 @@ from editor.views import (
     EditorView,
     EditorFormView,
     EditorStartFormView,
-    RegistrationsTemplateView,
+    RegistrationsListFormView,
 )
 
 
@@ -32,5 +32,5 @@ class ApplicationEditorFormView(ApplicationEditorView, EditorFormView):
     success_url = reverse_lazy('applications:new_application')
 
 
-class ApplicationRegistrationsTemplateView(ApplicationEditorView, RegistrationsTemplateView):
+class ApplicationRegistrationsListFormView(ApplicationEditorView, RegistrationsListFormView):
     pass

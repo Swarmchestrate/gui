@@ -11,12 +11,14 @@ from django.views.generic import (
 )
 
 from .api_endpoint_client import ApiEndpointClient
+from .forms import RegistrationsListForm
 
 
 class EditorView(View):
     registration_type_name_singular: str
     registration_type_name_plural: str
     api_endpoint_client: ApiEndpointClient
+    id_field: str
 
     editor_registration_list_url_reverse: str
     editor_start_url_reverse_base: str
@@ -24,16 +26,17 @@ class EditorView(View):
 
     api_endpoint_client_class = ApiEndpointClient
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.api_endpoint_client = self.api_endpoint_client_class()
+        self.id_field = self.api_endpoint_client.endpoint_definition.id_field
+
     def _get_first_field_format(self):
         return next(iter(
             self.api_endpoint_client_class()
             .endpoint_definition
             .get_user_specifiable_field_formats()
         ))
-
-    def dispatch(self, request, *args, **kwargs):
-        self.api_endpoint_client = self.api_endpoint_client_class()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,7 +47,7 @@ class EditorView(View):
             'editor_registration_list_url_reverse': self.editor_registration_list_url_reverse,
             'editor_url_reverse_base': self.editor_url_reverse_base,
             'editor_start_url_reverse_base': self.editor_start_url_reverse_base,
-            'id_field': self.api_endpoint_client.endpoint_definition.id_field,
+            'id_field': self.id_field,
             'toc_list_items': (self.api_endpoint_client_class()
                                 .endpoint_definition
                                 .get_user_specifiable_field_formats()),
@@ -74,7 +77,7 @@ class EditorStartFormView(EditorView, FormView):
         self.success_url = reverse_lazy(
             self.editor_url_reverse_base,
             kwargs={
-                'registration_id': new_registration.get(self.api_endpoint_client.endpoint_definition.id_field),
+                'registration_id': new_registration.get(self.id_field),
             }
         )
         return super().form_valid(form)
@@ -174,13 +177,45 @@ class EditorFormView(EditorView, FormView):
         })
 
 
-class RegistrationsTemplateView(EditorView, TemplateView):
+class RegistrationsListFormView(EditorView, FormView):
     template_name = 'editor/registrations_list.html'
+    form_class = RegistrationsListForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.registrations_list = self.api_endpoint_client.get_registrations()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = request.path
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.registration_type_name_plural.title(),
-            'registrations': self.api_endpoint_client.get_registrations()
+            'registrations': {
+                registration.get(self.id_field): registration
+                for registration in self.registrations_list
+            }
         })
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'registration_ids': [
+                registration.get(self.id_field)
+                for registration in self.registrations_list
+            ]
+        })
+        return kwargs
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'An error occurred whilst deleting registrations. The registrations may not have been deleted.')
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        self.api_endpoint_client.delete_many(
+            form.cleaned_data.get('registration_ids_to_delete', [])
+        )
+        return super().form_valid(form)
