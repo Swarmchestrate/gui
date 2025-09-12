@@ -15,5 +15,4 @@ def get_key_value_or_blank_string(d: dict, key: str):
 
 @register.filter
 def convert_str_date(value: str):
-    print('parser.parse(value)', parser.parse(value))
     return parser.parse(value)
