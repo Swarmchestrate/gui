@@ -84,6 +84,13 @@ class ApiEndpointClient(ApiClient):
         response = requests.delete(self.endpoint_url, params=params)
         response.raise_for_status()
 
+    def delete_many(self, registration_ids: list[int]):
+        params = {
+            self.endpoint_definition.id_field: f'in.({",".join(map(str, registration_ids))})',
+        }
+        response = requests.delete(self.endpoint_url, params=params)
+        response.raise_for_status()
+
     def update(self, registration_id: int, data: dict):
         params = {
             self.endpoint_definition.id_field: f'eq.{registration_id}',
