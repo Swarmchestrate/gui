@@ -51,7 +51,7 @@ class EditorView(View):
                                 .get_user_specifiable_field_formats()),
         })
         return context
-    
+
 
 
 class EditorStartFormView(EditorView, FormView):
@@ -125,7 +125,7 @@ class EditorFormView(EditorView, FormView):
             'registration_id': self.registration_id,
         })
         return context
-    
+
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -144,7 +144,7 @@ class EditorFormView(EditorView, FormView):
             'feedback': json.loads(form.errors.as_json()),
             'url': self.request.path,
         }, status=HTTPStatus.BAD_REQUEST)
-    
+
     def form_valid(self, form):
         prev_list_item, next_list_item = self.get_prev_and_next_list_items()
         if next_list_item:
@@ -177,11 +177,8 @@ class RegistrationsTemplateView(EditorView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print('self.api_endpoint_client', self.api_endpoint_client)
-        print('self.api_endpoint_client.get_registrations()', self.api_endpoint_client.get_registrations())
         context.update({
             'title': self.registration_type_name_plural.title(),
             'registrations': self.api_endpoint_client.get_registrations()
         })
         return context
-    
