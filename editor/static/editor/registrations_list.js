@@ -2,31 +2,34 @@ const form = document.getElementById("registration-deletion-form");
 const registrationsTableBody = document.querySelector(
     "#registrations-table tbody",
 );
-const tableRows = registrationsTableBody.querySelectorAll("tr");
 const deleteCheckedButton = document.getElementById("delete-checked-btn");
 const numCheckedElement = document.getElementById("num-checked");
-const selectAllCheckbox = document.getElementById("select-all-registrations");
 
-function updateSelectAllCheckboxState() {
-    const numChecked = registrationsTableBody.querySelectorAll(
-        "input[type='checkbox']:checked",
-    ).length;
-    if (numChecked === 0) {
-        selectAllCheckbox.indeterminate = false;
-        return (selectAllCheckbox.checked = false);
-    }
-    const allChecked = numChecked === tableRows.length;
-    if (allChecked) {
-        selectAllCheckbox.indeterminate = false;
-        return (selectAllCheckbox.checked = true);
-    }
-    return (selectAllCheckbox.indeterminate = true);
+// DataTables setup
+function initialiseDataTable() {
+    const dataTable = new DataTable("#registrations-table", {
+        columnDefs: [
+            {
+                render: DataTable.render.select(),
+                target: 0,
+            },
+        ],
+        select: {
+            style: "os",
+            selector: "td:first-child",
+        },
+        order: [[1, "asc"]],
+    });
+    return dataTable;
 }
 
-function updateDeleteCheckedButtonState() {
-    const numChecked = registrationsTableBody.querySelectorAll(
+function getAllSelectedRows() {
+    return registrationsTableBody.querySelectorAll(
         "input[type='checkbox']:checked",
-    ).length;
+    );
+}
+
+function updateDeleteCheckedButtonState(numChecked) {
     numCheckedElement.textContent = numChecked;
     if (numChecked === 0) {
         return deleteCheckedButton.classList.add("invisible");
@@ -34,19 +37,68 @@ function updateDeleteCheckedButtonState() {
     return deleteCheckedButton.classList.remove("invisible");
 }
 
-function setupSelectableTableRows() {
-    tableRows.forEach((tableRow) => {
-        const checkbox = tableRow.querySelector("input[type='checkbox']");
-        checkbox.addEventListener("input", () => {
-            updateSelectAllCheckboxState();
-            updateDeleteCheckedButtonState();
-            if (checkbox.checked) {
-                return tableRow.classList.add("table-active");
-            }
-            return tableRow.classList.remove("table-active");
+function setupDataTableEventListeners(dataTable) {
+    dataTable.on("select", (e, dt, type, indexes) => {
+        if (type !== "row") {
+            return;
+        }
+        const selected = dataTable.rows(indexes).nodes().toArray();
+        selected.forEach((row) => {
+            row.classList.add("table-active");
         });
+    });
 
-        const deleteButton = tableRow.querySelector(".delete-btn");
+    dataTable.on("deselect", (e, dt, type, indexes) => {
+        if (type !== "row") {
+            return;
+        }
+        const deselected = dataTable.rows(indexes).nodes().toArray();
+        deselected.forEach((row) => {
+            row.classList.remove("table-active");
+        });
+    });
+}
+
+function initialiseAndSetupDataTable() {
+    const dataTable = initialiseDataTable();
+    setupDataTableEventListeners(dataTable);
+    return dataTable;
+}
+
+// Table row setup
+function setupRegistrationsTableCheckboxStyling(checkbox) {
+    return checkbox.classList.add("form-check-input");
+}
+
+function setupRegistrationsTableInputsAndButtons() {
+    const selectAllRowsCheckbox = document.querySelector(
+        "#registrations-table thead input[type='checkbox']",
+    );
+    setupRegistrationsTableCheckboxStyling(selectAllRowsCheckbox);
+    selectAllRowsCheckbox.addEventListener("input", () => {
+        // Small timeout added before updating delete checked
+        // button state as number of selected rows doesn't
+        // update straight away.
+        window.setTimeout(() => {
+            updateDeleteCheckedButtonState(getAllSelectedRows().length);
+        }, 25);
+    });
+    const tableRows = registrationsTableBody.querySelectorAll("tr");
+    tableRows.forEach((tr) => {
+        // Select row checkbox
+        const checkbox = tr.querySelector("input[type='checkbox']");
+        setupRegistrationsTableCheckboxStyling(checkbox);
+        checkbox.addEventListener("input", () => {
+            updateDeleteCheckedButtonState(getAllSelectedRows().length);
+        });
+        checkbox.setAttribute("name", "registration_ids_to_delete");
+        const registrationId = tr.dataset.registrationId;
+        if (!registrationId) {
+            return;
+        }
+        checkbox.setAttribute("value", registrationId);
+        // Delete row button
+        const deleteButton = tr.querySelector(".delete-btn");
         deleteButton.addEventListener("click", () => {
             const isConfirmed = confirm(
                 "Are you sure you want to delete this registration?",
@@ -65,8 +117,8 @@ function setupSelectableTableRows() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    setupSelectableTableRows();
-    updateDeleteCheckedButtonState();
+    initialiseAndSetupDataTable();
+    setupRegistrationsTableInputsAndButtons();
     deleteCheckedButton.addEventListener("click", () => {
         const isConfirmed = confirm(
             "Are you sure you want to delete the selected registrations?",
@@ -75,16 +127,5 @@ window.addEventListener("DOMContentLoaded", () => {
             return;
         }
         form.submit();
-    });
-    selectAllCheckbox.addEventListener("input", () => {
-        tableRows.forEach((tableRow) => {
-            const checkbox = tableRow.querySelector("input[type='checkbox']");
-            checkbox.checked = selectAllCheckbox.checked;
-            updateDeleteCheckedButtonState();
-            if (selectAllCheckbox.checked) {
-                return tableRow.classList.add("table-active");
-            }
-            return tableRow.classList.remove("table-active");
-        });
     });
 });
