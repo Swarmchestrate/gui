@@ -10,6 +10,7 @@ function initialiseDataTable() {
     const dataTable = new DataTable("#registrations-table", {
         columnDefs: [
             {
+                orderable: false,
                 render: DataTable.render.select(),
                 target: 0,
             },

@@ -32,8 +32,7 @@
         <table id="registrations-table" class="table table-hover">
             <thead>
                 <tr class="table-primary">
-                    <th class="align-middle p-3">
-                    </th>
+                    <th class="align-middle p-3"></th>
                     <th class="align-middle p-3">ID</th>
                     <th class="align-middle p-3">Date Created</th>
                     <th class="align-middle p-3">Date Updated</th>
@@ -46,8 +45,7 @@
                 {% with registration=registrations|get_key_value_or_blank_string:registration_id %}
                 {% if registration %}
                 <tr data-registration-id="{{ registration_id }}">
-                    <td class="align-middle px-3">
-                    </td>
+                    <td class="align-middle px-3"></td>
                     <td class="font-monospace align-middle px-3">{{ registration_id }}</td>
                     <td class="align-middle px-3">{{ registration.created_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
                     <td class="align-middle px-3">{{ registration.updated_at|convert_str_date|date:'SHORT_DATE_FORMAT' }}</td>
