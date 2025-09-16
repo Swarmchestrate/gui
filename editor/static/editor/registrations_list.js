@@ -15,11 +15,21 @@ function initialiseDataTable() {
                 target: 0,
             },
         ],
+        columns: [
+            { name: "checkbox" },
+            { name: "id" },
+            { name: "date_created" },
+            { name: "date_updated" },
+            { name: "actions" },
+        ],
         select: {
             style: "os",
             selector: "td:first-child",
         },
-        order: [[1, "asc"]],
+        order: {
+            name: "date_updated",
+            dir: "asc",
+        },
     });
     return dataTable;
 }
