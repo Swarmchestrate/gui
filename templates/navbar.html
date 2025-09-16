@@ -13,15 +13,17 @@
                         Capacities
                     </a>
                     <ul class="dropdown-menu shadow">
+                        <!-- Cloud Capacities -->
                         <li>
                             <div class="dropdown-header">Cloud</div>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacities_list' %}">Cloud Capacities</a>
-                        </li>
-                        <li>
                             <a class="dropdown-item" href="{% url 'capacities:new_cloud_capacity' %}">New Cloud Capacity</a>
                         </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacities_list' %}">Cloud Capacities</a>
+                        </li>
+                        <!-- Edge Capacities -->
                         <li>
                             <div class="dropdown-header">Edge</div>
                         </li>
@@ -39,10 +41,10 @@
                     </a>
                     <ul class="dropdown-menu shadow">
                         <li>
-                            <a class="dropdown-item" href="{% url 'applications:applications_list' %}">Applications</a>
+                            <a class="dropdown-item" href="{% url 'applications:new_application' %}">New Application</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'applications:new_application' %}">New Application</a>
+                            <a class="dropdown-item" href="{% url 'applications:applications_list' %}">Applications</a>
                         </li>
                     </ul>
                 </li>
