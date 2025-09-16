@@ -50,7 +50,7 @@ class ApiEndpointClient(ApiClient):
         ]
 
     # Registrations
-    def get(self, registration_id: int, params: dict = {}):
+    def get(self, registration_id: int, params: dict = dict()):
         params.update({
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         })
