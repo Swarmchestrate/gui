@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+from datetime import datetime, timezone
 
 from .api_client import ApiClient
 from .definitions import UserSpecifiableOpenApiDefinition
@@ -93,6 +94,11 @@ class ApiEndpointClient(ApiClient):
         response.raise_for_status()
 
     def update(self, registration_id: int, data: dict):
+        current_time = datetime.now(timezone.utc).isoformat()
+        current_time_no_tz = str(current_time).replace('+00:00', '')
+        data.update({
+            'updated_at': current_time_no_tz,
+        })
         params = {
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         }
