@@ -46,12 +46,13 @@ class ApiEndpointClient(ApiClient):
         ]
 
     # Registrations
-    def get(self, registration_id: int):
+    def get(self, registration_id: int, params: dict = {}):
+        params.update({
+            self.endpoint_definition.id_field: f'eq.{registration_id}',
+        })
         response = requests.get(
             self.endpoint_url,
-            params={
-                self.endpoint_definition.id_field: f'eq.{registration_id}',
-            }
+            params=params
         )
         response.raise_for_status()
         # Responses are returned as lists, so need

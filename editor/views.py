@@ -134,9 +134,11 @@ class EditorFormView(EditorView, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        registration_data = self.api_endpoint_client.get(self.registration_id)
         kwargs.update({
-            'api_endpoint_client': self.api_endpoint_client_class(),
+            'api_endpoint_client': self.api_endpoint_client,
             'field_format': self.field_format,
+            'initial': registration_data,
         })
         return kwargs
 
