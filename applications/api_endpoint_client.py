@@ -12,7 +12,7 @@ class ApplicationApiEndpointClient(ApiEndpointClient):
 
 
 class ApplicationColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = {}):
+    def get_registrations(self, params: dict = dict()):
         params.update({
             'table_name': 'eq.application',
         })

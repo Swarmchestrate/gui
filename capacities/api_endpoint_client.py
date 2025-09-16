@@ -30,7 +30,7 @@ class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
 
 
 class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = {}):
+    def get_registrations(self, params: dict = dict()):
         params.update({
             'table_name': 'eq.capacity',
             'category': 'neq.Edge Specific',
@@ -53,7 +53,7 @@ class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
 
 
 class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = {}):
+    def get_registrations(self, params: dict = dict()):
         params.update({
             'table_name': 'eq.capacity',
             'category': 'neq.System Specific',
