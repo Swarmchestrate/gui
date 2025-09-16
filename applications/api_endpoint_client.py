@@ -1,6 +1,6 @@
 from .definitions import ApplicationUserSpecifiableOpenApiDefinition
 
-from editor.api_endpoint_client import ApiEndpointClient
+from editor.api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointClient
 
 
 class ApplicationApiEndpointClient(ApiEndpointClient):
@@ -9,3 +9,11 @@ class ApplicationApiEndpointClient(ApiEndpointClient):
     def __init__(self) -> None:
         self.endpoint = 'application'
         super().__init__()
+
+
+class ApplicationColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+    def get_registrations(self, params: dict = {}):
+        params.update({
+            'table_name': 'eq.application',
+        })
+        return super().get_registrations(params)

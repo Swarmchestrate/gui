@@ -3,7 +3,9 @@ from django.views.generic import FormView
 
 from .api_endpoint_client import (
     CloudCapacityApiEndpointClient,
+    CloudCapacityColumnMetadataApiEndpointClient,
     EdgeCapacityApiEndpointClient,
+    EdgeCapacityColumnMetadataApiEndpointClient,
 )
 from .forms import (
     CloudCapacityRegistrationForm,
@@ -28,6 +30,7 @@ class CloudCapacityEditorView(EditorView):
     registration_type_name_singular = 'cloud capacity'
     registration_type_name_plural = 'cloud capacities'
     api_endpoint_client_class = CloudCapacityApiEndpointClient
+    column_metadata_api_endpoint_client_class = CloudCapacityColumnMetadataApiEndpointClient
 
 
 class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormView, FormView):
@@ -54,6 +57,7 @@ class EdgeCapacityEditorView(EditorView):
     registration_type_name_plural = 'edge capacities'
     title_base = 'New Edge Capacity'
     api_endpoint_client_class = EdgeCapacityApiEndpointClient
+    column_metadata_api_endpoint_client_class = EdgeCapacityColumnMetadataApiEndpointClient
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):

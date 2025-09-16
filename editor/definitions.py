@@ -78,9 +78,24 @@ class UserSpecifiableOpenApiDefinition(OpenApiDefinition):
             if value.get('format') == format
         }
 
+    def get_user_specifiable_fields_with_names(self, names: list[str]):
+        all_user_specifiable_fields = self._get_all_user_specifiable_fields()
+        return {
+            key: value
+            for key, value in all_user_specifiable_fields.items()
+            if key in names
+        }
+
     def get_required_user_specifiable_fields(self):
         field_names = self._get_required_user_specifiable_field_names()
         return self._get_fields_with_names(field_names)
 
     def get_required_field_names(self):
         return self._get_required_field_names()
+
+
+class ColumnMetadataUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
+    def __init__(self, openapi_spec: dict) -> None:
+        super().__init__(openapi_spec)
+        self.definition_name = 'column_metadata'
+        self.id_field = ''

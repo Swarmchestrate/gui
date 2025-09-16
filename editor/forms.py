@@ -13,7 +13,7 @@ from .form_utils import (
     ConfiguredTextField,
 )
 
-from editor.api_endpoint_client import ApiEndpointClient
+from editor.api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointClient
 
 
 class OpenApiPropertyFormat(Enum):
@@ -31,9 +31,14 @@ class OpenApiSpecificationBasedForm(forms.Form):
     error_css_class = 'is-invalid'
     definition_name = ''
 
-    def __init__(self, api_endpoint_client: ApiEndpointClient, *args, **kwargs):
+    def __init__(
+            self,
+            api_endpoint_client: ApiEndpointClient,
+            column_metadata_api_endpoint_client: ColumnMetadataApiEndpointClient,
+            *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.api_endpoint_client = api_endpoint_client
+        self.column_metadata_api_endpoint_client = column_metadata_api_endpoint_client
         field_data = self.get_data_for_form_fields()
         required_field_names = self.api_endpoint_client.endpoint_definition.get_required_field_names()
         self.populate_form_fields(field_data, required_field_names)
@@ -101,13 +106,25 @@ class OpenApiSpecificationBasedForm(forms.Form):
         ).field_instance
 
 
-class OpenApiSpecificationFieldFormatBasedForm(OpenApiSpecificationBasedForm):
-    def __init__(self, api_endpoint_client: ApiEndpointClient, field_format: str, *args, **kwargs):
-        self.field_format = field_format
+class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
+    def __init__(
+            self,
+            api_endpoint_client: ApiEndpointClient,
+            category: str, *args, **kwargs):
+        self.category = category
         super().__init__(api_endpoint_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        return self.api_endpoint_client.endpoint_definition.get_user_specifiable_fields_with_format(self.field_format)
+        column_metadata_registrations = self.column_metadata_api_endpoint_client.get_registrations()
+        field_names = [
+            r.get('column_name')
+            for r in column_metadata_registrations
+            if r.get('category') == self.category
+        ]
+        return (
+            self
+            .api_endpoint_client.endpoint_definition
+            .get_user_specifiable_fields_with_names(field_names))
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):

@@ -1,5 +1,5 @@
 from editor.forms import (
-    OpenApiSpecificationFieldFormatBasedForm,
+    OpenApiSpecificationCategoryBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
 )
 
@@ -8,5 +8,5 @@ class ApplicationRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'application'
 
 
-class ApplicationEditorForm(OpenApiSpecificationFieldFormatBasedForm):
+class ApplicationEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = 'application'

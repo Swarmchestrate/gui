@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .api_endpoint_client import ApplicationApiEndpointClient
+from .api_endpoint_client import ApplicationApiEndpointClient, ApplicationColumnMetadataApiEndpointClient
 from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 
 from editor.views import (
@@ -18,6 +18,7 @@ class ApplicationEditorView(EditorView):
     registration_type_name_singular = 'application'
     registration_type_name_plural = 'applications'
     api_endpoint_client_class = ApplicationApiEndpointClient
+    column_metadata_api_endpoint_client_class = ApplicationColumnMetadataApiEndpointClient
 
 
 class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):

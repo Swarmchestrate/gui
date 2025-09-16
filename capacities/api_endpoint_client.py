@@ -1,6 +1,6 @@
 from .definitions import CapacityUserSpecifiableOpenApiDefinition
 
-from editor.api_endpoint_client import ApiEndpointClient
+from editor.api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointClient
 
 
 class BaseCapacityApiEndpointClient(ApiEndpointClient):
@@ -29,6 +29,15 @@ class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
         return super().delete(registration_id, params)
 
 
+class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+    def get_registrations(self, params: dict = {}):
+        params.update({
+            'table_name': 'eq.capacity',
+            'category': 'neq.Edge Specific',
+        })
+        return super().get_registrations(params)
+
+
 class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
     def get_registrations(self, params: dict = dict()):
         params.update({'resource_type': 'eq.Edge'})
@@ -41,3 +50,12 @@ class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
     def delete(self, registration_id: int, params: dict = dict()):
         params.update({'resource_type': 'eq.Edge'})
         return super().delete(registration_id, params)
+
+
+class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+    def get_registrations(self, params: dict = {}):
+        params.update({
+            'table_name': 'eq.capacity',
+            'category': 'neq.System Specific',
+        })
+        return super().get_registrations(params)

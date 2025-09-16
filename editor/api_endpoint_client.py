@@ -4,7 +4,10 @@ import requests
 from datetime import datetime, timezone
 
 from .api_client import ApiClient
-from .definitions import UserSpecifiableOpenApiDefinition
+from .definitions import (
+    ColumnMetadataUserSpecifiableOpenApiDefinition,
+    UserSpecifiableOpenApiDefinition,
+)
 
 
 class ApiEndpointClient(ApiClient):
@@ -108,3 +111,11 @@ class ApiEndpointClient(ApiClient):
             json=data
         )
         response.raise_for_status()
+
+
+class ColumnMetadataApiEndpointClient(ApiEndpointClient):
+    endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
+
+    def __init__(self) -> None:
+        self.endpoint = 'column_metadata'
+        super().__init__()
