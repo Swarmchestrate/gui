@@ -33,4 +33,4 @@ class ApplicationEditorFormView(ApplicationEditorView, EditorFormView):
 
 
 class ApplicationRegistrationsListFormView(ApplicationEditorView, RegistrationsListFormView):
-    pass
+    new_registration_reverse = 'applications:new_application'

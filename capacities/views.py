@@ -42,7 +42,7 @@ class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
-    pass
+    new_registration_reverse = 'capacities:new_cloud_capacity'
 
 
 # Edge Capacity
@@ -68,4 +68,4 @@ class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
 
 
 class EdgeCapacityRegistrationsListFormView(EdgeCapacityEditorView, RegistrationsListFormView):
-    pass
+    new_registration_reverse = 'capacities:new_edge_capacity'

@@ -181,6 +181,8 @@ class RegistrationsListFormView(EditorView, FormView):
     template_name = 'editor/registrations_list.html'
     form_class = RegistrationsListForm
 
+    new_registration_reverse: str
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.registrations_list = self.api_endpoint_client.get_registrations()
@@ -196,7 +198,8 @@ class RegistrationsListFormView(EditorView, FormView):
             'registrations': {
                 registration.get(self.id_field): registration
                 for registration in self.registrations_list
-            }
+            },
+            'new_registration_reverse': self.new_registration_reverse,
         })
         return context
 
