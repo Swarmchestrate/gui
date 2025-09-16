@@ -19,14 +19,18 @@
     <div>
         <ul class="d-inline-flex column-gap-3 list-unstyled">
             <li>
-                <a href="{% url new_registration_reverse %}" class="btn btn-primary">+ New</a>
+                <a href="{% url new_registration_reverse %}" class="d-inline-flex align-items-center column-gap-2 btn btn-primary">
+                   <i class="bi bi-plus-lg"></i>
+                   New
+                </a>
             </li>
             <li>
                 <button
                     id="delete-checked-btn"
-                    class="invisible btn btn-outline-danger"
+                    class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
                     type="submit">
-                    Delete selected (<span id="num-checked"></span>)
+                    <i class="bi bi-trash3-fill" title="Delete"></i>
+                    <span>Delete selected (<span id="num-checked"></span>)</span>
                 </button>
             </li>
         </ul>
