@@ -10,19 +10,41 @@
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        New Capacity
+                        Capacities
                     </a>
                     <ul class="dropdown-menu shadow">
+                        <li>
+                            <div class="dropdown-header">Cloud</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacities_list' %}">Cloud Capacities</a>
+                        </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'capacities:new_cloud_capacity' %}">New Cloud Capacity</a>
                         </li>
                         <li>
+                            <div class="dropdown-header">Edge</div>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="{% url 'capacities:new_edge_capacity' %}">New Edge Capacity</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'capacities:edge_capacities_list' %}">Edge Capacities</a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="{% url 'applications:new_application' %}" class="nav-link">New Application</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Applications
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'applications:applications_list' %}">Applications</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'applications:new_application' %}">New Application</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
