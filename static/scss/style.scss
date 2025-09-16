@@ -107,8 +107,25 @@ label:has(~ :required)::after,
 }
 
 /* DataTables */
+#registrations-table_wrapper {
+    max-width: calc(100vw - var(--bs-gutter-x));
+}
+
+#registrations-table_wrapper .dt-layout-table {
+    overflow-x: auto;
+}
+
 #registrations-table thead input[type="checkbox"] {
     margin: auto;
+}
+
+.delete-btn i {
+    transition: $btn-transition;
+}
+
+.delete-btn:hover i,
+.delete-btn:focus-visible i {
+    color: var(--bs-danger);
 }
 
 /* Root variables */
