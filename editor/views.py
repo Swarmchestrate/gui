@@ -173,7 +173,7 @@ class EditorFormView(EditorView, FormView):
             'title': f'{self.title_base} | {category_formatted}',
             'main_subheading': self.registration_type_name_singular.title(),
             'main_heading': category_formatted,
-            'current_category': category_formatted,
+            'current_category': self.category,
             'prev_list_item': prev_list_item,
             'prev_list_item_title': prev_list_item.replace(':', ': '),
             'next_list_item': next_list_item,
