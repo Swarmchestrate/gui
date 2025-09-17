@@ -1,9 +1,14 @@
+import { setupDialog } from "/static/dialog.js";
+
 const form = document.getElementById("registration-deletion-form");
 const registrationsTableBody = document.querySelector(
     "#registrations-table tbody",
 );
 const deleteCheckedButton = document.getElementById("delete-checked-btn");
 const numCheckedElement = document.getElementById("num-checked");
+
+const deleteDialog = document.querySelector("#delete-dialog");
+const deleteMultipleDialog = document.querySelector("#delete-multiple-dialog");
 
 // DataTables setup
 function initialiseDataTable() {
@@ -111,30 +116,54 @@ function setupRegistrationsTableInputsAndButtons() {
         // Delete row button
         const deleteButton = tr.querySelector(".delete-btn");
         deleteButton.addEventListener("click", () => {
-            const isConfirmed = confirm(
-                "Are you sure you want to delete this registration?",
-            );
-            if (!isConfirmed) {
-                return;
-            }
-            const hiddenInput = document.createElement("input");
-            hiddenInput.type = "hidden";
-            hiddenInput.name = "registration_ids_to_delete";
-            hiddenInput.value = deleteButton.dataset.registrationId;
-            form.appendChild(hiddenInput);
-            form.submit();
+            deleteDialog
+                .querySelector(".confirm-btn")
+                .setAttribute("value", tr.dataset.registrationId);
+
+            deleteDialog.querySelector(".dialog-id-to-delete").textContent =
+                tr.dataset.registrationId;
         });
+    });
+    // Delete dialog setup
+    const deleteButtons =
+        registrationsTableBody.querySelectorAll(".delete-btn");
+    setupDialog(
+        deleteDialog,
+        deleteDialog.querySelector(".btn-close"),
+        deleteButtons,
+    );
+    deleteDialog.addEventListener("close", (e) => {
+        const returnValue = deleteDialog.returnValue;
+        if (returnValue === "cancel" || returnValue === "") {
+            return;
+        }
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.name = "registration_ids_to_delete";
+        hiddenInput.value = returnValue;
+        form.appendChild(hiddenInput);
+        form.submit();
     });
 }
 
 window.addEventListener("DOMContentLoaded", () => {
     initialiseAndSetupDataTable();
     setupRegistrationsTableInputsAndButtons();
+    // Delete multiple dialog setup
     deleteCheckedButton.addEventListener("click", () => {
-        const isConfirmed = confirm(
-            "Are you sure you want to delete the selected registrations?",
-        );
-        if (!isConfirmed) {
+        deleteMultipleDialog.querySelector(".num-to-delete").textContent =
+            registrationsTableBody.querySelectorAll(
+                "input[type='checkbox']:checked",
+            ).length;
+    });
+    setupDialog(
+        deleteMultipleDialog,
+        deleteMultipleDialog.querySelector(".btn-close"),
+        [deleteCheckedButton],
+    );
+    deleteMultipleDialog.addEventListener("close", (e) => {
+        const returnValue = deleteMultipleDialog.returnValue;
+        if (returnValue === "cancel" || returnValue === "") {
             return;
         }
         form.submit();

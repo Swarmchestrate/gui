@@ -28,7 +28,7 @@
                 <button
                     id="delete-checked-btn"
                     class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
-                    type="submit">
+                    type="button">
                     <i class="bi bi-trash3-fill" title="Delete"></i>
                     <span>Delete selected (<span id="num-checked"></span>)</span>
                 </button>
@@ -83,4 +83,10 @@
     </table>
 </form>
 {% endif %}
+{% with dialog_id='delete-dialog' %}
+{% include 'editor/dialogs/delete_dialog.html' %}
+{% endwith %}
+{% with dialog_id='delete-multiple-dialog' %}
+{% include 'editor/dialogs/delete_multiple_dialog.html' %}
+{% endwith %}
 {% endblock content %}

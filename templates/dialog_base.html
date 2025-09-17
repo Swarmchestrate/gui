@@ -1,0 +1,16 @@
+<dialog id="{{ dialog_id }}" class="{{ dialog_extra_classes|default:'' }} shadow" inert="true">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <div class="d-flex align-items-baseline column-gap-4 w-100">
+                {% block dialog_header_content %}
+                {% endblock dialog_header_content %}
+                <button class="btn-close btn-close-dialog ms-auto" autofocus></button>
+            </div>
+        </div>
+        <hr>
+        <div class="dialog-body">
+            {% block dialog_body_content %}
+            {% endblock dialog_body_content %}
+        </div>
+    </div>
+</dialog>

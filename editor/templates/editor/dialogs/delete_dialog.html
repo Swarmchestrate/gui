@@ -1,0 +1,16 @@
+{% extends 'dialog_base.html' %}
+
+{% block dialog_header_content %}
+<div>
+    Delete {{ registration_type_name_singular|title }} <span class="dialog-id-to-delete"></span>
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+<form method="dialog">
+    <p>Are you sure you want to delete this {{ registration_type_name_singular }}?</p>
+    <button class="btn btn-light" value="cancel" formmethod="dialog">Cancel</button>
+    <button class="btn btn-danger confirm-btn">Delete</button>
+    <div class="form-text pt-4">This action cannot be undone.</div>
+</form>
+{% endblock dialog_body_content %}

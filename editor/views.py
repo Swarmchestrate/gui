@@ -274,5 +274,8 @@ class RegistrationsListFormView(EditorView, FormView):
     def form_valid(self, form):
         registration_ids_to_delete = form.cleaned_data.get('registration_ids_to_delete', [])
         self.api_endpoint_client.delete_many(registration_ids_to_delete)
-        messages.success(self.request, f'Deleted {len(registration_ids_to_delete)} registrations')
+        success_msg = f'Deleted 1 {self.registration_type_name_singular}'
+        if len(registration_ids_to_delete) != 1:
+            success_msg = f'Deleted {len(registration_ids_to_delete)} {self.registration_type_name_plural}'
+        messages.success(self.request, success_msg)
         return super().form_valid(form)
