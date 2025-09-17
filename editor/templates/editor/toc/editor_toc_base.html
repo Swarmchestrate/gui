@@ -3,7 +3,7 @@
 </h2>
 <ul class="nav flex-column list-unstyled">
     {% block before_toc %}{% endblock before_toc %}
-    {% for list_item in toc_list_items %}
+    {% for list_item, list_item_data in toc_list_items.items %}
     <li class="nav-item">
         {% block list_item %}
         {% include 'editor/toc/active_editor_toc_list_item.html' %}

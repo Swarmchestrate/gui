@@ -1,5 +1,9 @@
-<a
-    href="#"
-    class="nav-link disabled px-0"
-    aria-disblaed="true"
-    >{{ list_item }}</a>
+{% extends 'editor/toc/active_editor_toc_list_item.html' %}
+
+{% block list_item_link %}
+{% include 'editor/toc/inactive_editor_toc_list_item_link.html' %}
+{% endblock %}
+
+{% block descendent_list_item %}
+{% include 'editor/toc/inactive_editor_toc_list_item.html' %}
+{% endblock %}

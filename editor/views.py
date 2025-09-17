@@ -27,22 +27,68 @@ class EditorView(View):
 
     api_endpoint_client_class: ApiEndpointClient
     column_metadata_api_endpoint_client_class: ColumnMetadataApiEndpointClient
-    categories_ordered: list[str]
+    categories: dict
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.api_endpoint_client = self.api_endpoint_client_class()
         self.column_metadata_api_endpoint_client = self.column_metadata_api_endpoint_client_class()
         self.id_field = self.api_endpoint_client.endpoint_definition.id_field
-        self.categories_ordered = list(set([
+        self._setup_categories()
+
+    def _setup_categories(self):
+        self.category_names = list(set(
             r.get('category')
             for r in self.column_metadata_api_endpoint_client.get_registrations(params={
                 'select': 'category',
             })
-        ]))
+        ))
+        self.category_names.sort()
+        processed_categories = set()
+
+        def add_category_descendents(category: str, category_data: dict, parent_category: str = ''):
+            if category in processed_categories:
+                return
+            processed_categories.add(category)
+            if category not in category_data:
+                category_data.update({
+                    category: {
+                        'title': category,
+                        'descendents': dict(),
+                    },
+                })
+                if parent_category:
+                    category_data.update({
+                        category: {
+                            'title': category.replace(f'{parent_category}:', ''),
+                        },
+                    })
+
+            category_with_colon = f'{category}:'
+            descendent_names = [
+                possible_descendent_name
+                for possible_descendent_name in self.category_names
+                if (category in possible_descendent_name
+                    and category != possible_descendent_name
+                    and ':' not in possible_descendent_name.replace(category_with_colon, '')
+                )
+            ]
+            for dn in descendent_names:
+                add_category_descendents(
+                    dn,
+                    category_data[category]['descendents'],
+                    parent_category=category
+                )
+
+        self.categories = dict()
+        for category in self.category_names:
+            add_category_descendents(
+                category,
+                self.categories
+            )
 
     def _get_first_category(self):
-        return next(iter(self.categories_ordered))
+        return next(iter(self.category_names))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +100,7 @@ class EditorView(View):
             'editor_url_reverse_base': self.editor_url_reverse_base,
             'editor_start_url_reverse_base': self.editor_start_url_reverse_base,
             'id_field': self.id_field,
-            'toc_list_items': self.categories_ordered,
+            'toc_list_items': self.categories,
         })
         return context
 
@@ -92,18 +138,18 @@ class EditorFormView(EditorView, FormView):
     title_base = ''
 
     def get_prev_and_next_list_items(self):
-        index_of_current_category = self.categories_ordered.index(self.category)
-        prev_list_item = None
+        index_of_current_category = self.category_names.index(self.category)
+        prev_list_item = ''
         try:
             if index_of_current_category == 0:
                 raise IndexError
-            prev_list_item = self.categories_ordered[index_of_current_category - 1]
+            prev_list_item = self.category_names[index_of_current_category - 1]
         except IndexError:
             pass
 
-        next_list_item = None
+        next_list_item = ''
         try:
-            next_list_item = self.categories_ordered[index_of_current_category + 1]
+            next_list_item = self.category_names[index_of_current_category + 1]
         except IndexError:
             pass
 
@@ -122,13 +168,16 @@ class EditorFormView(EditorView, FormView):
     def get_context_data(self, **kwargs):
         prev_list_item, next_list_item = self.get_prev_and_next_list_items()
         context = super().get_context_data(**kwargs)
+        category_formatted = self.category.replace(':', ': ')
         context.update({
-            'title': f'{self.title_base} | {self.category}',
+            'title': f'{self.title_base} | {category_formatted}',
             'main_subheading': self.registration_type_name_singular.title(),
-            'main_heading': self.category,
-            'current_category': self.category,
+            'main_heading': category_formatted,
+            'current_category': category_formatted,
             'prev_list_item': prev_list_item,
+            'prev_list_item_title': prev_list_item.replace(':', ': '),
             'next_list_item': next_list_item,
+            'next_list_item_title': next_list_item.replace(':', ': '),
             'registration_id': self.registration_id,
         })
         return context

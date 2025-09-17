@@ -1,0 +1,4 @@
+<a
+    href="{% url editor_url_reverse_base registration_id %}?category={{ list_item|urlencode }}"
+    class="nav-link{% if current_category == list_item %} active{% endif %} px-0"
+    >{{ list_item_data.title }}</a>
