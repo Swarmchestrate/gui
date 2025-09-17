@@ -37,11 +37,18 @@
             {% endfor %}
             <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
                 {% if prev_list_item %}
-                <a href="{% url editor_url_reverse_base registration_id %}?category={{ prev_list_item|urlencode }}" class="btn btn-light">
+                <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+                    <a href="{% url editor_url_reverse_base registration_id %}?category={{ prev_list_item|urlencode }}" class="btn btn-light">
                     Previous Step
-                </a>
+                    </a>
+                    <div class="form-text text-center">{{ prev_list_item_title }}</div>
+                </div>
                 {% endif %}
+                {% if not prev_list_item %}
+                <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+                {% else %}
                 <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
+                {% endif %}
                     <button type="submit" class="btn btn-primary">
                         <span class="d-none loading-text">
                             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
@@ -55,6 +62,9 @@
                             {% endif %}
                         </span>
                     </button>
+                    {% if next_list_item %}
+                    <div class="form-text text-center">{{ next_list_item_title }}</div>
+                    {% endif %}
                     <ul id="form-messages-list" class="d-none text-danger text-center list-unstyled"></ul>
                 </div>
             </div>
