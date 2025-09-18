@@ -8,12 +8,13 @@
     {# High-level TOC #}
     <div class="col-xl-3">
         {% block high_level_toc %}
-        <ul class="nav flex-column list-unstyled">
+        <ul class="nav nav-pills flex-column list-unstyled">
             <li class="nav-item">
                 <a href="{% url editor_registration_list_url_reverse %}" class="nav-link pt-0">Back to {{ registration_type_name_plural|title }}</a>
             </li>
             <li class="nav-item">
-                <a href="{% url editor_overview_url_reverse_base registration_id %}" class="nav-link">Overview</a>
+                {% url editor_overview_url_reverse_base registration_id as overview_url %}
+                <a href="{{ overview_url }}" class="nav-link {% if request.path == overview_url %}active{% endif %}">Overview</a>
             </li>
         </ul>
         {% endblock high_level_toc %}
