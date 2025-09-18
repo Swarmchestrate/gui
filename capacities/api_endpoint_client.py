@@ -16,7 +16,9 @@ class CapacityApiEndpointClient(BaseCapacityApiEndpointClient):
 
 
 class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
-    def get_registrations(self, params: dict = dict()):
+    def get_registrations(self, params: dict = None):
+        if not params:
+            params = dict()
         params.update({'resource_type': 'eq.Cloud'})
         return super().get_registrations(params=params)
 
@@ -24,22 +26,28 @@ class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
         data.update({'resource_type': 'Cloud'})
         return super().register(data)
 
-    def delete(self, registration_id: int, params: dict = dict()):
+    def delete(self, registration_id: int, params: dict = None):
+        if not params:
+            params = dict()
         params.update({'resource_type': 'eq.Cloud'})
         return super().delete(registration_id, params)
 
 
 class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = dict()):
+    def get_registrations(self, params: dict = None):
+        if not params:
+            params = dict()
         params.update({
             'table_name': 'eq.capacity',
             'category': 'neq.Edge Specific',
         })
-        return super().get_registrations(params)
+        return super().get_registrations(params=params)
 
 
 class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
-    def get_registrations(self, params: dict = dict()):
+    def get_registrations(self, params: dict = None):
+        if not params:
+            params = dict()
         params.update({'resource_type': 'eq.Edge'})
         return super().get_registrations(params)
 
@@ -47,13 +55,17 @@ class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
         data.update({'resource_type': 'Edge'})
         return super().register(data)
 
-    def delete(self, registration_id: int, params: dict = dict()):
+    def delete(self, registration_id: int, params: dict = None):
+        if not params:
+            params = dict()
         params.update({'resource_type': 'eq.Edge'})
         return super().delete(registration_id, params)
 
 
 class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = dict()):
+    def get_registrations(self, params: dict = None):
+        if not params:
+            params = dict()
         params.update({
             'table_name': 'eq.capacity',
             'category': 'neq.System Specific',

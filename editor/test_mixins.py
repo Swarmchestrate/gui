@@ -25,7 +25,9 @@ class ApiEndpointClientTestCaseHelperMixin:
     def add_registration_id(self, registration_id: int):
         self.registration_ids.add(registration_id)
 
-    def register_with_api_endpoint_client_for_test(self, data: dict = dict()):
+    def register_with_api_endpoint_client_for_test(self, data: dict = None):
+        if not data:
+            data = dict()
         new_registration = self.api_endpoint_client.register(data)
         id_field = self.api_endpoint_client.endpoint_definition.id_field
         self.add_registration_id(new_registration.get(id_field))
@@ -33,7 +35,9 @@ class ApiEndpointClientTestCaseHelperMixin:
 
 
 class ApplicationApiEndpointClientTestCaseHelperMixin(ApiEndpointClientTestCaseHelperMixin):
-    def register_with_api_endpoint_client_for_test(self, data: dict = dict()):
+    def register_with_api_endpoint_client_for_test(self, data: dict = None):
+        if not data:
+            data = dict()
         data.update({
             'name': f'Application {len(self.registration_ids) + 1}',
             'container_image': 'https://hub.docker.com/myorg/weather-analytics:latest',

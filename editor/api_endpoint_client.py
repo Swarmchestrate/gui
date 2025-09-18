@@ -50,8 +50,9 @@ class ApiEndpointClient(ApiClient):
         ]
 
     # Registrations
-    def get(self, registration_id: int):
-        params = dict()
+    def get(self, registration_id: int, params: dict = None):
+        if not params:
+            params = dict()
         params.update({
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         })
@@ -65,7 +66,9 @@ class ApiEndpointClient(ApiClient):
         registration = next(iter(response.json()))
         return registration
 
-    def get_registrations(self, params: dict = dict()):
+    def get_registrations(self, params: dict = None):
+        if not params:
+            params = dict()
         response = requests.get(
             self.endpoint_url,
             params=params
@@ -83,7 +86,9 @@ class ApiEndpointClient(ApiClient):
         new_registration = self.get(new_id)
         return new_registration
 
-    def delete(self, registration_id: int, params: dict = dict()):
+    def delete(self, registration_id: int, params: dict = None):
+        if not params:
+            params = dict()
         params.update({
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         })
