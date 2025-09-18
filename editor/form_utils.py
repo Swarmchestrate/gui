@@ -36,12 +36,16 @@ class DefaultConfiguredField:
             })
         except AttributeError:
             pass
+        field_label = self.field_properties.get('title')
+        if field_label:
+            kwargs.update({
+                'label': field_label,
+            })
         field_description = self.field_properties.get('description')
-        if not field_description:
-            return kwargs
-        kwargs.update({
-            'help_text': field_description,
-        })
+        if field_description:
+            kwargs.update({
+                'help_text': field_description,
+            })
         return kwargs
 
     @property

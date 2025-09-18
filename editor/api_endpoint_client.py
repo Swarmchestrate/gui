@@ -125,3 +125,6 @@ class ColumnMetadataApiEndpointClient(ApiEndpointClient):
     def __init__(self) -> None:
         self.endpoint = 'column_metadata'
         super().__init__()
+
+    def get_column_metadata_with_category(self, category: str):
+        return self.get_registrations(params={'category': f'eq.{category}'})

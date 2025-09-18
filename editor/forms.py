@@ -39,9 +39,9 @@ class OpenApiSpecificationBasedForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.api_endpoint_client = api_endpoint_client
         self.column_metadata_api_endpoint_client = column_metadata_api_endpoint_client
+        self.required_field_names = self.api_endpoint_client.endpoint_definition.get_required_field_names()
         field_data = self.get_data_for_form_fields()
-        required_field_names = self.api_endpoint_client.endpoint_definition.get_required_field_names()
-        self.populate_form_fields(field_data, required_field_names)
+        self.populate_form_fields(field_data)
 
     def is_valid(self):
         is_valid = super().is_valid()
@@ -59,11 +59,11 @@ class OpenApiSpecificationBasedForm(forms.Form):
         return is_valid
 
     def get_data_for_form_fields(self):
-        return self.api_endpoint_client.endpoint_definition.get_all_user_specifiable_fields()
+        return dict()
 
-    def populate_form_fields(self, field_data: dict, required_field_names: list):
+    def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():
-            is_required = field_key in required_field_names
+            is_required = field_key in self.required_field_names
             new_field = self._get_configured_field(field_metadata, is_required=is_required)
             self.fields.update({
                 field_key: new_field,
@@ -91,7 +91,7 @@ class OpenApiSpecificationBasedForm(forms.Form):
                 return DefaultConfiguredField
 
     def _get_configured_field(self, field_metadata: dict, is_required: bool = False):
-        field_format = field_metadata.get('format')
+        field_format = field_metadata.get('format', '')
         try:
             field_format = OpenApiPropertyFormat(field_format)
         except ValueError:
@@ -115,21 +115,54 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         super().__init__(api_endpoint_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        column_metadata_registrations = self.column_metadata_api_endpoint_client.get_registrations()
+        column_metadata = (self.column_metadata_api_endpoint_client
+                            .get_column_metadata_with_category(self.category))
         field_names = [
             r.get('column_name')
-            for r in column_metadata_registrations
-            if r.get('category') == self.category
+            for r in column_metadata
         ]
-        return (
+        field_data = (
             self
             .api_endpoint_client.endpoint_definition
-            .get_user_specifiable_fields_with_names(field_names))
+            .get_user_specifiable_fields_with_names(field_names)
+        )
+        for cm in column_metadata:
+            field_name = cm.get('column_name')
+            try:
+                field_data[field_name].update(cm)
+            except KeyError:
+                pass
+        return field_data
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
     def get_data_for_form_fields(self):
-        return self.api_endpoint_client.endpoint_definition.get_required_user_specifiable_fields()
+        params = {
+            'column_name': 'in.(%s)' % (
+                ','.join([
+                    f'"{rfn}"'
+                    for rfn in self.required_field_names
+                ])
+            ),
+        }
+        column_metadata = (
+            self
+            .column_metadata_api_endpoint_client
+            .get_registrations(params=params)
+        )
+        field_data = (
+            self
+            .api_endpoint_client
+            .endpoint_definition
+            .get_required_user_specifiable_fields()
+        )
+        for cm in column_metadata:
+            field_name = cm.get('column_name')
+            try:
+                field_data[field_name].update(cm)
+            except KeyError:
+                pass
+        return field_data
 
 
 class RegistrationsListForm(forms.Form):
