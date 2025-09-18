@@ -48,6 +48,7 @@ class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClie
         params.update({
             'and': f'(category.{params.get('category')},category.neq.Edge Specific)',
         })
+        params.pop('category')
         return super().get_registrations(params)
 
 
@@ -84,4 +85,5 @@ class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClien
         params.update({
             'and': f'(category.{params.get('category')},category.neq.System Specific)',
         })
+        params.pop('category')
         return super().get_registrations(params)
