@@ -17,6 +17,7 @@ from .forms import (
 from editor.views import (
     EditorView,
     EditorFormView,
+    EditorOverviewTemplateView,
     EditorStartFormView,
     RegistrationsListFormView,
 )
@@ -27,6 +28,7 @@ class CloudCapacityEditorView(EditorView):
     editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
     editor_url_reverse_base = 'capacities:cloud_capacity_editor'
     editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
+    editor_overview_url_reverse_base = 'capacities:cloud_capacity_overview'
     registration_type_name_singular = 'cloud capacity'
     registration_type_name_plural = 'cloud capacities'
     api_endpoint_client_class = CloudCapacityApiEndpointClient
@@ -48,11 +50,16 @@ class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, Registrati
     new_registration_reverse = 'capacities:new_cloud_capacity'
 
 
+class CloudCapacityEditorOverviewTemplateView(CloudCapacityEditorView, EditorOverviewTemplateView):
+    pass
+
+
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
     editor_registration_list_url_reverse = 'capacities:edge_capacities_list'
     editor_url_reverse_base = 'capacities:edge_capacity_editor'
     editor_start_url_reverse_base = 'capacities:new_edge_capacity'
+    editor_overview_url_reverse_base = 'capacities:edge_capacity_overview'
     registration_type_name_singular = 'edge capacity'
     registration_type_name_plural = 'edge capacities'
     title_base = 'New Edge Capacity'
@@ -73,3 +80,7 @@ class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
 
 class EdgeCapacityRegistrationsListFormView(EdgeCapacityEditorView, RegistrationsListFormView):
     new_registration_reverse = 'capacities:new_edge_capacity'
+
+
+class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityEditorView, EditorOverviewTemplateView):
+    pass

@@ -13,7 +13,7 @@
                 <a href="{% url editor_registration_list_url_reverse %}" class="nav-link pt-0">Back to {{ registration_type_name_plural|title }}</a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">Overview</a>
+                <a href="{% url editor_overview_url_reverse_base registration_id %}" class="nav-link">Overview</a>
             </li>
         </ul>
         {% endblock high_level_toc %}

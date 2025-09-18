@@ -15,7 +15,7 @@ from .api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointCli
 from .forms import RegistrationsListForm
 
 
-class EditorView(View):
+class EditorView(TemplateView):
     registration_type_name_singular: str
     registration_type_name_plural: str
     api_endpoint_client: ApiEndpointClient
@@ -24,6 +24,7 @@ class EditorView(View):
     editor_registration_list_url_reverse: str
     editor_start_url_reverse_base: str
     editor_url_reverse_base: str
+    editor_overview_url_reverse_base: str
 
     api_endpoint_client_class: ApiEndpointClient
     column_metadata_api_endpoint_client_class: ColumnMetadataApiEndpointClient
@@ -99,6 +100,7 @@ class EditorView(View):
             'editor_registration_list_url_reverse': self.editor_registration_list_url_reverse,
             'editor_url_reverse_base': self.editor_url_reverse_base,
             'editor_start_url_reverse_base': self.editor_start_url_reverse_base,
+            'editor_overview_url_reverse_base': self.editor_overview_url_reverse_base,
             'id_field': self.id_field,
             'toc_list_items': self.categories,
         })
@@ -279,3 +281,18 @@ class RegistrationsListFormView(EditorView, FormView):
             success_msg = f'Deleted {len(registration_ids_to_delete)} {self.registration_type_name_plural}'
         messages.success(self.request, success_msg)
         return super().form_valid(form)
+
+
+class EditorOverviewTemplateView(EditorView, TemplateView):
+    template_name = 'editor/overview.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.registration_id = self.kwargs['registration_id']
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': f'{self.registration_type_name_singular.title()} {self.registration_id}'
+        })
+        return context
