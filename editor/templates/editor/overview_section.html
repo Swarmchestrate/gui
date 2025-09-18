@@ -1,0 +1,38 @@
+{% load helpers %}
+<section class="d-flex flex-column row-gap-2 {{ section_extra_classes|default:'' }}">
+    <div class="d-flex align-items-baseline column-gap-3">
+        <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.non_toc_title }}</h{{ heading_level }}>
+        <a
+            href="{% url editor_url_reverse_base registration_id %}?category={{ list_item|urlencode }}"
+            class="btn btn-success">Edit</a>
+    </div>
+    <div class="bg-body-tertiary rounded p-3">
+        {% if list_item in registration_data_by_category %}
+        <dl class="mb-0">
+            {% with category_registration_data=registration_data_by_category|get_key_value_or_empty_dict:list_item %}
+            {% for field_name, field_data in category_registration_data.items %}
+            <dt>{{ field_data.title }}</dt>
+            {% if forloop.last %}
+            <dd class="mb-0">
+            {% else %}
+            <dd>
+            {% endif %}
+                {% if not field_data.value %}
+                <span class="text-secondary">Not Set</span>
+                {% else %}
+                {{ field_data.value }}
+                {% endif %}
+            </dd>
+            {% endfor %}
+            {% endwith %}
+        </dl>
+        {% endif %}
+    </div>
+    {% if list_item_data.descendents %}
+    {% for descendent_list_item, descendent_list_item_data in list_item_data.descendents.items %}
+    {% with list_item=descendent_list_item list_item_data=descendent_list_item_data heading_level='3' heading_classes='fs-5 fw-semibold text-body-secondary' section_extra_classes='pt-2' %}
+    {% include 'editor/overview_section.html' %}
+    {% endwith %}
+    {% endfor %}
+    {% endif %}
+</section>

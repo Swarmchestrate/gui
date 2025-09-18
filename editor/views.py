@@ -55,14 +55,13 @@ class EditorView(TemplateView):
                 category_data.update({
                     category: {
                         'title': category,
+                        'non_toc_title': category.replace(':', ': '),
                         'descendents': dict(),
                     },
                 })
                 if parent_category:
-                    category_data.update({
-                        category: {
-                            'title': category.replace(f'{parent_category}:', ''),
-                        },
+                    category_data[category].update({
+                        'title': category.replace(f'{parent_category}:', ''),
                     })
 
             category_with_colon = f'{category}:'
@@ -286,6 +285,30 @@ class RegistrationsListFormView(EditorView, FormView):
 class EditorOverviewTemplateView(EditorView, TemplateView):
     template_name = 'editor/overview.html'
 
+    def format_registration_data_for_template(self) -> dict:
+        registration = self.api_endpoint_client.get(self.registration_id)
+        column_metadata = self.column_metadata_api_endpoint_client.get_registrations()
+        formatted_registration_data = dict()
+        for category_name in self.category_names:
+            field_names_for_category = [
+                (cm.get('column_name'), cm.get('title'))
+                for cm in column_metadata
+                if cm.get('category') == category_name
+            ]
+            field_data_for_category = dict()
+            for field_name, field_title in field_names_for_category:
+                field_value = registration.get(field_name)
+                field_data_for_category.update({
+                    field_name: {
+                        'title': field_title,
+                        'value': field_value,
+                    },
+                })
+            formatted_registration_data.update({
+                category_name: field_data_for_category,
+            })
+        return formatted_registration_data
+
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs['registration_id']
         return super().dispatch(request, *args, **kwargs)
@@ -293,6 +316,7 @@ class EditorOverviewTemplateView(EditorView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': f'{self.registration_type_name_singular.title()} {self.registration_id}'
+            'title': f'{self.registration_type_name_singular.title()} {self.registration_id}',
+            'registration_data_by_category': self.format_registration_data_for_template(),
         })
         return context

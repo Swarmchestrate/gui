@@ -14,5 +14,13 @@ def get_key_value_or_blank_string(d: dict, key: str):
 
 
 @register.filter
+def get_key_value_or_empty_dict(d: dict, key: str):
+    try:
+        return d.get(key, dict())
+    except AttributeError:
+        return dict()
+
+
+@register.filter
 def convert_str_date(value: str):
     return parser.parse(value)

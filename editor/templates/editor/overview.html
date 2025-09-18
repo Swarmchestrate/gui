@@ -1,4 +1,13 @@
 {% extends 'editor/editor_base.html' %}
+{% load helpers %}
 {% block editor_main_content %}
-<h1>{{ title }}</h1>
+<h1>
+    {{ registration_type_name_singular|title }}
+    <span class="text-body-tertiary">({{ registration_id }})</span>
+</h1>
+{% for list_item, list_item_data in toc_list_items.items %}
+{% with heading_level='2' heading_classes='fs-5' %}
+{% include 'editor/overview_section.html' %}
+{% endwith %}
+{% endfor %}
 {% endblock editor_main_content %}
