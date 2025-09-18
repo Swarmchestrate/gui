@@ -39,9 +39,16 @@ class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClie
             params = dict()
         params.update({
             'table_name': 'eq.capacity',
-            'category': 'neq.Edge Specific',
         })
-        return super().get_registrations(params=params)
+        if 'category' not in params:
+            params.update({
+                'category': 'neq.Edge Specific',
+            })
+            return super().get_registrations(params)
+        params.update({
+            'and': f'(category.{params.get('category')},category.neq.Edge Specific)',
+        })
+        return super().get_registrations(params)
 
 
 class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
@@ -68,6 +75,13 @@ class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClien
             params = dict()
         params.update({
             'table_name': 'eq.capacity',
-            'category': 'neq.System Specific',
+        })
+        if 'category' not in params:
+            params.update({
+                'category': 'neq.System Specific',
+            })
+            return super().get_registrations(params)
+        params.update({
+            'and': f'(category.{params.get('category')},category.neq.System Specific)',
         })
         return super().get_registrations(params)
