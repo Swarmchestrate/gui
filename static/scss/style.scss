@@ -46,6 +46,7 @@ section {
     padding-block: 1rem;
 }
 
+/* Dialog */
 /* Credit: Used this article as reference for dialog implementation:
 https://web.dev/articles/building/a-dialog-component */
 dialog {
@@ -145,11 +146,17 @@ dialog .btn-close {
     color: var(--swrm-link-colour);
 }
 
-/* Wizard */
+/* || Wizard */
 label:has(~ :required)::after,
 :required ~ label::after {
     content: " *";
     color: var(--bs-danger);
+}
+
+/* Wizard nav */
+.editor-toc.nav-pills .nav-link:not(.active):hover,
+.editor-toc.nav-pills .nav-link:not(.active):focus {
+    background: var(--bs-tertiary-bg);
 }
 
 /* DataTables */
