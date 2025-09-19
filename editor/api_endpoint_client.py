@@ -60,7 +60,7 @@ class ApiEndpointClient(ApiClient):
             self.endpoint_url,
             params=params
         )
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
         # Responses are returned as lists, so need
         # to get the first list element.
         registration = next(iter(response.json()))
@@ -73,7 +73,7 @@ class ApiEndpointClient(ApiClient):
             self.endpoint_url,
             params=params
         )
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
         return response.json()
 
     def register(self, data: dict) -> dict:
@@ -82,7 +82,7 @@ class ApiEndpointClient(ApiClient):
             self.endpoint_definition.id_field: new_id,
         })
         response = requests.post(self.endpoint_url, json=data)
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
         new_registration = self.get(new_id)
         return new_registration
 
@@ -93,14 +93,14 @@ class ApiEndpointClient(ApiClient):
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         })
         response = requests.delete(self.endpoint_url, params=params)
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
 
     def delete_many(self, registration_ids: list[int]):
         params = {
             self.endpoint_definition.id_field: f'in.({",".join(map(str, registration_ids))})',
         }
         response = requests.delete(self.endpoint_url, params=params)
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
 
     def update(self, registration_id: int, data: dict):
         current_time = datetime.now(timezone.utc).isoformat()
@@ -116,7 +116,7 @@ class ApiEndpointClient(ApiClient):
             params=params,
             json=data
         )
-        response.raise_for_status()
+        self.log_and_raise_response_status_if_error(response)
 
 
 class ColumnMetadataApiEndpointClient(ApiEndpointClient):

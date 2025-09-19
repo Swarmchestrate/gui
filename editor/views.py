@@ -1,9 +1,11 @@
 import json
+import logging
 import urllib.parse
 from http import HTTPStatus
 
 from django.contrib import messages
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
@@ -13,6 +15,9 @@ from django.views.generic import (
 
 from .api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointClient
 from .forms import RegistrationsListForm
+
+
+logger = logging.getLogger(__name__)
 
 
 class EditorView(TemplateView):
@@ -162,7 +167,12 @@ class EditorFormView(EditorView, FormView):
             'category',
             self._get_first_category()
         )
-        self.success_url = self.request.path
+        self.success_url = reverse_lazy(
+            self.editor_overview_url_reverse_base,
+            kwargs={
+                'registration_id': self.registration_id,
+            }
+        )
         self.title_base = f'{self.registration_type_name_singular.title()} {self.registration_id}'
         return super().dispatch(request, *args, **kwargs)
 
@@ -218,10 +228,22 @@ class EditorFormView(EditorView, FormView):
                 urllib.parse.quote_plus(next_list_item)
             )
         response = super().form_valid(form)
-        self.api_endpoint_client.update(
-            self.registration_id,
-            form.cleaned_data
-        )
+        try:
+            self.api_endpoint_client.update(
+                self.registration_id,
+                form.cleaned_data
+            )
+        except Exception:
+            error_msg = f'An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied.'
+            logger.error(error_msg)
+            if self.request.accepts('text/html'):
+                messages.error(self.request, error_msg)
+                return redirect(self.request.get_full_path())
+            return JsonResponse({
+                'feedback': error_msg,
+                'url': self.request.get_full_path(),
+            }, status=HTTPStatus.BAD_REQUEST)
+
         message = f'Updated {self.category}'
         if self.request.accepts('text/html'):
             messages.success(self.request, message)
