@@ -13,25 +13,25 @@
                         Capacities
                     </a>
                     <ul class="dropdown-menu shadow">
-                        <!-- Cloud Capacities -->
+                        <!-- Manage -->
                         <li>
-                            <div class="dropdown-header">Cloud</div>
+                            <div class="dropdown-header">Manage</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacities_list' %}">Cloud Capacities</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'capacities:edge_capacities_list' %}">Edge Capacities</a>
+                        </li>
+                        <!-- Register -->
+                        <li>
+                            <div class="dropdown-header">Add</div>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'capacities:new_cloud_capacity' %}">New Cloud Capacity</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacities_list' %}">Cloud Capacities</a>
-                        </li>
-                        <!-- Edge Capacities -->
-                        <li>
-                            <div class="dropdown-header">Edge</div>
-                        </li>
-                        <li>
                             <a class="dropdown-item" href="{% url 'capacities:new_edge_capacity' %}">New Edge Capacity</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'capacities:edge_capacities_list' %}">Edge Capacities</a>
                         </li>
                     </ul>
                 </li>
