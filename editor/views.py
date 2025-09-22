@@ -34,20 +34,23 @@ class EditorView(TemplateView):
     api_endpoint_client_class: ApiEndpointClient
     column_metadata_api_endpoint_client_class: ColumnMetadataApiEndpointClient
     categories: dict
+    column_metadata: list[dict]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.api_endpoint_client = self.api_endpoint_client_class()
         self.column_metadata_api_endpoint_client = self.column_metadata_api_endpoint_client_class()
         self.id_field = self.api_endpoint_client.endpoint_definition.id_field
+        self._setup_column_metadata()
         self._setup_categories()
+
+    def _setup_column_metadata(self):
+        self.column_metadata = self.column_metadata_api_endpoint_client.get_registrations()
 
     def _setup_categories(self):
         self.category_names = list(set(
             r.get('category')
-            for r in self.column_metadata_api_endpoint_client.get_registrations(params={
-                'select': 'category',
-            })
+            for r in self.column_metadata
         ))
         self.category_names.sort()
         processed_categories = set()
@@ -309,12 +312,11 @@ class EditorOverviewTemplateView(EditorView, TemplateView):
 
     def format_registration_data_for_template(self) -> dict:
         registration = self.api_endpoint_client.get(self.registration_id)
-        column_metadata = self.column_metadata_api_endpoint_client.get_registrations()
         formatted_registration_data = dict()
         for category_name in self.category_names:
             field_names_for_category = [
                 (cm.get('column_name'), cm.get('title'))
-                for cm in column_metadata
+                for cm in self.column_metadata
                 if cm.get('category') == category_name
             ]
             field_data_for_category = dict()
