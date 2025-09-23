@@ -2,17 +2,6 @@ from enum import Enum
 
 from django import forms
 
-from .form_utils import (
-    DefaultConfiguredField,
-    ConfiguredBooleanField,
-    ConfiguredCharField,
-    ConfiguredDateField,
-    ConfiguredFloatField,
-    ConfiguredIntegerField,
-    ConfiguredJsonField,
-    ConfiguredTextField,
-)
-
 from editor.api_endpoint_client import ApiEndpointClient, ColumnMetadataApiEndpointClient
 
 
