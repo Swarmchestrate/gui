@@ -64,46 +64,87 @@ class OpenApiSpecificationBasedForm(forms.Form):
     def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():
             is_required = field_key in self.required_field_names
-            new_field = self._get_configured_field(field_metadata, is_required=is_required)
+            field = self.get_field(
+                field_metadata,
+                is_required=is_required
+            )
             self.fields.update({
-                field_key: new_field,
+                field_key: field,
             })
 
-    def _get_configured_field_class(self, field_format: str):
-        match field_format:
-            case OpenApiPropertyFormat.BOOLEAN:
-                return ConfiguredBooleanField
-            case OpenApiPropertyFormat.CHARACTER_VARYING:
-                return ConfiguredCharField
-            case OpenApiPropertyFormat.DATE:
-                return ConfiguredDateField
-            case OpenApiPropertyFormat.INTEGER:
-                return ConfiguredIntegerField
-            case OpenApiPropertyFormat.JSONB:
-                return ConfiguredJsonField
-            case OpenApiPropertyFormat.NUMERIC:
-                return ConfiguredFloatField
-            case OpenApiPropertyFormat.TEXT:
-                return ConfiguredTextField
-            case OpenApiPropertyFormat.TEXT_ARRAY:
-                return ConfiguredTextField
-            case _:
-                return DefaultConfiguredField
-
-    def _get_configured_field(self, field_metadata: dict, is_required: bool = False):
+    def _initialise_base_field_vars(self, field_metadata: dict) -> dict:
+        field_class = forms.CharField
+        widget_class = None
+        css_classes: list = ['form-control']
         field_format = field_metadata.get('format', '')
         try:
             field_format = OpenApiPropertyFormat(field_format)
         except ValueError:
             pass
-        configured_field_kwargs = {
-            'is_required': is_required,
+        match field_format:
+            case OpenApiPropertyFormat.BOOLEAN:
+                field_class = forms.BooleanField
+                css_classes = ['form-check-input']
+            case OpenApiPropertyFormat.DATE:
+                field_class = forms.DateField
+            case OpenApiPropertyFormat.INTEGER:
+                field_class = forms.IntegerField
+            case OpenApiPropertyFormat.NUMERIC:
+                field_class = forms.FloatField
+            case (OpenApiPropertyFormat.TEXT
+                | OpenApiPropertyFormat.TEXT_ARRAY
+                | OpenApiPropertyFormat.JSONB):
+                widget_class = forms.Textarea
+        if not widget_class:
+            widget_class = field_class.widget
+        return {
+            'field_class': field_class,
+            'widget_class': widget_class,
+            'css_classes': css_classes,
         }
-        configured_field_class = self._get_configured_field_class(field_format)
-        return configured_field_class(
+
+    def _configure_field_kwargs(
+            self,
+            field_metadata: dict,
+            widget_class,
+            css_classes: list[str],
+            is_required: bool):
+        kwargs = {
+            'required': is_required,
+            'widget': widget_class(attrs={
+                'class': ' '.join(css_classes),
+            }),
+        }
+        field_label = field_metadata.get('title')
+        if field_label:
+            kwargs.update({
+                'label': field_label,
+            })
+        field_description = field_metadata.get('description')
+        if field_description:
+            kwargs.update({
+                'help_text': field_description,
+            })
+        return kwargs
+
+    def get_field(self, field_metadata: dict, is_required: bool = False) -> list[forms.Field]:
+        # Determine field, widget and/or widget CSS classes
+        # from OpenAPI spec metadata.
+        (
+            field_class,
+            widget_class,
+            css_classes,
+        ) = self._initialise_base_field_vars(field_metadata).values()
+
+        # Build field kwargs
+        kwargs = self._configure_field_kwargs(
             field_metadata,
-            **configured_field_kwargs
-        ).field_instance
+            widget_class,
+            css_classes,
+            is_required
+        )
+
+        return field_class(**kwargs)
 
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
