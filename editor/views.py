@@ -3,15 +3,16 @@ import logging
 import urllib.parse
 from http import HTTPStatus
 
+from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
     TemplateView,
-    View,
 )
+from django.views.generic.edit import ProcessFormView
 
 from .forms import RegistrationsListForm
 from .generic_views import EditorTocView, EditorView
@@ -48,8 +49,26 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
         return super().form_valid(form)
 
 
-class EditorFormView(EditorView, EditorTocView, FormView):
+class EditorRouterView(EditorTocView, ProcessFormView):
+    editor_view_class: TemplateView
+
+    def route_to_view(self, request, *args, **kwargs):
+        return self.editor_view_class.as_view()(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.route_to_view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.route_to_view(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.category = self.request.GET.get('category', self._get_first_category())
+        return super().dispatch(request, *args, **kwargs)
+
+
+class EditorFormView(EditorView, EditorTocView, ProcessFormView):
     title_base = ''
+    form_class: forms.Form
 
     def get_prev_and_next_list_items(self):
         index_of_current_category = self.category_names.index(self.category)
@@ -69,8 +88,94 @@ class EditorFormView(EditorView, EditorTocView, FormView):
 
         return (prev_list_item, next_list_item)
 
+    def get_form_kwargs(self):
+        kwargs = {
+            'initial': dict(),
+            'prefix': None,
+        }
+        kwargs.update({
+            'initial': self.registration,
+            'api_endpoint_client': self.api_endpoint_client,
+            'column_metadata_api_endpoint_client': self.column_metadata_api_endpoint_client,
+            'category': self.category,
+        })
+        return kwargs
+
+    def get_forms_from_request_data(self, request):
+        kwargs = self.get_form_kwargs()
+        form = self.form_class(data=request.POST, **kwargs)
+        return {
+            '': form,
+        }
+
+    def get_form_invalid_context_data(self, form):
+        context = self.get_context_data()
+        context.update({
+            'form': form,
+        })
+        return context
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict):
+        return cleaned_data
+
+    def form_invalid(self, form, error_msg: str = None):
+        if not error_msg:
+            error_msg = 'Some fields were invalid. Please see feedback below.'
+        if self.request.accepts('text/html'):
+            messages.error(self.request, error_msg)
+            return render(
+                self.request,
+                self.template_name,
+                self.get_form_invalid_context_data(form)
+            )
+        return JsonResponse({
+            'feedback': json.loads(form.errors.as_json()),
+            'url': self.request.get_full_path(),
+        }, status=HTTPStatus.BAD_REQUEST)
+
+    def form_valid(self, form):
+        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
+        if next_list_item:
+            self.success_url = '%s?category=%s' % (
+                reverse_lazy(
+                    self.editor_url_reverse_base,
+                    kwargs={
+                        'registration_id': self.registration_id,
+                    }
+                ),
+                urllib.parse.quote_plus(next_list_item)
+            )
+        update_data = form.cleaned_data
+        update_data = self.add_formset_data_to_main_form(update_data)
+        try:
+            self.api_endpoint_client.update(
+                self.registration_id,
+                update_data
+            )
+        except Exception:
+            error_msg = f'An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied.'
+            logger.exception(error_msg)
+            return self.form_invalid(form, error_msg=error_msg)
+
+        message = f'Updated {self.category}'
+        if self.request.accepts('text/html'):
+            messages.success(self.request, message)
+            return redirect(self.success_url)
+        return JsonResponse({
+            'message': message,
+            'redirect': self.success_url,
+        })
+
+    def post(self, request, *args, **kwargs):
+        forms = self.get_forms_from_request_data(request)
+        main_form = forms.get('')
+        if all([form.is_valid() for form in forms.values()]):
+            return self.form_valid(main_form)
+        return self.form_invalid(main_form)
+
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs['registration_id']
+        self.registration = self.api_endpoint_client.get(self.registration_id)
         self.category = self.request.GET.get(
             'category',
             self._get_first_category()
@@ -98,68 +203,9 @@ class EditorFormView(EditorView, EditorTocView, FormView):
             'next_list_item': next_list_item,
             'next_list_item_title': next_list_item.replace(':', ': '),
             'registration_id': self.registration_id,
+            'form': self.form_class(**self.get_form_kwargs()),
         })
         return context
-
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        registration_data = self.api_endpoint_client.get(self.registration_id)
-        kwargs.update({
-            'api_endpoint_client': self.api_endpoint_client,
-            'column_metadata_api_endpoint_client': self.column_metadata_api_endpoint_client,
-            'category': self.category,
-            'initial': registration_data,
-        })
-        return kwargs
-
-    def form_invalid(self, form):
-        response = super().form_invalid(form)
-        if self.request.accepts('text/html'):
-            messages.error(self.request, 'Some fields were invalid. Please see feedback below.')
-            return response
-        return JsonResponse({
-            'feedback': json.loads(form.errors.as_json()),
-            'url': self.request.path,
-        }, status=HTTPStatus.BAD_REQUEST)
-
-    def form_valid(self, form):
-        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
-        if next_list_item:
-            self.success_url = '%s?category=%s' % (
-                reverse_lazy(
-                    self.editor_url_reverse_base,
-                    kwargs={
-                        'registration_id': self.registration_id,
-                    }
-                ),
-                urllib.parse.quote_plus(next_list_item)
-            )
-        response = super().form_valid(form)
-        try:
-            self.api_endpoint_client.update(
-                self.registration_id,
-                form.cleaned_data
-            )
-        except Exception:
-            error_msg = f'An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied.'
-            logger.error(error_msg)
-            if self.request.accepts('text/html'):
-                messages.error(self.request, error_msg)
-                return redirect(self.request.get_full_path())
-            return JsonResponse({
-                'feedback': error_msg,
-                'url': self.request.get_full_path(),
-            }, status=HTTPStatus.BAD_REQUEST)
-
-        message = f'Updated {self.category}'
-        if self.request.accepts('text/html'):
-            messages.success(self.request, message)
-            return response
-        return JsonResponse({
-            'message': message,
-            'redirect': self.success_url,
-        })
 
 
 class RegistrationsListFormView(EditorView, FormView):

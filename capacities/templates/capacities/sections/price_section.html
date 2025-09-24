@@ -1,0 +1,16 @@
+<section>
+    <fieldset class="vstack gap-3">
+        <legend class="fw-semibold mb-0">{{ form.price.label }}</legend>
+        {{ price_formset.management_form }}
+        {% for form in price_formset %}
+        {% with formset=price_formset current_form_index=forloop.counter %}
+        <fieldset class="vstack gap-1">
+            <legend class="fs-6">Instance Type {{ forloop.counter }}</legend>
+            {% for field in form %}
+            {% include 'editor/field_templates/field_template.html' with field_wrapper_class='py-0' %}
+            {% endfor %}
+        </fieldset>
+        {% endwith %}
+        {% endfor %}
+    </fieldset>
+</section>

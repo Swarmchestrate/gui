@@ -4,11 +4,11 @@
 <script type="module" src="{% static 'editor.js' %}"></script>
 {% endblock scripts %}
 {% block content %}
-<div class="row align-items-baseline justify-content-center gx-md-5">
+<div class="row justify-content-center gx-md-5">
     {# High-level TOC #}
     <div class="col-xl-3">
         {% block high_level_toc %}
-        <ul class="nav nav-pills flex-column list-unstyled editor-toc">
+        <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top pt-4">
             <li class="nav-item">
                 <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
             </li>
@@ -20,7 +20,7 @@
         {% endblock high_level_toc %}
     </div>
     {# Editor main content #}
-    <div class="col-xl-6">
+    <div class="col-xl-7 pt-4">
         {% block editor_main_content %}
         <hgroup class="d-flex flex-column-reverse row-gap-1">
             <h1>{{ main_heading }}</h1>
@@ -30,11 +30,13 @@
         <form id="editor-form" action="{{ request.get_full_path }}" method="POST">
             {% csrf_token %}
             {% for field in form %}
+            {% block field %}
             {% if field.field.widget.input_type == 'checkbox' %}
             {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
             {% else %}
             {% include 'editor/field_templates/field_template.html' %}
             {% endif %}
+            {% endblock field %}
             {% endfor %}
             <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
                 {% if prev_list_item %}
@@ -73,7 +75,7 @@
         {% endblock editor_main_content %}
     </div>
     {# In-editor TOC #}
-    <div class="col-xl-3">
+    <div class="col-xl-2 pt-4">
         {% block editor_toc %}
         {% include 'editor/toc/editor_toc_base.html' %}
         {% endblock editor_toc %}

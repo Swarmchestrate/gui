@@ -1,4 +1,4 @@
-<div class="py-4">
+<div class="{{ field_wrapper_class|default:'py-4' }}">
     <label for="{{ field.auto_id }}" class="fw-semibold">{{ field.label }}</label>
     {{ field }}
     {% if field.help_text %}

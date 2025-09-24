@@ -1,3 +1,4 @@
+from django.forms import formset_factory
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
@@ -8,6 +9,7 @@ from .api_endpoint_client import (
     EdgeCapacityColumnMetadataApiEndpointClient,
 )
 from .forms import (
+    CapacityPriceEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
     EdgeCapacityEditorForm,
@@ -18,6 +20,7 @@ from editor.views import (
     EditorView,
     EditorFormView,
     EditorOverviewTemplateView,
+    EditorRouterView,
     EditorStartFormView,
     RegistrationsListFormView,
 )
@@ -44,6 +47,71 @@ class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
     template_name = 'capacities/capacity_editor.html'
     form_class = CloudCapacityEditorForm
     success_url = reverse_lazy('capacities:new_cloud_capacity')
+
+
+class CloudCapacityEditorRouterView(CloudCapacityEditorView, EditorRouterView):
+    editor_view_class = CloudCapacityEditorFormView
+
+    def route_to_view(self, request, *args, **kwargs):
+        if self.category.lower() == 'cost & locality':
+            return CloudCapacityCostAndLocalityEditorTemplateView.as_view()(request, *args, **kwargs)
+        return super().route_to_view(request, *args, **kwargs)
+
+
+class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorFormView):
+    PriceFormset = formset_factory(CapacityPriceEditorForm)
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict):
+        cleaned_data = super().add_formset_data_to_main_form(cleaned_data)
+        price_formset = self.PriceFormset(self.request.POST)
+        price_formset.is_valid()
+        price_unformatted = price_formset.cleaned_data
+        price_formatted = dict()
+        for price_data in price_unformatted:
+            if not price_data:
+                continue
+            price_formatted.update({
+                price_data.get('price_instance_type', ''): '%s credit/hour' % (
+                    price_data.get('price_credits_per_hour')
+                )
+            })
+        if price_formatted:
+            cleaned_data.update({
+                'price': price_formatted,
+            })
+        return cleaned_data
+
+    def get_form_invalid_context_data(self, form):
+        context = super().get_form_invalid_context_data(form)
+        price_formset = self.PriceFormset(self.request.POST)
+        price_formset.is_valid()
+        context.update({
+            'price_formset': price_formset,
+        })
+        return context
+
+    def get_forms_from_request_data(self, request):
+        forms = super().get_forms_from_request_data(request)
+        price_formset = self.PriceFormset(request.POST)
+        forms.update({
+            'price': price_formset,
+        })
+        return forms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial = list()
+        for instance_type, credits_per_hour in self.registration.get('price').items():
+            credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
+            initial.append({
+                'price_instance_type': instance_type,
+                'price_credits_per_hour': credits_per_hour_num,
+            })
+        price_formset = self.PriceFormset(initial=initial)
+        context.update({
+            'price_formset': price_formset,
+        })
+        return context
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
