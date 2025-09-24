@@ -66,7 +66,7 @@ class EditorRouterView(EditorTocView, ProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class EditorFormView(EditorView, EditorTocView, ProcessFormView):
+class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
     title_base = ''
     form_class: forms.Form
 

@@ -18,7 +18,7 @@ from .forms import (
 
 from editor.views import (
     EditorView,
-    EditorFormView,
+    EditorProcessFormView,
     EditorOverviewTemplateView,
     EditorRouterView,
     EditorStartFormView,
@@ -43,14 +43,14 @@ class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormV
     form_class = CloudCapacityRegistrationForm
 
 
-class CloudCapacityEditorFormView(CloudCapacityEditorView, EditorFormView):
+class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessFormView):
     template_name = 'capacities/capacity_editor.html'
     form_class = CloudCapacityEditorForm
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, EditorRouterView):
-    editor_view_class = CloudCapacityEditorFormView
+    editor_view_class = CloudCapacityEditorProcessFormView
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'cost & locality':
@@ -58,7 +58,7 @@ class CloudCapacityEditorRouterView(CloudCapacityEditorView, EditorRouterView):
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorFormView):
+class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessFormView):
     PriceFormset = formset_factory(CapacityPriceEditorForm)
 
     def add_formset_data_to_main_form(self, cleaned_data: dict):
@@ -140,7 +140,7 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormVie
     form_class = EdgeCapacityRegistrationForm
 
 
-class EdgeCapacityEditorFormView(EdgeCapacityEditorView, EditorFormView):
+class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFormView):
     template_name = 'capacities/capacity_editor.html'
     form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('capacities:new_edge_capacity')

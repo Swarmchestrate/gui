@@ -5,7 +5,7 @@ from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 
 from editor.views import (
     EditorView,
-    EditorFormView,
+    EditorProcessFormView,
     EditorOverviewTemplateView,
     EditorStartFormView,
     RegistrationsListFormView,
@@ -29,7 +29,7 @@ class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView)
     success_url = reverse_lazy('applications:new_application')
 
 
-class ApplicationEditorFormView(ApplicationEditorView, EditorFormView):
+class ApplicationEditorProcessFormView(ApplicationEditorView, EditorProcessFormView):
     template_name = 'applications/application_editor.html'
     form_class = ApplicationEditorForm
     success_url = reverse_lazy('applications:new_application')
