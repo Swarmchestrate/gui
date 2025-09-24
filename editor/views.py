@@ -50,7 +50,7 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
 
 
 class EditorRouterView(EditorTocView, ProcessFormView):
-    editor_view_class: TemplateView
+    editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
         return self.editor_view_class.as_view()(request, *args, **kwargs)
@@ -108,17 +108,24 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
             '': form,
         }
 
-    def get_form_invalid_context_data(self, form):
+    def get_context_data_forms_invalid(self, forms: dict):
+        form = forms.get('')
         context = self.get_context_data()
         context.update({
             'form': form,
         })
         return context
 
-    def add_formset_data_to_main_form(self, cleaned_data: dict):
+    def get_json_response_feedback_forms_invalid(self, forms: dict) -> dict:
+        feedback = dict()
+        for form in forms:
+            feedback.update(form.errors.as_json())
+        return feedback
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         return cleaned_data
 
-    def form_invalid(self, form, error_msg: str = None):
+    def forms_invalid(self, forms: dict, error_msg: str = None):
         if not error_msg:
             error_msg = 'Some fields were invalid. Please see feedback below.'
         if self.request.accepts('text/html'):
@@ -126,14 +133,14 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
             return render(
                 self.request,
                 self.template_name,
-                self.get_form_invalid_context_data(form)
+                self.get_context_data_forms_invalid(forms)
             )
         return JsonResponse({
-            'feedback': json.loads(form.errors.as_json()),
+            'feedback': self.get_json_response_feedback_forms_invalid(forms),
             'url': self.request.get_full_path(),
         }, status=HTTPStatus.BAD_REQUEST)
 
-    def form_valid(self, form):
+    def forms_valid(self, forms: dict):
         prev_list_item, next_list_item = self.get_prev_and_next_list_items()
         if next_list_item:
             self.success_url = '%s?category=%s' % (
@@ -145,8 +152,9 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
                 ),
                 urllib.parse.quote_plus(next_list_item)
             )
+        form = forms.get('')
         update_data = form.cleaned_data
-        update_data = self.add_formset_data_to_main_form(update_data)
+        update_data = self.add_formset_data_to_main_form(update_data, forms)
         try:
             self.api_endpoint_client.update(
                 self.registration_id,
@@ -155,7 +163,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         except Exception:
             error_msg = f'An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied.'
             logger.exception(error_msg)
-            return self.form_invalid(form, error_msg=error_msg)
+            return self.forms_invalid(forms, error_msg=error_msg)
 
         message = f'Updated {self.category}'
         if self.request.accepts('text/html'):
@@ -168,10 +176,9 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
 
     def post(self, request, *args, **kwargs):
         forms = self.get_forms_from_request_data(request)
-        main_form = forms.get('')
         if all([form.is_valid() for form in forms.values()]):
-            return self.form_valid(main_form)
-        return self.form_invalid(main_form)
+            return self.forms_valid(forms)
+        return self.forms_invalid(forms)
 
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs['registration_id']

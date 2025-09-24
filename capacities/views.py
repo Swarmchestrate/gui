@@ -61,8 +61,8 @@ class CloudCapacityEditorRouterView(CloudCapacityEditorView, EditorRouterView):
 class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessFormView):
     PriceFormset = formset_factory(CapacityPriceEditorForm)
 
-    def add_formset_data_to_main_form(self, cleaned_data: dict):
-        cleaned_data = super().add_formset_data_to_main_form(cleaned_data)
+    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
+        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
         price_formset = self.PriceFormset(self.request.POST)
         price_formset.is_valid()
         price_unformatted = price_formset.cleaned_data
@@ -81,12 +81,10 @@ class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessF
             })
         return cleaned_data
 
-    def get_form_invalid_context_data(self, form):
-        context = super().get_form_invalid_context_data(form)
-        price_formset = self.PriceFormset(self.request.POST)
-        price_formset.is_valid()
+    def get_context_data_forms_invalid(self, forms):
+        context = super().get_context_data_forms_invalid(forms)
         context.update({
-            'price_formset': price_formset,
+            'price_formset': forms.get('price'),
         })
         return context
 
