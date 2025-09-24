@@ -15,12 +15,12 @@ class ApiClient:
         self.api_url = os.environ.get('API_URL')
 
     def log_and_raise_response_status_if_error(self, response: requests.Response):
-        if response.status_code == requests.codes.ok:
+        if response.ok:
             return
         try:
             logger.error(json.dumps(response.json(), indent=2))
-        except TypeError:
-            logger.error('Could not parse and log response as JSON.')
+        except Exception:
+            logger.exception('Could not log error response.')
         response.raise_for_status()
 
     def get_openapi_spec(self):
