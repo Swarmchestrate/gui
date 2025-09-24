@@ -63,8 +63,7 @@ class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessF
 
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        price_formset = self.PriceFormset(self.request.POST)
-        price_formset.is_valid()
+        price_formset = forms.get('price')
         price_unformatted = price_formset.cleaned_data
         price_formatted = dict()
         for price_data in price_unformatted:
