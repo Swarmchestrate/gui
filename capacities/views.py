@@ -26,39 +26,15 @@ from editor.views import (
 )
 
 
-# Cloud Capacity
-class CloudCapacityEditorView(EditorView):
-    editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
-    editor_url_reverse_base = 'capacities:cloud_capacity_editor'
-    editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
-    editor_overview_url_reverse_base = 'capacities:cloud_capacity_overview'
-    registration_type_name_singular = 'cloud capacity'
-    registration_type_name_plural = 'cloud capacities'
-    api_endpoint_client_class = CloudCapacityApiEndpointClient
-    column_metadata_api_endpoint_client_class = CloudCapacityColumnMetadataApiEndpointClient
-
-
-class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormView, FormView):
-    template_name = 'capacities/new_cloud_capacity_start.html'
-    form_class = CloudCapacityRegistrationForm
-
-
-class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessFormView):
-    template_name = 'capacities/capacity_editor.html'
-    form_class = CloudCapacityEditorForm
-    success_url = reverse_lazy('capacities:new_cloud_capacity')
-
-
-class CloudCapacityEditorRouterView(CloudCapacityEditorView, EditorRouterView):
-    editor_view_class = CloudCapacityEditorProcessFormView
-
+# Cloud & Edge Capacities
+class CapacityEditorRouterView(EditorRouterView):
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'cost & locality':
             return CloudCapacityCostAndLocalityEditorTemplateView.as_view()(request, *args, **kwargs)
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessFormView):
+class CapacityCostAndLocalityEditorTemplateView(EditorProcessFormView):
     PriceFormset = formset_factory(CapacityPriceEditorForm)
 
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
@@ -109,6 +85,39 @@ class CloudCapacityCostAndLocalityEditorTemplateView(CloudCapacityEditorProcessF
             'price_formset': price_formset,
         })
         return context
+
+
+# Cloud Capacity
+class CloudCapacityEditorView(EditorView):
+    editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
+    editor_url_reverse_base = 'capacities:cloud_capacity_editor'
+    editor_start_url_reverse_base = 'capacities:new_cloud_capacity'
+    editor_overview_url_reverse_base = 'capacities:cloud_capacity_overview'
+    registration_type_name_singular = 'cloud capacity'
+    registration_type_name_plural = 'cloud capacities'
+    api_endpoint_client_class = CloudCapacityApiEndpointClient
+    column_metadata_api_endpoint_client_class = CloudCapacityColumnMetadataApiEndpointClient
+
+
+class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormView, FormView):
+    template_name = 'capacities/new_cloud_capacity_start.html'
+    form_class = CloudCapacityRegistrationForm
+
+
+class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessFormView):
+    template_name = 'capacities/capacity_editor.html'
+    form_class = CloudCapacityEditorForm
+    success_url = reverse_lazy('capacities:new_cloud_capacity')
+
+
+class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
+    editor_view_class = CloudCapacityEditorProcessFormView
+
+
+class CloudCapacityCostAndLocalityEditorTemplateView(
+        CloudCapacityEditorProcessFormView,
+        CapacityCostAndLocalityEditorTemplateView):
+    pass
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
