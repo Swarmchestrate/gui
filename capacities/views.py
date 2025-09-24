@@ -36,7 +36,7 @@ class CapacityEditorRouterView(EditorRouterView):
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CapacityCostAndLocalityEditorTemplateView(EditorProcessFormView):
+class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
     PriceFormset = formset_factory(CapacityPriceEditorForm)
 
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
@@ -112,15 +112,15 @@ class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessF
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
-class CloudCapacityCostAndLocalityEditorTemplateView(
+class CloudCapacityCostAndLocalityEditorProcessFormView(
         CloudCapacityEditorProcessFormView,
-        CapacityCostAndLocalityEditorTemplateView):
+        CapacityCostAndLocalityEditorProcessFormView):
     pass
 
 
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
-    cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorTemplateView
+    cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
