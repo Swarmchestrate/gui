@@ -28,9 +28,11 @@ from editor.views import (
 
 # Cloud & Edge Capacities
 class CapacityEditorRouterView(EditorRouterView):
+    cost_and_locality_editor_view_class = None
+
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'cost & locality':
-            return CloudCapacityCostAndLocalityEditorTemplateView.as_view()(request, *args, **kwargs)
+            return self.cost_and_locality_editor_view_class.as_view()(request, *args, **kwargs)
         return super().route_to_view(request, *args, **kwargs)
 
 
@@ -110,14 +112,15 @@ class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessF
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
-class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
-    editor_view_class = CloudCapacityEditorProcessFormView
-
-
 class CloudCapacityCostAndLocalityEditorTemplateView(
         CloudCapacityEditorProcessFormView,
         CapacityCostAndLocalityEditorTemplateView):
     pass
+
+
+class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
+    editor_view_class = CloudCapacityEditorProcessFormView
+    cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorTemplateView
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
