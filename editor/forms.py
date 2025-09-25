@@ -16,7 +16,21 @@ class OpenApiPropertyFormat(Enum):
     TEXT_ARRAY = 'text[]'
 
 
-class OpenApiSpecificationBasedForm(forms.Form):
+class EditorForm(forms.Form):
+    error_css_class = 'is-invalid'
+
+    def is_valid(self):
+        result = super().is_valid()
+        fields_with_errors = self.errors
+        if '__all__' in self.errors:
+            fields_with_errors = self.fields
+        for field_name in fields_with_errors:
+            attrs = self.fields[field_name].widget.attrs
+            attrs.update({'class': attrs.get('class', '') + ' is-invalid'})
+        return result
+
+
+class OpenApiSpecificationBasedForm(EditorForm):
     error_css_class = 'is-invalid'
     definition_name = ''
 

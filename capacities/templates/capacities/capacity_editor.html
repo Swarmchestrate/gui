@@ -2,9 +2,17 @@
 
 {% block field %}
 {% if field.name == 'price' %}
-{% include 'capacities/sections/price_section.html' %}
+{% with section_field=field formset=price_formset formset_instance_legend='Instance Type' %}
+{% include 'editor/section_templates/formset_section_template.html' %}
+{% endwith %}
 {% elif field.name == 'energy_consumption' %}
-{% include 'capacities/sections/energy_consumption_section.html' %}
+{% with section_field=field formset=energy_consumption_formset formset_instance_legend='Type' %}
+{% include 'editor/section_templates/formset_section_template.html' %}
+{% endwith %}
+{% elif field.name == 'accessible_sensors' and registration_type_name_singular == 'edge capacity' %}
+{% with section_field=field formset=accessible_sensors_formset formset_instance_legend='Sensor' %}
+{% include 'editor/section_templates/formset_section_template.html' %}
+{% endwith %}
 {% elif field.field.widget.input_type == 'checkbox' %}
 {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
 {% else %}

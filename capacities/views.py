@@ -13,6 +13,7 @@ from .forms import (
     CapacityPriceEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
+    EdgeCapacityAccessibleSensorsEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
@@ -254,10 +255,74 @@ class EdgeCapacityEnergyEditorProcessFormView(
     pass
 
 
+class EdgeCapacitySpecificEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView):
+    AccessibleSensorsFormset = formset_factory(EdgeCapacityAccessibleSensorsEditorForm)
+    acc_sens_formset_context_varname = 'accessible_sensors_formset'
+    acc_sens_formset_prefix = 'accessible_sensors'
+    acc_sens_property_name = 'accessible_sensors'
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
+        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
+        accessible_sensors_formset = forms.get(self.acc_sens_formset_prefix)
+        sensor_names_uncleaned = accessible_sensors_formset.cleaned_data
+        sensor_names_cleaned = list()
+        for sensor_name in sensor_names_uncleaned:
+            if not sensor_name.trim():
+                continue
+            sensor_names_cleaned.append(sensor_name)
+        cleaned_data.update({
+            self.acc_sens_property_name: sensor_names_cleaned,
+        })
+        return cleaned_data
+
+    def get_context_data_forms_invalid(self, forms):
+        context = super().get_context_data_forms_invalid(forms)
+        context.update({
+            self.acc_sens_formset_context_varname: forms.get(self.acc_sens_formset_prefix),
+        })
+        return context
+
+    def get_forms_from_request_data(self, request):
+        forms = super().get_forms_from_request_data(request)
+        accessible_sensors_formset = self.AccessibleSensorsFormset(
+            request.POST,
+            prefix=self.acc_sens_formset_prefix
+        )
+        forms.update({
+            self.acc_sens_formset_prefix: accessible_sensors_formset,
+        })
+        return forms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial = list()
+        sensor_names = self.registration.get(self.acc_sens_property_name)
+        if not sensor_names:
+            sensor_names = list()
+        for sensor_name in sensor_names:
+            initial.append({
+                'sensor_name': sensor_name,
+            })
+        accessible_sensors_formset = self.AccessibleSensorsFormset(
+            initial=initial,
+            prefix=self.acc_sens_formset_prefix
+        )
+        context.update({
+            self.acc_sens_formset_context_varname: accessible_sensors_formset,
+        })
+        return context
+
+
 class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = EdgeCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
+
+    def route_to_view(self, request, *args, **kwargs):
+        if self.category.lower() == 'edge specific':
+            return EdgeCapacitySpecificEditorProcessFormView.as_view()(request, *args, **kwargs)
+        return super().route_to_view(request, *args, **kwargs)
 
 
 class EdgeCapacityRegistrationsListFormView(EdgeCapacityEditorView, RegistrationsListFormView):

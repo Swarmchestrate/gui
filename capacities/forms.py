@@ -1,26 +1,14 @@
 from django import forms
 
 from editor.forms import (
+    EditorForm,
     OpenApiSpecificationCategoryBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
 )
 
 
-class EditorFormWithInvalidStyling(forms.Form):
-    error_css_class = 'is-invalid'
-
-    def is_valid(self):
-        result = super().is_valid()
-        fields_with_errors = self.errors
-        if '__all__' in self.errors:
-            fields_with_errors = self.fields
-        for field_name in fields_with_errors:
-            attrs = self.fields[field_name].widget.attrs
-            attrs.update({'class': attrs.get('class', '') + ' is-invalid'})
-        return result
-
-
-class CapacityPriceEditorForm(EditorFormWithInvalidStyling):
+# Cloud & Edge Capacity forms
+class CapacityPriceEditorForm(EditorForm):
     instance_type = forms.CharField(
         label='Instance Type',
         widget=forms.TextInput(attrs={
@@ -30,7 +18,7 @@ class CapacityPriceEditorForm(EditorFormWithInvalidStyling):
     )
 
     credits_per_hour = forms.IntegerField(
-        label='Credits',
+        label='Cost (Credits per Hour)',
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         }),
@@ -38,7 +26,7 @@ class CapacityPriceEditorForm(EditorFormWithInvalidStyling):
     )
 
 
-class CapacityEnergyConsumptionEditorForm(EditorFormWithInvalidStyling):
+class CapacityEnergyConsumptionEditorForm(EditorForm):
     type = forms.CharField(
         label='Type',
         widget=forms.TextInput(attrs={
@@ -48,7 +36,7 @@ class CapacityEnergyConsumptionEditorForm(EditorFormWithInvalidStyling):
     )
 
     amount = forms.CharField(
-        label='Amount',
+        label='Energy Consumed',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
@@ -56,6 +44,7 @@ class CapacityEnergyConsumptionEditorForm(EditorFormWithInvalidStyling):
     )
 
 
+# Cloud Capacity forms
 class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
 
@@ -64,9 +53,20 @@ class CloudCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = 'capacity'
 
 
+# Edge Capacity forms
 class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
 
 
 class EdgeCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = 'capacity'
+
+
+class EdgeCapacityAccessibleSensorsEditorForm(EditorForm):
+    sensor_name = forms.CharField(
+        label='Sensor Name',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
