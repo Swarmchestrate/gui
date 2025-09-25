@@ -70,3 +70,26 @@ class EdgeCapacityAccessibleSensorsEditorForm(EditorForm):
         }),
         required=True
     )
+
+
+class EdgeCapacityDevicesEditorForm(EditorForm):
+    device_type = forms.ChoiceField(
+        label='Device Type',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        choices=[
+            ('', ''),
+            ('hardware', 'Hardware'),
+            ('software', 'Software'),
+        ],
+        required=True
+    )
+
+    device_name = forms.CharField(
+        label='Device Name',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )

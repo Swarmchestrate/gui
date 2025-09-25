@@ -14,6 +14,7 @@ from .forms import (
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
     EdgeCapacityAccessibleSensorsEditorForm,
+    EdgeCapacityDevicesEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
@@ -261,18 +262,39 @@ class EdgeCapacitySpecificEditorProcessFormView(
     acc_sens_formset_context_varname = 'accessible_sensors_formset'
     acc_sens_formset_prefix = 'accessible_sensors'
     acc_sens_property_name = 'accessible_sensors'
+    DevicesFormset = formset_factory(EdgeCapacityDevicesEditorForm)
+    devices_formset_context_varname = 'devices_formset'
+    devices_formset_prefix = 'devices'
+    devices_property_name = 'devices'
 
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
+        # Accessible sensors
         accessible_sensors_formset = forms.get(self.acc_sens_formset_prefix)
-        sensor_names_uncleaned = accessible_sensors_formset.cleaned_data
+        sensor_data_uncleaned = accessible_sensors_formset.cleaned_data
         sensor_names_cleaned = list()
-        for sensor_name in sensor_names_uncleaned:
-            if not sensor_name.trim():
+        for sensor_data in sensor_data_uncleaned:
+            sensor_name = sensor_data.get('sensor_name', '')
+            if not sensor_name.strip():
                 continue
             sensor_names_cleaned.append(sensor_name)
         cleaned_data.update({
             self.acc_sens_property_name: sensor_names_cleaned,
+        })
+        # Devices
+        devices_formset = forms.get(self.devices_formset_prefix)
+        devices_uncleaned = devices_formset.cleaned_data
+        devices_cleaned = dict()
+        for data in devices_uncleaned:
+            if not data:
+                continue
+            device_type = data.get('device_type')
+            device_name = data.get('device_name')
+            devices_cleaned.update({
+                device_type: device_name,
+            })
+        cleaned_data.update({
+            self.devices_property_name: devices_cleaned,
         })
         return cleaned_data
 
@@ -280,6 +302,7 @@ class EdgeCapacitySpecificEditorProcessFormView(
         context = super().get_context_data_forms_invalid(forms)
         context.update({
             self.acc_sens_formset_context_varname: forms.get(self.acc_sens_formset_prefix),
+            self.devices_formset_context_varname: forms.get(self.devices_formset_prefix),
         })
         return context
 
@@ -289,27 +312,48 @@ class EdgeCapacitySpecificEditorProcessFormView(
             request.POST,
             prefix=self.acc_sens_formset_prefix
         )
+        devices_formset = self.DevicesFormset(
+            request.POST,
+            prefix=self.devices_formset_prefix
+        )
         forms.update({
             self.acc_sens_formset_prefix: accessible_sensors_formset,
+            self.devices_formset_prefix: devices_formset,
         })
         return forms
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        initial = list()
+        # Accessible sensors
         sensor_names = self.registration.get(self.acc_sens_property_name)
         if not sensor_names:
             sensor_names = list()
+        initial_sensor_names = list()
         for sensor_name in sensor_names:
-            initial.append({
+            initial_sensor_names.append({
                 'sensor_name': sensor_name,
             })
         accessible_sensors_formset = self.AccessibleSensorsFormset(
-            initial=initial,
+            initial=initial_sensor_names,
             prefix=self.acc_sens_formset_prefix
+        )
+        # Devices
+        devices = self.registration.get(self.devices_property_name)
+        if not devices:
+            devices = dict()
+        initial_device_data = list()
+        for device_type, device_name in devices.items():
+            initial_device_data.append({
+                'device_type': device_type,
+                'device_name': device_name,
+            })
+        devices_formset = self.DevicesFormset(
+            initial=initial_device_data,
+            prefix=self.devices_formset_prefix
         )
         context.update({
             self.acc_sens_formset_context_varname: accessible_sensors_formset,
+            self.devices_formset_context_varname: devices_formset,
         })
         return context
 

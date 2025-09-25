@@ -13,6 +13,10 @@
 {% with section_field=field formset=accessible_sensors_formset formset_instance_legend='Sensor' %}
 {% include 'editor/section_templates/formset_section_template.html' %}
 {% endwith %}
+{% elif field.name == 'devices' and registration_type_name_singular == 'edge capacity' %}
+{% with section_field=field formset=devices_formset formset_instance_legend='Device' %}
+{% include 'editor/section_templates/formset_section_template.html' %}
+{% endwith %}
 {% elif field.field.widget.input_type == 'checkbox' %}
 {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
 {% else %}
