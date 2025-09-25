@@ -24,9 +24,6 @@ class ApiClient:
         response.raise_for_status()
 
     def get_openapi_spec(self):
-        # TEMP - API spec currently not parsing correctly
-        parser = ResolvingParser(os.path.join(settings.BASE_DIR, 'swagger.yaml'))
-        return parser.specification
-        # response = requests.get(self.api_url)
-        # self.log_and_raise_response_status_if_error(response)
-        # return response.json()
+        response = requests.get(self.api_url)
+        self.log_and_raise_response_status_if_error(response)
+        return response.json()
