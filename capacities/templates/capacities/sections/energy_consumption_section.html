@@ -1,14 +1,14 @@
 <section>
     <fieldset class="vstack gap-2">
-        <legend class="fs-6 fw-semibold mb-0">{{ form.price.label }}</legend>
-        <p class="form-text mb-0">{{ form.price.help_text }}</p>
-        {{ price_formset.management_form }}
+        <legend class="fs-6 fw-semibold mb-0">{{ form.energy_consumption.label }}</legend>
+        <p class="form-text mb-0">{{ form.energy_consumption.help_text }}</p>
+        {{ energy_consumption_formset.management_form }}
         <ul class="list-group list-group-flush">
-            {% for form in price_formset %}
-            {% with formset=price_formset current_form_index=forloop.counter %}
+            {% for form in energy_consumption_formset %}
+            {% with formset=energy_consumption_formset current_form_index=forloop.counter %}
             <li class="list-group-item px-0 py-4 {% if forloop.first %}pt-0{% endif %}">
                 <fieldset class="vstack gap-1">
-                    <legend class="fs-6 visually-hidden">Instance Type {{ forloop.counter }}</legend>
+                    <legend class="fs-6 visually-hidden">Instance Type {{ current_form_index }}</legend>
                     {% for field in form %}
                     {% include 'editor/field_templates/field_template.html' with field_wrapper_class='py-0' %}
                     {% endfor %}

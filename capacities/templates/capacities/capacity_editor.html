@@ -3,6 +3,8 @@
 {% block field %}
 {% if field.name == 'price' %}
 {% include 'capacities/sections/price_section.html' %}
+{% elif field.name == 'energy_consumption' %}
+{% include 'capacities/sections/energy_consumption_section.html' %}
 {% elif field.field.widget.input_type == 'checkbox' %}
 {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
 {% else %}

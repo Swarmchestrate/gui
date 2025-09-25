@@ -6,7 +6,7 @@ from editor.forms import (
 )
 
 
-class CapacityPriceEditorForm(forms.Form):
+class EditorFormWithInvalidStyling(forms.Form):
     error_css_class = 'is-invalid'
 
     def is_valid(self):
@@ -19,7 +19,9 @@ class CapacityPriceEditorForm(forms.Form):
             attrs.update({'class': attrs.get('class', '') + ' is-invalid'})
         return result
 
-    price_instance_type = forms.CharField(
+
+class CapacityPriceEditorForm(EditorFormWithInvalidStyling):
+    instance_type = forms.CharField(
         label='Instance Type',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -27,9 +29,27 @@ class CapacityPriceEditorForm(forms.Form):
         required=True
     )
 
-    price_credits_per_hour = forms.CharField(
+    credits_per_hour = forms.IntegerField(
         label='Credits',
         widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+
+class CapacityEnergyConsumptionEditorForm(EditorFormWithInvalidStyling):
+    type = forms.CharField(
+        label='Type',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+    amount = forms.CharField(
+        label='Amount',
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
         required=True

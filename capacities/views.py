@@ -9,6 +9,7 @@ from .api_endpoint_client import (
     EdgeCapacityColumnMetadataApiEndpointClient,
 )
 from .forms import (
+    CapacityEnergyConsumptionEditorForm,
     CapacityPriceEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
@@ -29,62 +30,138 @@ from editor.views import (
 # Cloud & Edge Capacities
 class CapacityEditorRouterView(EditorRouterView):
     cost_and_locality_editor_view_class = None
+    energy_editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'cost & locality':
             return self.cost_and_locality_editor_view_class.as_view()(request, *args, **kwargs)
+        elif self.category.lower() == 'energy':
+            return self.energy_editor_view_class.as_view()(request, *args, **kwargs)
         return super().route_to_view(request, *args, **kwargs)
 
 
 class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
     PriceFormset = formset_factory(CapacityPriceEditorForm)
 
+    formset_context_varname = 'price_formset'
+    price_formset_prefix = 'price'
+    price_property_name = 'price'
+
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        price_formset = forms.get('price')
+        price_formset = forms.get(self.price_formset_prefix)
         price_unformatted = price_formset.cleaned_data
         price_formatted = dict()
-        for price_data in price_unformatted:
-            if not price_data:
+        for data in price_unformatted:
+            if not data:
                 continue
             price_formatted.update({
-                price_data.get('price_instance_type', ''): '%s credit/hour' % (
-                    price_data.get('price_credits_per_hour')
+                data.get('instance_type'): '%s credit/hour' % (
+                    data.get('credits_per_hour')
                 )
             })
         if price_formatted:
             cleaned_data.update({
-                'price': price_formatted,
+                self.price_property_name: price_formatted,
             })
         return cleaned_data
 
     def get_context_data_forms_invalid(self, forms):
         context = super().get_context_data_forms_invalid(forms)
         context.update({
-            'price_formset': forms.get('price'),
+            self.formset_context_varname: forms.get(self.price_formset_prefix),
         })
         return context
 
     def get_forms_from_request_data(self, request):
         forms = super().get_forms_from_request_data(request)
-        price_formset = self.PriceFormset(request.POST)
+        price_formset = self.PriceFormset(
+            request.POST,
+            prefix=self.price_formset_prefix
+        )
         forms.update({
-            'price': price_formset,
+            self.price_formset_prefix: price_formset,
         })
         return forms
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         initial = list()
-        for instance_type, credits_per_hour in self.registration.get('price').items():
+        for instance_type, credits_per_hour in self.registration.get(self.price_property_name).items():
             credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
             initial.append({
-                'price_instance_type': instance_type,
-                'price_credits_per_hour': credits_per_hour_num,
+                'instance_type': instance_type,
+                'credits_per_hour': credits_per_hour_num,
             })
-        price_formset = self.PriceFormset(initial=initial)
+        price_formset = self.PriceFormset(
+            initial=initial,
+            prefix=self.price_formset_prefix
+        )
         context.update({
-            'price_formset': price_formset,
+            self.formset_context_varname: price_formset,
+        })
+        return context
+
+
+class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
+    EnergyConsumptionFormset = formset_factory(CapacityEnergyConsumptionEditorForm)
+
+    formset_context_varname = 'energy_consumption_formset'
+    energy_consumption_formset_prefix = 'energy_consumption'
+    energy_consumption_property_name = 'energy_consumption'
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
+        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
+        energy_consumption_formset = forms.get(self.energy_consumption_formset_prefix)
+        energy_consumption_unformatted = energy_consumption_formset.cleaned_data
+        energy_consumption_formatted = dict()
+        for data in energy_consumption_unformatted:
+            if not data:
+                continue
+            energy_consumption_formatted.update({
+                data.get('type'): data.get('amount'),
+            })
+        if energy_consumption_formatted:
+            cleaned_data.update({
+                self.energy_consumption_property_name: energy_consumption_formatted,
+            })
+        return cleaned_data
+
+    def get_context_data_forms_invalid(self, forms):
+        context = super().get_context_data_forms_invalid(forms)
+        context.update({
+            self.formset_context_varname: forms.get(self.energy_consumption_formset_prefix),
+        })
+        return context
+
+    def get_forms_from_request_data(self, request):
+        forms = super().get_forms_from_request_data(request)
+        energy_consumption_formset = self.EnergyConsumptionFormset(
+            request.POST,
+            prefix=self.energy_consumption_formset_prefix
+        )
+        forms.update({
+            self.energy_consumption_formset_prefix: energy_consumption_formset,
+        })
+        return forms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial = list()
+        energy_consumption_data = self.registration.get(self.energy_consumption_property_name)
+        if not energy_consumption_data:
+            energy_consumption_data = dict()
+        for type, amount in energy_consumption_data.items():
+            initial.append({
+                'type': type,
+                'amount': amount,
+            })
+        energy_consumption_formset = self.EnergyConsumptionFormset(
+            initial=initial,
+            prefix=self.energy_consumption_formset_prefix
+        )
+        context.update({
+            self.formset_context_varname: energy_consumption_formset,
         })
         return context
 
@@ -118,9 +195,16 @@ class CloudCapacityCostAndLocalityEditorProcessFormView(
     pass
 
 
+class CloudCapacityEnergyEditorProcessFormView(
+        CloudCapacityEditorProcessFormView,
+        CapacityEnergyEditorProcessFormView):
+    pass
+
+
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
+    energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
