@@ -87,7 +87,10 @@ class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         initial = list()
-        for instance_type, credits_per_hour in self.registration.get(self.price_property_name).items():
+        price_data = self.registration.get(self.price_property_name)
+        if not price_data:
+            price_data = dict()
+        for instance_type, credits_per_hour in price_data.items():
             credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
             initial.append({
                 'instance_type': instance_type,
@@ -237,6 +240,24 @@ class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFor
     template_name = 'capacities/capacity_editor.html'
     form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('capacities:new_edge_capacity')
+
+
+class EdgeCapacityCostAndLocalityEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView,
+        CapacityCostAndLocalityEditorProcessFormView):
+    pass
+
+
+class EdgeCapacityEnergyEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView,
+        CapacityEnergyEditorProcessFormView):
+    pass
+
+
+class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
+    editor_view_class = EdgeCapacityEditorProcessFormView
+    cost_and_locality_editor_view_class = EdgeCapacityCostAndLocalityEditorProcessFormView
+    energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
 
 
 class EdgeCapacityRegistrationsListFormView(EdgeCapacityEditorView, RegistrationsListFormView):
