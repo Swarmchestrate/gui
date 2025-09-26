@@ -1,5 +1,5 @@
-<div class="{{ field_wrapper_class|default:'py-4' }}">
-    <label for="{{ field.auto_id }}" class="fw-semibold">{{ field.label }}</label>
+<div class="{{ field_wrapper_classes|default:'py-4' }}">
+    <label for="{{ field.auto_id }}" class="{{ label_classes|default:'fw-semibold' }}">{{ field.label }}</label>
     {{ field }}
     {% include 'editor/field_templates/field_help_text.html' %}
     {% include 'editor/field_templates/field_invalid_feedback.html' %}

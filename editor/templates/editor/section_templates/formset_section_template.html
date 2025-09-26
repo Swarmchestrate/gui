@@ -8,9 +8,9 @@
             {% with current_form_index=forloop.counter %}
             <li class="list-group-item px-0 py-4 {% if forloop.first %}pt-0{% endif %}">
                 <fieldset class="vstack gap-1">
-                    <legend class="fs-6 visually-hidden">{{ formset_instance_legend }} {{ current_form_index }}</legend>
+                    <legend class="fs-6 visually-hidden">{{ formset_instance_legend|default:section_field.label }} {{ current_form_index }}</legend>
                     {% for field in form %}
-                    {% include 'editor/field_templates/field_template.html' with field_wrapper_class='py-0' %}
+                    {% include 'editor/field_templates/field_template.html' with field_wrapper_classes='py-0' %}
                     {% endfor %}
                 </fieldset>
             </li>
