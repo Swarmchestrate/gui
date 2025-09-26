@@ -19,6 +19,7 @@ from .forms import (
     EdgeCapacityRegistrationForm,
 )
 
+from editor.formsets import BaseEditorFormset
 from editor.views import (
     EditorView,
     EditorProcessFormView,
@@ -43,7 +44,11 @@ class CapacityEditorRouterView(EditorRouterView):
 
 
 class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
-    PriceFormset = formset_factory(CapacityPriceEditorForm)
+    PriceFormset = formset_factory(
+        CapacityPriceEditorForm,
+        formset=BaseEditorFormset,
+        can_delete=True
+    )
 
     formset_context_varname = 'price_formset'
     price_formset_prefix = 'price'
@@ -105,11 +110,20 @@ class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
         context.update({
             self.formset_context_varname: price_formset,
         })
+        context.update({
+            'formsets': {
+                self.price_formset_prefix: price_formset,
+            },
+        })
         return context
 
 
 class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
-    EnergyConsumptionFormset = formset_factory(CapacityEnergyConsumptionEditorForm)
+    EnergyConsumptionFormset = formset_factory(
+        CapacityEnergyConsumptionEditorForm,
+        formset=BaseEditorFormset,
+        can_delete=True
+    )
 
     formset_context_varname = 'energy_consumption_formset'
     energy_consumption_formset_prefix = 'energy_consumption'
@@ -167,6 +181,11 @@ class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
         )
         context.update({
             self.formset_context_varname: energy_consumption_formset,
+        })
+        context.update({
+            'formsets': {
+                self.energy_consumption_formset_prefix: energy_consumption_formset,
+            },
         })
         return context
 
@@ -258,11 +277,19 @@ class EdgeCapacityEnergyEditorProcessFormView(
 
 class EdgeCapacitySpecificEditorProcessFormView(
         EdgeCapacityEditorProcessFormView):
-    AccessibleSensorsFormset = formset_factory(EdgeCapacityAccessibleSensorsEditorForm)
+    AccessibleSensorsFormset = formset_factory(
+        EdgeCapacityAccessibleSensorsEditorForm,
+        formset=BaseEditorFormset,
+        can_delete=True
+    )
     acc_sens_formset_context_varname = 'accessible_sensors_formset'
     acc_sens_formset_prefix = 'accessible_sensors'
     acc_sens_property_name = 'accessible_sensors'
-    DevicesFormset = formset_factory(EdgeCapacityDevicesEditorForm)
+    DevicesFormset = formset_factory(
+        EdgeCapacityDevicesEditorForm,
+        formset=BaseEditorFormset,
+        can_delete=True
+    )
     devices_formset_context_varname = 'devices_formset'
     devices_formset_prefix = 'devices'
     devices_property_name = 'devices'
@@ -354,6 +381,12 @@ class EdgeCapacitySpecificEditorProcessFormView(
         context.update({
             self.acc_sens_formset_context_varname: accessible_sensors_formset,
             self.devices_formset_context_varname: devices_formset,
+        })
+        context.update({
+            'formsets': {
+                self.acc_sens_formset_prefix: accessible_sensors_formset,
+                self.devices_formset_prefix: devices_formset,
+            },
         })
         return context
 

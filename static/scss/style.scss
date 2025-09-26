@@ -153,6 +153,12 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+/* Formset tables */
+.formset-table.delete-disabled tr th:last-child,
+.formset-table.delete-disabled tr td:last-child {
+    display: none;
+}
+
 /* Wizard nav */
 .editor-toc.nav-pills .nav-link:not(.active):hover,
 .editor-toc.nav-pills .nav-link:not(.active):focus {

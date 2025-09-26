@@ -3,19 +3,19 @@
 {% block field %}
 {% if field.name == 'price' %}
 {% with section_field=field formset=price_formset %}
-{% include 'editor/section_templates/formset_table_section_template.html' %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
 {% elif field.name == 'energy_consumption' %}
 {% with section_field=field formset=energy_consumption_formset %}
-{% include 'editor/section_templates/formset_table_section_template.html' %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
 {% elif field.name == 'accessible_sensors' and registration_type_name_singular == 'edge capacity' %}
 {% with section_field=field formset=accessible_sensors_formset %}
-{% include 'editor/section_templates/formset_table_section_template.html' %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
 {% elif field.name == 'devices' and registration_type_name_singular == 'edge capacity' %}
 {% with section_field=field formset=devices_formset %}
-{% include 'editor/section_templates/formset_table_section_template.html' %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
 {% elif field.field.widget.input_type == 'checkbox' %}
 {% include 'editor/field_templates/checkbox_field_wrapper.html' %}

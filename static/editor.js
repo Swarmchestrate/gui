@@ -1,3 +1,5 @@
+import { setupFormsetTables } from "/static/editor_formsets.js";
+
 const form = document.querySelector("#editor-form");
 const formSubmitButton = form.querySelector("button[type='submit']");
 const loadingText = formSubmitButton.querySelector(".loading-text");
@@ -6,10 +8,9 @@ const statusText = formSubmitButton.querySelector(".status-text");
 const fields = document.querySelectorAll("input, textarea, select");
 const formMessagesList = document.querySelector("#form-messages-list");
 
-
 function displayFormMessages(messages) {
     clearFormMessagesList();
-    messages.forEach(message => {
+    messages.forEach((message) => {
         const listItem = document.createElement("li");
         listItem.textContent = message;
         formMessagesList.appendChild(listItem);
@@ -29,7 +30,11 @@ function displayFormSuccessMessages(messages) {
     displayFormMessages(messages);
 }
 
-function displayValidationMessagesForField(fieldName, messages, scrollIntoView) {
+function displayValidationMessagesForField(
+    fieldName,
+    messages,
+    scrollIntoView,
+) {
     if (fieldName === "__all__") return;
     const field = document.querySelector(`[name="${fieldName}"]`);
     if (!field) {
@@ -64,12 +69,14 @@ function displayValidationMessages(validationMessages) {
      */
     // __all__ signifies validation feedback that applies
     // to the whole form.
-    const firstInvalidFieldName = Object.keys(validationMessages).find(key => key !== "__all__");
+    const firstInvalidFieldName = Object.keys(validationMessages).find(
+        (key) => key !== "__all__",
+    );
     for (const fieldName in validationMessages) {
         displayValidationMessagesForField(
             fieldName,
             validationMessages[fieldName],
-            fieldName === firstInvalidFieldName
+            fieldName === firstInvalidFieldName,
         );
     }
     if (!("__all__" in validationMessages)) {
@@ -77,7 +84,9 @@ function displayValidationMessages(validationMessages) {
     }
     // Display validation feedback that applies to the whole
     // form.
-    displayFormErrors(validationMessages.__all__.map(messageData => messageData.message));
+    displayFormErrors(
+        validationMessages.__all__.map((messageData) => messageData.message),
+    );
 }
 
 function clearFormMessagesList() {
@@ -86,7 +95,9 @@ function clearFormMessagesList() {
 
 function clearValidationMessages() {
     clearFormMessagesList();
-    const allNotEmptyInvalidFeedbackElements = document.querySelectorAll(".invalid-feedback:not(:empty)");
+    const allNotEmptyInvalidFeedbackElements = document.querySelectorAll(
+        ".invalid-feedback:not(:empty)",
+    );
     allNotEmptyInvalidFeedbackElements.forEach((element) => {
         element.replaceChildren();
     });
@@ -126,10 +137,10 @@ function validateField(event) {
     const feedback = document.querySelector(`#${field.id} ~ .invalid-feedback`);
     if (!isValid) {
         field.classList.add("is-invalid");
-        return feedback.textContent = field.validationMessage;
+        return (feedback.textContent = field.validationMessage);
     }
     return field.classList.remove("is-invalid");
-};
+}
 
 async function submitFormAsynchronously() {
     const data = new URLSearchParams();
@@ -150,12 +161,12 @@ async function submitFormAsynchronously() {
     } catch (error) {
         hideLoadingText();
         return displayFormErrors([
-            "Encountered checking server validation results. Please try again."
+            "Encountered checking server validation results. Please try again.",
         ]);
     }
     if (response.ok) {
         updateStatusText(`Redirecting`);
-        return window.location.href = responseData.redirect;
+        return (window.location.href = responseData.redirect);
     }
     hideLoadingText();
     const validationMessages = responseData.feedback || {};
@@ -173,4 +184,5 @@ window.addEventListener("DOMContentLoaded", () => {
     fields.forEach((field) => {
         field.addEventListener("input", validateField);
     });
+    setupFormsetTables();
 });

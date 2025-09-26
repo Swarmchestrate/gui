@@ -81,4 +81,19 @@
         {% endblock editor_toc %}
     </div>
 </div>
+{% if formsets %}
+<div id="formset-tables" class="d-none">
+    {% block formset_tables %}
+    {% for formset_prefix, formset in formsets.items %}
+    <table
+        class="formset-template-table"
+        data-formset-prefix="{{ formset_prefix }}">
+        <tbody>
+            {% include 'editor/util_templates/formset_table_row_template.html' with form=formset.empty_form %}
+        </tbody>
+    </table>
+    {% endfor %}
+    {% endblock formset_tables %}
+</div>
+{% endif %}
 {% endblock content %}
