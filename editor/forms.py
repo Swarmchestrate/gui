@@ -128,6 +128,9 @@ class OpenApiSpecificationBasedForm(EditorForm):
             kwargs.update({
                 'help_text': field_description,
             })
+            kwargs['widget'].attrs.update({
+                'aria-describedby': f'{field_metadata.get("column_name")}-help-text',
+            })
         return kwargs
 
     def get_field(self, field_metadata: dict, is_required: bool = False) -> list[forms.Field]:

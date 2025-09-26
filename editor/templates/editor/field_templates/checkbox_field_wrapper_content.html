@@ -4,5 +4,6 @@
 <label class="form-check-label" for="{{ field.auto_id }}">
     {{ field.label }}
 </label>
+{% include 'editor/field_templates/field_help_text.html' %}
 {% include 'editor/field_templates/field_invalid_feedback.html' %}
 {% endblock content %}
