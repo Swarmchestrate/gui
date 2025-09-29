@@ -6,6 +6,7 @@ The following prerequisites should be installed before getting started:
 - **Git**: for cloning the repository
 - **Python**: version 3.10 or later
 - **pip**: Python package manager
+- **[Dart Sass](https://sass-lang.com/install/)**
 
 ## Getting Started
 ### 1. Clone the repository
@@ -35,7 +36,6 @@ Rename or copy the example file to `swagger.yaml`
 ```bash
 cp swagger_example.yaml swagger.yaml
 ```
-
 ## Running the GUI
 To run the GUI locally in your browser, ensure the virtual environment is activated beforehand, then use the `run.sh` script to run the GUI:
 ```bash
