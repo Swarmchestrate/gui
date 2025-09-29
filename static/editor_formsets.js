@@ -9,7 +9,7 @@ function toggleDeleteUi(button, table) {
     return table.classList.remove("delete-disabled");
 }
 
-function addRow(tableBody, templateRow) {
+function addRow(tableBody, templateRow, totalFormsetInput) {
     const nextIndex = tableBody.querySelectorAll("tr").length;
     const newRow = templateRow.cloneNode(true);
     const templateElements = newRow.querySelectorAll(
@@ -27,12 +27,16 @@ function addRow(tableBody, templateRow) {
         }
     }
     tableBody.appendChild(newRow);
+    totalFormsetInput.value = parseInt(totalFormsetInput.value) + 1;
 }
 
 export function setupFormsetTables() {
     const formsetTables = document.querySelectorAll(".formset-table");
     for (const formsetTable of formsetTables) {
         const formsetPrefix = formsetTable.dataset.formsetPrefix;
+        const formsetTotalInput = document.querySelector(
+            `input[name="${formsetPrefix}-TOTAL_FORMS"]`,
+        );
         const tableBody = formsetTable.querySelector("tbody");
         const templateRow = document.querySelector(
             `table.formset-template-table[data-formset-prefix="${formsetPrefix}"] tr`,
@@ -41,7 +45,7 @@ export function setupFormsetTables() {
             `button.formset-table-add-row-button[data-table-id="${formsetTable.id}"]`,
         );
         addRowButton.addEventListener("click", () => {
-            addRow(tableBody, templateRow);
+            addRow(tableBody, templateRow, formsetTotalInput);
         });
         const deleteRowsButton = document.querySelector(
             `button.formset-table-delete-rows-button[data-table-id="${formsetTable.id}"]`,

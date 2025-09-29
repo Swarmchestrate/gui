@@ -47,19 +47,36 @@ class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
     PriceFormset = formset_factory(
         CapacityPriceEditorForm,
         formset=BaseEditorFormset,
-        can_delete=True
+        can_delete=True,
+        can_delete_extra=False
     )
 
     formset_context_varname = 'price_formset'
     price_formset_prefix = 'price'
     price_property_name = 'price'
 
+    def get_initial_formset_data(self):
+        initial = list()
+        price_data = self.registration.get(self.price_property_name)
+        if not price_data:
+            price_data = dict()
+        for instance_type, credits_per_hour in price_data.items():
+            credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
+            initial.append({
+                'instance_type': instance_type,
+                'credits_per_hour': credits_per_hour_num,
+            })
+        return initial
+
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
         price_formset = forms.get(self.price_formset_prefix)
-        price_unformatted = price_formset.cleaned_data
         price_formatted = dict()
-        for data in price_unformatted:
+        for form in price_formset:
+            if (price_formset.can_delete
+                and price_formset._should_delete_form(form)):
+                continue
+            data = form.cleaned_data
             if not data:
                 continue
             price_formatted.update({
@@ -67,10 +84,9 @@ class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
                     data.get('credits_per_hour')
                 )
             })
-        if price_formatted:
-            cleaned_data.update({
-                self.price_property_name: price_formatted,
-            })
+        cleaned_data.update({
+            self.price_property_name: price_formatted,
+        })
         return cleaned_data
 
     def get_context_data_forms_invalid(self, forms):
@@ -93,16 +109,7 @@ class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        initial = list()
-        price_data = self.registration.get(self.price_property_name)
-        if not price_data:
-            price_data = dict()
-        for instance_type, credits_per_hour in price_data.items():
-            credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
-            initial.append({
-                'instance_type': instance_type,
-                'credits_per_hour': credits_per_hour_num,
-            })
+        initial = self.get_initial_formset_data()
         price_formset = self.PriceFormset(
             initial=initial,
             prefix=self.price_formset_prefix
@@ -122,29 +129,43 @@ class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
     EnergyConsumptionFormset = formset_factory(
         CapacityEnergyConsumptionEditorForm,
         formset=BaseEditorFormset,
-        can_delete=True
+        can_delete=True,
+        can_delete_extra=False
     )
 
     formset_context_varname = 'energy_consumption_formset'
     energy_consumption_formset_prefix = 'energy_consumption'
     energy_consumption_property_name = 'energy_consumption'
 
+    def get_initial_formset_data(self):
+        initial = list()
+        energy_consumption_data = self.registration.get(self.energy_consumption_property_name)
+        if not energy_consumption_data:
+            energy_consumption_data = dict()
+        for type, amount in energy_consumption_data.items():
+            initial.append({
+                'type': type,
+                'amount': amount,
+            })
+        return initial
+
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
         energy_consumption_formset = forms.get(self.energy_consumption_formset_prefix)
-        energy_consumption_unformatted = energy_consumption_formset.cleaned_data
         energy_consumption_formatted = dict()
-        for data in energy_consumption_unformatted:
+        for form in energy_consumption_formset:
+            if (energy_consumption_formset.can_delete
+                and energy_consumption_formset._should_delete_form(form)):
+                continue
+            data = form.cleaned_data
             if not data:
                 continue
             energy_consumption_formatted.update({
                 data.get('type'): data.get('amount'),
             })
-        if energy_consumption_formatted:
-            cleaned_data.update({
-                self.energy_consumption_property_name: energy_consumption_formatted,
-            })
-        return cleaned_data
+        cleaned_data.update({
+            self.energy_consumption_property_name: energy_consumption_formatted,
+        })
 
     def get_context_data_forms_invalid(self, forms):
         context = super().get_context_data_forms_invalid(forms)
@@ -166,15 +187,7 @@ class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        initial = list()
-        energy_consumption_data = self.registration.get(self.energy_consumption_property_name)
-        if not energy_consumption_data:
-            energy_consumption_data = dict()
-        for type, amount in energy_consumption_data.items():
-            initial.append({
-                'type': type,
-                'amount': amount,
-            })
+        initial = self.get_initial_formset_data()
         energy_consumption_formset = self.EnergyConsumptionFormset(
             initial=initial,
             prefix=self.energy_consumption_formset_prefix
