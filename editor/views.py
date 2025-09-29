@@ -15,7 +15,7 @@ from django.views.generic import (
 from django.views.generic.edit import ProcessFormView
 
 from .forms import RegistrationsListForm
-from .formsets import BaseEditorFormset
+from .formsets import BaseEditorFormSet
 from .generic_views import EditorTocView, EditorView
 
 
@@ -321,10 +321,10 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             self,
             form_class: Form,
             formset_prefix: str,
-            base_formset_class: BaseEditorFormset = None,
+            base_formset_class: BaseEditorFormSet = None,
             manually_process: bool = False):
         if not base_formset_class:
-            base_formset_class = BaseEditorFormset
+            base_formset_class = BaseEditorFormSet
         formset_class = formset_factory(
             form_class,
             formset=base_formset_class,

@@ -1,7 +1,7 @@
 from django.forms import BaseFormSet, CheckboxInput, Form
 
 
-class BaseEditorFormset(BaseFormSet):
+class BaseEditorFormSet(BaseFormSet):
     def get_cleaned_data_from_form(self, form: Form):
         if (self.can_delete
             and self._should_delete_form(form)):

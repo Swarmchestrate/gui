@@ -1,7 +1,7 @@
-from editor.formsets import BaseEditorFormset
+from editor.formsets import BaseEditorFormSet
 
 
-class CapacityPriceEditorFormSet(BaseEditorFormset):
+class CapacityPriceEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = dict()
         for form in self:
@@ -16,7 +16,7 @@ class CapacityPriceEditorFormSet(BaseEditorFormset):
         return formatted_data
 
 
-class CapacityEnergyConsumptionEditorFormSet(BaseEditorFormset):
+class CapacityEnergyConsumptionEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = dict()
         for form in self:
@@ -29,7 +29,7 @@ class CapacityEnergyConsumptionEditorFormSet(BaseEditorFormset):
         return formatted_data
 
 
-class EdgeCapacityAccessibleSensorsEditorFormSet(BaseEditorFormset):
+class EdgeCapacityAccessibleSensorsEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = list()
         for form in self:
@@ -41,7 +41,7 @@ class EdgeCapacityAccessibleSensorsEditorFormSet(BaseEditorFormset):
         return formatted_data
 
 
-class EdgeCapacityDevicesEditorFormSet(BaseEditorFormset):
+class EdgeCapacityDevicesEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = dict()
         for form in self:
