@@ -1,4 +1,3 @@
-from django.forms import formset_factory
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
@@ -13,19 +12,25 @@ from .forms import (
     CapacityPriceEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
-    EdgeCapacityAccessibleSensorsEditorForm,
-    EdgeCapacityDevicesEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
+from .formsets import (
+    CapacityEnergyConsumptionEditorFormSet,
+    CapacityPriceEditorFormSet,
+)
+from .view_mixins import (
+    AccessibleSensorsFormsetEditorViewMixin,
+    DevicesFormsetEditorViewMixin,
+)
 
-from editor.formsets import BaseEditorFormset
 from editor.views import (
     EditorView,
     EditorProcessFormView,
     EditorOverviewTemplateView,
     EditorRouterView,
     EditorStartFormView,
+    MultipleEditorFormsetProcessFormView,
     RegistrationsListFormView,
 )
 
@@ -43,103 +48,45 @@ class CapacityEditorRouterView(EditorRouterView):
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CapacityCostAndLocalityEditorProcessFormView(EditorProcessFormView):
-    PriceFormset = formset_factory(
-        CapacityPriceEditorForm,
-        formset=BaseEditorFormset,
-        can_delete=True,
-        can_delete_extra=False
-    )
+class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        property_name = 'price'
+        self.add_formset_class(
+            CapacityPriceEditorForm,
+            property_name,
+            base_formset_class=CapacityPriceEditorFormSet
+        )
 
-    formset_context_varname = 'price_formset'
-    price_formset_prefix = 'price'
-    price_property_name = 'price'
-
-    def get_initial_formset_data(self):
+        # Configure initial formset data
         initial = list()
-        price_data = self.registration.get(self.price_property_name)
+        price_data = self.registration.get(property_name)
         if not price_data:
             price_data = dict()
         for instance_type, credits_per_hour in price_data.items():
-            credits_per_hour_num = int(credits_per_hour.replace(' credit/hour', ''))
+            credits_per_hour_num = int(credits_per_hour.replace(
+                ' credit/hour',
+                ''
+            ))
             initial.append({
                 'instance_type': instance_type,
                 'credits_per_hour': credits_per_hour_num,
             })
-        return initial
+        self.add_initial_data_for_formset(initial, property_name)
+        return super().dispatch(request, *args, **kwargs)
 
-    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
-        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        price_formset = forms.get(self.price_formset_prefix)
-        price_formatted = dict()
-        for form in price_formset:
-            if (price_formset.can_delete
-                and price_formset._should_delete_form(form)):
-                continue
-            data = form.cleaned_data
-            if not data:
-                continue
-            price_formatted.update({
-                data.get('instance_type'): '%s credit/hour' % (
-                    data.get('credits_per_hour')
-                )
-            })
-        cleaned_data.update({
-            self.price_property_name: price_formatted,
-        })
-        return cleaned_data
 
-    def get_context_data_forms_invalid(self, forms):
-        context = super().get_context_data_forms_invalid(forms)
-        context.update({
-            self.formset_context_varname: forms.get(self.price_formset_prefix),
-        })
-        return context
-
-    def get_forms_from_request_data(self, request):
-        forms = super().get_forms_from_request_data(request)
-        price_formset = self.PriceFormset(
-            request.POST,
-            prefix=self.price_formset_prefix
+class CapacityEnergyEditorProcessFormView(MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        property_name = 'energy_consumption'
+        self.add_formset_class(
+            CapacityEnergyConsumptionEditorForm,
+            property_name,
+            base_formset_class=CapacityEnergyConsumptionEditorFormSet
         )
-        forms.update({
-            self.price_formset_prefix: price_formset,
-        })
-        return forms
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        initial = self.get_initial_formset_data()
-        price_formset = self.PriceFormset(
-            initial=initial,
-            prefix=self.price_formset_prefix
-        )
-        context.update({
-            self.formset_context_varname: price_formset,
-        })
-        context.update({
-            'formsets': {
-                self.price_formset_prefix: price_formset,
-            },
-        })
-        return context
-
-
-class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
-    EnergyConsumptionFormset = formset_factory(
-        CapacityEnergyConsumptionEditorForm,
-        formset=BaseEditorFormset,
-        can_delete=True,
-        can_delete_extra=False
-    )
-
-    formset_context_varname = 'energy_consumption_formset'
-    energy_consumption_formset_prefix = 'energy_consumption'
-    energy_consumption_property_name = 'energy_consumption'
-
-    def get_initial_formset_data(self):
+        # Configure initial formset data
         initial = list()
-        energy_consumption_data = self.registration.get(self.energy_consumption_property_name)
+        energy_consumption_data = self.registration.get(property_name)
         if not energy_consumption_data:
             energy_consumption_data = dict()
         for type, amount in energy_consumption_data.items():
@@ -147,60 +94,8 @@ class CapacityEnergyEditorProcessFormView(EditorProcessFormView):
                 'type': type,
                 'amount': amount,
             })
-        return initial
-
-    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
-        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        energy_consumption_formset = forms.get(self.energy_consumption_formset_prefix)
-        energy_consumption_formatted = dict()
-        for form in energy_consumption_formset:
-            if (energy_consumption_formset.can_delete
-                and energy_consumption_formset._should_delete_form(form)):
-                continue
-            data = form.cleaned_data
-            if not data:
-                continue
-            energy_consumption_formatted.update({
-                data.get('type'): data.get('amount'),
-            })
-        cleaned_data.update({
-            self.energy_consumption_property_name: energy_consumption_formatted,
-        })
-
-    def get_context_data_forms_invalid(self, forms):
-        context = super().get_context_data_forms_invalid(forms)
-        context.update({
-            self.formset_context_varname: forms.get(self.energy_consumption_formset_prefix),
-        })
-        return context
-
-    def get_forms_from_request_data(self, request):
-        forms = super().get_forms_from_request_data(request)
-        energy_consumption_formset = self.EnergyConsumptionFormset(
-            request.POST,
-            prefix=self.energy_consumption_formset_prefix
-        )
-        forms.update({
-            self.energy_consumption_formset_prefix: energy_consumption_formset,
-        })
-        return forms
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        initial = self.get_initial_formset_data()
-        energy_consumption_formset = self.EnergyConsumptionFormset(
-            initial=initial,
-            prefix=self.energy_consumption_formset_prefix
-        )
-        context.update({
-            self.formset_context_varname: energy_consumption_formset,
-        })
-        context.update({
-            'formsets': {
-                self.energy_consumption_formset_prefix: energy_consumption_formset,
-            },
-        })
-        return context
+        self.add_initial_data_for_formset(initial, property_name)
+        return super().dispatch(request, *args, **kwargs)
 
 
 # Cloud Capacity
@@ -222,7 +117,7 @@ class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormV
 
 class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessFormView):
     template_name = 'capacities/capacity_editor.html'
-    form_class = CloudCapacityEditorForm
+    main_form_class = CloudCapacityEditorForm
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
@@ -272,7 +167,7 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormVie
 
 class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFormView):
     template_name = 'capacities/capacity_editor.html'
-    form_class = EdgeCapacityEditorForm
+    main_form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('capacities:new_edge_capacity')
 
 
@@ -289,119 +184,14 @@ class EdgeCapacityEnergyEditorProcessFormView(
 
 
 class EdgeCapacitySpecificEditorProcessFormView(
-        EdgeCapacityEditorProcessFormView):
-    AccessibleSensorsFormset = formset_factory(
-        EdgeCapacityAccessibleSensorsEditorForm,
-        formset=BaseEditorFormset,
-        can_delete=True
-    )
-    acc_sens_formset_context_varname = 'accessible_sensors_formset'
-    acc_sens_formset_prefix = 'accessible_sensors'
-    acc_sens_property_name = 'accessible_sensors'
-    DevicesFormset = formset_factory(
-        EdgeCapacityDevicesEditorForm,
-        formset=BaseEditorFormset,
-        can_delete=True
-    )
-    devices_formset_context_varname = 'devices_formset'
-    devices_formset_prefix = 'devices'
-    devices_property_name = 'devices'
-
-    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
-        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        # Accessible sensors
-        accessible_sensors_formset = forms.get(self.acc_sens_formset_prefix)
-        sensor_data_uncleaned = accessible_sensors_formset.cleaned_data
-        sensor_names_cleaned = list()
-        for sensor_data in sensor_data_uncleaned:
-            sensor_name = sensor_data.get('sensor_name', '')
-            if not sensor_name.strip():
-                continue
-            sensor_names_cleaned.append(sensor_name)
-        cleaned_data.update({
-            self.acc_sens_property_name: sensor_names_cleaned,
-        })
-        # Devices
-        devices_formset = forms.get(self.devices_formset_prefix)
-        devices_uncleaned = devices_formset.cleaned_data
-        devices_cleaned = dict()
-        for data in devices_uncleaned:
-            if not data:
-                continue
-            device_type = data.get('device_type')
-            device_name = data.get('device_name')
-            devices_cleaned.update({
-                device_type: device_name,
-            })
-        cleaned_data.update({
-            self.devices_property_name: devices_cleaned,
-        })
-        return cleaned_data
-
-    def get_context_data_forms_invalid(self, forms):
-        context = super().get_context_data_forms_invalid(forms)
-        context.update({
-            self.acc_sens_formset_context_varname: forms.get(self.acc_sens_formset_prefix),
-            self.devices_formset_context_varname: forms.get(self.devices_formset_prefix),
-        })
-        return context
-
-    def get_forms_from_request_data(self, request):
-        forms = super().get_forms_from_request_data(request)
-        accessible_sensors_formset = self.AccessibleSensorsFormset(
-            request.POST,
-            prefix=self.acc_sens_formset_prefix
-        )
-        devices_formset = self.DevicesFormset(
-            request.POST,
-            prefix=self.devices_formset_prefix
-        )
-        forms.update({
-            self.acc_sens_formset_prefix: accessible_sensors_formset,
-            self.devices_formset_prefix: devices_formset,
-        })
-        return forms
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Accessible sensors
-        sensor_names = self.registration.get(self.acc_sens_property_name)
-        if not sensor_names:
-            sensor_names = list()
-        initial_sensor_names = list()
-        for sensor_name in sensor_names:
-            initial_sensor_names.append({
-                'sensor_name': sensor_name,
-            })
-        accessible_sensors_formset = self.AccessibleSensorsFormset(
-            initial=initial_sensor_names,
-            prefix=self.acc_sens_formset_prefix
-        )
-        # Devices
-        devices = self.registration.get(self.devices_property_name)
-        if not devices:
-            devices = dict()
-        initial_device_data = list()
-        for device_type, device_name in devices.items():
-            initial_device_data.append({
-                'device_type': device_type,
-                'device_name': device_name,
-            })
-        devices_formset = self.DevicesFormset(
-            initial=initial_device_data,
-            prefix=self.devices_formset_prefix
-        )
-        context.update({
-            self.acc_sens_formset_context_varname: accessible_sensors_formset,
-            self.devices_formset_context_varname: devices_formset,
-        })
-        context.update({
-            'formsets': {
-                self.acc_sens_formset_prefix: accessible_sensors_formset,
-                self.devices_formset_prefix: devices_formset,
-            },
-        })
-        return context
+        EdgeCapacityEditorProcessFormView,
+        MultipleEditorFormsetProcessFormView,
+        AccessibleSensorsFormsetEditorViewMixin,
+        DevicesFormsetEditorViewMixin):
+    def dispatch(self, request, *args, **kwargs):
+        self.add_accessible_sensors_formset_metadata()
+        self.add_devices_formset_metadata()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):

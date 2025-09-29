@@ -31,7 +31,7 @@ class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView)
 
 class ApplicationEditorProcessFormView(ApplicationEditorView, EditorProcessFormView):
     template_name = 'applications/application_editor.html'
-    form_class = ApplicationEditorForm
+    main_form_class = ApplicationEditorForm
     success_url = reverse_lazy('applications:new_application')
 
 

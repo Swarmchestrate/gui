@@ -1,10 +1,10 @@
-import json
 import logging
 import urllib.parse
 from http import HTTPStatus
 
 from django import forms
 from django.contrib import messages
+from django.forms import Form, formset_factory
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -15,6 +15,7 @@ from django.views.generic import (
 from django.views.generic.edit import ProcessFormView
 
 from .forms import RegistrationsListForm
+from .formsets import BaseEditorFormset
 from .generic_views import EditorTocView, EditorView
 
 
@@ -66,9 +67,12 @@ class EditorRouterView(EditorTocView, ProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
+class EditorProcessFormView(
+        EditorView,
+        EditorTocView,
+        ProcessFormView):
     title_base = ''
-    form_class: forms.Form
+    main_form_class: forms.Form
 
     def get_prev_and_next_list_items(self):
         index_of_current_category = self.category_names.index(self.category)
@@ -103,7 +107,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
 
     def get_forms_from_request_data(self, request):
         kwargs = self.get_form_kwargs()
-        form = self.form_class(data=request.POST, **kwargs)
+        form = self.main_form_class(data=request.POST, **kwargs)
         return {
             '': form,
         }
@@ -174,15 +178,12 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
             'redirect': self.success_url,
         })
 
-    def post(self, request, *args, **kwargs):
-        forms = self.get_forms_from_request_data(request)
-        if all([form.is_valid() for form in forms.values()]):
-            return self.forms_valid(forms)
-        return self.forms_invalid(forms)
-
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
+        response = super().setup(request, *args, **kwargs)
         self.registration_id = self.kwargs['registration_id']
         self.registration = self.api_endpoint_client.get(self.registration_id)
+
+    def dispatch(self, request, *args, **kwargs):
         self.category = self.request.GET.get(
             'category',
             self._get_first_category()
@@ -195,6 +196,12 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         )
         self.title_base = f'{self.registration_type_name_singular.title()} {self.registration_id}'
         return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        forms = self.get_forms_from_request_data(request)
+        if all([form.is_valid() for form in forms.values()]):
+            return self.forms_valid(forms)
+        return self.forms_invalid(forms)
 
     def get_context_data(self, **kwargs):
         prev_list_item, next_list_item = self.get_prev_and_next_list_items()
@@ -210,7 +217,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
             'next_list_item': next_list_item,
             'next_list_item_title': next_list_item.replace(':', ': '),
             'registration_id': self.registration_id,
-            'form': self.form_class(**self.get_form_kwargs()),
+            'form': self.main_form_class(**self.get_form_kwargs()),
         })
         return context
 
@@ -301,4 +308,107 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
             'title': f'{self.registration_type_name_singular.title()} {self.registration_id}',
             'registration_data_by_category': self.format_registration_data_for_template(),
         })
+        return context
+
+
+class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
+    formset_classes: dict
+    initial_data_for_formsets: dict[str, list[dict]]
+    manually_processed_formset_prefixes: list[str]
+
+    # Class-specific methods
+    def add_formset_class(
+            self,
+            form_class: Form,
+            formset_prefix: str,
+            base_formset_class: BaseEditorFormset = None,
+            manually_process: bool = False):
+        if not base_formset_class:
+            base_formset_class = BaseEditorFormset
+        formset_class = formset_factory(
+            form_class,
+            formset=base_formset_class,
+            can_delete=True,
+            can_delete_extra=False
+        )
+        self.formset_classes.update({
+            formset_prefix: formset_class,
+        })
+        if not manually_process:
+            return
+        self.manually_processed_formset_prefixes.append(
+            formset_prefix
+        )
+
+    def add_initial_data_for_formset(
+            self,
+            data: list[dict],
+            formset_prefix: str):
+        self.initial_data_for_formsets.update({
+            formset_prefix: data,
+        })
+
+    def get_initial_data_for_formset(self, formset_prefix: str):
+        return self.initial_data_for_formsets.get(formset_prefix, list())
+
+    # EditorProcessFormView method overrides
+    def get_forms_from_request_data(self, request):
+        forms = super().get_forms_from_request_data(request)
+        for formset_prefix, formset_class in self.formset_classes.items():
+            initial = self.get_initial_data_for_formset(formset_prefix)
+            loaded_formset = formset_class(
+                data=request.POST,
+                initial=initial,
+                prefix=formset_prefix
+            )
+            forms.update({
+                formset_prefix: loaded_formset,
+            })
+        return forms
+
+    def get_context_data_forms_invalid(self, forms):
+        context = super().get_context_data_forms_invalid(forms)
+        for form_prefix, formset in forms.items():
+            context.update({
+                f'{form_prefix}_formset': formset,
+            })
+        return context
+
+    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
+        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
+        for formset_prefix, formset in forms.items():
+            if (not formset_prefix
+                or formset_prefix in self.manually_processed_formset_prefixes):
+                continue
+            formset_data = formset.to_api_ready_format()
+            cleaned_data.update({
+                formset_prefix: formset_data,
+            })
+        return cleaned_data
+
+    # ProcessFormView method overrides
+    def setup(self, request, *args, **kwargs):
+        self.initial_data_for_formsets = dict()
+        self.formset_classes = dict()
+        self.manually_processed_formset_prefixes = list()
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        for formset_prefix, formset_class in self.formset_classes.items():
+            initial = self.get_initial_data_for_formset(formset_prefix)
+            initial_formset = formset_class(
+                initial=initial,
+                prefix=formset_prefix
+            )
+            if 'formsets' not in context:
+                context.update({
+                    'formsets': dict(),
+                })
+            context.update({
+                f'{formset_prefix}_formset': initial_formset,
+            })
+            context['formsets'].update({
+                formset_prefix: initial_formset,
+            })
         return context
