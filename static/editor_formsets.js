@@ -1,14 +1,21 @@
-function toggleDeleteUi(button, table) {
-    if (!table.classList.contains("delete-disabled")) {
-        button.removeAttribute("aria-pressed");
-        button.classList.remove("active");
-        return table.classList.add("delete-disabled");
+// Deleting rows
+function toggleDeleteUi(checkbox, table) {
+    if (checkbox.checked) {
+        return table.classList.remove("delete-disabled");
     }
-    button.setAttribute("aria-pressed", "true");
-    button.classList.add("active");
-    return table.classList.remove("delete-disabled");
+    return table.classList.add("delete-disabled");
 }
 
+function setupDeleteCheckbox(deleteCheckbox, tableRow) {
+    deleteCheckbox.addEventListener("input", () => {
+        if (deleteCheckbox.checked) {
+            return tableRow.classList.add("table-danger");
+        }
+        return tableRow.classList.remove("table-danger");
+    });
+}
+
+// Adding rows
 function addRow(tableBody, templateRow, totalFormsetInput) {
     const nextIndex = tableBody.querySelectorAll("tr").length;
     const newRow = templateRow.cloneNode(true);
@@ -38,6 +45,14 @@ export function setupFormsetTables() {
             `input[name="${formsetPrefix}-TOTAL_FORMS"]`,
         );
         const tableBody = formsetTable.querySelector("tbody");
+        const tableRows = tableBody.querySelectorAll("tr");
+        for (const tableRow of tableRows) {
+            const deleteCheckbox = tableRow.querySelector(
+                `input[type="checkbox"][name$="-DELETE"]`,
+            );
+            if (!deleteCheckbox) continue;
+            setupDeleteCheckbox(deleteCheckbox, tableRow);
+        }
         const templateRow = document.querySelector(
             `table.formset-template-table[data-formset-prefix="${formsetPrefix}"] tr`,
         );
@@ -47,11 +62,11 @@ export function setupFormsetTables() {
         addRowButton.addEventListener("click", () => {
             addRow(tableBody, templateRow, formsetTotalInput);
         });
-        const deleteRowsButton = document.querySelector(
-            `button.formset-table-delete-rows-button[data-table-id="${formsetTable.id}"]`,
+        const deleteRowsCheckbox = document.querySelector(
+            `input.formset-should-delete-rows[type="checkbox"][data-table-id="${formsetTable.id}"]`,
         );
-        deleteRowsButton.addEventListener("click", () => {
-            toggleDeleteUi(deleteRowsButton, formsetTable);
+        deleteRowsCheckbox.addEventListener("input", () => {
+            toggleDeleteUi(deleteRowsCheckbox, formsetTable);
         });
     }
 }

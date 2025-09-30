@@ -159,6 +159,21 @@ label:has(~ :required)::after,
     display: none;
 }
 
+.formset-should-delete-rows + label {
+    color: var(--bs-secondary-text-emphasis);
+}
+
+.formset-should-delete-rows + label i {
+    color: var(--bs-danger);
+}
+
+.formset-should-delete-rows + label:hover,
+.formset-should-delete-rows:focus-visible + label,
+.formset-should-delete-rows:checked + label {
+    color: var(--bs-danger) !important;
+    transition: $btn-transition;
+}
+
 /* Wizard nav */
 .editor-toc.nav-pills .nav-link:not(.active):hover,
 .editor-toc.nav-pills .nav-link:not(.active):focus {

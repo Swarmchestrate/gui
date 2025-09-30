@@ -26,24 +26,27 @@
                 </tbody>
             </table>
         </div>
-        <div class="d-flex justify-content-between column-gap-2">
+        <div class="d-flex align-items-center column-gap-2">
             <button
                 id="{{ formset.prefix }}-table-add-row-btn"
-                class="btn btn-sm btn-light formset-table-add-row-button"
+                class="btn btn-sm btn-light formset-table-add-row-button me-auto"
                 type="button"
                 data-table-id="{{ table_id }}">
-                <i class="bi bi-plus-lg"></i>
+                <i class="bi bi-plus-lg me-1"></i>
                 Add Row
             </button>
-            <button
-                id="{{ formset.prefix }}-table-delete-rows-btn"
-                class="btn btn-sm btn-outline-secondary formset-table-delete-rows-button"
-                type="button"
-                data-bs-toggle="button"
-                data-table-id="{{ table_id }}">
-                <i class="bi bi-dash-lg"></i>
-                Delete Rows
-            </button>
+            <input
+                type="checkbox"
+                id="{{ formset.prefix }}-should-delete-rows"
+                class="btn-check formset-should-delete-rows"
+                data-table-id="{{ table_id }}"
+                autocomplete="off">
+            <label
+                for="{{ formset.prefix }}-should-delete-rows"
+                class="btn btn-light btn-sm">
+                <i class="bi bi-trash me-1"></i>
+                Select Rows
+            </label>
         </div>
         {% endwith %}
     </fieldset>
