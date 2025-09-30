@@ -1,6 +1,7 @@
 from editor.formsets import BaseEditorFormSet
 
 
+# Cloud & Edge Capacity formsets
 class CapacityPriceEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = dict()
@@ -41,6 +42,20 @@ class CapacitySecurityPortsEditorFormSet(BaseEditorFormSet):
         return formatted_data
 
 
+# Cloud Capacity formsets
+class CloudCapacityArchitectureEditorFormSet(BaseEditorFormSet):
+    def to_api_ready_format(self) -> dict | list:
+        formatted_data = list()
+        for form in self:
+            data = self.get_cleaned_data_from_form(form)
+            architecture_name = data.get('architecture_name', '')
+            if not architecture_name.strip():
+                continue
+            formatted_data.append(architecture_name)
+        return formatted_data
+
+
+# Edge Capacity formsets
 class EdgeCapacityAccessibleSensorsEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = list()

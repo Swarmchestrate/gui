@@ -63,6 +63,16 @@ class CloudCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = 'capacity'
 
 
+class CloudCapacityArchitectureEditorForm(EditorForm):
+    architecture_name = forms.CharField(
+        label='Architecture Name',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+
 # Edge Capacity forms
 class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'

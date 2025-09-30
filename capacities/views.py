@@ -13,6 +13,7 @@ from .forms import (
     CapacitySecurityPortsEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
+    CloudCapacityArchitectureEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
@@ -20,6 +21,7 @@ from .formsets import (
     CapacityEnergyConsumptionEditorFormSet,
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
+    CloudCapacityArchitectureEditorFormSet,
 )
 from .view_mixins import (
     AccessibleSensorsFormsetEditorViewMixin,
@@ -167,11 +169,40 @@ class CloudCapacitySecurityTrustAndAccessEditorProcessFormView(
     pass
 
 
+class CloudCapacitySystemSpecificEditorProcessFormView(
+        CloudCapacityEditorProcessFormView,
+        MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        property_name = 'architecture'
+        self.add_formset_class(
+            CloudCapacityArchitectureEditorForm,
+            property_name,
+            base_formset_class=CloudCapacityArchitectureEditorFormSet
+        )
+
+        # Configure initial formset data
+        initial = list()
+        architecture_names = self.registration.get(property_name)
+        if not architecture_names:
+            architecture_names = list()
+        for architecture_name in architecture_names:
+            initial.append({
+                'architecture_name': architecture_name,
+            })
+        self.add_initial_data_for_formset(initial, property_name)
+        return super().dispatch(request, *args, **kwargs)
+
+
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
     security_trust_and_access_editor_view_class = CloudCapacitySecurityTrustAndAccessEditorProcessFormView
+
+    def route_to_view(self, request, *args, **kwargs):
+        if self.category.lower() == 'system specific':
+            return CloudCapacitySystemSpecificEditorProcessFormView.as_view()(request, *args, **kwargs)
+        return super().route_to_view(request, *args, **kwargs)
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
