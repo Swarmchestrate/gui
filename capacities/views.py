@@ -13,7 +13,6 @@ from .forms import (
     CapacitySecurityPortsEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
-    CloudCapacityArchitectureEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
@@ -21,11 +20,12 @@ from .formsets import (
     CapacityEnergyConsumptionEditorFormSet,
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
-    CloudCapacityArchitectureEditorFormSet,
 )
 from .view_mixins import (
     AccessibleSensorsFormsetEditorViewMixin,
+    ArchitectureFormSetEditorViewMixin,
     DevicesFormsetEditorViewMixin,
+    OperatingSystemFormSetEditorViewMixin,
 )
 
 from editor.views import (
@@ -171,25 +171,12 @@ class CloudCapacitySecurityTrustAndAccessEditorProcessFormView(
 
 class CloudCapacitySystemSpecificEditorProcessFormView(
         CloudCapacityEditorProcessFormView,
-        MultipleEditorFormsetProcessFormView):
+        MultipleEditorFormsetProcessFormView,
+        ArchitectureFormSetEditorViewMixin,
+        OperatingSystemFormSetEditorViewMixin):
     def dispatch(self, request, *args, **kwargs):
-        property_name = 'architecture'
-        self.add_formset_class(
-            CloudCapacityArchitectureEditorForm,
-            property_name,
-            base_formset_class=CloudCapacityArchitectureEditorFormSet
-        )
-
-        # Configure initial formset data
-        initial = list()
-        architecture_names = self.registration.get(property_name)
-        if not architecture_names:
-            architecture_names = list()
-        for architecture_name in architecture_names:
-            initial.append({
-                'architecture_name': architecture_name,
-            })
-        self.add_initial_data_for_formset(initial, property_name)
+        self.add_architecture_formset_metadata()
+        self.add_operating_system_formset_metadata()
         return super().dispatch(request, *args, **kwargs)
 
 

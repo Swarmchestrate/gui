@@ -73,6 +73,24 @@ class CloudCapacityArchitectureEditorForm(EditorForm):
     )
 
 
+class CloudCapacityOperatingSystemEditorForm(EditorForm):
+    os_name = forms.CharField(
+        label='OS Name',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+    os_id = forms.CharField(
+        label='OS Identifier',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+
 # Edge Capacity forms
 class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
