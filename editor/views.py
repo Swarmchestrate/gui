@@ -328,8 +328,7 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
         formset_class = formset_factory(
             form_class,
             formset=base_formset_class,
-            can_delete=True,
-            can_delete_extra=False
+            can_delete=True
         )
         self.formset_classes.update({
             formset_prefix: formset_class,
