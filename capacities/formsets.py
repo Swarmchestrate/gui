@@ -29,6 +29,18 @@ class CapacityEnergyConsumptionEditorFormSet(BaseEditorFormSet):
         return formatted_data
 
 
+class CapacitySecurityPortsEditorFormSet(BaseEditorFormSet):
+    def to_api_ready_format(self):
+        formatted_data = list()
+        for form in self:
+            data = self.get_cleaned_data_from_form(form)
+            port_number = str(data.get('port_number', ''))
+            if not port_number.strip():
+                continue
+            formatted_data.append(port_number)
+        return formatted_data
+
+
 class EdgeCapacityAccessibleSensorsEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self):
         formatted_data = list()

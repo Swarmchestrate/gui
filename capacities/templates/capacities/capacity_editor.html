@@ -9,6 +9,10 @@
 {% with section_field=field formset=energy_consumption_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
+{% elif field.name == 'security_ports' %}
+{% with section_field=field formset=security_ports_formset %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
+{% endwith %}
 {% elif field.name == 'accessible_sensors' and registration_type_name_singular == 'edge capacity' %}
 {% with section_field=field formset=accessible_sensors_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}

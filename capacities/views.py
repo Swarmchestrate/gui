@@ -10,6 +10,7 @@ from .api_endpoint_client import (
 from .forms import (
     CapacityEnergyConsumptionEditorForm,
     CapacityPriceEditorForm,
+    CapacitySecurityPortsEditorForm,
     CloudCapacityRegistrationForm,
     CloudCapacityEditorForm,
     EdgeCapacityEditorForm,
@@ -18,6 +19,7 @@ from .forms import (
 from .formsets import (
     CapacityEnergyConsumptionEditorFormSet,
     CapacityPriceEditorFormSet,
+    CapacitySecurityPortsEditorFormSet,
 )
 from .view_mixins import (
     AccessibleSensorsFormsetEditorViewMixin,
@@ -39,12 +41,15 @@ from editor.views import (
 class CapacityEditorRouterView(EditorRouterView):
     cost_and_locality_editor_view_class = None
     energy_editor_view_class = None
+    security_trust_and_access_editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'cost & locality':
             return self.cost_and_locality_editor_view_class.as_view()(request, *args, **kwargs)
         elif self.category.lower() == 'energy':
             return self.energy_editor_view_class.as_view()(request, *args, **kwargs)
+        elif self.category.lower() == 'security, trust & access':
+            return self.security_trust_and_access_editor_view_class.as_view()(request, *args, **kwargs)
         return super().route_to_view(request, *args, **kwargs)
 
 
@@ -98,6 +103,29 @@ class CapacityEnergyEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
+class CapacitySecurityTrustAndAccessEditorProcessFormView(
+        MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        property_name = 'security_ports'
+        self.add_formset_class(
+            CapacitySecurityPortsEditorForm,
+            property_name,
+            base_formset_class=CapacitySecurityPortsEditorFormSet
+        )
+
+        # Configure initial formset data
+        initial = list()
+        security_ports = self.registration.get(property_name)
+        if not security_ports:
+            security_ports = list()
+        for port_number in security_ports:
+            initial.append({
+                'port_number': int(port_number),
+            })
+        self.add_initial_data_for_formset(initial, property_name)
+        return super().dispatch(request, *args, **kwargs)
+
+
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
     editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
@@ -133,10 +161,17 @@ class CloudCapacityEnergyEditorProcessFormView(
     pass
 
 
+class CloudCapacitySecurityTrustAndAccessEditorProcessFormView(
+        CloudCapacityEditorProcessFormView,
+        CapacitySecurityTrustAndAccessEditorProcessFormView):
+    pass
+
+
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
+    security_trust_and_access_editor_view_class = CloudCapacitySecurityTrustAndAccessEditorProcessFormView
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
@@ -194,10 +229,17 @@ class EdgeCapacitySpecificEditorProcessFormView(
         return super().dispatch(request, *args, **kwargs)
 
 
+class EdgeCapacitySecurityTrustAndAccessEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView,
+        CapacityCostAndLocalityEditorProcessFormView):
+    pass
+
+
 class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = EdgeCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
+    security_trust_and_access_editor_view_class = EdgeCapacitySecurityTrustAndAccessEditorProcessFormView
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'edge specific':

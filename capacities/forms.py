@@ -44,6 +44,16 @@ class CapacityEnergyConsumptionEditorForm(EditorForm):
     )
 
 
+class CapacitySecurityPortsEditorForm(EditorForm):
+    port_number = forms.IntegerField(
+        label='Port Number',
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        }),
+        required=True
+    )
+
+
 # Cloud Capacity forms
 class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'
