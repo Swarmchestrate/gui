@@ -231,7 +231,7 @@ class EdgeCapacitySpecificEditorProcessFormView(
 
 class EdgeCapacitySecurityTrustAndAccessEditorProcessFormView(
         EdgeCapacityEditorProcessFormView,
-        CapacityCostAndLocalityEditorProcessFormView):
+        CapacitySecurityTrustAndAccessEditorProcessFormView):
     pass
 
 
