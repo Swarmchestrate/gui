@@ -48,7 +48,7 @@ class CapacitySecurityPortsEditorForm(EditorForm):
     port_number = forms.IntegerField(
         label='Port Number',
         widget=forms.NumberInput(attrs={
-            'class': 'form-control',
+            'class': 'w-auto form-control',
         }),
         required=True
     )
