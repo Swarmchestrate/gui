@@ -32,7 +32,7 @@ Rename or copy the example file to `.env`
 cp .env_example .env
 ```
 > [!NOTE]
-> The `SECRET_KEY`, `OPENAPI_SPEC_URL` and `API_URL` variables are not set, and the values for the `OPENAPI_SPEC_URL` and `API_URL` variables are not publicly shareable.
+> The `SECRET_KEY`, `OPENAPI_SPEC_URL` and `API_URL` variables are not set (the values for the `OPENAPI_SPEC_URL` and `API_URL` variables are not publicly shareable).
 ## Running the GUI
 To run the GUI locally in your browser, ensure the virtual environment is activated beforehand, then use the `run.sh` script to run the GUI:
 ```bash
