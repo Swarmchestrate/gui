@@ -31,11 +31,11 @@ Rename or copy the example file to `.env`
 ```bash
 cp .env_example .env
 ```
-### 6. Set up the swagger.yaml file
-Rename or copy the example file to `swagger.yaml`
-```bash
-cp swagger_example.yaml swagger.yaml
-```
+> [!NOTE]
+> The `SECRET_KEY`, `OPENAPI_SPEC_URL` and `API_URL` variables are not set.
+
+> [!NOTE]
+> The values for the `OPENAPI_SPEC_URL` and `API_URL` variables are not publicly shareable.
 ## Running the GUI
 To run the GUI locally in your browser, ensure the virtual environment is activated beforehand, then use the `run.sh` script to run the GUI:
 ```bash
