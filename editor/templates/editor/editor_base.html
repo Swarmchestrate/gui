@@ -4,81 +4,88 @@
 <script type="module" src="{% static 'editor.js' %}"></script>
 {% endblock scripts %}
 {% block content %}
-<div class="row justify-content-center gx-md-5">
-    {# High-level TOC #}
-    <div class="col-xl-3">
-        {% block high_level_toc %}
-        <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top pt-4">
-            <li class="nav-item">
-                <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
-            </li>
-            <li class="nav-item">
-                {% url editor_overview_url_reverse_base registration_id as overview_url %}
-                <a href="{{ overview_url }}" class="nav-link {% if request.path == overview_url %}active{% endif %}">Overview</a>
-            </li>
-        </ul>
-        {% endblock high_level_toc %}
-    </div>
-    {# Editor main content #}
-    <div class="col-xl-7 pt-4">
-        {% block editor_main_content %}
-        <hgroup class="d-flex flex-column-reverse row-gap-1">
-            <h1>{{ main_heading }}</h1>
-            <p class="fs-6 text-body-secondary mb-0">{{ main_subheading }} <span class="text-body-tertiary">({{ registration_id }})</span></p>
-        </hgroup>
-        <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-        <form id="editor-form" action="{{ request.get_full_path }}" method="POST">
-            {% csrf_token %}
-            {% for field in form %}
-            {% block field %}
-            {% if field.field.widget.input_type == 'checkbox' %}
-            {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
-            {% else %}
-            {% include 'editor/field_templates/field_template.html' %}
-            {% endif %}
-            {% endblock field %}
-            {% endfor %}
-            <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
-                {% if prev_list_item %}
-                <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
-                    <a href="{% url editor_url_reverse_base registration_id %}?category={{ prev_list_item|urlencode }}" class="btn btn-light">
-                    Previous Step
-                    </a>
-                    <div class="form-text text-center">{{ prev_list_item_title }}</div>
-                </div>
-                {% endif %}
-                {% if not prev_list_item %}
-                <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
-                {% else %}
-                <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
-                {% endif %}
-                    <button type="submit" class="btn btn-primary">
-                        <span class="d-none loading-text">
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                            <span class="status-text">Applying Changes</span>
-                        </span>
-                        <span class="default-text">
-                            {% if next_list_item %}
-                            Next Step
-                            {% else %}
-                            Finish & Review
-                            {% endif %}
-                        </span>
-                    </button>
-                    {% if next_list_item %}
-                    <div class="form-text text-center">{{ next_list_item_title }}</div>
-                    {% endif %}
-                    <ul id="form-messages-list" class="d-none text-danger text-center list-unstyled"></ul>
-                </div>
+<div class="editor-layout">
+    <div class="editor-layout__content">
+        {# Editor header #}
+        <div class="editor-layout__header">
+            <hgroup class="d-flex flex-column row-gap-1 pt-4">
+                <h1 class="mb-0">{{ main_heading }}</h1>
+                <p class="fs-6 text-body-secondary">{{ main_subheading }} <span class="text-body-tertiary">{{ registration_id }}</span></p>
+            </hgroup>
+            <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+        </div>
+        {# High-level TOC #}
+        <div class="editor-layout__sidebar d-lg-block d-none">
+            {% block high_level_toc %}
+            <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top pt-3">
+                <li class="nav-item">
+                    <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
+                </li>
+                <li class="nav-item">
+                    {% url editor_overview_url_reverse_base registration_id as overview_url %}
+                    <a href="{{ overview_url }}" class="nav-link {% if request.path == overview_url %}active{% endif %}">Overview</a>
+                </li>
+            </ul>
+            {% endblock high_level_toc %}
+        </div>
+        {# In-editor TOC #}
+        <div class="editor-layout__toc">
+            <div class="sticky-top pt-4">
+                {% block editor_toc %}
+                {% include 'editor/toc/editor_toc_base.html' %}
+                {% endblock editor_toc %}
             </div>
-        </form>
-        {% endblock editor_main_content %}
-    </div>
-    {# In-editor TOC #}
-    <div class="col-xl-2 pt-4">
-        {% block editor_toc %}
-        {% include 'editor/toc/editor_toc_base.html' %}
-        {% endblock editor_toc %}
+        </div>
+        {# Editor main content #}
+        <div class="editor-layout__body">
+            {% block editor_main_content %}
+            <form id="editor-form" action="{{ request.get_full_path }}" method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                {% block field %}
+                {% if field.field.widget.input_type == 'checkbox' %}
+                {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+                {% else %}
+                {% include 'editor/field_templates/field_template.html' %}
+                {% endif %}
+                {% endblock field %}
+                {% endfor %}
+                <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
+                    {% if prev_list_item %}
+                    <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+                        <a href="{% url editor_url_reverse_base registration_id %}?category={{ prev_list_item|urlencode }}" class="btn btn-light">
+                        Previous Step
+                        </a>
+                        <div class="form-text text-center">{{ prev_list_item_title }}</div>
+                    </div>
+                    {% endif %}
+                    {% if not prev_list_item %}
+                    <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+                    {% else %}
+                    <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
+                    {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            <span class="d-none loading-text">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <span class="status-text">Applying Changes</span>
+                            </span>
+                            <span class="default-text">
+                                {% if next_list_item %}
+                                Next Step
+                                {% else %}
+                                Finish & Review
+                                {% endif %}
+                            </span>
+                        </button>
+                        {% if next_list_item %}
+                        <div class="form-text text-center">{{ next_list_item_title }}</div>
+                        {% endif %}
+                        <ul id="form-messages-list" class="d-none text-danger text-center list-unstyled"></ul>
+                    </div>
+                </div>
+            </form>
+            {% endblock editor_main_content %}
+        </div>
     </div>
 </div>
 {% if formsets %}

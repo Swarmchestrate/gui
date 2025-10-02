@@ -305,7 +305,9 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': f'{self.registration_type_name_singular.title()} {self.registration_id}',
+            'title': f'{self.registration_type_name_singular.title()} {self.registration_id} | Overview',
+            'main_heading': 'Overview',
+            'main_subheading': f'{self.registration_type_name_singular.title()}',
             'registration_data_by_category': self.format_registration_data_for_template(),
         })
         return context
