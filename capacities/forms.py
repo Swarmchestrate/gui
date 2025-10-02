@@ -17,10 +17,11 @@ class CapacityPriceEditorForm(EditorForm):
         required=True
     )
 
-    credits_per_hour = forms.IntegerField(
+    credits_per_hour = forms.FloatField(
         label='Cost (Credits per Hour)',
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
+            'step': '0.0001',
         }),
         required=True
     )
