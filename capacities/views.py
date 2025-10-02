@@ -70,7 +70,7 @@ class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessF
         if not price_data:
             price_data = dict()
         for instance_type, credits_per_hour in price_data.items():
-            credits_per_hour_num = int(credits_per_hour.replace(
+            credits_per_hour_num = float(credits_per_hour.replace(
                 ' credit/hour',
                 ''
             ))
