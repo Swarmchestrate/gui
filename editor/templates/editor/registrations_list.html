@@ -52,7 +52,9 @@
             {% if registration %}
             <tr data-registration-id="{{ registration_id }}">
                 <td class="align-middle px-3"></td>
-                <td class="font-monospace align-middle px-3">{{ registration_id }}</td>
+                <td class="font-monospace align-middle px-3">
+                    <a href="{% url editor_overview_url_reverse_base registration_id %}">{{ registration_id }}</a>
+                </td>
                 <td class="text-body-secondary align-middle px-3">{{ registration.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}</td>
                 <td class="text-body-secondary align-middle px-3">{{ registration.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}</td>
                 <td class="align-middle text-center px-3">
