@@ -33,6 +33,7 @@ class CapacityEnergyConsumptionEditorForm(EditorForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
+        help_text='E.g. CPU-based',
         required=True
     )
 
@@ -41,6 +42,7 @@ class CapacityEnergyConsumptionEditorForm(EditorForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
+        help_text='E.g. 5W',
         required=True
     )
 

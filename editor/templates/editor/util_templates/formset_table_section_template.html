@@ -12,7 +12,12 @@
                 <thead>
                     <tr>
                         {% for field in formset.form %}
-                        <th>{{ field.label }}</th>
+                        <th>
+                            {{ field.label }}
+                            {% if field.help_text %}
+                                <div class="fw-normal form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                        </th>
                         {% endfor %}
                         <th>
                             <i class="bi bi-trash text-danger" title="Delete"></i>

@@ -2,7 +2,7 @@
     {% for field in form %}
     {% if field != form.DELETE %}
     <td>
-        {% include 'editor/field_templates/field_template.html' with field_wrapper_classes='py-0' label_classes='visually-hidden' %}
+        {% include 'editor/field_templates/field_template.html' with field_wrapper_classes='py-0' label_classes='visually-hidden' help_text_classes='visually-hidden' %}
     </td>
     {% endif %}
     {% endfor %}
