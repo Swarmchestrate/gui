@@ -324,13 +324,20 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             form_class: Form,
             formset_prefix: str,
             base_formset_class: BaseEditorFormSet = None,
+            can_delete: bool | None = None,
+            extra_formset_factory_kwargs: dict = None,
             manually_process: bool = False):
         if not base_formset_class:
             base_formset_class = BaseEditorFormSet
+        if can_delete is None:
+            can_delete = True
+        if not extra_formset_factory_kwargs:
+            extra_formset_factory_kwargs = dict()
         formset_class = formset_factory(
             form_class,
             formset=base_formset_class,
-            can_delete=True
+            can_delete=can_delete,
+            **extra_formset_factory_kwargs
         )
         self.formset_classes.update({
             formset_prefix: formset_class,

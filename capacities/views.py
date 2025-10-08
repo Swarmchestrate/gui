@@ -1,5 +1,10 @@
+import geonamescache
+from http import HTTPStatus
+
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.views.generic.base import TemplateView
 
 from .api_endpoint_client import (
     CloudCapacityApiEndpointClient,
@@ -9,6 +14,8 @@ from .api_endpoint_client import (
 )
 from .forms import (
     CapacityEnergyConsumptionEditorForm,
+    CapacityLocalityEditorForm,
+    CapacityLocalitySearchForm,
     CapacityPriceEditorForm,
     CapacitySecurityPortsEditorForm,
     CloudCapacityRegistrationForm,
@@ -18,6 +25,7 @@ from .forms import (
 )
 from .formsets import (
     CapacityEnergyConsumptionEditorFormSet,
+    CapacityLocalityEditorFormSet,
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
 )
@@ -57,16 +65,17 @@ class CapacityEditorRouterView(EditorRouterView):
 
 class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def dispatch(self, request, *args, **kwargs):
-        property_name = 'price'
+        # Price
+        price_property_name = 'price'
         self.add_formset_class(
             CapacityPriceEditorForm,
-            property_name,
+            price_property_name,
             base_formset_class=CapacityPriceEditorFormSet
         )
 
         # Configure initial formset data
-        initial = list()
-        price_data = self.registration.get(property_name)
+        initial_price = list()
+        price_data = self.registration.get(price_property_name)
         if not price_data:
             price_data = dict()
         for instance_type, credits_per_hour in price_data.items():
@@ -74,12 +83,92 @@ class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessF
                 ' credit/hour',
                 ''
             ))
-            initial.append({
+            initial_price.append({
                 'instance_type': instance_type,
                 'credits_per_hour': credits_per_hour_num,
             })
-        self.add_initial_data_for_formset(initial, property_name)
+        self.add_initial_data_for_formset(initial_price, price_property_name)
+
+        # Locality
+        locality_property_name = 'locality'
+        self.add_formset_class(
+            CapacityLocalityEditorForm,
+            locality_property_name,
+            base_formset_class=CapacityLocalityEditorFormSet,
+            can_delete=False,
+            extra_formset_factory_kwargs={
+                'extra': 0,
+                'max_num': 1,
+            }
+        )
+
+        # Configure initial formset data
+        initial_locality = list()
+        locality_data = self.registration.get(locality_property_name)
+        if (not locality_data
+            or not isinstance(locality_data, dict)):
+            locality_data = {
+                'continent': '',
+                'country': '',
+                'city': '',
+                'gps': '',
+            }
+        initial_locality.append(locality_data)
+        self.add_initial_data_for_formset(initial_locality, locality_property_name)
+
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'locality_search_form': CapacityLocalitySearchForm(prefix='locality'),
+            'locality_search_form_url_reverse': reverse_lazy('capacities:locality_search'),
+        })
+        return context
+
+
+class CapacityLocalitySearchFormView(TemplateView):
+    template_name = 'editor/editor_base.html'
+
+    def get(self, request, *args, **kwargs):
+        form = CapacityLocalitySearchForm(data=request.GET)
+        if (not form.is_valid()):
+            return JsonResponse({}, status_code=HTTPStatus.BAD_REQUEST)
+        query = form.cleaned_data.get('query', '')
+        gc = geonamescache.GeonamesCache()
+        options = list()
+        all_continents = gc.get_continents()
+        continents = {
+            continent_code: {
+                'name': continent.get('toponymName'),
+                'optgroup': 'continents',
+            }
+            for continent_code, continent in all_continents.items()
+            if query.lower() in continent.get('toponymName').lower()
+        }
+        options += continents.values()
+        all_country_names = gc.get_countries_by_names()
+        countries = [
+            {
+                'name': country_name,
+                'optgroup': 'countries',
+            }
+            for country_name in all_country_names
+            if query.lower() in country_name.lower()
+        ]
+        options += countries
+        cities = gc.search_cities(query)
+        cities = [
+            {
+                'name': city.get('name'),
+                'optgroup': 'cities',
+            }
+            for city in cities
+        ]
+        options += cities
+        return JsonResponse({
+            'options': options,
+        })
 
 
 class CapacityEnergyEditorProcessFormView(MultipleEditorFormsetProcessFormView):

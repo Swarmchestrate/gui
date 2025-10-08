@@ -1,0 +1,13 @@
+<section>
+    <h2 class="fs-6">Locality</h2>
+    {% for field in locality_search_form %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endfor %}
+    <input
+        type="hidden"
+        id="locality-search-url"
+        value="{{ locality_search_form_url_reverse }}">
+    {% with section_field=field formset=locality_formset %}
+    {% include 'editor/util_templates/formset_section_template.html' %}
+    {% endwith %}
+</section>

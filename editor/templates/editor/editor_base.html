@@ -2,6 +2,8 @@
 {% load static %}
 {% block scripts %}
 <script type="module" src="{% static 'editor.js' %}"></script>
+{% block extra_scripts %}
+{% endblock extra_scripts %}
 {% endblock scripts %}
 {% block content %}
 <div class="editor-layout">

@@ -57,6 +57,55 @@ class CapacitySecurityPortsEditorForm(EditorForm):
     )
 
 
+class CapacityLocalityEditorForm(EditorForm):
+    continent = forms.CharField(
+        label='Continent',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        help_text='e.g. Europe',
+        required=False
+    )
+
+    country = forms.CharField(
+        label='Country',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        help_text='e.g. United Kingdom',
+        required=False
+    )
+
+    city = forms.CharField(
+        label='City',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        help_text='e.g. Paris',
+        required=False
+    )
+
+    gps = forms.CharField(
+        label='GPS',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        }),
+        help_text='e.g. 51.5072,-0.1276',
+        required=False
+    )
+
+
+class CapacityLocalitySearchForm(forms.Form):
+    query = forms.CharField(
+        label='Search',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        help_text='Search for a continent, country or city.',
+        required=False
+    )
+
+
 # Cloud Capacity forms
 class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = 'capacity'

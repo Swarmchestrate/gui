@@ -1,59 +1,57 @@
-<section>
-    <fieldset class="vstack gap-2">
-        <legend class="fs-6 fw-bold mb-0">{{ section_field.label }}</legend>
-        <p class="form-text">{{ section_field.help_text }}</p>
-        {{ formset.management_form }}
-        {% with table_id=formset.prefix|add:'-table' %}
-        <div class="table-responsive">
-            <table
-                id="{{ table_id }}"
-                class="table table-hover table-striped formset-table delete-disabled"
-                data-formset-prefix="{{ formset.prefix }}">
-                <thead>
-                    <tr>
-                        {% for field in formset.form %}
-                        <th>
-                            {{ field.label }}
-                            {% if field.help_text %}
-                                <div class="fw-normal form-text">{{ field.help_text }}</div>
-                            {% endif %}
-                        </th>
-                        {% endfor %}
-                        <th>
-                            <i class="bi bi-trash text-danger" title="Delete"></i>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for form in formset %}
-                    {% include 'editor/util_templates/formset_table_row_template.html' %}
+<fieldset class="vstack gap-2">
+    <legend class="fs-6 fw-bold mb-0">{{ section_field.label }}</legend>
+    <p class="form-text">{{ section_field.help_text }}</p>
+    {{ formset.management_form }}
+    {% with table_id=formset.prefix|add:'-table' %}
+    <div class="table-responsive">
+        <table
+            id="{{ table_id }}"
+            class="table table-hover table-striped formset-table delete-disabled"
+            data-formset-prefix="{{ formset.prefix }}">
+            <thead>
+                <tr>
+                    {% for field in formset.form %}
+                    <th>
+                        {{ field.label }}
+                        {% if field.help_text %}
+                            <div class="fw-normal form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                    </th>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="d-flex align-items-center column-gap-2">
-            <button
-                id="{{ formset.prefix }}-table-add-row-btn"
-                class="btn btn-sm btn-light formset-table-add-row-button me-auto"
-                type="button"
-                data-table-id="{{ table_id }}">
-                <i class="bi bi-plus-lg me-1"></i>
-                Add Row
-            </button>
-            <input
-                type="checkbox"
-                id="{{ formset.prefix }}-should-delete-rows"
-                class="btn-check formset-should-delete-rows"
-                data-table-id="{{ table_id }}"
-                autocomplete="off">
-            <label
-                for="{{ formset.prefix }}-should-delete-rows"
-                class="btn btn-light btn-sm icon-link icon-link-hover align-items-baseline"
-                style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);">
-                <i class="bi bi-trash"></i>
-                Select Rows
-            </label>
-        </div>
-        {% endwith %}
-    </fieldset>
-</section>
+                    <th>
+                        <i class="bi bi-trash text-danger" title="Delete"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                {% include 'editor/util_templates/formset_table_row_template.html' %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex align-items-center column-gap-2">
+        <button
+            id="{{ formset.prefix }}-table-add-row-btn"
+            class="btn btn-sm btn-light formset-table-add-row-button me-auto"
+            type="button"
+            data-table-id="{{ table_id }}">
+            <i class="bi bi-plus-lg me-1"></i>
+            Add Row
+        </button>
+        <input
+            type="checkbox"
+            id="{{ formset.prefix }}-should-delete-rows"
+            class="btn-check formset-should-delete-rows"
+            data-table-id="{{ table_id }}"
+            autocomplete="off">
+        <label
+            for="{{ formset.prefix }}-should-delete-rows"
+            class="btn btn-light btn-sm icon-link icon-link-hover align-items-baseline"
+            style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);">
+            <i class="bi bi-trash"></i>
+            Select Rows
+        </label>
+    </div>
+    {% endwith %}
+</fieldset>

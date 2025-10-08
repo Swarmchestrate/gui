@@ -1,10 +1,18 @@
 {% extends 'editor/editor_base.html' %}
+{% load static %}
+{% block extra_scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+<script type="module" src="{% static 'capacities/locality_search.js' %}"></script>
+{% endblock extra_scripts %}
 
 {% block field %}
 {% if field.name == 'price' %}
 {% with section_field=field formset=price_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
+{% elif field.name == 'locality' %}
+{% include 'capacities/sections/locality_section.html' %}
 {% elif field.name == 'energy_consumption' %}
 {% with section_field=field formset=energy_consumption_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}
