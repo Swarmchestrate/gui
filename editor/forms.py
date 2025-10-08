@@ -75,16 +75,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 field_key: field,
             })
 
-    def _initialise_base_field_vars(self, field_metadata: dict) -> dict:
+    def _get_initial_field_vars_from_field_format(self, field_format: str):
         field_class = forms.CharField
         widget_class = None
         css_classes: list = ['form-control']
-        field_format = field_metadata.get('format', '')
+        format_enum = None
         try:
-            field_format = OpenApiPropertyFormat(field_format)
+            format_enum = OpenApiPropertyFormat(field_format)
         except ValueError:
             pass
-        match field_format:
+        match format_enum:
             case OpenApiPropertyFormat.BOOLEAN:
                 field_class = forms.BooleanField
                 css_classes = ['form-check-input']
@@ -133,14 +133,19 @@ class OpenApiSpecificationBasedForm(EditorForm):
             })
         return kwargs
 
-    def get_field(self, field_metadata: dict, is_required: bool = False) -> list[forms.Field]:
+    def get_field(
+            self,
+            field_metadata: dict,
+            is_required: bool = False) -> list[forms.Field]:
         # Determine field, widget and/or widget CSS classes
         # from OpenAPI spec metadata.
         (
             field_class,
             widget_class,
             css_classes,
-        ) = self._initialise_base_field_vars(field_metadata).values()
+        ) = self._get_initial_field_vars_from_field_format(
+            field_metadata.get('format', '')
+        ).values()
 
         # Build field kwargs
         kwargs = self._configure_field_kwargs(
