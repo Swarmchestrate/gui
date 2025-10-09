@@ -1,6 +1,8 @@
-<fieldset class="vstack gap-2">
-    <legend class="fs-6 fw-bold mb-0">{{ section_field.label }}</legend>
-    <p class="form-text">{{ section_field.help_text }}</p>
+<fieldset class="vstack gap-2 py-4">
+    <legend class="fs-6 fw-bold {{ extra_fieldset_legend_classes|default:'' }} mb-0">{{ section_field.label }}</legend>
+    {% if show_fieldset_description|default_if_none:True %}
+        <p class="form-text">{{ section_field.help_text }}</p>
+    {% endif %}
     {{ formset.management_form }}
     {% with table_id=formset.prefix|add:'-table' %}
     <div class="table-responsive">

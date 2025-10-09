@@ -1,6 +1,8 @@
-<fieldset class="vstack gap-2">
-    <legend class="fs-6 fw-semibold mb-0">{{ section_field.label }}</legend>
-    <p class="form-text">{{ section_field.help_text }}</p>
+<fieldset class="vstack gap-2 py-4">
+    <legend class="fs-6 fw-semibold {{ extra_fieldset_legend_classes|default:'' }} mb-0">{{ section_field.label }}</legend>
+    {% if show_fieldset_description|default_if_none:True %}
+        <p class="form-text">{{ section_field.help_text }}</p>
+    {% endif %}
     {{ formset.management_form }}
     <ul class="list-group list-group-flush">
         {% for form in formset %}

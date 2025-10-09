@@ -1,5 +1,7 @@
 from django import forms
 
+from .dataclasses import GpsLocation
+
 from editor.forms import (
     EditorForm,
     OpenApiSpecificationCategoryBasedForm,
@@ -81,12 +83,12 @@ class CapacityLocalityEditorForm(EditorForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
-        help_text='e.g. Paris',
+        help_text='e.g. London',
         required=False
     )
 
     gps = forms.CharField(
-        label='GPS',
+        label='GPS Location',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
@@ -97,12 +99,12 @@ class CapacityLocalityEditorForm(EditorForm):
 
 class CapacityLocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
-        label='Search',
+        label='Search by Location Name',
         widget=forms.Select(attrs={
             'class': 'form-select',
-            'placeholder': "E.g. 'London' or 'Mauritius'",
+            'placeholder': "e.g. 'Mauritius' or 'London'",
         }),
-        help_text='Search for a continent, country or city.',
+        help_text='Enter the name of a continent, country or city.',
         required=False
     )
 
@@ -125,8 +127,8 @@ class CapacityGetLocalityByNameForm(forms.Form):
     )
 
 
-class SplitGpsWidget(forms.MultiWidget):
-    template_name = 'capacities/field_templates/gps_widget.html'
+class SplitGpsLocationWidget(forms.MultiWidget):
+    template_name = 'capacities/field_templates/gps_location_widget.html'
 
     def decompress(self, value):
         if value:
@@ -134,7 +136,7 @@ class SplitGpsWidget(forms.MultiWidget):
         return [None, None]
 
 
-class GpsField(forms.MultiValueField):
+class GpsLocationField(forms.MultiValueField):
     def __init__(self, **kwargs):
         # Define one message for all fields.
         error_messages = {
@@ -161,24 +163,34 @@ class GpsField(forms.MultiValueField):
         )
 
     def compress(self, data_list):
-        return {
-            'latitude': data_list[0],
-            'longitude': data_list[1],
-        }
+        if not data_list:
+            return GpsLocation(
+                latitude=None,
+                longitude=None
+            )
+        return GpsLocation(
+            latitude=data_list[0],
+            longitude=data_list[1]
+        )
 
 
 class CapacityGetLocalityByGpsForm(forms.Form):
-    gps = GpsField(
-        label='Search by GPS',
-        widget=SplitGpsWidget(widgets={
+    gps_location = GpsLocationField(
+        label='Search by GPS Location',
+        widget=SplitGpsLocationWidget(widgets={
             'latitude': forms.NumberInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'e.g. 51.5072',
+                'step': 'any',
             }),
             'longitude': forms.NumberInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'e.g. -0.1276',
+                'step': 'any',
             }),
         }),
-        help_text='Search by GPS co-ordinates. e.g. 51.5072, -0.1276'
+        help_text='Enter the GPS co-ordinates of an edge device. e.g. 51.5072, -0.1276',
+        required=False
     )
 
 
