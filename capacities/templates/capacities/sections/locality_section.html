@@ -1,12 +1,23 @@
 <section>
     <h2 class="fs-6">Locality</h2>
-    {% for field in locality_search_form %}
+    {% for field in locality_options_search_form %}
     {% include 'editor/field_templates/field_template.html' %}
     {% endfor %}
+    {% with field=get_locality_by_gps_form.gps %}
+    {% include 'capacities/field_templates/search_by_gps_field_wrapper.html' %}
+    {% endwith %}
     <input
         type="hidden"
-        id="locality-search-url"
-        value="{{ locality_search_form_url_reverse }}">
+        id="locality-options-search-url"
+        value="{{ locality_options_search_form_url_reverse }}">
+    <input
+        type="hidden"
+        id="get-locality-by-name-url"
+        value="{{ get_locality_by_name_url_reverse }}">
+    <input
+        type="hidden"
+        id="get-locality-by-gps-url"
+        value="{{ get_locality_by_gps_url_reverse }}">
     {% with section_field=field formset=locality_formset %}
     {% include 'editor/util_templates/formset_section_template.html' %}
     {% endwith %}

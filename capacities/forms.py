@@ -90,19 +90,95 @@ class CapacityLocalityEditorForm(EditorForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
         }),
-        help_text='e.g. 51.5072,-0.1276',
+        help_text='e.g. 51.5072, -0.1276',
         required=False
     )
 
 
-class CapacityLocalitySearchForm(forms.Form):
+class CapacityLocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
         label='Search',
         widget=forms.Select(attrs={
             'class': 'form-select',
+            'placeholder': "E.g. 'London' or 'Mauritius'",
         }),
         help_text='Search for a continent, country or city.',
         required=False
+    )
+
+
+class CapacityGetLocalityByNameForm(forms.Form):
+    geoname_id = forms.IntegerField(
+        required=True
+    )
+
+    continent_code = forms.CharField(
+        required=False
+    )
+
+    country_code = forms.CharField(
+        required=False
+    )
+
+    city_name = forms.CharField(
+        required=False
+    )
+
+
+class SplitGpsWidget(forms.MultiWidget):
+    template_name = 'capacities/field_templates/gps_widget.html'
+
+    def decompress(self, value):
+        if value:
+            return [value.get('latitude'), value.get('longitude')]
+        return [None, None]
+
+
+class GpsField(forms.MultiValueField):
+    def __init__(self, **kwargs):
+        # Define one message for all fields.
+        error_messages = {
+            'incomplete': 'Enter both latitude and longitude.',
+        }
+        # Fields
+        fields = (
+            forms.FloatField(
+                error_messages={'incomplete': 'Enter the latitude'},
+                label='Latitude',
+                required=True
+            ),
+            forms.FloatField(
+                error_messages={'incomplete': 'Enter the longitude'},
+                label='Longitude',
+                required=True
+            ),
+        )
+        super().__init__(
+            error_messages=error_messages,
+            fields=fields,
+            require_all_fields=True,
+            **kwargs
+        )
+
+    def compress(self, data_list):
+        return {
+            'latitude': data_list[0],
+            'longitude': data_list[1],
+        }
+
+
+class CapacityGetLocalityByGpsForm(forms.Form):
+    gps = GpsField(
+        label='Search by GPS',
+        widget=SplitGpsWidget(widgets={
+            'latitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+            }),
+            'longitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+            }),
+        }),
+        help_text='Search by GPS co-ordinates. e.g. 51.5072, -0.1276'
     )
 
 

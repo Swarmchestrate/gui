@@ -1,0 +1,5 @@
+{% for subwidget in widget.subwidgets %}
+<div class="col-6">
+    {% include subwidget.template_name with widget=subwidget %}
+</div>
+{% endfor %}

@@ -14,5 +14,7 @@ urlpatterns = [
     path('edge-capacities/<registration_id>/edit/', views.EdgeCapacityEditorRouterView.as_view(), name='edge_capacity_editor'),
     path('edge-capacities/<registration_id>/overview/', views.EdgeCapacityEditorOverviewTemplateView.as_view(), name='edge_capacity_overview'),
     path('new-edge-capacity/', views.EdgeCapacityEditorStartFormView.as_view(), name='new_edge_capacity'),
-    path('api/locality/', views.CapacityLocalitySearchFormView.as_view(), name='locality_search')
+    path('api/locality/search', views.CapacityLocalityOptionsSearchProcessFormView.as_view(), name='locality_options_search'),
+    path('api/locality-by-name/', views.CapacityGetLocalityProcessFormView.as_view(), name='get_locality_by_name'),
+    path('api/locality-by-gps/', views.CapacityGetLocalityByGpsProcessFormView.as_view(), name='get_locality_by_gps'),
 ]

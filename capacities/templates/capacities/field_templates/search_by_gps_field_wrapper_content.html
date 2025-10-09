@@ -1,0 +1,7 @@
+{% extends 'editor/field_templates/field_wrapper_template.html' %}
+{% block content %}
+<label for="{{ field.auto_id }}" class="{{ label_classes|default:'fw-semibold' }} col-12">{{ field.label }}</label>
+{{ field }}
+{% include 'editor/field_templates/field_help_text.html' %}
+{% include 'editor/field_templates/field_invalid_feedback.html' %}
+{% endblock content %}

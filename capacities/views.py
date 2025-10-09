@@ -1,4 +1,6 @@
 import geonamescache
+import json
+from django.views.generic.edit import ProcessFormView
 from http import HTTPStatus
 
 from django.http import JsonResponse
@@ -15,7 +17,9 @@ from .api_endpoint_client import (
 from .forms import (
     CapacityEnergyConsumptionEditorForm,
     CapacityLocalityEditorForm,
-    CapacityLocalitySearchForm,
+    CapacityLocalityOptionsSearchForm,
+    CapacityGetLocalityByGpsForm,
+    CapacityGetLocalityByNameForm,
     CapacityPriceEditorForm,
     CapacitySecurityPortsEditorForm,
     CloudCapacityRegistrationForm,
@@ -121,47 +125,54 @@ class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessF
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'locality_search_form': CapacityLocalitySearchForm(prefix='locality'),
-            'locality_search_form_url_reverse': reverse_lazy('capacities:locality_search'),
+            'locality_options_search_form': CapacityLocalityOptionsSearchForm(prefix='locality'),
+            'locality_options_search_form_url_reverse': reverse_lazy('capacities:locality_options_search'),
+            'get_locality_by_gps_form': CapacityGetLocalityByGpsForm(prefix='locality'),
+            'get_locality_by_name_url_reverse': reverse_lazy('capacities:get_locality_by_name'),
+            'get_locality_by_gps_url_reverse': reverse_lazy('capacities:get_locality_by_gps'),
         })
         return context
 
 
-class CapacityLocalitySearchFormView(TemplateView):
-    template_name = 'editor/editor_base.html'
-
+class CapacityLocalityOptionsSearchProcessFormView(ProcessFormView):
     def get(self, request, *args, **kwargs):
-        form = CapacityLocalitySearchForm(data=request.GET)
+        form = CapacityLocalityOptionsSearchForm(data=request.GET)
         if (not form.is_valid()):
-            return JsonResponse({}, status_code=HTTPStatus.BAD_REQUEST)
+            return JsonResponse({}, status=HTTPStatus.BAD_REQUEST)
         query = form.cleaned_data.get('query', '')
-        gc = geonamescache.GeonamesCache()
         options = list()
+        gc = geonamescache.GeonamesCache()
         all_continents = gc.get_continents()
         continents = {
             continent_code: {
-                'name': continent.get('toponymName'),
+                'name': continent.get('name'),
                 'optgroup': 'continents',
+                'value': f"continent_{continent.get('geonameId')}_{continent_code}",
             }
             for continent_code, continent in all_continents.items()
             if query.lower() in continent.get('toponymName').lower()
         }
         options += continents.values()
-        all_country_names = gc.get_countries_by_names()
+        all_countries = gc.get_countries()
         countries = [
             {
-                'name': country_name,
+                'name': country.get('name'),
                 'optgroup': 'countries',
+                'value': f"country_{country.get('geonameid')}_{country_code}",
             }
-            for country_name in all_country_names
-            if query.lower() in country_name.lower()
+            for country_code, country in all_countries.items()
+            if query.lower() in country.get('name', '').lower()
         ]
         options += countries
         cities = gc.search_cities(query)
         cities = [
             {
                 'name': city.get('name'),
+                'country_name': all_countries.get(
+                    city.get('countrycode', ''), {}
+                ).get('name'),
                 'optgroup': 'cities',
+                'value': f"city_{city.get('geonameid')}_{city.get('name')}",
             }
             for city in cities
         ]
@@ -169,6 +180,153 @@ class CapacityLocalitySearchFormView(TemplateView):
         return JsonResponse({
             'options': options,
         })
+
+
+class CapacityGetLocalityProcessFormView(ProcessFormView):
+    def get_city(
+            self,
+            gc: geonamescache.GeonamesCache,
+            geoname_id: int | None,
+            selected_city_name: str) -> dict:
+        cities = gc.search_cities(selected_city_name)
+        city = next((
+            city
+            for city in cities
+            if city.get('geonameid') == geoname_id
+        ), dict())
+        return city
+
+    def get_country(
+            self,
+            gc: geonamescache.GeonamesCache,
+            selected_country_code: str) -> dict:
+        all_countries = gc.get_countries()
+        country = next((
+            country
+            for country_code, country in all_countries.items()
+            if selected_country_code == country_code
+        ), dict())
+        return country
+
+    def get_continent(
+            self,
+            gc: geonamescache.GeonamesCache,
+            selected_continent_code: str) -> dict:
+        all_continents = gc.get_continents()
+        continent = next((
+            continent
+            for continent_code, continent in all_continents.items()
+            if selected_continent_code == continent_code
+        ), dict())
+        return continent
+
+
+class CapacityGetLocalityByNameProcessFormView(CapacityGetLocalityProcessFormView):
+    def get(self, request, *args, **kwargs):
+        locality = {
+            'continent': '',
+            'country': '',
+            'city': '',
+        }
+        form = CapacityGetLocalityByNameForm(data=request.GET)
+        if (not form.is_valid()):
+            return JsonResponse({
+                'errors': form.errors.as_json()
+            }, status=HTTPStatus.BAD_REQUEST)
+        geoname_id = form.cleaned_data.get('geoname_id')
+        selected_continent_code = form.cleaned_data.get('continent_code')
+        selected_country_code = form.cleaned_data.get('country_code')
+        selected_city_name = form.cleaned_data.get('city_name')
+        gc = geonamescache.GeonamesCache()
+        if selected_city_name:
+            city = self.get_city(
+                gc,
+                geoname_id,
+                selected_city_name
+            )
+            locality.update({
+                'city': city.get('name', ''),
+            })
+            selected_country_code = city.get('countrycode')
+        if selected_country_code:
+            country = self.get_country(
+                gc,
+                selected_country_code
+            )
+            locality.update({
+                'country': country.get('name', ''),
+            })
+            selected_continent_code = country.get('continentcode')
+        if selected_continent_code:
+            continent = self.get_continent(
+                gc,
+                selected_continent_code
+            )
+            locality.update({
+                'continent': continent.get('name', ''),
+            })
+        return JsonResponse(locality)
+
+
+class CapacityGetLocalityByGpsProcessFormView(CapacityGetLocalityProcessFormView):
+    def get_city_by_gps(
+            self,
+            gc: geonamescache.GeonamesCache,
+            longitude: float | None,
+            latitude: float | None) -> dict:
+        cities = gc.get_cities()
+        city = next((
+            city
+            for city in cities
+            if (
+                city.get('longitude') == longitude
+                and city.get('latitude') == latitude
+            )
+        ), dict())
+        return city
+
+    def get(self, request, *args, **kwargs):
+        locality = {
+            'continent': '',
+            'country': '',
+            'city': '',
+        }
+        form = CapacityGetLocalityByGpsForm(data=request.GET)
+        if (not form.is_valid()):
+            return JsonResponse({
+                'errors': form.errors.as_json()
+            }, status=HTTPStatus.BAD_REQUEST)
+        longitude = form.cleaned_data.get('longitude')
+        latitude = form.cleaned_data.get('latitude')
+        gc = geonamescache.GeonamesCache()
+        city = self.get_city_by_gps(
+            gc,
+            longitude,
+            latitude
+        )
+        locality.update({
+            'city': city.get('name', ''),
+        })
+        selected_country_code = city.get('countrycode')
+        selected_continent_code = None
+        if selected_country_code:
+            country = self.get_country(
+                gc,
+                selected_country_code
+            )
+            locality.update({
+                'country': country.get('name', ''),
+            })
+            selected_continent_code = country.get('continentcode')
+        if selected_continent_code:
+            continent = self.get_continent(
+                gc,
+                selected_continent_code
+            )
+            locality.update({
+                'continent': continent.get('name', ''),
+            })
+        return JsonResponse(locality)
 
 
 class CapacityEnergyEditorProcessFormView(MultipleEditorFormsetProcessFormView):
