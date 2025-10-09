@@ -45,7 +45,7 @@ class CapacitySecurityPortsEditorFormSet(BaseEditorFormSet):
 class CapacityLocalityEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self) -> dict | list:
         formatted_data = dict()
-        form = next(enumerate(self))
+        form = next(iter(self))
         data = self.get_cleaned_data_from_form(form)
         # Continent
         continent = data.get('continent')
