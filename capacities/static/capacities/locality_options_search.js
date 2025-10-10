@@ -1,3 +1,8 @@
+import {
+    getEmptyLocalityTemplate,
+    fillLocalityAutomatically,
+} from "/static/capacities/locality_autofill.js";
+
 async function getLocalityOptions(query, localityOptionsSearchUrl) {
     const response = await fetch(
         `${localityOptionsSearchUrl}?${new URLSearchParams({
@@ -15,11 +20,7 @@ async function getLocalityOptions(query, localityOptionsSearchUrl) {
 }
 
 async function getLocality(value, getLocalityUrl) {
-    const emptyLocality = {
-        continent: "",
-        country: "",
-        city: "",
-    };
+    const locality = getEmptyLocalityTemplate();
     const [localityType, geonameId, label] = value.split("_");
     let continentCode = "",
         countryCode = "",
@@ -47,9 +48,12 @@ async function getLocality(value, getLocalityUrl) {
         },
     );
     if (!response.ok) {
-        return emptyLocality;
+        return locality;
     }
-    const locality = await response.json();
+    const responseContent = await response.json();
+    locality.continent = responseContent.continent;
+    locality.country = responseContent.country;
+    locality.city = responseContent.city;
     return locality;
 }
 
@@ -106,16 +110,7 @@ function setupLocalityTomSelect(localityOptionsSearchUrl) {
         }
         const getLocalityUrl = getLocalityUrlInput.value;
         const locality = await getLocality(value, getLocalityUrl);
-        const localityContinentInput = document.querySelector(
-            "#id_locality-0-continent",
-        );
-        localityContinentInput.value = locality.continent;
-        const localityCountryInput = document.querySelector(
-            "#id_locality-0-country",
-        );
-        localityCountryInput.value = locality.country;
-        const localityCityInput = document.querySelector("#id_locality-0-city");
-        localityCityInput.value = locality.city;
+        fillLocalityAutomatically(locality);
     });
     return localityTomSelect;
 }

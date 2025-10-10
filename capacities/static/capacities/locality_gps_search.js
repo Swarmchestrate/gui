@@ -1,12 +1,13 @@
+import {
+    getEmptyLocalityTemplate,
+    fillLocalityAutomatically,
+} from "/static/capacities/locality_autofill.js";
+
 const latitudeInputSelector = "input[name='locality-gps_location_latitude']";
 const longitudeInputSelector = "input[name='locality-gps_location_longitude']";
 
 async function getLocalityByGpsLocation(latitude, longitude) {
-    const emptyLocality = {
-        continent: "",
-        country: "",
-        city: "",
-    };
+    const locality = getEmptyLocalityTemplate();
     const getLocalityByGpsUrl = document.querySelector(
         "#get-locality-by-gps-url",
     ).value;
@@ -20,9 +21,14 @@ async function getLocalityByGpsLocation(latitude, longitude) {
         },
     );
     if (!response.ok) {
-        return emptyLocality;
+        return locality;
     }
-    const locality = await response.json();
+    const responseContent = await response.json();
+    locality.continent = responseContent.continent;
+    locality.country = responseContent.country;
+    locality.city = responseContent.city;
+    locality.latitude = latitude;
+    locality.longitude = longitude;
     return locality;
 }
 
@@ -44,19 +50,7 @@ function setupGpsLocationSearch() {
         findByGpsButton
             .querySelector(".spinner-wrapper")
             .classList.add("d-none");
-        const localityContinentInput = document.querySelector(
-            "#id_locality-0-continent",
-        );
-        localityContinentInput.value = locality.continent;
-        const localityCountryInput = document.querySelector(
-            "#id_locality-0-country",
-        );
-        localityCountryInput.value = locality.country;
-        const localityCityInput = document.querySelector("#id_locality-0-city");
-        localityCityInput.value = locality.city;
-        const localityGpsLocationInput =
-            document.querySelector("#id_locality-0-gps");
-        localityGpsLocationInput.value = `${latitudeInput.value}, ${longitudeInput.value}`;
+        fillLocalityAutomatically(locality);
     });
 }
 

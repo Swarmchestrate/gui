@@ -97,7 +97,7 @@ class CapacityLocalityEditorForm(EditorForm):
 
 class CapacityLocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
-        label='Find a Location by Name',
+        label='Enter a Continent/Country/City Name',
         widget=forms.Select(attrs={
             'class': 'form-select',
             'placeholder': "e.g. 'Mauritius' or 'London'",
@@ -168,7 +168,7 @@ class GpsLocationField(forms.MultiValueField):
 
 class CapacityGetLocalityByGpsForm(forms.Form):
     gps_location = GpsLocationField(
-        label='Find a Location by GPS Co-ordinates',
+        label='Enter the GPS Co-ordinates of the Edge Device',
         widget=SplitGpsLocationWidget(widgets={
             'latitude': forms.NumberInput(attrs={
                 'class': 'form-control',
