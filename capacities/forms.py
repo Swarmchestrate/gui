@@ -168,7 +168,7 @@ class GpsLocationField(forms.MultiValueField):
 
 class CapacityGetLocalityByGpsForm(forms.Form):
     gps_location = GpsLocationField(
-        label='Enter the GPS Co-ordinates of the Edge Device',
+        label='Enter the Edge Device\'s GPS Co-ordinates',
         widget=SplitGpsLocationWidget(widgets={
             'latitude': forms.NumberInput(attrs={
                 'class': 'form-control',
