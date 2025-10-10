@@ -1,7 +1,5 @@
 from django import forms
 
-from .dataclasses import GpsLocation
-
 from editor.forms import (
     EditorForm,
     OpenApiSpecificationCategoryBasedForm,
@@ -99,7 +97,7 @@ class CapacityLocalityEditorForm(EditorForm):
 
 class CapacityLocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
-        label='Search by Location Name',
+        label='Find a Location by Name',
         widget=forms.Select(attrs={
             'class': 'form-select',
             'placeholder': "e.g. 'Mauritius' or 'London'",
@@ -164,32 +162,30 @@ class GpsLocationField(forms.MultiValueField):
 
     def compress(self, data_list):
         if not data_list:
-            return GpsLocation(
-                latitude=None,
-                longitude=None
-            )
-        return GpsLocation(
-            latitude=data_list[0],
-            longitude=data_list[1]
-        )
+            return (None, None)
+        return (data_list[0], data_list[1])
 
 
 class CapacityGetLocalityByGpsForm(forms.Form):
     gps_location = GpsLocationField(
-        label='Search by GPS Location',
+        label='Find a Location by GPS Co-ordinates',
         widget=SplitGpsLocationWidget(widgets={
             'latitude': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'e.g. 51.5072',
                 'step': 'any',
+                'min': -90,
+                'max': 90,
             }),
             'longitude': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'e.g. -0.1276',
                 'step': 'any',
+                'min': -180,
+                'max': 180,
             }),
         }),
-        help_text='Enter the GPS co-ordinates of an edge device. e.g. 51.5072, -0.1276',
+        help_text='Enter the GPS co-ordinates of an edge device. e.g. 51.5072 (-90 to 90), -0.1276 (-180 to 180)',
         required=False
     )
 

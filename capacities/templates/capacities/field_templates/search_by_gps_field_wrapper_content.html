@@ -1,14 +1,14 @@
 {% extends 'editor/field_templates/field_wrapper_template.html' %}
 {% block content %}
 <label for="{{ field.auto_id }}" class="{{ label_classes|default:'fw-semibold' }}">{{ field.label }}</label>
-<div class="vstack align-items-start gap-2 pb-2">
+<div class="vstack align-items-sm-start align-items-stretch gap-2 pb-2">
     {{ field }}
     <button
         type="button"
         id="find-by-gps-button"
         class="btn btn-outline-primary"
         >
-            Find by GPS Location
+            Find Nearest Location
             <span class="d-none spinner-wrapper">
                 <span class="spinner-border spinner-border-sm ms-1" aria-hidden="true"></span>
                 <span class="visually-hidden" role="status">Loading...</span>

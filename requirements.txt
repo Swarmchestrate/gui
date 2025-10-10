@@ -7,11 +7,13 @@ Django==5.2.4
 django-appconf==1.1.0
 django-compressor==4.5.1
 django-environ==0.12.0
+geonamescache==3.0.0
 idna==3.10
 jsonschema==4.25.0
 jsonschema-path==0.3.4
 jsonschema-specifications==2025.4.1
 lazy-object-proxy==1.11.0
+numpy==2.3.3
 openapi-schema-validator==0.6.3
 openapi-spec-validator==0.7.2
 packaging==25.0
@@ -23,11 +25,13 @@ PyYAML==6.0.2
 rcssmin==1.1.2
 referencing==0.36.2
 requests==2.32.4
+reverse_geocode==1.6.6
 rfc3339-validator==0.1.4
 rjsmin==1.2.2
 rpds-py==0.26.0
 ruamel.yaml==0.18.14
 ruamel.yaml.clib==0.2.12
+scipy==1.16.2
 six==1.17.0
 sqlparse==0.5.3
 typing_extensions==4.14.1

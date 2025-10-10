@@ -1,5 +1,5 @@
 import geonamescache
-from functools import cmp_to_key
+import reverse_geocode
 from http import HTTPStatus
 
 from django.http import JsonResponse
@@ -274,39 +274,18 @@ class CapacityGetLocalityByNameProcessFormView(CapacityGetLocalityProcessFormVie
 
 
 class CapacityGetLocalityByGpsProcessFormView(CapacityGetLocalityProcessFormView):
-    def compare(self, city1: dict, city2: dict):
-        # city1
-        city1_latitude = float(city1.get('latitude', 99999999))
-        city1_longitude = float(city1.get('longitude', 99999999))
-        city1_score = (
-            abs(self.latitude - city1_latitude)
-            + abs(self.longitude - city1_longitude)
-        )
-        # city2
-        city2_latitude = float(city2.get('latitude', 99999999))
-        city2_longitude = float(city2.get('longitude', 99999999))
-        city2_score = (
-            abs(self.latitude - city2_latitude)
-            + abs(self.longitude - city2_longitude)
-        )
-        return city1_score - city2_score
-
-    def get_closest_city_by_gps(
+    def get_nearest_known_location(
             self,
-            gc: geonamescache.GeonamesCache,
-            gps_location: GpsLocation) -> dict:
-        self.latitude = gps_location.latitude
-        self.longitude = gps_location.longitude
-        if (self.latitude is None
-            or self.longitude is None):
+            gps_location: tuple[float, float] | None) -> dict:
+        """Returns a dict containing data (including city and
+        country) on the nearest known location to the provided
+        coordinates.
+        """
+        if (not gps_location
+            or gps_location[0] is None
+            or gps_location[1] is None):
             return dict()
-        cities = gc.get_cities()
-        cities_sorted_by_distance = sorted(
-            cities.values(),
-            key=cmp_to_key(self.compare)
-        )
-        city = next(iter(cities_sorted_by_distance), dict())
-        return city
+        return reverse_geocode.get(gps_location)
 
     def get(self, request, *args, **kwargs):
         locality = {
@@ -320,16 +299,14 @@ class CapacityGetLocalityByGpsProcessFormView(CapacityGetLocalityProcessFormView
                 'errors': form.errors.as_json()
             }, status=HTTPStatus.BAD_REQUEST)
         gps_location = form.cleaned_data.get('gps_location')
-        gc = geonamescache.GeonamesCache()
-        city = self.get_closest_city_by_gps(
-            gc,
-            gps_location
-        )
+        nearest_known_location = self.get_nearest_known_location(gps_location)
         locality.update({
-            'city': city.get('name', ''),
+            'city': nearest_known_location.get('city', ''),
+            'country': nearest_known_location.get('country', ''),
         })
-        selected_country_code = city.get('countrycode')
+        selected_country_code = nearest_known_location.get('country_code')
         selected_continent_code = None
+        gc = geonamescache.GeonamesCache()
         if selected_country_code:
             country = self.get_country(
                 gc,
