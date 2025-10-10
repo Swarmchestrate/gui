@@ -1,10 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Swarmchestrate Management Portal</h1>
+<h1>Swarmchestrate Application Templates</h1>
 <p>
     A portal for registering and managing Swarmchestrate Application
     Templates (SATs) for Capacities, Applications and Instance Types.
 </p>
+<section>
+    <h2 class="fs-6 text-body-secondary">Instance Types</h2>
+    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
+        <li class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a href="{% url 'instance_types:instance_types_list' %}" class="fw-medium text-decoration-none stretched-link">Instance Types</a>
+                    </div>
+                    <p class="card-text">View registered Swarmchestrate Instance Types.</p>
+                </div>
+            </div>
+        </li>
+        <li class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a href="{% url 'instance_types:new_instance_type' %}" class="fw-medium text-decoration-none stretched-link">Register a New Instance Type</a>
+                    </div>
+                    <p class="card-text">Register a new Swarmchestrate Instance Type.</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+</section>
 <section>
     <h2 class="fs-6 text-body-secondary">Cloud Capacities</h2>
     <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">

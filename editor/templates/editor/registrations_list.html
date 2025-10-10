@@ -42,7 +42,11 @@
                 <th class="align-middle p-3">ID</th>
                 <th class="align-middle p-3">Created At</th>
                 <th class="align-middle p-3">Updated At</th>
-                <th class="align-middle text-end p-3" data-dt-order="disable"><span class="visually-hidden">Actions</span></th>
+                <th
+                    class="align-middle text-end p-3"
+                    data-dt-order="disable">
+                    <span class="visually-hidden">Actions</span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -55,8 +59,20 @@
                 <td class="font-monospace align-middle px-3">
                     <a href="{% url editor_overview_url_reverse_base registration_id %}">{{ registration_id }}</a>
                 </td>
-                <td class="text-body-secondary align-middle px-3">{{ registration.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}</td>
-                <td class="text-body-secondary align-middle px-3">{{ registration.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}</td>
+                <td class="text-body-secondary align-middle px-3">
+                    {% if 'created_at' in registration %}
+                    {{ registration.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td class="text-body-secondary align-middle px-3">
+                    {% if 'updated_at' in registration %}
+                    {{ registration.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
                 <td class="align-middle text-center px-3">
                     <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
                         <li>
