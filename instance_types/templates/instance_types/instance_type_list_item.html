@@ -1,0 +1,23 @@
+<button class="list-group-item list-group-item-action" type="button">
+    <div class="d-flex align-items-center column-gap-4">
+        <div class="flex-grow-1">
+            <strong class="name">{{ it_name|default:'' }}</strong>
+            <div class="form-text">
+                <span class="num-cpus">{{ it_num_cpus|default:'' }}</span> CPUs
+                <i class="bi bi-dot"></i>
+                <span class="num-memory-size">{{ it_memory_size|default:'' }}</span>GB RAM
+                <i class="bi bi-dot"></i>
+                <span class="num-disk-size">{{ it_disk_size|default:'' }}</span>GB Storage
+                <i class="bi bi-dot"></i>
+                <span class="num-energy-consumption">{{ it_energy_consumption|default:'' }}</span>W
+                <i class="bi bi-dot"></i>
+                <span class="num-bandwidth">{{ it_bandwidth|default:'' }}</span> Mbps
+                <i class="bi bi-dot"></i>
+                <span class="num-price">{{ it_price|default:'' }}</span> credits/hour
+            </div>
+        </div>
+        <div>
+            <i class="bi bi-pencil-fill"></i>
+        </div>
+    </div>
+</button>

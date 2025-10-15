@@ -61,9 +61,9 @@ dialog {
     max-inline-size: min(90vw, 60ch);
     max-block-size: min(80vh, 100%);
     max-block-size: min(80dvb, 100%);
-    overflow: auto;
     margin: auto;
     padding: 0;
+    padding-top: 2rem;
     position: fixed;
     inset: 0;
 }
@@ -77,14 +77,18 @@ html:has(dialog[open]) {
     overflow: hidden;
 }
 
-dialog .dialog-content {
-    padding: 2rem;
+dialog .dialog-header {
+    padding-inline: 2rem;
 }
 
-dialog .dialog-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+dialog .dialog-header hr {
+    margin: 0;
+    margin-top: 1rem;
+}
+
+dialog .dialog-content {
+    overflow: auto;
+    padding: 2rem;
 }
 
 dialog .btn-close {
@@ -182,6 +186,11 @@ label:has(~ :required)::after,
 
 .editor-layout__toc-body {
     grid-area: body;
+}
+
+#instance-types-list:empty::after {
+    content: "No instance types have been specified.";
+    color: var(--bs-secondary-color);
 }
 
 /* Formset tables */

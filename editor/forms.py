@@ -62,7 +62,11 @@ class OpenApiSpecificationBasedForm(EditorForm):
         return is_valid
 
     def get_data_for_form_fields(self):
-        return dict()
+        return (
+            self
+            .api_endpoint_client.endpoint_definition
+            .get_all_user_specifiable_fields()
+        )
 
     def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():

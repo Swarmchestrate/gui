@@ -66,7 +66,7 @@
                     {% else %}
                     <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
                     {% endif %}
-                        <button type="submit" class="btn btn-primary">
+                        <button id="editor-submit-button" type="submit" class="btn btn-primary">
                             <span class="d-none loading-text">
                                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                                 <span class="status-text">Applying Changes</span>
@@ -90,19 +90,6 @@
         </div>
     </div>
 </div>
-{% if formsets %}
-<div id="formset-tables" class="d-none">
-    {% block formset_tables %}
-    {% for formset_prefix, formset in formsets.items %}
-    <table
-        class="formset-template-table"
-        data-formset-prefix="{{ formset_prefix }}">
-        <tbody>
-            {% include 'editor/util_templates/formset_table_row_template.html' with form=formset.empty_form %}
-        </tbody>
-    </table>
-    {% endfor %}
-    {% endblock formset_tables %}
-</div>
-{% endif %}
+{% block dialogs %}
+{% endblock dialogs %}
 {% endblock content %}

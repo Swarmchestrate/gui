@@ -1,7 +1,7 @@
 import { setupFormsetTables } from "/static/editor_formsets.js";
 
 const form = document.querySelector("#editor-form");
-const formSubmitButton = form.querySelector("button[type='submit']");
+const formSubmitButton = form.querySelector("button#editor-submit-button");
 const loadingText = formSubmitButton.querySelector(".loading-text");
 const defaultText = formSubmitButton.querySelector(".default-text");
 const statusText = formSubmitButton.querySelector(".status-text");
@@ -137,7 +137,8 @@ function validateField(event) {
     const feedback = document.querySelector(`#${field.id} ~ .invalid-feedback`);
     if (!isValid) {
         field.classList.add("is-invalid");
-        return (feedback.textContent = field.validationMessage);
+        feedback.textContent = field.validationMessage;
+        return;
     }
     return field.classList.remove("is-invalid");
 }

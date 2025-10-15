@@ -5,6 +5,8 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 <script type="module" src="{% static 'capacities/locality_options_search.js' %}"></script>
 <script type="module" src="{% static 'capacities/locality_gps_search.js' %}"></script>
+<script type="module" src="{% static 'instance_types/instance_types_dialogs.js' %}"></script>
+{{ instance_type_list_item_template|json_script:'instance-type-list-item-template' }}
 {% endblock extra_scripts %}
 
 {% block field %}
@@ -22,6 +24,8 @@
 {% with section_field=field formset=security_ports_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}
 {% endwith %}
+{% elif field.name == 'instance_types' %}
+{% include 'instance_types/instance_types_section.html' %}
 {% elif field.name == 'architecture' and registration_type_name_singular == 'cloud capacity' %}
 {% with section_field=field formset=architecture_formset %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}
@@ -44,3 +48,9 @@
 {% include 'editor/field_templates/field_template.html' %}
 {% endif %}
 {% endblock field %}
+
+{% block dialogs %}
+{% with dialog_id='instance-type-dialog' %}
+{% include 'instance_types/dialogs/instance_type_dialog.html' %}
+{% endwith %}
+{% endblock dialogs %}

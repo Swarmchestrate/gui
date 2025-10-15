@@ -1,0 +1,35 @@
+{% extends 'dialog_base.html' %}
+
+{% block dialog_header_content %}
+<span class="fw-semibold">
+    Edit Instance Type
+</span>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+<form method="dialog">
+    <p>Supported instance types and specifications (CPU, RAM, storage).</p>
+    <div class="instance-type-form pb-4">
+        {% with form=instance_types_formset.empty_form %}
+        {% for field in form %}
+        {% if field == form.DELETE %}
+        <div class="d-none">
+            {{ field }}
+        </div>
+        {% else %}
+        {% include 'editor/field_templates/field_template.html' %}
+        {% endif %}
+        {% endfor %}
+        {% endwith %}
+    </div>
+    <div class="row gy-3">
+        <div class="col-lg-6">
+            <button class="btn btn-light w-100" value="cancel" formmethod="dialog">Cancel</button>
+        </div>
+        <div class="col-lg-6">
+            <button class="btn btn-primary confirm-btn w-100">Confirm Changes</button>
+            <div class="form-text text-sm-end text-center">You can commit the changes after closing this dialog and clicking "Save Changes".</div>
+        </div>
+    </div>
+</form>
+{% endblock dialog_body_content %}

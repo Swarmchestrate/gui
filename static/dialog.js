@@ -1,9 +1,33 @@
-export function setupDialog(dialog, closeButton, showButtons) {
+export function addShowButtonToDialog(showButton, dialog, closeButton) {
+    showButton.addEventListener("click", () => {
+        dialog.removeAttribute("inert");
+        dialog.showModal();
+        // Close button should autofocus with
+        // dialog, but doesn't in Safari for
+        // some reason.
+        if (typeof closeButton === "undefined") {
+            closeButton = dialog.querySelector(".btn-close");
+        }
+        if (!closeButton) {
+            return;
+        }
+        closeButton.focus();
+    });
+}
+
+export function setupDialog(dialog, closeButton, showButtons, options) {
+    if (typeof options === "undefined") {
+        options = {
+            closeOnBackdropClick: true,
+        };
+    }
     // Light dismiss - allows dialog to be closed
     // by clicking on the backdrop.
-    dialog.addEventListener("click", () => {
-        dialog.close();
-    });
+    if (options.closeOnBackdropClick) {
+        dialog.addEventListener("click", () => {
+            dialog.close();
+        });
+    }
 
     dialog
         .querySelector(".dialog-content")
@@ -12,7 +36,7 @@ export function setupDialog(dialog, closeButton, showButtons) {
         });
 
     closeButton.addEventListener("click", () => {
-        dialog.close();
+        dialog.close("");
     });
 
     dialog.addEventListener("close", () => {
@@ -24,13 +48,6 @@ export function setupDialog(dialog, closeButton, showButtons) {
     });
 
     showButtons.forEach((showButton) => {
-        showButton.addEventListener("click", () => {
-            dialog.removeAttribute("inert");
-            dialog.showModal();
-            // Close button should autofocus with
-            // dialog, but doesn't in Safari for
-            // some reason.
-            closeButton.focus();
-        });
+        addShowButtonToDialog(showButton, dialog, closeButton);
     });
 }

@@ -3,12 +3,10 @@ import reverse_geocode
 from http import HTTPStatus
 
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import FormView
-from django.views.generic.base import TemplateView
 from django.views.generic.edit import ProcessFormView
-
-from .dataclasses import GpsLocation
 
 from .api_endpoint_client import (
     CloudCapacityApiEndpointClient,
@@ -51,16 +49,21 @@ from editor.views import (
     MultipleEditorFormsetProcessFormView,
     RegistrationsListFormView,
 )
+from instance_types.forms import InstanceTypeEditorForm
+from instance_types.formsets import InstanceTypeFormSet
 
 
 # Cloud & Edge Capacities
 class CapacityEditorRouterView(EditorRouterView):
+    specs_editor_view_class = None
     cost_and_locality_editor_view_class = None
     energy_editor_view_class = None
     security_trust_and_access_editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
-        if self.category.lower() == 'cost & locality':
+        if self.category.lower() == 'specs':
+            return self.specs_editor_view_class.as_view()(request, *args, **kwargs)
+        elif self.category.lower() == 'cost & locality':
             return self.cost_and_locality_editor_view_class.as_view()(request, *args, **kwargs)
         elif self.category.lower() == 'energy':
             return self.energy_editor_view_class.as_view()(request, *args, **kwargs)
@@ -373,6 +376,39 @@ class CapacitySecurityTrustAndAccessEditorProcessFormView(
         return super().dispatch(request, *args, **kwargs)
 
 
+class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        property_name = 'instance_types'
+        self.add_formset_class(
+            InstanceTypeEditorForm,
+            property_name,
+            base_formset_class=InstanceTypeFormSet,
+            extra_formset_factory_kwargs={
+                'extra': 0,
+            }
+        )
+
+        # Configure initial formset data
+        initial = list()
+        instance_types = self.registration.get(property_name)
+        if not instance_types:
+            instance_types = list()
+        for instance_type in instance_types:
+            initial.append(instance_type)
+        self.add_initial_data_for_formset(initial, property_name)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'instance_type_list_item_template': render_to_string(
+                'instance_types/instance_type_list_item.html',
+                {}
+            ),
+        })
+        return context
+
+
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
     editor_registration_list_url_reverse = 'capacities:cloud_capacities_list'
@@ -425,11 +461,18 @@ class CloudCapacitySystemSpecificEditorProcessFormView(
         return super().dispatch(request, *args, **kwargs)
 
 
+class CloudCapacitySpecsEditorProcessFormView(
+        CloudCapacityEditorProcessFormView,
+        CapacitySpecsEditorProcessFormView):
+    pass
+
+
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
     security_trust_and_access_editor_view_class = CloudCapacitySecurityTrustAndAccessEditorProcessFormView
+    specs_editor_view_class = CloudCapacitySpecsEditorProcessFormView
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'system specific':
@@ -498,11 +541,18 @@ class EdgeCapacitySecurityTrustAndAccessEditorProcessFormView(
     pass
 
 
+class EdgeCapacitySpecsEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView,
+        CapacitySpecsEditorProcessFormView):
+    pass
+
+
 class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
     cost_and_locality_editor_view_class = EdgeCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
     security_trust_and_access_editor_view_class = EdgeCapacitySecurityTrustAndAccessEditorProcessFormView
+    specs_editor_view_class = EdgeCapacitySpecsEditorProcessFormView
 
     def route_to_view(self, request, *args, **kwargs):
         if self.category.lower() == 'edge specific':
