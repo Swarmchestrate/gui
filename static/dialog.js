@@ -1,12 +1,13 @@
-export function addShowButtonToDialog(showButton, dialog, closeButton) {
+export function addShowButtonToDialog(showButton, dialog, closeButtons) {
     showButton.addEventListener("click", () => {
         dialog.removeAttribute("inert");
         dialog.showModal();
         // Close button should autofocus with
         // dialog, but doesn't in Safari for
         // some reason.
-        if (typeof closeButton === "undefined") {
-            closeButton = dialog.querySelector(".btn-close");
+        let closeButton = dialog.querySelector(".btn-close");
+        if (closeButtons.length) {
+            closeButton = closeButtons[0];
         }
         if (!closeButton) {
             return;
@@ -15,15 +16,15 @@ export function addShowButtonToDialog(showButton, dialog, closeButton) {
     });
 }
 
-export function setupDialog(dialog, closeButton, showButtons, options) {
+export function setupDialog(dialog, closeButtons, showButtons, options) {
     if (typeof options === "undefined") {
         options = {
-            closeOnBackdropClick: true,
+            lightDismiss: true,
         };
     }
     // Light dismiss - allows dialog to be closed
     // by clicking on the backdrop.
-    if (options.closeOnBackdropClick) {
+    if (options.lightDismiss) {
         dialog.addEventListener("click", () => {
             dialog.close();
         });
@@ -35,8 +36,10 @@ export function setupDialog(dialog, closeButton, showButtons, options) {
             event.stopPropagation();
         });
 
-    closeButton.addEventListener("click", () => {
-        dialog.close("");
+    closeButtons.forEach((closeButton) => {
+        closeButton.addEventListener("click", () => {
+            dialog.close("");
+        });
     });
 
     dialog.addEventListener("close", () => {
@@ -48,6 +51,6 @@ export function setupDialog(dialog, closeButton, showButtons, options) {
     });
 
     showButtons.forEach((showButton) => {
-        addShowButtonToDialog(showButton, dialog, closeButton);
+        addShowButtonToDialog(showButton, dialog, closeButtons);
     });
 }

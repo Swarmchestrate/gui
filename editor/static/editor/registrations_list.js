@@ -129,7 +129,7 @@ function setupRegistrationsTableInputsAndButtons() {
         registrationsTableBody.querySelectorAll(".delete-btn");
     setupDialog(
         deleteDialog,
-        deleteDialog.querySelector(".btn-close"),
+        [deleteDialog.querySelector(".btn-close")],
         deleteButtons,
     );
     deleteDialog.addEventListener("close", (e) => {
@@ -158,7 +158,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
     setupDialog(
         deleteMultipleDialog,
-        deleteMultipleDialog.querySelector(".btn-close"),
+        [deleteMultipleDialog.querySelector(".btn-close")],
         [deleteCheckedButton],
     );
     deleteMultipleDialog.addEventListener("close", (e) => {

@@ -51,21 +51,21 @@ section {
 /* Credit: Used this article as reference for dialog implementation:
 https://web.dev/articles/building/a-dialog-component */
 dialog {
-    border: 1px var(--bs-gray-300) solid;
+    border: var(--bs-border-width) var(--bs-gray-300) var(--bs-border-style);
     border-radius: var(--bs-border-radius);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.25s;
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     max-inline-size: min(90vw, 60ch);
     max-block-size: min(80vh, 100%);
     max-block-size: min(80dvb, 100%);
     margin: auto;
     padding: 0;
-    padding-top: 2rem;
     position: fixed;
     inset: 0;
+    overflow: auto;
 }
 
 dialog[open] {
@@ -78,15 +78,14 @@ html:has(dialog[open]) {
 }
 
 dialog .dialog-header {
+    padding-block: 1rem;
     padding-inline: 2rem;
-}
-
-dialog .dialog-header hr {
-    margin: 0;
-    margin-top: 1rem;
+    border-bottom: var(--bs-border-width) var(--bs-gray-300)
+        var(--bs-border-style);
 }
 
 dialog .dialog-content {
+    flex-grow: 1;
     overflow: auto;
     padding: 2rem;
 }

@@ -1,19 +1,22 @@
-<button class="list-group-item list-group-item-action" type="button">
+<button
+    class="list-group-item list-group-item-action"
+    type="button"
+    data-dialog-id="{{ dialog_id|default:'' }}">
     <div class="d-flex align-items-center column-gap-4">
         <div class="flex-grow-1">
-            <strong class="name">{{ it_name|default:'' }}</strong>
+            <strong class="name">{{ form.name.value|default:'' }}</strong>
             <div class="form-text">
-                <span class="num-cpus">{{ it_num_cpus|default:'' }}</span> CPUs
+                <span class="num-cpus">{{ form.num_cpus.value|default:'' }}</span> CPUs
                 <i class="bi bi-dot"></i>
-                <span class="num-memory-size">{{ it_memory_size|default:'' }}</span>GB RAM
+                <span class="num-memory-size">{{ form.mem_size.value|default:'' }}</span>GB RAM
                 <i class="bi bi-dot"></i>
-                <span class="num-disk-size">{{ it_disk_size|default:'' }}</span>GB Storage
+                <span class="num-disk-size">{{ form.disk_size.value|default:'' }}</span>GB Storage
                 <i class="bi bi-dot"></i>
-                <span class="num-energy-consumption">{{ it_energy_consumption|default:'' }}</span>W
+                <span class="num-energy-consumption">{{ form.energy_consumption.value|default:'' }}</span>W
                 <i class="bi bi-dot"></i>
-                <span class="num-bandwidth">{{ it_bandwidth|default:'' }}</span> Mbps
+                <span class="num-bandwidth">{{ form.bandwidth.value|default:'' }}</span> Mbps
                 <i class="bi bi-dot"></i>
-                <span class="num-price">{{ it_price|default:'' }}</span> credits/hour
+                <span class="num-price">{{ form.price.value|default:'' }}</span> credits/hour
             </div>
         </div>
         <div>

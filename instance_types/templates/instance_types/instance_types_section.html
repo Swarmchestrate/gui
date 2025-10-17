@@ -1,11 +1,9 @@
-<section>
+<section id="instance-types-section">
     <h2 class="fw-semibold fs-6">{{ field.label }}</h2>
     <div id="instance-types-list" class="list-group mb-4">
         {% for form in instance_types_formset %}
-        {% with it_name=form.name.value it_num_cpus=form.num_cpus.value it_memory_size=form.mem_size.value it_disk_size=form.disk_size.value %}
-        {% with it_energy_consumption=form.energy_consumption.value it_bandwidth=form.bandwidth.value it_price=form.price.value it_disk_size=form.disk_size.value %}
-        {% include 'instance_types/instance_type_list_item.html' %}
-        {% endwith %}
+        {% with counter_str=forloop.counter0|stringformat:'s' %}
+        {% include 'instance_types/instance_type_list_item.html' with dialog_id='instance-type-'|add:counter_str|add:'-dialog' %}
         {% endwith %}
         {% endfor %}
         <button
@@ -17,12 +15,18 @@
         </button>
     </div>
     <div class="form-text">{{ field.help_text }}</div>
-    <div id="instance-types-formset-wrapper" class="d-none">
-        {{ instance_types_formset.management_form }}
-        {% for form in instance_types_formset %}
-        <div class="instance-type-form">
-            {{ form }}
-        </div>
-        {% endfor %}
-    </div>
+    {{ instance_types_formset.management_form }}
+    {# New instance type dialog #}
+    {% with dialog_id='instance-type-__prefix__-dialog' dialog_header_text='New Instance Type' form=instance_types_formset.empty_form %}
+    {% include 'instance_types/dialogs/instance_type_dialog.html' %}
+    {% endwith %}
+
+    {# Instance type editor dialog #}
+    {% for form in instance_types_formset %}
+    {% with counter_str=forloop.counter0|stringformat:'s' %}
+    {% with dialog_id='instance-type-'|add:counter_str|add:'-dialog' dialog_extra_classes='instance-type-formset-instance-dialog' %}
+    {% include 'instance_types/dialogs/instance_type_dialog.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
 </section>

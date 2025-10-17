@@ -391,7 +391,8 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         # Configure initial formset data
         initial = list()
         instance_types = self.registration.get(property_name)
-        if not instance_types:
+        if (not instance_types
+            or not isinstance(instance_types, list)):
             instance_types = list()
         for instance_type in instance_types:
             initial.append(instance_type)
