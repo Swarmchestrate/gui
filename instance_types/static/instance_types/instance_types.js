@@ -122,6 +122,7 @@ class InstanceTypesList {
             this.getListItemIndex(listItem),
         );
         dialog.addShowButton(listItem, { lightDismiss: false });
+        this.setupListInstanceTypeButton(listItem, dialog);
     }
 }
 
