@@ -3,23 +3,30 @@
     type="button"
     data-dialog-id="{{ dialog_id|default:'' }}">
     <div class="d-flex align-items-center column-gap-4">
-        <div class="flex-grow-1">
+        <div>
             <strong class="name">{{ form.name.value|default:'' }}</strong>
             <div class="form-text">
-                <span class="num-cpus">{{ form.num_cpus.value|default:'' }}</span> CPUs
-                <i class="bi bi-dot"></i>
-                <span class="num-memory-size">{{ form.mem_size.value|default:'' }}</span>GB RAM
-                <i class="bi bi-dot"></i>
-                <span class="num-disk-size">{{ form.disk_size.value|default:'' }}</span>GB Storage
-                <i class="bi bi-dot"></i>
-                <span class="num-energy-consumption">{{ form.energy_consumption.value|default:'' }}</span>W
-                <i class="bi bi-dot"></i>
-                <span class="num-bandwidth">{{ form.bandwidth.value|default:'' }}</span> Mbps
-                <i class="bi bi-dot"></i>
-                <span class="num-price">{{ form.price.value|default:'' }}</span> credits/hour
+                <span class="property">
+                    <span class="num-cpus property-value">{{ form.num_cpus.value|default:'' }}</span> <span class="property-unit">CPUs</span>
+                </span>
+                <span class="property">
+                    <span class="num-memory-size property-value">{{ form.mem_size.value|default:'' }}</span><span class="property-unit">GB RAM</span>
+                </span>
+                <span class="property">
+                    <span class="num-disk-size property-value">{{ form.disk_size.value|default:'' }}</span><span class="property-unit">GB Storage</span>
+                </span>
+                <span class="property">
+                    <span class="num-energy-consumption property-value">{{ form.energy_consumption.value|default:'' }}</span><span class="property-unit">W</span>
+                </span>
+                <span class="property">
+                    <span class="num-bandwidth property-value">{{ form.bandwidth.value|default:'' }}</span> <span class="property-unit">Mbps</span>
+                </span>
+                <span class="property">
+                    <span class="num-price property-value">{{ form.price.value|default:'' }}</span> <span class="property-unit">credits/hour</span>
+                </span>
             </div>
         </div>
-        <div class="edit-icon text-body-secondary">
+        <div class="edit-icon text-body-secondary ms-auto">
             <small>Edit</small>
             <i class="bi bi-pencil-fill ms-2"></i>
         </div>

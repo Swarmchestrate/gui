@@ -220,6 +220,17 @@ label:has(~ :required)::after,
     display: block;
 }
 
+#instance-types-list .property:has(.property-value:empty) {
+    display: none;
+}
+
+#instance-types-list .property:not(:first-child)::before {
+    content: "•";
+    font-size: 0.75em;
+    vertical-align: middle;
+    margin-inline: 0.25em;
+}
+
 /* Wizard nav */
 .editor-toc.nav-pills .nav-link:not(.active):hover,
 .editor-toc.nav-pills .nav-link:not(.active):focus {
