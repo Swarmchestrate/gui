@@ -19,13 +19,17 @@
     {% endif %}
     {% endfor %}
 </div>
-<div class="row gy-3">
-    <div class="col-lg-6">
-        <button class="btn btn-light cancel-btn w-100" type="button">Cancel</button>
-    </div>
-    <div class="col-lg-6">
-        <button class="btn btn-primary confirm-btn w-100" type="button">Confirm Changes</button>
-        <div class="form-text text-sm-end text-center">You can commit the changes after closing this dialog and clicking "Save Changes".</div>
-    </div>
-</div>
 {% endblock dialog_body_content %}
+
+
+{% block dialog_body_footer %}
+<div class="row gx-0">
+    <div class="col-6">
+        <button class="btn btn-light cancel-btn w-100 col rounded-0" type="button">Cancel</button>
+    </div>
+    <div class="col-6">
+        <button class="btn btn-primary confirm-btn w-100 col rounded-0" type="button">Confirm</button>
+    </div>
+    <!--<div class="col-lg-12 form-text text-center">You can commit the changes after closing this dialog and clicking "Save Changes".</div>-->
+</div>
+{% endblock dialog_body_footer %}
