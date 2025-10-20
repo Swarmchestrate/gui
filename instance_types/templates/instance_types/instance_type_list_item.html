@@ -2,10 +2,10 @@
     class="list-group-item list-group-item-action"
     type="button"
     data-dialog-id="{{ dialog_id|default:'' }}">
-    <div class="d-flex align-items-center column-gap-4">
-        <div>
-            <strong class="name">{{ form.name.value|default:'' }}</strong>
-            <div class="form-text">
+    <div class="d-flex align-items-center column-gap-4 text-nowrap">
+        <div class="w-100 overflow-hidden">
+            <strong class="name text-truncate">{{ form.name.value|default:'' }}</strong>
+            <div class="form-text text-truncate">
                 <span class="property">
                     <span class="num-cpus property-value">{{ form.num_cpus.value|default:'' }}</span> <span class="property-unit">CPUs</span>
                 </span>
