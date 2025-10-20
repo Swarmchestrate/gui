@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block scripts %}
-<script type="module" src="{% static 'editor.js' %}"></script>
+<script type="module" src="{% static 'editor/editor.js' %}"></script>
 {% block extra_scripts %}
 {% endblock extra_scripts %}
 {% endblock scripts %}
@@ -82,7 +82,7 @@
                         {% if next_list_item %}
                         <div class="form-text text-center">{{ next_list_item_title }}</div>
                         {% endif %}
-                        <ul id="form-messages-list" class="d-none text-danger text-center list-unstyled"></ul>
+                        <ul class="d-none text-danger text-center list-unstyled form-messages-list"></ul>
                     </div>
                 </div>
             </form>
