@@ -1,0 +1,13 @@
+<span class="d-none loading-text">
+    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+    <span class="status-text">
+        {% block loading_text %}
+        Applying Changes
+        {% endblock loading_text %}
+    </span>
+</span>
+<span class="default-text">
+    {% block default_text %}
+    Save
+    {% endblock default_text %}
+</span>

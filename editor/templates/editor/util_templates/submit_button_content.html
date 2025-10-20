@@ -1,0 +1,13 @@
+{% extends 'editor/util_templates/save_button_content.html' %}
+
+{% block loading_text %}
+Applying Changes
+{% endblock loading_text %}
+
+{% block default_text %}
+{% if next_list_item %}
+Next Step
+{% else %}
+Finish & Review
+{% endif %}
+{% endblock default_text %}

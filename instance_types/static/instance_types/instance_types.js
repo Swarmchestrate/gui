@@ -1,4 +1,5 @@
 import { setupDialog } from "/static/dialog.js";
+import { EditorForm } from "/static/editor/editor.js";
 import {
     htmlToNode,
     updateElementPlaceholderAttributes,

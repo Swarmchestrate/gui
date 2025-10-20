@@ -1,7 +1,7 @@
 import { EditorValidator } from "/static/editor/validation.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
 
-class EditorForm {
+export class EditorForm {
     constructor(form, options) {
         this.form = form;
         if (typeof options != "object") {
@@ -13,6 +13,9 @@ class EditorForm {
         if (!("successText" in options)) {
             options.successText = "Redirecting";
         }
+        if (!("onSubmit" in options)) {
+            options.onSubmit = () => {};
+        }
         this.formStatusButton = form.querySelector(
             options.formStatusButtonSelector,
         );
@@ -23,14 +26,19 @@ class EditorForm {
         this.formStatusButtonStatusText =
             this.formStatusButton.querySelector(".status-text");
         this.successText = options.successText;
+        this.onSubmit = options.onSubmit;
         this.validator = new EditorValidator(this.form);
 
         this.form.addEventListener("submit", async (event) => {
-            this.showLoadingText();
-            this.validator.resetInvalidFields();
-            this.validator.clearFormAndFieldValidationMessages();
+            this.runSubmitActions();
             return false;
         });
+    }
+
+    runSubmitActions() {
+        this.showLoadingText();
+        this.validator.resetInvalidFields();
+        this.validator.clearFormAndFieldValidationMessages();
     }
 
     showLoadingText() {
@@ -76,6 +84,7 @@ class EditorForm {
         // Request headers
         const headers = new Headers();
         headers.append("Accept", "application/json");
+        this.runSubmitActions();
         const response = await fetch(this.form.action, {
             method: "POST",
             headers: headers,
@@ -92,7 +101,7 @@ class EditorForm {
         }
         if (response.ok) {
             this.updateStatusText(this.successText);
-            return (window.location.href = responseData.redirect);
+            return this.onSubmit();
         }
         this.hideLoadingText();
         const validationMessages = responseData.feedback || {};
