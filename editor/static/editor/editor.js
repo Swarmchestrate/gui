@@ -7,88 +7,64 @@ export class EditorForm {
         if (typeof options != "object") {
             options = {};
         }
+        if (!("onSubmit" in options)) {
+            options.onSubmit = () => {};
+        }
+        this.onSubmit = options.onSubmit;
+        this.validator = new EditorValidator(this.form);
+        this.form.addEventListener("submit", async (event) => {
+            this.runSubmitActions();
+            return false;
+        });
+        if (!("useStatusButton" in options)) {
+            options.useStatusButton = true;
+        }
         if (!("formStatusButtonSelector" in options)) {
             options.formStatusButtonSelector = "button[type='submit']";
         }
-        if (!("successText" in options)) {
-            options.successText = "Redirecting";
-        }
-        if (!("onSubmit" in options)) {
-            options.onSubmit = () => {};
+        if (!options.useStatusButton) {
+            return;
         }
         this.formStatusButton = form.querySelector(
             options.formStatusButtonSelector,
         );
         this.formStatusButtonLoadingText =
             this.formStatusButton.querySelector(".loading-text");
+        this.formStatusButtonLoadingSuccessText =
+            this.formStatusButton.querySelector(".success-status-text");
         this.formStatusButtonDefaultText =
             this.formStatusButton.querySelector(".default-text");
-        this.formStatusButtonStatusText =
-            this.formStatusButton.querySelector(".status-text");
-        this.successText = options.successText;
-        this.onSubmit = options.onSubmit;
-        this.validator = new EditorValidator(this.form);
-
-        this.form.addEventListener("submit", async (event) => {
-            this.runSubmitActions();
-            return false;
-        });
+        this.formStatusButtonStatusText = this.formStatusButton.querySelector(
+            ".loading-status-text",
+        );
     }
 
-    runSubmitActions() {
-        this.showLoadingText();
-        this.validator.resetInvalidFields();
-        this.validator.clearFormAndFieldValidationMessages();
-    }
-
-    showLoadingText() {
-        this.formStatusButton.disabled = true;
-        if (
-            !this.formStatusButtonDefaultText ||
-            !this.formStatusButtonLoadingText
-        ) {
-            return;
+    prepareFormBody() {
+        const data = new URLSearchParams();
+        for (const pair of new FormData(this.getFormToSubmit())) {
+            data.append(pair[0], pair[1]);
         }
-        this.formStatusButtonLoadingText.classList.remove("d-none");
-        this.formStatusButtonDefaultText.classList.add("d-none");
+        return data;
     }
 
-    hideLoadingText() {
-        this.formStatusButton.disabled = false;
-        if (
-            !this.formStatusButtonDefaultText ||
-            !this.formStatusButtonLoadingText
-        ) {
-            return;
-        }
-        this.formStatusButtonLoadingText.classList.add("d-none");
-        this.formStatusButtonDefaultText.classList.remove("d-none");
+    getFormToSubmit() {
+        return this.form;
     }
 
-    updateStatusText(updatedText) {
-        if (!formStatusButtonStatusText) {
-            return;
-        }
-        this.formStatusButtonStatusText.textContent = updatedText;
-    }
-
-    showSuccessText() {
-        this.updateStatusText();
+    getFormAction() {
+        return this.form.action;
     }
 
     async submitAsynchronously() {
-        const data = new URLSearchParams();
-        for (const pair of new FormData(this.form)) {
-            data.append(pair[0], pair[1]);
-        }
+        const body = this.prepareFormBody();
         // Request headers
         const headers = new Headers();
         headers.append("Accept", "application/json");
         this.runSubmitActions();
-        const response = await fetch(this.form.action, {
+        const response = await fetch(this.getFormAction(), {
             method: "POST",
             headers: headers,
-            body: data,
+            body: body,
         });
         let responseData;
         try {
@@ -100,12 +76,80 @@ export class EditorForm {
             ]);
         }
         if (response.ok) {
-            this.updateStatusText(this.successText);
+            this.showLoadingSuccessText();
             return this.onSubmit();
         }
         this.hideLoadingText();
         const validationMessages = responseData.feedback || {};
         this.validator.displayValidationMessages(validationMessages);
+    }
+
+    runSubmitActions() {
+        this.showLoadingText();
+        this.validator.resetInvalidFields();
+        this.validator.clearFormAndFieldValidationMessages();
+    }
+
+    showLoadingText() {
+        if (!this.formStatusButton) {
+            return;
+        }
+        this.formStatusButton.disabled = true;
+        if (
+            !this.formStatusButtonDefaultText ||
+            !this.formStatusButtonLoadingText ||
+            !this.formStatusButtonLoadingSuccessText
+        ) {
+            return;
+        }
+        this.formStatusButtonLoadingText.classList.remove("d-none");
+        this.formStatusButtonDefaultText.classList.add("d-none");
+        this.formStatusButtonLoadingSuccessText.classList.add("d-none");
+    }
+
+    showLoadingSuccessText() {
+        if (!this.formStatusButton) {
+            return;
+        }
+        this.formStatusButton.disabled = true;
+        if (
+            !this.formStatusButtonDefaultText ||
+            !this.formStatusButtonLoadingText ||
+            !this.formStatusButtonLoadingSuccessText
+        ) {
+            return;
+        }
+        this.formStatusButtonLoadingSuccessText.classList.remove("d-none");
+        this.formStatusButtonLoadingText.classList.add("d-none");
+        this.formStatusButtonDefaultText.classList.add("d-none");
+    }
+
+    hideLoadingText() {
+        if (!this.formStatusButton) {
+            return;
+        }
+        this.formStatusButton.disabled = false;
+        if (
+            !this.formStatusButtonDefaultText ||
+            !this.formStatusButtonLoadingText ||
+            !this.formStatusButtonLoadingSuccessText
+        ) {
+            return;
+        }
+        this.formStatusButtonDefaultText.classList.remove("d-none");
+        this.formStatusButtonLoadingText.classList.add("d-none");
+        this.formStatusButtonLoadingSuccessText.classList.add("d-none");
+    }
+
+    updateStatusText(updatedText) {
+        if (!this.formStatusButtonStatusText) {
+            return;
+        }
+        this.formStatusButtonStatusText.textContent = updatedText;
+    }
+
+    showSuccessText() {
+        this.updateStatusText();
     }
 }
 

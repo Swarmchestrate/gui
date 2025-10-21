@@ -1,5 +1,13 @@
 <section id="instance-types-section">
-    <h2 class="fw-semibold fs-6">{{ field.label }}</h2>
+    <div class="d-flex align-items-start column-gap-2">
+        <h2 class="fw-semibold fs-6">{{ field.label }}</h2>
+        <div class="status ms-auto">
+            {% with success_text='' default_text='' extra_loading_text_classes='text-body-tertiary' %}
+            {% include 'editor/util_templates/save_button_content.html' %}
+            {% endwith %}
+        </div>
+    </div>
+    {% include 'editor/util_templates/form_errors_list.html' %}
     <div id="instance-types-list" class="list-group mb-4">
         {% for form in instance_types_formset %}
         {% with counter_str=forloop.counter0|stringformat:'s' %}

@@ -1,13 +1,18 @@
-<span class="d-none loading-text">
-    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-    <span class="status-text">
+<span class="d-none loading-text {{ extra_loading_text_classes|default:'' }}">
+    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+    <span class="loading-status-text">
         {% block loading_text %}
-        Applying Changes
+        {{ loading_text|default:'Applying Changes' }}
         {% endblock loading_text %}
+    </span>
+    <span class="success-status-text">
+        {% block loading_success_text %}
+        {{ success_text|default_if_none:'Redirecting' }}
+        {% endblock loading_success_text %}
     </span>
 </span>
 <span class="default-text">
     {% block default_text %}
-    Save
+    {{ default_text|default_if_none:'Save' }}
     {% endblock default_text %}
 </span>

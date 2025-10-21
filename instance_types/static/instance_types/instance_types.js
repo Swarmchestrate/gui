@@ -5,6 +5,44 @@ import {
     updateElementPlaceholderAttributes,
 } from "/static/editor/utils.js";
 
+let instanceTypeEditorForm;
+
+class InstanceTypeEditorForm extends EditorForm {
+    constructor(options) {
+        const instanceTypesSectionElement = document.querySelector(
+            "#instance-types-section",
+        );
+        super(instanceTypesSectionElement, options);
+        this.csrfMiddlewareTokenElement = document.querySelector(
+            "input[name='csrfmiddlewaretoken']",
+        );
+    }
+
+    prepareFormBody() {
+        const body = super.prepareFormBody();
+        body.append(
+            this.csrfMiddlewareTokenElement.name,
+            this.csrfMiddlewareTokenElement.value,
+        );
+        return body;
+    }
+
+    getFormToSubmit() {
+        const form = document.createElement("form");
+        const fields = Array.from(
+            this.form.querySelectorAll("input, select, textarea"),
+        );
+        fields.forEach((field) => {
+            form.appendChild(field.cloneNode(true));
+        });
+        return form;
+    }
+
+    getFormAction() {
+        return document.querySelector("#editor-form").action;
+    }
+}
+
 class InstanceTypesList {
     constructor(listId, listItemTemplateId, totalFormsetsInput) {
         this.listElement = document.querySelector(`#${listId}`);
@@ -77,7 +115,7 @@ class InstanceTypesList {
             "instance-type-__prefix__-dialog",
         );
         dialog.addShowButton(this.addNewButton);
-        dialog.dialogElement.addEventListener("close", () => {
+        dialog.dialogElement.addEventListener("close", async () => {
             const dialogReturnValue = dialog.dialogElement.returnValue;
             if (!dialogReturnValue) {
                 return;
@@ -99,11 +137,12 @@ class InstanceTypesList {
             );
             this.totalFormsetsInput.value =
                 this.listElement.children.length - 1;
+            await instanceTypeEditorForm.submitAsynchronously();
         });
     }
 
     setupListInstanceTypeButton(listInstanceTypeButton, dialog) {
-        dialog.dialogElement.addEventListener("close", () => {
+        dialog.dialogElement.addEventListener("close", async () => {
             const dialogReturnValue = dialog.dialogElement.returnValue;
             if (!dialogReturnValue) {
                 return;
@@ -113,6 +152,7 @@ class InstanceTypesList {
                 listInstanceTypeButton,
                 updatedInstanceTypeData,
             );
+            await instanceTypeEditorForm.submitAsynchronously();
         });
     }
 
@@ -158,6 +198,9 @@ class InstanceTypeDialog {
                 ).value,
                 energyConsumption: this.dialogElement.querySelector(
                     `input[name='instance_types-${this.formsetInstanceIndex}-energy_consumption']`,
+                ).value,
+                bandwidth: this.dialogElement.querySelector(
+                    `input[name='instance_types-${this.formsetInstanceIndex}-bandwidth']`,
                 ).value,
                 price: this.dialogElement.querySelector(
                     `input[name='instance_types-${this.formsetInstanceIndex}-price']`,
@@ -208,6 +251,9 @@ const createInstanceTypeFormsetInstanceDialog = (
 };
 
 window.addEventListener("DOMContentLoaded", () => {
+    instanceTypeEditorForm = new InstanceTypeEditorForm({
+        formStatusButtonSelector: ".status",
+    });
     const instanceTypesList = new InstanceTypesList(
         "instance-types-list",
         "instance-type-list-item-template",
