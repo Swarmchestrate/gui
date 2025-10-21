@@ -397,6 +397,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         for instance_type in instance_types:
             initial.append(instance_type)
         self.add_initial_data_for_formset(initial, property_name)
+        self.exclude_formset_from_table_templates(property_name)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
