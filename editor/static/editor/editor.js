@@ -79,6 +79,11 @@ export class EditorForm {
             this.showLoadingSuccessText();
             return this.onSubmit();
         }
+        try {
+            console.error(await response.text());
+        } catch (error) {
+            console.error(error);
+        }
         this.hideLoadingText();
         const validationMessages = responseData.feedback || {};
         this.validator.displayValidationMessages(validationMessages);

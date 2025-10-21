@@ -222,13 +222,59 @@ label:has(~ :required)::after,
     transition: $btn-transition;
 }
 
-#instance-types-list .list-group-item-action .edit-icon {
+#instance-types-list .list-group-item-action a {
+    color: var(--bs-list-group-action-color);
+    text-decoration: none;
+}
+
+#instance-types-list .list-group-item-action:not(.active):hover a,
+#instance-types-list .list-group-item-action:not(.active):focus a {
+    color: var(--bs-list-group-action-hover-color);
+}
+
+#instance-types-list .list-group-item-action .list-item-toolbar {
     display: none;
 }
 
-#instance-types-list .list-group-item-action:hover .edit-icon,
-#instance-types-list .list-group-item-action:focus .edit-icon {
-    display: block;
+#instance-types-list .list-group-item-action:hover .list-item-toolbar,
+#instance-types-list .list-group-item-action:focus .list-item-toolbar {
+    display: flex;
+    column-gap: 0.25rem;
+}
+
+#instance-types-list .list-group-item-action:hover .list-item-toolbar button i {
+    color: var(--bs-secondary-color);
+}
+
+#instance-types-list
+    .list-group-item-action:hover
+    .list-item-toolbar
+    button:hover
+    i {
+    color: #000;
+}
+
+#instance-types-list .list-group-item-action:has(.btn-check:checked) {
+    color: var(--bs-danger-text-emphasis);
+    background-color: var(--bs-danger-bg-subtle);
+    --bs-list-group-border-color: var(--bs-danger-border-subtle);
+}
+
+#instance-types-list .list-group-item-action .unsaved-alert {
+    display: none;
+}
+
+#instance-types-list
+    .list-group-item-action.list-group-item-warning
+    .unsaved-alert,
+#instance-types-list
+    .list-group-item-action:has(.btn-check:checked)
+    .unsaved-alert {
+    display: inline;
+}
+
+#instance-types-list .list-group-item-action .btn-check:checked + label i {
+    color: var(--bs-danger);
 }
 
 #instance-types-list .property:has(.property-value:empty) {

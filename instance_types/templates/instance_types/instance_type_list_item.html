@@ -1,10 +1,18 @@
-<button
+
+<li
     class="list-group-item list-group-item-action"
-    type="button"
     data-dialog-id="{{ dialog_id|default:'' }}">
-    <div class="d-flex align-items-center column-gap-4 text-nowrap">
-        <div class="w-100 overflow-hidden">
-            <strong class="name text-truncate">{{ form.name.value|default:'' }}</strong>
+    <div class="d-flex align-items-center text-nowrap">
+        <div class="position-relative overflow-hidden w-100">
+            <div class="d-flex align-items-center column-gap-3">
+                <a href="javascript:;" class="stretched-link" role="button">
+                    <strong class="name text-truncate">{{ form.name.value|default:'' }}</strong>
+                </a>
+                <small class="unsaved-alert text-body-secondary">
+                    <i class="bi bi-exclamation-circle"></i>
+                    Unsaved changes
+                </small>
+            </div>
             <div class="form-text text-truncate">
                 <span class="property">
                     <span class="num-cpus property-value">{{ form.num_cpus.value|default:'' }}</span> <span class="property-unit">CPUs</span>
@@ -26,9 +34,17 @@
                 </span>
             </div>
         </div>
-        <div class="edit-icon text-body-secondary ms-auto">
-            <small>Edit</small>
-            <i class="bi bi-pencil-fill ms-2"></i>
+        <div class="list-item-toolbar ms-auto">
+            <div>
+                {{ form.DELETE }}
+                <label class="btn btn-light btn-sm delete-btn" for="{{ form.DELETE.id_for_label }}">
+                    <i class="bi bi-trash-fill"></i>
+                    <span class="visually-hidden">Mark for Deletion</span>
+                </label>
+            </div>
+            <button class="btn btn-light edit-btn btn-sm" type="button">
+                <i class="bi bi-pencil-fill"></i>
+            </button>
         </div>
     </div>
-</button>
+</li>

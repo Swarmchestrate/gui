@@ -122,7 +122,7 @@ class EditorProcessFormView(
 
     def get_json_response_feedback_forms_invalid(self, forms: dict) -> dict:
         feedback = dict()
-        for form in forms:
+        for form in forms.values():
             feedback.update(form.errors.as_json())
         return feedback
 

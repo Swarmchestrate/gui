@@ -378,10 +378,10 @@ class CapacitySecurityTrustAndAccessEditorProcessFormView(
 
 class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def dispatch(self, request, *args, **kwargs):
-        property_name = 'instance_types'
+        self.instance_types_property_name = 'instance_types'
         self.add_formset_class(
             InstanceTypeEditorForm,
-            property_name,
+            self.instance_types_property_name,
             base_formset_class=InstanceTypeFormSet,
             extra_formset_factory_kwargs={
                 'extra': 0,
@@ -390,14 +390,14 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
 
         # Configure initial formset data
         initial = list()
-        instance_types = self.registration.get(property_name)
+        instance_types = self.registration.get(self.instance_types_property_name)
         if (not instance_types
             or not isinstance(instance_types, list)):
             instance_types = list()
         for instance_type in instance_types:
             initial.append(instance_type)
-        self.add_initial_data_for_formset(initial, property_name)
-        self.exclude_formset_from_table_templates(property_name)
+        self.add_initial_data_for_formset(initial, self.instance_types_property_name)
+        self.exclude_formset_from_table_templates(self.instance_types_property_name)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -405,7 +405,12 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         context.update({
             'instance_type_list_item_template': render_to_string(
                 'instance_types/instance_type_list_item.html',
-                {}
+                {
+                    'form': (context
+                        .get('formsets', {})
+                        .get(self.instance_types_property_name)
+                        .empty_form),
+                }
             ),
         })
         return context

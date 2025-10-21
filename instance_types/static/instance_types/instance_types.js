@@ -5,44 +5,6 @@ import {
     updateElementPlaceholderAttributes,
 } from "/static/editor/utils.js";
 
-let instanceTypeEditorForm;
-
-class InstanceTypeEditorForm extends EditorForm {
-    constructor(options) {
-        const instanceTypesSectionElement = document.querySelector(
-            "#instance-types-section",
-        );
-        super(instanceTypesSectionElement, options);
-        this.csrfMiddlewareTokenElement = document.querySelector(
-            "input[name='csrfmiddlewaretoken']",
-        );
-    }
-
-    prepareFormBody() {
-        const body = super.prepareFormBody();
-        body.append(
-            this.csrfMiddlewareTokenElement.name,
-            this.csrfMiddlewareTokenElement.value,
-        );
-        return body;
-    }
-
-    getFormToSubmit() {
-        const form = document.createElement("form");
-        const fields = Array.from(
-            this.form.querySelectorAll("input, select, textarea"),
-        );
-        fields.forEach((field) => {
-            form.appendChild(field.cloneNode(true));
-        });
-        return form;
-    }
-
-    getFormAction() {
-        return document.querySelector("#editor-form").action;
-    }
-}
-
 class InstanceTypesList {
     constructor(listId, listItemTemplateId, totalFormsetsInput) {
         this.listElement = document.querySelector(`#${listId}`);
@@ -54,6 +16,9 @@ class InstanceTypesList {
             "#add-instance-type-button",
         );
         this.setupAddNewButton();
+        this.unsavedAlertElement = document.querySelector(
+            "#instance-types-section .unsaved-alert",
+        );
         Array.from(this.listElement.children).forEach((listItem, i) => {
             this.linkListItemToDialog(listItem);
         });
@@ -77,8 +42,9 @@ class InstanceTypesList {
         this.listElement.insertBefore(listItem, this.addNewButton);
     }
 
-    createAndAppendNewListItem(initialData) {
+    createAndAppendNewListItem(initialData, formsetInstanceIndex) {
         const newListItem = this.createListItem();
+        updateElementPlaceholderAttributes(newListItem, formsetInstanceIndex);
         this.appendListItem(newListItem);
         this.updateListItem(newListItem, initialData);
         return newListItem;
@@ -129,30 +95,28 @@ class InstanceTypesList {
                 );
             const newListItem = this.createAndAppendNewListItem(
                 initialInstanceTypeData,
+                formsetInstanceIndex,
             );
             dialogForNewInstanceType.addShowButton(newListItem);
-            this.setupListInstanceTypeButton(
-                newListItem,
-                dialogForNewInstanceType,
-            );
-            this.totalFormsetsInput.value =
-                this.listElement.children.length - 1;
-            await instanceTypeEditorForm.submitAsynchronously();
+            this.setupListItem(newListItem, dialogForNewInstanceType);
+            this.totalFormsetsInput.value = this.listElement.querySelectorAll(
+                "li.list-group-item-action",
+            ).length;
+            this.unsavedAlertElement.classList.remove("d-none");
+            newListItem.classList.add("list-group-item-warning");
         });
     }
 
-    setupListInstanceTypeButton(listInstanceTypeButton, dialog) {
+    setupListItem(listItem, dialog) {
         dialog.dialogElement.addEventListener("close", async () => {
             const dialogReturnValue = dialog.dialogElement.returnValue;
             if (!dialogReturnValue) {
                 return;
             }
             const updatedInstanceTypeData = JSON.parse(dialogReturnValue);
-            this.updateListItem(
-                listInstanceTypeButton,
-                updatedInstanceTypeData,
-            );
-            await instanceTypeEditorForm.submitAsynchronously();
+            this.updateListItem(listItem, updatedInstanceTypeData);
+            this.unsavedAlertElement.classList.remove("d-none");
+            listItem.classList.add("list-group-item-warning");
         });
     }
 
@@ -162,8 +126,13 @@ class InstanceTypesList {
             listItem.dataset.dialogId,
             this.getListItemIndex(listItem),
         );
-        dialog.addShowButton(listItem, { lightDismiss: false });
-        this.setupListInstanceTypeButton(listItem, dialog);
+        dialog.addShowButton(listItem.querySelector("a.stretched-link"), {
+            lightDismiss: false,
+        });
+        dialog.addShowButton(listItem.querySelector("button.edit-btn"), {
+            lightDismiss: false,
+        });
+        this.setupListItem(listItem, dialog);
     }
 }
 
@@ -251,9 +220,6 @@ const createInstanceTypeFormsetInstanceDialog = (
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-    instanceTypeEditorForm = new InstanceTypeEditorForm({
-        formStatusButtonSelector: ".status",
-    });
     const instanceTypesList = new InstanceTypesList(
         "instance-types-list",
         "instance-type-list-item-template",

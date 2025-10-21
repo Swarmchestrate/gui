@@ -1,3 +1,5 @@
+from django.forms import CheckboxInput
+
 from editor.formsets import BaseEditorFormSet
 
 
@@ -10,5 +12,11 @@ class InstanceTypeFormSet(BaseEditorFormSet):
                 continue
             if data.get('DELETE') is True:
                 continue
+            data.pop('DELETE')
             formatted_data.append(data)
         return formatted_data
+
+    def get_deletion_widget(self):
+        return CheckboxInput(attrs={
+            'class': 'btn-check',
+        })
