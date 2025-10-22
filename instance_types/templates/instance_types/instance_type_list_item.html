@@ -2,15 +2,14 @@
 <li
     class="list-group-item list-group-item-action"
     data-dialog-id="{{ dialog_id|default:'' }}">
-    <div class="d-flex align-items-center text-nowrap">
+    <div class="d-flex align-items-center column-gap-4 text-nowrap">
         <div class="position-relative overflow-hidden w-100">
-            <div class="d-flex align-items-center column-gap-3">
-                <a href="javascript:;" class="stretched-link" role="button">
-                    <strong class="name text-truncate">{{ form.name.value|default:'' }}</strong>
+            <div class="d-flex align-items-center column-gap-2 text-truncate">
+                <a href="javascript:;" class="stretched-link text-truncate" role="button">
+                    <strong class="name">{{ form.name.value|default:'' }}</strong>
                 </a>
-                <small class="unsaved-alert text-body-secondary">
-                    <i class="bi bi-exclamation-circle"></i>
-                    Unsaved changes
+                <small class="edit-text text-body-secondary">
+                    Edit
                 </small>
             </div>
             <div class="form-text text-truncate">
@@ -33,18 +32,23 @@
                     <span class="num-price property-value">{{ form.price.value|default:'' }}</span> <span class="property-unit">credits/hour</span>
                 </span>
             </div>
+            <small class="unsaved-alert text-body-secondary">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                Unsaved changes
+            </small>
         </div>
         <div class="list-item-toolbar ms-auto">
             <div>
                 {{ form.DELETE }}
-                <label class="btn btn-light btn-sm delete-btn" for="{{ form.DELETE.id_for_label }}">
+                <label
+                    class="btn btn-light btn-sm delete-btn"
+                    for="{{ form.DELETE.id_for_label }}"
+                    data-bs-title="Mark for Deletion"
+                    data-bs-toggle="tooltip">
                     <i class="bi bi-trash-fill"></i>
                     <span class="visually-hidden">Mark for Deletion</span>
                 </label>
             </div>
-            <button class="btn btn-light edit-btn btn-sm" type="button">
-                <i class="bi bi-pencil-fill"></i>
-            </button>
         </div>
     </div>
 </li>

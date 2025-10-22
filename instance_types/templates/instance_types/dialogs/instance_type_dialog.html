@@ -10,14 +10,11 @@
 <p>Supported instance types and specifications (CPU, RAM, storage).</p>
 <div class="instance-type-form">
     {% for field in form %}
-    {% if field == form.DELETE %}
-    <div class="d-none">
-        {{ field }}
-    </div>
-    {% else %}
+    {% if field != form.DELETE %}
     {% include 'editor/field_templates/field_template.html' %}
     {% endif %}
     {% endfor %}
+    <input type="hidden" class="unsaved-flag" name="instance_types-{{ forloop.counter0 }}-unsaved">
 </div>
 {% endblock dialog_body_content %}
 

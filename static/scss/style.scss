@@ -233,21 +233,51 @@ label:has(~ :required)::after,
 }
 
 #instance-types-list .list-group-item-action .list-item-toolbar {
-    display: none;
-}
-
-#instance-types-list .list-group-item-action:hover .list-item-toolbar,
-#instance-types-list .list-group-item-action:focus .list-item-toolbar {
     display: flex;
     column-gap: 0.25rem;
 }
 
-#instance-types-list .list-group-item-action:hover .list-item-toolbar button i {
-    color: var(--bs-secondary-color);
+#instance-types-list .list-group-item-action .list-item-toolbar .delete-btn {
+    display: none;
 }
 
 #instance-types-list
     .list-group-item-action:hover
+    .list-item-toolbar
+    .delete-btn,
+#instance-types-list
+    .list-group-item-action:has(a:focus)
+    .list-item-toolbar
+    .delete-btn,
+#instance-types-list
+    .list-group-item-action
+    .list-item-toolbar
+    .btn-check:focus
+    + .delete-btn,
+#instance-types-list
+    .list-group-item-action
+    .list-item-toolbar
+    .btn-check:checked
+    + .delete-btn {
+    display: inline;
+}
+
+#instance-types-list .list-group-item-action .edit-text {
+    display: none;
+}
+
+#instance-types-list .list-group-item-action:hover .edit-text,
+#instance-types-list .list-group-item-action:has(a:focus) .edit-text {
+    display: inline;
+}
+
+#instance-types-list
+    .list-group-item-action:hover
+    .list-item-toolbar
+    button:hover
+    i,
+#instance-types-list
+    .list-group-item-action:has(a:focus)
     .list-item-toolbar
     button:hover
     i {
@@ -265,10 +295,7 @@ label:has(~ :required)::after,
 }
 
 #instance-types-list
-    .list-group-item-action.list-group-item-warning
-    .unsaved-alert,
-#instance-types-list
-    .list-group-item-action:has(.btn-check:checked)
+    .list-group-item-action.list-group-item-light
     .unsaved-alert {
     display: inline;
 }
@@ -311,8 +338,8 @@ label:has(~ :required)::after,
     transition: $btn-transition;
 }
 
-.delete-btn:hover i,
-.delete-btn:focus-visible i {
+.btn-check + .delete-btn:hover i,
+.btn-check:focus + .delete-btn i {
     color: var(--bs-danger);
 }
 
@@ -346,5 +373,14 @@ label:has(~ :required)::after,
             "toc header"
             "toc body";
         grid-template-columns: 1.5fr minmax(0, 3fr);
+    }
+}
+
+@media (pointer: coarse) {
+    #instance-types-list
+        .list-group-item-action
+        .list-item-toolbar
+        .delete-btn {
+        display: inline;
     }
 }

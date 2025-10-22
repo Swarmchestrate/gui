@@ -16,12 +16,15 @@ class InstanceTypesList {
             "#add-instance-type-button",
         );
         this.setupAddNewButton();
-        this.unsavedAlertElement = document.querySelector(
-            "#instance-types-section .unsaved-alert",
-        );
         Array.from(this.listElement.children).forEach((listItem, i) => {
             this.linkListItemToDialog(listItem);
         });
+        const tooltipTriggerList = document.querySelectorAll(
+            '[data-bs-toggle="tooltip"]',
+        );
+        const tooltipList = [...tooltipTriggerList].map(
+            (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+        );
     }
 
     getListItem(listItemIndex) {
@@ -74,6 +77,9 @@ class InstanceTypesList {
             updateData.bandwidth;
         // Set price
         listItem.querySelector(".num-price").textContent = updateData.price;
+        if (updateData.unsaved) {
+            listItem.classList.add("list-group-item-light");
+        }
     }
 
     setupAddNewButton() {
@@ -97,17 +103,19 @@ class InstanceTypesList {
                 initialInstanceTypeData,
                 formsetInstanceIndex,
             );
-            dialogForNewInstanceType.addShowButton(newListItem);
+            dialogForNewInstanceType.addShowButton(
+                newListItem.querySelector("a"),
+            );
             this.setupListItem(newListItem, dialogForNewInstanceType);
             this.totalFormsetsInput.value = this.listElement.querySelectorAll(
                 "li.list-group-item-action",
             ).length;
-            this.unsavedAlertElement.classList.remove("d-none");
-            newListItem.classList.add("list-group-item-warning");
         });
     }
 
     setupListItem(listItem, dialog) {
+        const dialogFormInputValues = dialog.getFormInputValues();
+        this.updateListItem(listItem, dialogFormInputValues);
         dialog.dialogElement.addEventListener("close", async () => {
             const dialogReturnValue = dialog.dialogElement.returnValue;
             if (!dialogReturnValue) {
@@ -115,8 +123,6 @@ class InstanceTypesList {
             }
             const updatedInstanceTypeData = JSON.parse(dialogReturnValue);
             this.updateListItem(listItem, updatedInstanceTypeData);
-            this.unsavedAlertElement.classList.remove("d-none");
-            listItem.classList.add("list-group-item-warning");
         });
     }
 
@@ -127,9 +133,6 @@ class InstanceTypesList {
             this.getListItemIndex(listItem),
         );
         dialog.addShowButton(listItem.querySelector("a.stretched-link"), {
-            lightDismiss: false,
-        });
-        dialog.addShowButton(listItem.querySelector("button.edit-btn"), {
             lightDismiss: false,
         });
         this.setupListItem(listItem, dialog);
@@ -150,31 +153,41 @@ class InstanceTypeDialog {
         this.setupConfirmButton();
     }
 
+    getFormInputValues = () => {
+        return {
+            name: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-name']`,
+            ).value,
+            numCpus: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-num_cpus']`,
+            ).value,
+            memorySize: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-mem_size']`,
+            ).value,
+            diskSize: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-disk_size']`,
+            ).value,
+            energyConsumption: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-energy_consumption']`,
+            ).value,
+            bandwidth: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-bandwidth']`,
+            ).value,
+            price: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-price']`,
+            ).value,
+            unsaved: this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-unsaved']`,
+            ).value,
+        };
+    };
+
     setupConfirmButton() {
         this.confirmButton.addEventListener("click", () => {
-            const returnValue = {
-                name: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-name']`,
-                ).value,
-                numCpus: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-num_cpus']`,
-                ).value,
-                memorySize: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-mem_size']`,
-                ).value,
-                diskSize: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-disk_size']`,
-                ).value,
-                energyConsumption: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-energy_consumption']`,
-                ).value,
-                bandwidth: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-bandwidth']`,
-                ).value,
-                price: this.dialogElement.querySelector(
-                    `input[name='instance_types-${this.formsetInstanceIndex}-price']`,
-                ).value,
-            };
+            this.dialogElement.querySelector(
+                `input[name='instance_types-${this.formsetInstanceIndex}-unsaved']`,
+            ).value = true;
+            const returnValue = this.getFormInputValues();
             this.dialogElement.close(JSON.stringify(returnValue));
         });
     }
