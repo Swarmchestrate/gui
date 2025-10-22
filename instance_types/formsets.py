@@ -18,5 +18,7 @@ class InstanceTypeFormSet(BaseEditorFormSet):
 
     def get_deletion_widget(self):
         return CheckboxInput(attrs={
-            'class': 'btn-check',
+            'class': 'form-check-input delete-list-item',
+            'data-bs-title': 'Delete',
+            'data-bs-toggle': 'tooltip',
         })

@@ -237,29 +237,39 @@ label:has(~ :required)::after,
     column-gap: 0.25rem;
 }
 
-#instance-types-list .list-group-item-action .list-item-toolbar .delete-btn {
+#instance-types-list
+    .list-group-item-action
+    .list-item-toolbar
+    .form-check:has(input.delete-list-item) {
     display: none;
 }
 
 #instance-types-list
     .list-group-item-action:hover
     .list-item-toolbar
-    .delete-btn,
+    .form-check:has(input.delete-list-item),
 #instance-types-list
     .list-group-item-action:has(a:focus)
     .list-item-toolbar
-    .delete-btn,
+    .form-check:has(input.delete-list-item),
 #instance-types-list
     .list-group-item-action
     .list-item-toolbar
-    .btn-check:focus
-    + .delete-btn,
+    .form-check:has(input.delete-list-item:focus),
 #instance-types-list
     .list-group-item-action
     .list-item-toolbar
-    .btn-check:checked
-    + .delete-btn {
+    .form-check:has(input.delete-list-item:checked) {
     display: inline;
+}
+
+#instance-types-list
+    .list-group-item-action
+    .list-item-toolbar
+    .form-check
+    .form-check-label
+    i::before {
+    vertical-align: -0.25em;
 }
 
 #instance-types-list .list-group-item-action .edit-text {
@@ -284,7 +294,8 @@ label:has(~ :required)::after,
     color: #000;
 }
 
-#instance-types-list .list-group-item-action:has(.btn-check:checked) {
+#instance-types-list
+    .list-group-item-action:has(input.delete-list-item:checked) {
     color: var(--bs-danger-text-emphasis);
     background-color: var(--bs-danger-bg-subtle);
     --bs-list-group-border-color: var(--bs-danger-border-subtle);
@@ -298,10 +309,6 @@ label:has(~ :required)::after,
     .list-group-item-action.list-group-item-light
     .unsaved-alert {
     display: inline;
-}
-
-#instance-types-list .list-group-item-action .btn-check:checked + label i {
-    color: var(--bs-danger);
 }
 
 #instance-types-list .property:has(.property-value:empty) {
@@ -380,7 +387,7 @@ label:has(~ :required)::after,
     #instance-types-list
         .list-group-item-action
         .list-item-toolbar
-        .delete-btn {
+        .form-check:has(input.delete-list-item) {
         display: inline;
     }
 }

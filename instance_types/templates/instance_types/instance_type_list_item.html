@@ -38,15 +38,13 @@
             </small>
         </div>
         <div class="list-item-toolbar ms-auto">
-            <div>
+            <div class="form-check">
                 {{ form.DELETE }}
                 <label
-                    class="btn btn-light btn-sm delete-btn"
-                    for="{{ form.DELETE.id_for_label }}"
-                    data-bs-title="Mark for Deletion"
-                    data-bs-toggle="tooltip">
+                    class="form-check-label"
+                    for="{{ form.DELETE.id_for_label }}">
                     <i class="bi bi-trash-fill"></i>
-                    <span class="visually-hidden">Mark for Deletion</span>
+                    <span class="visually-hidden">Delete</span>
                 </label>
             </div>
         </div>
