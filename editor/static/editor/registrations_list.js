@@ -12,6 +12,7 @@ const deleteMultipleDialog = document.querySelector("#delete-multiple-dialog");
 
 // DataTables setup
 function initialiseDataTable() {
+    DataTable.datetime("dd/MM/yyyy, HH:mm:ss");
     const dataTable = new DataTable("#registrations-table", {
         columnDefs: [
             {
@@ -33,7 +34,7 @@ function initialiseDataTable() {
         },
         order: {
             name: "date_updated",
-            dir: "asc",
+            dir: "desc",
         },
     });
     return dataTable;
