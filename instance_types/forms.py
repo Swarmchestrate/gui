@@ -7,7 +7,6 @@ from .api_endpoint_client import (
 
 from editor.forms import (
     OpenApiSpecificationBasedForm,
-    OpenApiSpecificationCategoryBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
 )
 
@@ -25,3 +24,10 @@ class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
             **kwargs
         )
     definition_name = 'instance_type'
+
+    unsaved = forms.BooleanField(
+        required=False,
+        widget=forms.HiddenInput(attrs={
+            'class': 'unsaved-flag',
+        })
+    )
