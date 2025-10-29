@@ -4,6 +4,11 @@ from editor.formsets import BaseEditorFormSet
 
 
 class InstanceTypeFormSet(BaseEditorFormSet):
+    non_api_data_fields = [
+        'DELETE',
+        'unsaved',
+    ]
+
     def to_api_ready_format(self):
         formatted_data = list()
         for form in self:
@@ -12,7 +17,8 @@ class InstanceTypeFormSet(BaseEditorFormSet):
                 continue
             if data.get('DELETE') is True:
                 continue
-            data.pop('DELETE')
+            for field in self.non_api_data_fields:
+                data.pop(field, None)
             formatted_data.append(data)
         return formatted_data
 

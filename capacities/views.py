@@ -49,6 +49,7 @@ from editor.views import (
     MultipleEditorFormsetProcessFormView,
     RegistrationsListFormView,
 )
+from instance_types.api_endpoint_client import InstanceTypeApiEndpointClient
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
 
@@ -377,25 +378,125 @@ class CapacitySecurityTrustAndAccessEditorProcessFormView(
 
 
 class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
+    manually_processed_formsets: dict
+
+    def process_instance_types(
+            self,
+            formset: InstanceTypeFormSet,
+            api_endpoint_client_class: InstanceTypeApiEndpointClient):
+        instance_type_api_client = api_endpoint_client_class()
+        inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
+        current_instance_type_id_strs = list(map(str, self.registration.get('instance_types')))
+        instance_types_to_add = list()
+        instance_types_to_update = list()
+        instance_type_ids_to_delete = set()
+        updated_instance_types_data = formset.to_api_ready_format()
+        for instance_type in updated_instance_types_data:
+            instance_type_id = instance_type.get(inst_type_id_field_name)
+            if instance_type_id is None:
+                instance_types_to_add.append(instance_type)
+                continue
+            if str(instance_type_id) not in current_instance_type_id_strs:
+                instance_type_ids_to_delete.add(instance_type_id)
+                continue
+            instance_types_to_update.append(instance_type)
+        # New instance types
+        new_instance_type_ids = list()
+        if instance_types_to_add:
+            new_instance_type_ids = instance_type_api_client.bulk_register(instance_types_to_add)
+        # Updating instance types
+        updated_instance_type_ids = list()
+        if instance_types_to_update:
+            for instance_type in instance_types_to_update:
+                instance_type_id = instance_type.get(inst_type_id_field_name)
+                updated_instance_type_ids.append(instance_type_id)
+                instance_type.pop(inst_type_id_field_name)
+                instance_type_api_client.update(
+                    instance_type_id,
+                    instance_type
+                )
+        # Deleting instance types
+        if instance_type_ids_to_delete:
+            instance_type_api_client.delete_many(list(instance_type_ids_to_delete))
+        self.api_endpoint_client.update(self.registration_id, {
+            self.instance_types_property_name: updated_instance_type_ids + new_instance_type_ids,
+        })
+
+    def add_instance_type_formset(
+            self,
+            form_class,
+            formset_prefix: str,
+            base_formset_class,
+            api_endpoint_client_class,
+            formset_processing_function,
+            can_delete: bool | None = None,
+            extra_formset_factory_kwargs: dict | None = None):
+        self.manually_processed_formsets[formset_prefix] = {
+            'api_endpoint_client_class': api_endpoint_client_class,
+            'formset_processing_function': formset_processing_function,
+        }
+        return self.add_formset_class(
+            form_class,
+            formset_prefix,
+            base_formset_class=base_formset_class,
+            can_delete=can_delete,
+            extra_formset_factory_kwargs=extra_formset_factory_kwargs,
+            add_to_main_form=False
+        )
+
+    def get_instance_type_formset_initial(self):
+        initial = list()
+        instance_type_ids = self.registration.get(self.instance_types_property_name)
+        if not all(isinstance(instance_type_id, int) for instance_type_id in instance_type_ids):
+            return initial
+        instance_type_api_client = InstanceTypeApiEndpointClient()
+        instance_types = instance_type_api_client.get_registrations({
+            instance_type_api_client.endpoint_definition.id_field: f'in.({",".join([
+                str(instance_type_id)
+                for instance_type_id in instance_type_ids
+            ])})',
+        })
+        if (not instance_types
+            or not isinstance(instance_types, list)):
+            instance_types = list()
+        for instance_type in instance_types:
+            initial.append(instance_type)
+        return initial
+
+    # EditorProcessFormView
+    def setup(self, request, *args, **kwargs):
+        self.manually_processed_formsets = dict()
+        return super().setup(request, *args, **kwargs)
+
+    def forms_valid(self, forms: dict):
+        response = super().forms_valid(forms)
+        for formset_prefix, formset_metadata in self.manually_processed_formsets.items():
+            api_endpoint_client_class = formset_metadata.get('api_endpoint_client_class')
+            formset_processing_function = formset_metadata.get('formset_processing_function')
+            if not formset_processing_function:
+                continue
+            formset_processing_function(
+                forms.get(formset_prefix),
+                api_endpoint_client_class
+            )
+        return response
+
+    # ProcessFormView
     def dispatch(self, request, *args, **kwargs):
         self.instance_types_property_name = 'instance_types'
-        self.add_formset_class(
+        self.add_instance_type_formset(
             InstanceTypeEditorForm,
             self.instance_types_property_name,
-            base_formset_class=InstanceTypeFormSet,
+            InstanceTypeFormSet,
+            InstanceTypeApiEndpointClient,
+            self.process_instance_types,
             extra_formset_factory_kwargs={
                 'extra': 0,
             }
         )
 
         # Configure initial formset data
-        initial = list()
-        instance_types = self.registration.get(self.instance_types_property_name)
-        if (not instance_types
-            or not isinstance(instance_types, list)):
-            instance_types = list()
-        for instance_type in instance_types:
-            initial.append(instance_type)
+        initial = self.get_instance_type_formset_initial()
         self.add_initial_data_for_formset(initial, self.instance_types_property_name)
         self.exclude_formset_from_table_templates(self.instance_types_property_name)
         return super().dispatch(request, *args, **kwargs)

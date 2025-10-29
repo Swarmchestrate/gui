@@ -10,6 +10,12 @@ class InstanceTypeApiEndpointClient(ApiEndpointClient):
         self.endpoint = 'instance_types'
         super().__init__()
 
+    def _prepare_update_data(self, data: dict):
+        data = super()._prepare_update_data(data)
+        data.pop('updated_at', None)
+        data.pop(self.endpoint_definition.id_field, None)
+        return data
+
 
 class InstanceTypeColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
     def get_registrations(self, params: dict = None):

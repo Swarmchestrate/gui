@@ -326,8 +326,8 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             formset_prefix: str,
             base_formset_class: BaseEditorFormSet = None,
             can_delete: bool | None = None,
-            extra_formset_factory_kwargs: dict = None,
-            manually_process: bool = False):
+            extra_formset_factory_kwargs: dict | None = None,
+            add_to_main_form: bool = True):
         if not base_formset_class:
             base_formset_class = BaseEditorFormSet
         if can_delete is None:
@@ -343,7 +343,7 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
         self.formset_classes.update({
             formset_prefix: formset_class,
         })
-        if not manually_process:
+        if add_to_main_form:
             return
         self.manually_processed_formset_prefixes.add(
             formset_prefix
@@ -389,8 +389,12 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
         for formset_prefix, formset in forms.items():
-            if (not formset_prefix
-                or formset_prefix in self.manually_processed_formset_prefixes):
+            if not formset_prefix:
+               continue
+            if formset_prefix in self.manually_processed_formset_prefixes:
+                # The property will be updated when the
+                # formset is processed after the main form.
+                cleaned_data.pop(formset_prefix, None)
                 continue
             formset_data = formset.to_api_ready_format()
             cleaned_data.update({

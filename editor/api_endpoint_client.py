@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import requests
@@ -8,6 +9,9 @@ from .definitions import (
     ColumnMetadataUserSpecifiableOpenApiDefinition,
     UserSpecifiableOpenApiDefinition,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class ApiEndpointClient(ApiClient):
@@ -37,8 +41,26 @@ class ApiEndpointClient(ApiClient):
         ))
         existing_ids_set = set(existing_registration_ids)
         possible_ids_set = possible_ids_set - existing_ids_set
-        random_id = random.choice(list(possible_ids_set))
+        if not len(possible_ids_set):
+            raise Error('There are no new unique IDs that can be used.')
+        random_id = random.choice(possible_ids_set)
         return random_id
+
+    def _generate_random_ids(self, amount: int = 1):
+        existing_registration_ids = self._get_existing_registration_ids()
+        # Credit for random_id solution: https://stackoverflow.com/a/70239671
+        possible_ids_set = set(range(
+            self.random_id_min_value,
+            self.random_id_max_value
+        ))
+        existing_ids_set = set(existing_registration_ids)
+        possible_ids_set = possible_ids_set - existing_ids_set
+        if not len(possible_ids_set):
+            raise Error('There are no new unique IDs that can be used.')
+        random_ids = random.sample(list(possible_ids_set), int(amount))
+        if len(random_ids) != amount:
+            raise Error(f'Failed to generate {amount} new unique IDs.')
+        return random_ids
 
     def _get_existing_registration_ids(self):
         params = {
@@ -86,6 +108,19 @@ class ApiEndpointClient(ApiClient):
         new_registration = self.get(new_id)
         return new_registration
 
+    def bulk_register(self, data_list: list[dict]) -> list[str]:
+        new_ids = self._generate_random_ids(amount=len(data_list))
+        try:
+            for i, data in enumerate(data_list):
+                data.update({
+                    self.endpoint_definition.id_field: new_ids[i]
+                })
+        except IndexError:
+            raise Error('An error occurred whilst assigning IDs for bulk registration.')
+        response = requests.post(self.endpoint_url, json=data_list)
+        self.log_and_raise_response_status_if_error(response)
+        return new_ids
+
     def delete(self, registration_id: int, params: dict = None):
         if not params:
             params = dict()
@@ -102,19 +137,23 @@ class ApiEndpointClient(ApiClient):
         response = requests.delete(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
 
-    def update(self, registration_id: int, data: dict):
+    def _prepare_update_data(self, data: dict):
         current_time = datetime.now(timezone.utc).isoformat()
         current_time_no_tz = str(current_time).replace('+00:00', '')
         data.update({
             'updated_at': current_time_no_tz,
         })
+        return data
+
+    def update(self, registration_id: int, data: dict):
+        prepared_update_data = self._prepare_update_data(data)
         params = {
             self.endpoint_definition.id_field: f'eq.{registration_id}',
         }
         response = requests.patch(
             self.endpoint_url,
             params=params,
-            json=data
+            json=prepared_update_data
         )
         self.log_and_raise_response_status_if_error(response)
 
