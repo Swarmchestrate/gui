@@ -7,7 +7,7 @@ The following prerequisites should be installed before getting started:
 - **Python**: version 3.10 or later
 - **pip**: Python package manager
 - **[Dart Sass](https://sass-lang.com/install/)**: to allow styles to work in the browser.
-- **[Node.js](https://nodejs.org/en/download)**: for Bootstrap SASS files.
+- **[Node.js](https://nodejs.org/en/download)**: for Bootstrap Sass files.
 
 ## Getting Started
 ### 1. Clone the repository
