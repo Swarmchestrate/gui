@@ -23,7 +23,7 @@ class ApiEndpointClient(ApiClient):
         super().__init__()
         openapi_spec = self.get_openapi_spec()
         self.endpoint_definition = self.endpoint_definition_class(openapi_spec)
-        self.openapi_spec_url = os.environ.get('OPENAPI_SPEC_URL')
+        self.openapi_spec_url = os.environ.get('API_URL')
         self.random_id_min_value = 0
         self.random_id_max_value = 999999
 

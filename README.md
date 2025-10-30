@@ -37,7 +37,9 @@ Rename or copy the example file to `.env`
 cp .env_example .env
 ```
 > [!NOTE]
-> The `SECRET_KEY`, `OPENAPI_SPEC_URL` and `API_URL` variables are not set (the values for the `OPENAPI_SPEC_URL` and `API_URL` variables are not publicly shareable).
+> The following environment variables have to be set manually:
+> - `SECRET_KEY`: see the [Django documentation](https://docs.djangoproject.com/en/5.2/ref/settings/#secret-key) for guidance on how to set this (for development purposes, this can be any value).
+> - `API_URL`: the URL for the API used to generate parts of the GUI (not publicly shareable).
 ## Running the GUI
 To run the GUI locally in your browser, ensure the virtual environment is activated beforehand, then use the `run.sh` script to run the GUI:
 ```bash
