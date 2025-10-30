@@ -437,4 +437,7 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             context.update({
                 f'{formset_prefix}_formset': initial_formset,
             })
+            context['formset_tables'].update({
+                formset_prefix: initial_formset,
+            })
         return context
