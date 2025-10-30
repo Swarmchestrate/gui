@@ -14,7 +14,7 @@ jsonschema-path==0.3.4
 jsonschema-specifications==2025.4.1
 lazy-object-proxy==1.11.0
 libsass==0.23.0
-numpy==2.3.3
+numpy==2.2.6
 openapi-schema-validator==0.6.3
 openapi-spec-validator==0.7.2
 packaging==25.0
@@ -32,7 +32,7 @@ rjsmin==1.2.2
 rpds-py==0.26.0
 ruamel.yaml==0.18.14
 ruamel.yaml.clib==0.2.12
-scipy==1.16.2
+scipy==1.15.3
 six==1.17.0
 sqlparse==0.5.3
 typing_extensions==4.14.1
