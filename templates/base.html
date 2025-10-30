@@ -1,5 +1,5 @@
 {% load static %}
-{% load compress %}
+{% load sass_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,22 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{% static 'favicon-32x32.png' %}" sizes="32x32" />
     <link rel="icon" type="image/png" href="{% static 'favicon-16x16.png' %}" sizes="16x16" />
-    <!-- Bootstrap SCSS -->
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'bootstrap/scss/bootstrap.scss' %}">
-    {% endcompress %}
     <!-- Bootstrap JS -->
-    {% compress js %}
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    {% endcompress %}
+    <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- Site font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- Styles -->
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/style.scss' %}">
-    {% endcompress %}
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'scss/style.scss' %}">
     {% block styles %}{% endblock styles %}
     {% block scripts %}{% endblock scripts %}
     <title>{{ title }}</title>
