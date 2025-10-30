@@ -19,11 +19,9 @@ class InstanceTypesList {
         Array.from(this.listElement.children).forEach((listItem, i) => {
             this.linkListItemToDialog(listItem);
         });
-        const tooltipTriggerList = document.querySelectorAll(
-            '[data-bs-toggle="tooltip"]',
-        );
-        const tooltipList = [...tooltipTriggerList].map(
-            (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+        const deleteCheckboxes = document.querySelectorAll(".delete-list-item");
+        const tooltipList = [...deleteCheckboxes].map(
+            (checkbox) => new bootstrap.Tooltip(checkbox),
         );
     }
 

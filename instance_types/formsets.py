@@ -26,5 +26,5 @@ class InstanceTypeFormSet(BaseEditorFormSet):
         return CheckboxInput(attrs={
             'class': 'form-check-input delete-list-item',
             'data-bs-title': 'Delete',
-            'data-bs-toggle': 'tooltip',
+            'data-bs-placement': 'left',
         })

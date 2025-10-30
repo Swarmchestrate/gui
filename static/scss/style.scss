@@ -274,7 +274,7 @@ label:has(~ :required)::after,
     .list-group-item-action
     .list-item-toolbar
     .form-check:has(input.delete-list-item:checked) {
-    display: inline;
+    display: block;
 }
 
 #instance-types-list
@@ -364,6 +364,11 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+/* Bootstrap */
+.tooltip .tooltip-arrow {
+    display: none;
+}
+
 /* Root variables */
 :root {
     --swrm-link-colour: #0455bf;
@@ -402,6 +407,6 @@ label:has(~ :required)::after,
         .list-group-item-action
         .list-item-toolbar
         .form-check:has(input.delete-list-item) {
-        display: inline;
+        display: block;
     }
 }
