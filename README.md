@@ -21,13 +21,17 @@ cd gui
 ### 3. Make and activate the Python virtual environment
 ```bash
 python3 -m venv venv
-source venv.sh # venv/bin/activate
+source venv/bin/activate # or source venv.sh
 ```
-### 4. Install packages from requirements.txt
+### 4. Install packages in requirements.txt
 ```bash
 pip install -r requirements.txt
 ```
-### 5. Set up the .env file
+### 5. Install dependencies in package.json
+```bash
+npm install
+```
+### 6. Set up the .env file
 Rename or copy the example file to `.env`
 ```bash
 cp .env_example .env
@@ -38,5 +42,5 @@ cp .env_example .env
 To run the GUI locally in your browser, ensure the virtual environment is activated beforehand, then use the `run.sh` script to run the GUI:
 ```bash
 source venv.sh
-./run.sh # python3 manage.py runserver
+python3 manage.py runserver # or ./run.sh
 ```
