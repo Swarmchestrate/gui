@@ -451,10 +451,10 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             return initial
         instance_type_api_client = InstanceTypeApiEndpointClient()
         instance_types = instance_type_api_client.get_registrations({
-            instance_type_api_client.endpoint_definition.id_field: f'in.({",".join([
+            instance_type_api_client.endpoint_definition.id_field: 'in.(%s)' % ",".join([
                 str(instance_type_id)
                 for instance_type_id in instance_type_ids
-            ])})',
+            ]),
         })
         if (not instance_types
             or not isinstance(instance_types, list)):
