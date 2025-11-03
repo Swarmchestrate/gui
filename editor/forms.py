@@ -9,6 +9,7 @@ class OpenApiPropertyFormat(Enum):
     BOOLEAN = 'boolean'
     CHARACTER_VARYING = 'character varying'
     DATE = 'timestamp without time zone'
+    DOUBLE_PRECISION = 'double precision'
     INTEGER = 'integer'
     JSONB = 'jsonb'
     NUMERIC = 'numeric'
@@ -96,7 +97,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 field_class = forms.DateField
             case OpenApiPropertyFormat.INTEGER:
                 field_class = forms.IntegerField
-            case OpenApiPropertyFormat.NUMERIC:
+            case (OpenApiPropertyFormat.NUMERIC
+                | OpenApiPropertyFormat.DOUBLE_PRECISION):
                 field_class = forms.FloatField
             case (OpenApiPropertyFormat.TEXT
                 | OpenApiPropertyFormat.TEXT_ARRAY
