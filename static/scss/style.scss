@@ -189,6 +189,7 @@ label:has(~ :required)::after,
         "toc"
         "body";
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, auto);
 }
 
 .editor-layout__content {
@@ -200,15 +201,11 @@ label:has(~ :required)::after,
     grid-area: header;
 }
 
-.editor-layout__sidebar {
-    grid-area: sidebar;
-}
-
 .editor-layout__toc {
     grid-area: toc;
 }
 
-.editor-layout__toc-body {
+.editor-layout__body {
     grid-area: body;
 }
 
@@ -379,9 +376,9 @@ label:has(~ :required)::after,
 @media (min-width: 992px) {
     .editor-layout {
         grid-template-areas:
-            "sidebar header toc"
-            "sidebar body toc";
-        grid-template-columns: 1fr minmax(0, 3fr) 1fr;
+            "toc header"
+            "toc body";
+        grid-template-columns: 1fr minmax(0, 3fr);
     }
 }
 

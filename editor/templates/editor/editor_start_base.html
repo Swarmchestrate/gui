@@ -1,18 +1,21 @@
 {% extends 'editor/editor_base.html' %}
 {% block scripts %}{% endblock scripts %}
-{# High-level TOC #}
-{% block high_level_toc %}
-<ul class="nav flex-column list-unstyled">
-    <li class="nav-item">
-        <a href="{% url editor_registration_list_url_reverse %}" class="nav-link pt-0">Back to {{ registration_type_name_plural|title }}</a>
-    </li>
-</ul>
-{% endblock high_level_toc %}
-{# Editor main content #}
-{% block editor_main_content %}
+{% block top_section %}
 <h1>{{ title }}</h1>
 <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
 <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+{% endblock top_section %}
+{# TOC #}
+{% block high_level_toc_list_items %}
+<li class="nav-item">
+    <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
+</li>
+{% endblock high_level_toc_list_items %}
+{% block list_item %}
+{% include 'editor/toc/inactive_editor_toc_list_item.html' %}
+{% endblock list_item %}
+{# Editor main content #}
+{% block editor_main_content %}
 <form id="registration-form" action="{{ request.path }}" method="POST">
     {% csrf_token %}
     {% for field in form %}
@@ -27,7 +30,3 @@
     </div>
 </form>
 {% endblock editor_main_content %}
-{# In-editor TOC #}
-{% block editor_toc %}
-{% include 'editor/toc/editor_toc_start.html' %}
-{% endblock editor_toc %}
