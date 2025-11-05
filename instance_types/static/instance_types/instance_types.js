@@ -1,5 +1,4 @@
 import { setupDialog } from "/static/dialog.js";
-import { EditorForm } from "/static/editor/editor.js";
 import {
     htmlToNode,
     updateElementPlaceholderAttributes,
@@ -11,6 +10,9 @@ class InstanceTypesList {
         this.listItemTemplateHtml = JSON.parse(
             document.querySelector(`#${listItemTemplateId}`).textContent,
         ).trim();
+        if (!this.listItemTemplateHtml) {
+            return;
+        }
         this.totalFormsetsInput = totalFormsetsInput;
         this.addNewButton = this.listElement.querySelector(
             "#add-instance-type-button",

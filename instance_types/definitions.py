@@ -7,8 +7,7 @@ class InstanceTypeUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinit
         self.definition_name = 'instance_types'
         self.id_field = 'id'
 
-    @property
-    def auto_generated_field_names(self):
-        field_names = super().auto_generated_field_names
+    def _get_auto_generated_field_names(self) -> list:
+        field_names = super()._get_auto_generated_field_names()
         field_names.append('provider')
         return field_names
