@@ -18,5 +18,6 @@ class CapacityUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition)
             'price',
             'trust',
             'energy_consumption',
+            'instance_quota',
         ])
         return names
