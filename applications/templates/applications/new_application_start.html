@@ -1,2 +1,7 @@
 {% extends 'editor/editor_start_base.html' %}
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'applications/breadcrumbs/applications_item.html' %}
+{% include 'applications/breadcrumbs/new_application_item.html' with active=True %}
+{% endblock breadcrumb_items %}
 {% block lead_text %}Register a new Swarmchestrate application.{% endblock lead_text %}

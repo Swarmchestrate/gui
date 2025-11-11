@@ -216,6 +216,7 @@ class EditorProcessFormView(
             'prev_list_item_title': prev_list_item.replace(':', ': '),
             'next_list_item': next_list_item,
             'next_list_item_title': next_list_item.replace(':', ': '),
+            'registration': self.registration,
             'registration_id': self.registration_id,
             'form': self.main_form_class(**self.get_form_kwargs()),
         })
@@ -223,14 +224,14 @@ class EditorProcessFormView(
 
 
 class RegistrationsListFormView(EditorView, FormView):
-    template_name = 'editor/registrations_list.html'
+    template_name = 'editor/registration_list.html'
     form_class = RegistrationsListForm
 
     new_registration_reverse: str
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.registrations_list = self.api_endpoint_client.get_registrations()
+        self.registration_list = self.api_endpoint_client.get_registrations()
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = request.path
@@ -242,7 +243,7 @@ class RegistrationsListFormView(EditorView, FormView):
             'title': self.registration_type_name_plural.title(),
             'registrations': {
                 registration.get(self.id_field): registration
-                for registration in self.registrations_list
+                for registration in self.registration_list
             },
             'new_registration_reverse': self.new_registration_reverse,
         })
@@ -253,7 +254,7 @@ class RegistrationsListFormView(EditorView, FormView):
         kwargs.update({
             'registration_ids': [
                 registration.get(self.id_field)
-                for registration in self.registrations_list
+                for registration in self.registration_list
             ]
         })
         return kwargs
@@ -276,7 +277,6 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
     template_name = 'editor/overview.html'
 
     def format_registration_data_for_template(self) -> dict:
-        registration = self.api_endpoint_client.get(self.registration_id)
         formatted_registration_data = dict()
         for category_name in self.category_names:
             field_names_for_category = [
@@ -286,7 +286,7 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
             ]
             field_data_for_category = dict()
             for field_name, field_title in field_names_for_category:
-                field_value = registration.get(field_name)
+                field_value = self.registration.get(field_name)
                 field_data_for_category.update({
                     field_name: {
                         'title': field_title,
@@ -300,6 +300,7 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs['registration_id']
+        self.registration = self.api_endpoint_client.get(self.registration_id)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -309,6 +310,7 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
             'main_heading': 'Overview',
             'main_subheading': f'{self.registration_type_name_singular.title()}',
             'registration_data_by_category': self.format_registration_data_for_template(),
+            'registration': self.registration,
         })
         return context
 

@@ -1,0 +1,4 @@
+{% load helpers %}
+{% with registration_name_base='Cloud Capacity ' url_name='capacities:cloud_capacity_overview' registration_id_in_url=registration_id %}
+{% include 'editor/breadcrumbs/overview_item_base.html' with registration_name=registration_name_base|add:registration_id %}
+{% endwith %}

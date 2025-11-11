@@ -1,0 +1,6 @@
+{% extends 'editor/overview.html' %}
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'capacities/breadcrumbs/cloud_capacities_item.html' %}
+{% include 'capacities/breadcrumbs/cloud_capacity_overview_item.html' with active=True %}
+{% endblock breadcrumb_items %}

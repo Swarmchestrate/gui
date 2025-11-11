@@ -1,0 +1,16 @@
+{% load static %}
+{% load helpers %}
+
+{% if field.name == 'locality' %}
+{% include 'capacities/sections/locality_section.html' %}
+{% elif field.name == 'instance_types' %}
+{% include 'instance_types/instance_types_section.html' %}
+{% elif field.name in formset_tables %}
+{% with section_field=field formset=formset_tables|get_key_value_or_empty_dict:field.name %}
+{% include 'editor/util_templates/formset_table_section_template.html' %}
+{% endwith %}
+{% elif field.field.widget.input_type == 'checkbox' %}
+{% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+{% else %}
+{% include 'editor/field_templates/field_template.html' %}
+{% endif %}

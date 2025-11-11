@@ -36,8 +36,9 @@ class ApplicationEditorProcessFormView(ApplicationEditorView, EditorProcessFormV
 
 
 class ApplicationRegistrationsListFormView(ApplicationEditorView, RegistrationsListFormView):
+    template_name = 'applications/applications.html'
     new_registration_reverse = 'applications:new_application'
 
 
 class ApplicationEditorOverviewTemplateView(ApplicationEditorView, EditorOverviewTemplateView):
-    pass
+    template_name = 'applications/application_overview.html'

@@ -10,41 +10,5 @@
 {% endblock extra_scripts %}
 
 {% block field %}
-{% if field.name == 'price' %}
-{% with section_field=field formset=price_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'locality' %}
-{% include 'capacities/sections/locality_section.html' %}
-{% elif field.name == 'energy_consumption' %}
-{% with section_field=field formset=energy_consumption_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'security_ports' %}
-{% with section_field=field formset=security_ports_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'instance_types' %}
-{% include 'instance_types/instance_types_section.html' %}
-{% elif field.name == 'architecture' and registration_type_name_singular == 'cloud capacity' %}
-{% with section_field=field formset=architecture_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'operating_system' and registration_type_name_singular == 'cloud capacity' %}
-{% with section_field=field formset=operating_system_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'accessible_sensors' and registration_type_name_singular == 'edge capacity' %}
-{% with section_field=field formset=accessible_sensors_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.name == 'devices' and registration_type_name_singular == 'edge capacity' %}
-{% with section_field=field formset=devices_formset %}
-{% include 'editor/util_templates/formset_table_section_template.html' %}
-{% endwith %}
-{% elif field.field.widget.input_type == 'checkbox' %}
-{% include 'editor/field_templates/checkbox_field_wrapper.html' %}
-{% else %}
-{% include 'editor/field_templates/field_template.html' %}
-{% endif %}
+{% include 'capacities/field_templates/generic_field_template.html' %}
 {% endblock field %}

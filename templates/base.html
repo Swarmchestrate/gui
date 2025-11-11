@@ -25,6 +25,15 @@
         <!-- A handy skip link for keyboard users -->
         <a href="#main" class="btn btn-light">Skip to main content</a>
         {% include 'navbar.html' %}
+        <div class="container-xxl gx-sm-5 gx-4 py-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% block breadcrumb_items %}
+                    {% include 'breadcrumbs/index_item.html' with active=True %}
+                    {% endblock breadcrumb_items %}
+                </ol>
+            </nav>
+        </div>
         {% include 'messages.html' %}
         <main id="main">
             <div class="container-xxl gx-sm-5 gx-4">

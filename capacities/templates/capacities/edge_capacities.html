@@ -1,0 +1,5 @@
+{% extends 'editor/registration_list.html' %}
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'capacities/breadcrumbs/edge_capacities_item.html' with active=True %}
+{% endblock breadcrumb_items %}

@@ -1,0 +1,8 @@
+{% load breadcrumbs %}
+{% if active %}
+{% breadcrumb_item_active page_title %}
+{% elif registration_id_in_url %}
+{% breadcrumb_item page_title url_name registration_id_in_url %}
+{% else %}
+{% breadcrumb_item page_title url_name %}
+{% endif %}

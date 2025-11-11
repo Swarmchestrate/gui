@@ -535,7 +535,7 @@ class CloudCapacityEditorStartFormView(CloudCapacityEditorView, EditorStartFormV
 
 
 class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessFormView):
-    template_name = 'capacities/capacity_editor.html'
+    template_name = 'capacities/cloud_capacity_editor.html'
     main_form_class = CloudCapacityEditorForm
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
@@ -589,11 +589,12 @@ class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRoute
 
 
 class CloudCapacityRegistrationsListFormView(CloudCapacityEditorView, RegistrationsListFormView):
+    template_name = 'capacities/cloud_capacities.html'
     new_registration_reverse = 'capacities:new_cloud_capacity'
 
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityEditorView, EditorOverviewTemplateView):
-    pass
+    template_name = 'capacities/cloud_capacity_overview.html'
 
 
 # Edge Capacity
@@ -615,7 +616,7 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormVie
 
 
 class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFormView):
-    template_name = 'capacities/capacity_editor.html'
+    template_name = 'capacities/edge_capacity_editor.html'
     main_form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy('capacities:new_edge_capacity')
 
@@ -669,8 +670,9 @@ class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterV
 
 
 class EdgeCapacityRegistrationsListFormView(EdgeCapacityEditorView, RegistrationsListFormView):
+    template_name = 'capacities/edge_capacities.html'
     new_registration_reverse = 'capacities:new_edge_capacity'
 
 
 class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityEditorView, EditorOverviewTemplateView):
-    pass
+    template_name = 'capacities/edge_capacity_overview.html'
