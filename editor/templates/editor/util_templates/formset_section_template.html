@@ -1,4 +1,4 @@
-<fieldset class="vstack gap-2 py-4">
+<fieldset class="vstack gap-2 py-4 {{ extra_fieldset_classes|default:'' }}">
     <legend class="fs-6 fw-semibold {{ extra_fieldset_legend_classes|default:'' }} mb-0">{{ section_field.label }}</legend>
     {% if show_fieldset_description|default_if_none:True %}
         <p class="form-text">{{ section_field.help_text }}</p>
@@ -7,7 +7,7 @@
     <ul class="list-group list-group-flush">
         {% for form in formset %}
         {% with current_form_index=forloop.counter %}
-        <li class="list-group-item px-0 py-4 {% if forloop.first %}pt-0{% endif %}">
+        <li class="list-group-item px-0 py-4 {% if forloop.first %}pt-0{% endif %} {% if forloop.last %}pb-0{% endif %}">
             <fieldset class="vstack gap-2">
                 <legend class="fs-6 visually-hidden">{{ formset_instance_legend|default:section_field.label }} {{ current_form_index }}</legend>
                 {% for field in form %}
