@@ -1,5 +1,11 @@
 {% extends 'editor/editor_base.html' %}
 {% load helpers %}
+{% block top_section %}
+<hgroup class="d-flex flex-column row-gap-1">
+    <h1 class="mb-0">{{ main_heading }}</h1>
+    <p class="fs-6 text-body-secondary">{{ main_subheading }} {{ registration_id }}</p>
+</hgroup>
+{% endblock top_section %}
 {% block editor_main_content %}
 {% for list_item, list_item_data in toc_list_items.items %}
 {% with heading_level='2' heading_classes='fs-5' %}

@@ -13,7 +13,15 @@
             {% block top_section %}
             <hgroup class="d-flex flex-column row-gap-1">
                 <h1 class="mb-0">{{ main_heading }}</h1>
-                <p class="fs-6 text-body-secondary">{{ main_subheading }} <span class="text-body-tertiary">{{ registration_id }}</span></p>
+                <p class="fs-6 text-body-secondary">
+                    {% url editor_overview_url_reverse_base registration_id as overview_url %}
+                    <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover">
+                        {{ main_subheading }} {{ registration_id }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                        </svg>
+                    </a>
+                </p>
             </hgroup>
             <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
             {% endblock top_section %}
@@ -21,15 +29,6 @@
         {# TOC #}
         <div class="editor-layout__toc">
             <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top">
-                {% block high_level_toc_list_items %}
-                <li class="nav-item">
-                    <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
-                </li>
-                <li class="nav-item">
-                    {% url editor_overview_url_reverse_base registration_id as overview_url %}
-                    <a href="{{ overview_url }}" class="nav-link {% if request.path == overview_url %}active{% endif %}">Overview</a>
-                </li>
-                {% endblock high_level_toc_list_items %}
                 {% for list_item, list_item_data in toc_list_items.items %}
                 <li class="nav-item">
                     {% block list_item %}

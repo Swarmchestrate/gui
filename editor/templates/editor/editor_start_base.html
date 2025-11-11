@@ -6,11 +6,6 @@
 <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
 {% endblock top_section %}
 {# TOC #}
-{% block high_level_toc_list_items %}
-<li class="nav-item">
-    <a href="{% url editor_registration_list_url_reverse %}" class="nav-link">Back to {{ registration_type_name_plural|title }}</a>
-</li>
-{% endblock high_level_toc_list_items %}
 {% block list_item %}
 {% include 'editor/toc/inactive_editor_toc_list_item.html' %}
 {% endblock list_item %}
