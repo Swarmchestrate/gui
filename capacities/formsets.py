@@ -1,4 +1,4 @@
-from editor.formsets import BaseEditorFormSet
+from editor.forms.formsets import BaseEditorFormSet
 
 
 # Cloud & Edge Capacity formsets

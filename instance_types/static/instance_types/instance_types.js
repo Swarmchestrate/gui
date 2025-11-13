@@ -159,13 +159,13 @@ class InstanceTypeDialog {
                 `input[name='instance_types-${this.formsetInstanceIndex}-name']`,
             ).value,
             numCpus: this.dialogElement.querySelector(
-                `input[name='instance_types-${this.formsetInstanceIndex}-num_cpus']`,
+                `[name='instance_types-${this.formsetInstanceIndex}-num_cpus']`,
             ).value,
             memorySize: this.dialogElement.querySelector(
-                `input[name='instance_types-${this.formsetInstanceIndex}-mem_size']`,
+                `[name='instance_types-${this.formsetInstanceIndex}-mem_size']`,
             ).value,
             diskSize: this.dialogElement.querySelector(
-                `input[name='instance_types-${this.formsetInstanceIndex}-disk_size']`,
+                `[name='instance_types-${this.formsetInstanceIndex}-disk_size']`,
             ).value,
             energyConsumption: this.dialogElement.querySelector(
                 `input[name='instance_types-${this.formsetInstanceIndex}-energy_consumption']`,

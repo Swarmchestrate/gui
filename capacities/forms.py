@@ -1,6 +1,6 @@
 from django import forms
 
-from editor.forms import (
+from editor.forms.base_forms import (
     EditorForm,
     LocalityEditorForm,
     OpenApiSpecificationCategoryBasedForm,

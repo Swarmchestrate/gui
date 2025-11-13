@@ -1,4 +1,5 @@
-from editor.forms import (
+from editor.forms.base_forms import (
+    LocalityEditorForm,
     OpenApiSpecificationCategoryBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
 )
@@ -10,3 +11,7 @@ class ApplicationRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
 
 class ApplicationEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = 'application'
+
+
+class ApplicationLocalityEditorForm(LocalityEditorForm):
+    pass

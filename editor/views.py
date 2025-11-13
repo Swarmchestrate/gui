@@ -14,8 +14,8 @@ from django.views.generic import (
 )
 from django.views.generic.edit import ProcessFormView
 
-from .forms import RegistrationsListForm
-from .formsets import BaseEditorFormSet
+from .forms.base_forms import RegistrationsListForm
+from .forms.formsets import BaseEditorFormSet
 from .generic_views import EditorTocView, EditorView
 
 
