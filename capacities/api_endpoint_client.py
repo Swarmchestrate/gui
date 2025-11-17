@@ -51,7 +51,7 @@ class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClie
         params.pop('category', None)
         return super().get_registrations(params)
 
-    def get_column_metadata_with_category(self, category: str):
+    def get_by_category(self, category: str):
         return self.get_registrations(params={'category': f'eq."{category}"'})
 
 
@@ -91,5 +91,5 @@ class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClien
         params.pop('category', None)
         return super().get_registrations(params)
 
-    def get_column_metadata_with_category(self, category: str):
+    def get_by_category(self, category: str):
         return self.get_registrations(params={'category': f'eq."{category}"'})

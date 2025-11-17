@@ -63,11 +63,20 @@ class OpenApiSpecificationBasedForm(EditorForm):
         return is_valid
 
     def get_data_for_form_fields(self):
-        return (
+        column_metadata = (self.column_metadata_api_endpoint_client
+                            .get_registrations())
+        field_data = (
             self
             .api_endpoint_client.endpoint_definition
             .get_all_user_specifiable_fields()
         )
+        for cm in column_metadata:
+            field_name = cm.get('column_name')
+            try:
+                field_data[field_name].update(cm)
+            except KeyError:
+                pass
+        return field_data
 
     def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():
@@ -174,7 +183,7 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
 
     def get_data_for_form_fields(self):
         column_metadata = (self.column_metadata_api_endpoint_client
-                            .get_column_metadata_with_category(self.category))
+                            .get_by_category(self.category))
         field_names = [
             r.get('column_name')
             for r in column_metadata

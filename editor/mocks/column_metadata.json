@@ -550,5 +550,13 @@
         "category": "Metadata",
         "description": "The description of the capacity",
         "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "num_cpus",
+        "title": "Number of CPUs",
+        "category": "",
+        "description": "Number of CPUs required (exact or range).",
+        "order": null
     }
 ]

@@ -1,7 +1,11 @@
 from django.urls import reverse_lazy
 
-from .api_endpoint_client import InstanceTypeApiEndpointClient, InstanceTypeColumnMetadataApiEndpointClient
+# from .api_endpoint_client import InstanceTypeApiEndpointClient, InstanceTypeColumnMetadataApiEndpointClient
 from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
+from .mocks.api_endpoint_client import (
+    InstanceTypeApiEndpointClient,
+    InstanceTypeColumnMetadataApiEndpointClient,
+)
 
 from editor.views import (
     EditorView,

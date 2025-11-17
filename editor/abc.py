@@ -7,11 +7,15 @@ class BaseApiEndpointClient(ABC):
         pass
 
     @abstractmethod
-    def get(self, registration_id: int, params: dict = None) -> dict:
+    def get(self, registration_id: int, params: dict | None = None) -> dict:
         pass
 
     @abstractmethod
-    def get_registrations(self, params: dict = None):
+    def get_registrations_by_ids(self, registration_ids: list[int], params: dict | None = None) -> list[dict]:
+        pass
+
+    @abstractmethod
+    def get_registrations(self, params: dict | None = None):
         pass
 
     @abstractmethod

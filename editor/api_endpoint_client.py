@@ -88,6 +88,22 @@ class ApiEndpointClient(ApiClient):
         registration = next(iter(response.json()))
         return registration
 
+    def get_registrations_by_ids(self, registration_ids: list[int], params: dict | None = None):
+        if not params:
+            params = dict()
+        params.update({
+            self.endpoint_definition.id_field: 'in.(%s)' % ",".join([
+                str(registration_id)
+                for registration_id in registration_ids
+            ])
+        })
+        response = requests.get(
+            self.endpoint_url,
+            params=params
+        )
+        self.log_and_raise_response_status_if_error(response)
+        return response.json()
+
     def get_registrations(self, params: dict = None):
         if not params:
             params = dict()
@@ -165,5 +181,8 @@ class ColumnMetadataApiEndpointClient(ApiEndpointClient):
         self.endpoint = 'column_metadata'
         super().__init__()
 
-    def get_column_metadata_with_category(self, category: str):
+    def get_by_category(self, category: str):
         return self.get_registrations(params={'category': f'eq.{category}'})
+
+    def get_by_table_name(self, table_name: str):
+        return self.get_registrations(params={'table_name': f'eq.{table_name}'})

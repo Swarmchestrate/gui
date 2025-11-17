@@ -54,7 +54,8 @@ from editor.views import (
     MultipleEditorFormsetProcessFormView,
     RegistrationsListFormView,
 )
-from instance_types.api_endpoint_client import InstanceTypeApiEndpointClient
+# from instance_types.api_endpoint_client import InstanceTypeApiEndpointClient
+from instance_types.mocks.api_endpoint_client import InstanceTypeApiEndpointClient
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
 
@@ -428,12 +429,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         if not all(isinstance(instance_type_id, int) for instance_type_id in instance_type_ids):
             return initial
         instance_type_api_client = InstanceTypeApiEndpointClient()
-        instance_types = instance_type_api_client.get_registrations({
-            instance_type_api_client.endpoint_definition.id_field: 'in.(%s)' % ",".join([
-                str(instance_type_id)
-                for instance_type_id in instance_type_ids
-            ]),
-        })
+        instance_types = instance_type_api_client.get_registrations_by_ids(instance_type_ids)
         if (not instance_types
             or not isinstance(instance_types, list)):
             instance_types = list()

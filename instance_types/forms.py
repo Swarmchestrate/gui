@@ -1,6 +1,10 @@
 from django import forms
 
-from .api_endpoint_client import (
+# from .api_endpoint_client import (
+#     InstanceTypeApiEndpointClient,
+#     InstanceTypeColumnMetadataApiEndpointClient,
+# )
+from .mocks.api_endpoint_client import (
     InstanceTypeApiEndpointClient,
     InstanceTypeColumnMetadataApiEndpointClient,
 )

@@ -114,6 +114,14 @@ class TestApiEndpointClient(BaseApiEndpointClient, TestApiClient):
             break
         return registration
 
+    def get_registrations_by_ids(self, registration_ids: list[int], params: dict | None = None) -> list[dict]:
+        all_registrations = self._get_temp_data_and_create_if_not_exists()
+        registrations = [
+            r for r in all_registrations
+            if int(r.get(self.endpoint_definition.id_field)) in registration_ids
+        ]
+        return registrations
+
     def get_registrations(self, params: dict = None):
         registrations = self._get_temp_data_and_create_if_not_exists()
         return registrations
@@ -196,10 +204,18 @@ class TestColumnMetadataApiEndpointClient(TestApiEndpointClient):
 
     endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
 
-    def get_column_metadata_with_category(self, category: str):
+    def get_by_category(self, category: str):
         registrations = self.get_registrations()
         return [
             r
             for r in registrations
             if r.get('category') == category
+        ]
+
+    def get_by_table_name(self, table_name: str):
+        registrations = self.get_registrations()
+        return [
+            r
+            for r in registrations
+            if r.get('table_name') == table_name
         ]
