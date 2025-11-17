@@ -210,6 +210,7 @@ __marimo__/
 swagger.yaml
 staticfiles/
 .DS_Store
+temp/
 
 # Node
 node_modules

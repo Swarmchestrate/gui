@@ -1,0 +1,554 @@
+[
+    {
+        "table_name": "application",
+        "column_name": "name",
+        "title": "Application Name",
+        "category": "Metadata",
+        "description": "Name of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "author",
+        "title": "Author",
+        "category": "Metadata",
+        "description": "Author of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "creation_date",
+        "title": "Creation Date",
+        "category": "Metadata",
+        "description": "Date the application was created.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "version",
+        "title": "Version",
+        "category": "Metadata",
+        "description": "Version of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "classification",
+        "title": "Classification",
+        "category": "Metadata",
+        "description": "Classification/type of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "container_image",
+        "title": "Container Image",
+        "category": "Specs:Component",
+        "description": "OCI-compliant container image (mandatory parameter).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "commands",
+        "title": "Commands",
+        "category": "Specs:Component",
+        "description": "List of startup commands.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "arguments",
+        "title": "Arguments",
+        "category": "Specs:Component",
+        "description": "Arguments passed to the application container.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "environment_vars",
+        "title": "Environment Variables",
+        "category": "Specs:Component",
+        "description": "Environment variables in key-value format.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "min_cpu",
+        "title": "Minimum CPU",
+        "category": "Specs:Component",
+        "description": "Minimum required CPU.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "min_memory_gb",
+        "title": "Minimum Memory (GB)",
+        "category": "Specs:Component",
+        "description": "Minimum required memory in GB.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "max_cpu",
+        "title": "Maximum CPU",
+        "category": "Specs:Component",
+        "description": "Maximum allowed CPU.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "max_memory_gb",
+        "title": "Maximum Memory (GB)",
+        "category": "Specs:Component",
+        "description": "Maximum allowed memory in GB.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "relationships",
+        "title": "Relationships",
+        "category": "Specs",
+        "description": "Relationships such as volumes, other containers, and node selectors.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "behaviour",
+        "title": "Behaviour",
+        "category": "Specs",
+        "description": "Deployment strategy and orchestration behaviour (type, replicas, restart policy, cron, etc.).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "security_config",
+        "title": "Security Config",
+        "category": "Specs",
+        "description": "Secrets, credentials, keys, and firewall rules.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "instance_type",
+        "title": "Instance Type",
+        "category": "Resource Requirements",
+        "description": "Type of instance: General or Optimised (CPU/RAM/Storage/GPU).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "num_cpu",
+        "title": "Number of CPUs",
+        "category": "Resource Requirements",
+        "description": "Number of CPUs required (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "mem_ram",
+        "title": "Memory RAM",
+        "category": "Resource Requirements",
+        "description": "Memory requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "num_gpu",
+        "title": "Number of GPUs",
+        "category": "Resource Requirements",
+        "description": "Number of GPUs required.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "disk_size",
+        "title": "Disk Size",
+        "category": "Resource Requirements",
+        "description": "Disk size requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "network_bandwidth",
+        "title": "Network Bandwidth",
+        "category": "Resource Requirements",
+        "description": "Network bandwidth requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "num_instances",
+        "title": "Number of Instances",
+        "category": "Resource Requirements",
+        "description": "Number of instances required.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "energy_type",
+        "title": "Energy Type",
+        "category": "Resource Requirements",
+        "description": "Energy type preference (Green, Brown, Mix).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "security_rules",
+        "title": "Security Rules",
+        "category": "Resource Requirements",
+        "description": "Firewall/security rules including whitelists and ports.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "max_price",
+        "title": "Maximum Price",
+        "category": "Resource Requirements",
+        "description": "Maximum price user is willing to pay for resource unit.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "location",
+        "title": "Location",
+        "category": "QoS Goals",
+        "description": "Preferred location of resource (continent, country, city, GPS).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "pref_capacity_provider",
+        "title": "Preferred Capacity Provider",
+        "category": "QoS Goals",
+        "description": "Preferred capacity provider (e.g., ACME Corp).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "pref_resource_type",
+        "title": "Preferred Resource Type",
+        "category": "QoS Goals",
+        "description": "Preferred type of resource (Cloud/Edge).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "pref_provider_type",
+        "title": "Preferred Provider Type",
+        "category": "QoS Goals",
+        "description": "Preferred provider type (Public/Private).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "pref_resource_provider",
+        "title": "Preferred Resource Provider",
+        "category": "QoS Goals",
+        "description": "Preferred specific providers with weights (e.g., Amazon 70%, Azure 50%).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "minimise_power_usage",
+        "title": "Minimise Power Usage",
+        "category": "QoS Goals:Energy",
+        "description": "Indicates if power usage should be minimised.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "energy_budget",
+        "title": "Energy Budget",
+        "category": "QoS Goals:Energy",
+        "description": "Energy budget in kWh per hour.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "minimise_cost",
+        "title": "Minimise Cost",
+        "category": "QoS Goals:Cost",
+        "description": "Indicates if cost should be minimised.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "cost_budget",
+        "title": "Cost Budget",
+        "category": "QoS Goals:Cost",
+        "description": "Maximum cost budget (£/hour).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "trust_level",
+        "title": "Trust Level",
+        "category": "QoS Goals",
+        "description": "Overall trust level score (percentage).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "response_time_ms",
+        "title": "Response Time (ms)",
+        "category": "QoS Goals:Performance",
+        "description": "Response time in milliseconds. Example: Rt >= 50 ms & Rt <= 100 ms.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "requests_per_sec",
+        "title": "Requests per Second",
+        "category": "QoS Goals:Performance",
+        "description": "Number of requests per second (throughput requirement).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "iops",
+        "title": "IOPS",
+        "category": "QoS Goals:Performance",
+        "description": "IOPS (Input/Output operations per second).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "io_throughput_bps",
+        "title": "IO Throughput (bps)",
+        "category": "QoS Goals:Performance",
+        "description": "IO Throughput measured in bits per second.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "net_throughput_bps",
+        "title": "Net Throughput (bps)",
+        "category": "QoS Goals:Performance",
+        "description": "Net Throughput measured in bits per second.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "database_writes",
+        "title": "Database Writes",
+        "category": "QoS Goals:Performance",
+        "description": "Number of database writes per second required.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "custom_attributes",
+        "title": "Custom Attributes",
+        "category": "QoS Goals:Performance",
+        "description": "Custom attributes in key-value format (e.g., {\"latency\":\"<50ms\"}).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "custom_scaling_rules",
+        "title": "Custom Scaling Rules",
+        "category": "QoS Goals:Performance",
+        "description": "Custom scaling rules with higher priority over AI decision making in case of conflict.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "resource_provider",
+        "title": "Resource Provider",
+        "category": "Metadata",
+        "description": "The provider of the resources, where they run (e.g., Amazon, Azure, UoW, Sztaki, edge provider).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "capacity_provider",
+        "title": "Capacity Provider",
+        "category": "Metadata",
+        "description": "The provider of the capacity (e.g., ACME Corporation).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "resource_type",
+        "title": "Resource Type",
+        "category": "Metadata",
+        "description": "The type of resource: Cloud or Edge.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "instance_types",
+        "title": "Instance Types",
+        "category": "Specs",
+        "description": "Supported instance types and specifications (CPU, RAM, storage).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "resource_quota",
+        "title": "Resource Quota",
+        "category": "Specs",
+        "description": "Available capacity as CPU/RAM/Memory quota. Either use resource_quota or instance_quota.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "instance_quota",
+        "title": "Instance Quota",
+        "category": "Specs",
+        "description": "Available capacity as number of instances. Either use resource_quota or instance_quota.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "price",
+        "title": "Price",
+        "category": "Metadata",
+        "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "locality",
+        "title": "Locality",
+        "category": "Metadata",
+        "description": "Geographic location(s) of resources: continent, country, city, GPS. Multiple values possible.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "operating_system",
+        "title": "Operating System",
+        "category": "System Specific",
+        "description": "Supported operating systems with IDs (limited to Debian, Ubuntu, CentOS).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "architecture",
+        "title": "Architecture",
+        "category": "System Specific",
+        "description": "Supported architecture types (e.g., x86, ARM).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "energy_type",
+        "title": "Energy Type",
+        "category": "Energy",
+        "description": "Type of energy used: Green, Brown, Mix.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "powered_type",
+        "title": "Powered Type",
+        "category": "Energy",
+        "description": "Power source type: Battery powered or Mains powered.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "energy_consumption",
+        "title": "Energy Consumption",
+        "category": "Energy",
+        "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "accessible_sensors",
+        "title": "Accessible Sensors",
+        "category": "Edge Specific",
+        "description": "Sensors accessible through local network from edge machine.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "devices",
+        "title": "Devices",
+        "category": "Edge Specific",
+        "description": "Details of additional devices (e.g., Hardware: GPU, Software: CUDA).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "mobility",
+        "title": "Mobility",
+        "category": "Edge Specific",
+        "description": "Indicates whether the device is mobile (true/false).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "security_ports",
+        "title": "Security Ports",
+        "category": "Security, Trust & Access",
+        "description": "List of ports that the resource allows to be opened.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "trust",
+        "title": "Trust",
+        "category": "Security, Trust & Access",
+        "description": "Trust level of the resource (definition TBD).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "access_credentials",
+        "title": "Access Credentials",
+        "category": "Security, Trust & Access:Access",
+        "description": "Credentials for accessing the resource (e.g., SSH keys).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "access_endpoints",
+        "title": "Access Endpoints",
+        "category": "Security, Trust & Access:Access",
+        "description": "Endpoints for accessing the resource.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "bandwidth_mbps",
+        "title": "Bandwidth (Mbps)",
+        "category": "Networking",
+        "description": "Capacity of data transfer supported (Mbps).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "connectivity_type",
+        "title": "Connectivity Type",
+        "category": "Networking",
+        "description": "Connectivity type: wired, wifi, 4G, 5G.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "network_stability",
+        "title": "Network Stability",
+        "category": "Networking",
+        "description": "Network stability (TBD definition).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "network_access",
+        "title": "Network Access",
+        "category": "Networking",
+        "description": "Network access type: Public / Private / Community.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "description",
+        "title": "Description",
+        "category": "Metadata",
+        "description": "The description of the capacity",
+        "order": null
+    }
+]

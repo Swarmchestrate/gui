@@ -1,0 +1,98 @@
+{
+    "required": ["capacity_id"],
+    "properties": {
+        "capacity_id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "created_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "updated_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "description": { "format": "text", "type": "string" },
+        "resource_provider": {
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "capacity_provider": {
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "resource_type": {
+            "enum": ["Cloud", "Edge"],
+            "format": "public.resource_type_enum",
+            "type": "string"
+        },
+        "resource_provider_type": {
+            "enum": ["Public", "Private", "Hybrid"],
+            "format": "public.provider_type_enum",
+            "type": "string"
+        },
+        "energy_type": {
+            "enum": ["Green", "Brown", "Mix"],
+            "format": "public.energy_type_enum",
+            "type": "string"
+        },
+        "powered_type": {
+            "enum": ["Mains", "Battery"],
+            "format": "public.power_type_enum",
+            "type": "string"
+        },
+        "mobility": { "format": "boolean", "type": "boolean" },
+        "trust": { "format": "text", "type": "string" },
+        "access_credentials": { "format": "text", "type": "string" },
+        "access_endpoints": { "format": "text", "type": "string" },
+        "bandwidth_mbps": { "format": "numeric", "type": "number" },
+        "connectivity_type": {
+            "enum": ["Ethernet", "WiFi", "4G", "5G", "Satellite"],
+            "format": "public.connectivity_type_enum",
+            "type": "string"
+        },
+        "network_stability": { "format": "text", "type": "string" },
+        "network_access": {
+            "enum": ["Public", "Private", "Restricted"],
+            "format": "public.network_access_enum",
+            "type": "string"
+        },
+        "accessible_sensors": {
+            "format": "text[]",
+            "items": { "type": "string" },
+            "type": "array"
+        },
+        "security_ports": {
+            "format": "text[]",
+            "items": { "type": "string" },
+            "type": "array"
+        },
+        "locality_id": {
+            "description": "Note:\nThis is a Foreign Key to `locality.locality_id`.<fk table='locality' column='locality_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "resource_quota_id": {
+            "description": "Note:\nThis is a Foreign Key to `capacity_resource_quota.resource_quota_id`.<fk table='capacity_resource_quota' column='resource_quota_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "energy_consumption_id": {
+            "description": "Note:\nThis is a Foreign Key to `capacity_energy_consumption.energy_consumption_id`.<fk table='capacity_energy_consumption' column='energy_consumption_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "price_id": {
+            "description": "Note:\nThis is a Foreign Key to `capacity_price.price_id`.<fk table='capacity_price' column='price_id'/>",
+            "format": "integer",
+            "type": "integer"
+        }
+    },
+    "type": "object"
+}

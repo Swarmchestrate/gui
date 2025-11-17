@@ -8,9 +8,13 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView
 from django.views.generic.edit import ProcessFormView
 
-from .api_endpoint_client import (
+from .mocks.api_endpoint_client import (
     CloudCapacityApiEndpointClient,
     CloudCapacityColumnMetadataApiEndpointClient,
+)
+from .api_endpoint_client import (
+    # CloudCapacityApiEndpointClient,
+    # CloudCapacityColumnMetadataApiEndpointClient,
     EdgeCapacityApiEndpointClient,
     EdgeCapacityColumnMetadataApiEndpointClient,
 )
@@ -37,6 +41,7 @@ from .view_mixins import (
     AccessibleSensorsFormsetEditorViewMixin,
     ArchitectureFormSetEditorViewMixin,
     DevicesFormsetEditorViewMixin,
+    LocalityFormSetEditorViewMixin,
     OperatingSystemFormSetEditorViewMixin,
 )
 
@@ -56,12 +61,15 @@ from instance_types.formsets import InstanceTypeFormSet
 
 # Cloud & Edge Capacities
 class CapacityEditorRouterView(EditorRouterView):
+    metadata_editor_view_class = None
     specs_editor_view_class = None
     cost_and_locality_editor_view_class = None
     energy_editor_view_class = None
     security_trust_and_access_editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
+        if self.category.lower() == 'metadata':
+            return self.metadata_editor_view_class.as_view()(request, *args, **kwargs)
         if self.category.lower() == 'specs':
             return self.specs_editor_view_class.as_view()(request, *args, **kwargs)
         elif self.category.lower() == 'cost & locality':
@@ -71,6 +79,14 @@ class CapacityEditorRouterView(EditorRouterView):
         elif self.category.lower() == 'security, trust & access':
             return self.security_trust_and_access_editor_view_class.as_view()(request, *args, **kwargs)
         return super().route_to_view(request, *args, **kwargs)
+
+
+class CapacityMetadataEditorProcessFormView(
+        LocalityFormSetEditorViewMixin,
+        MultipleEditorFormsetProcessFormView):
+    def dispatch(self, request, *args, **kwargs):
+        self.add_locality_formset_metadata()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessFormView):
@@ -99,45 +115,7 @@ class CapacityCostAndLocalityEditorProcessFormView(MultipleEditorFormsetProcessF
             })
         self.add_initial_data_for_formset(initial_price, price_property_name)
 
-        # Locality
-        locality_property_name = 'locality'
-        self.add_formset_class(
-            CapacityLocalityEditorForm,
-            locality_property_name,
-            base_formset_class=CapacityLocalityEditorFormSet,
-            can_delete=False,
-            extra_formset_factory_kwargs={
-                'extra': 0,
-                'max_num': 1,
-            }
-        )
-
-        # Configure initial formset data
-        initial_locality = list()
-        locality_data = self.registration.get(locality_property_name)
-        if (not locality_data
-            or not isinstance(locality_data, dict)):
-            locality_data = {
-                'continent': '',
-                'country': '',
-                'city': '',
-                'gps': '',
-            }
-        initial_locality.append(locality_data)
-        self.add_initial_data_for_formset(initial_locality, locality_property_name)
-
         return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'locality_options_search_form': CapacityLocalityOptionsSearchForm(prefix='locality'),
-            'locality_options_search_form_url_reverse': reverse_lazy('capacities:locality_options_search'),
-            'get_locality_by_gps_form': CapacityGetLocalityByGpsForm(prefix='locality'),
-            'get_locality_by_name_url_reverse': reverse_lazy('capacities:get_locality_by_name'),
-            'get_locality_by_gps_url_reverse': reverse_lazy('capacities:get_locality_by_gps'),
-        })
-        return context
 
 
 class CapacityLocalityOptionsSearchProcessFormView(ProcessFormView):
@@ -194,11 +172,11 @@ class CapacityGetLocalityProcessFormView(ProcessFormView):
             gc: geonamescache.GeonamesCache,
             geoname_id: int | None,
             selected_city_name: str) -> dict:
-        cities = gc.search_cities(selected_city_name)
+        cities = gc.get_cities()
         city = next((
             city
-            for city in cities
-            if city.get('geonameid') == geoname_id
+            for city_code, city in cities.items()
+            if int(city_code) == int(geoname_id)
         ), dict())
         return city
 
@@ -540,6 +518,12 @@ class CloudCapacityEditorProcessFormView(CloudCapacityEditorView, EditorProcessF
     success_url = reverse_lazy('capacities:new_cloud_capacity')
 
 
+class CloudCapacityMetadataEditorProcessFormView(
+        CloudCapacityEditorProcessFormView,
+        CapacityMetadataEditorProcessFormView):
+    pass
+
+
 class CloudCapacityCostAndLocalityEditorProcessFormView(
         CloudCapacityEditorProcessFormView,
         CapacityCostAndLocalityEditorProcessFormView):
@@ -577,6 +561,7 @@ class CloudCapacitySpecsEditorProcessFormView(
 
 class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
+    metadata_editor_view_class = CloudCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = CloudCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
     security_trust_and_access_editor_view_class = CloudCapacitySecurityTrustAndAccessEditorProcessFormView
@@ -621,6 +606,12 @@ class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFor
     success_url = reverse_lazy('capacities:new_edge_capacity')
 
 
+class EdgeCapacityMetadataEditorProcessFormView(
+        EdgeCapacityEditorProcessFormView,
+        CapacityMetadataEditorProcessFormView):
+    pass
+
+
 class EdgeCapacityCostAndLocalityEditorProcessFormView(
         EdgeCapacityEditorProcessFormView,
         CapacityCostAndLocalityEditorProcessFormView):
@@ -658,6 +649,7 @@ class EdgeCapacitySpecsEditorProcessFormView(
 
 class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
+    metadata_editor_view_class = EdgeCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = EdgeCapacityCostAndLocalityEditorProcessFormView
     energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
     security_trust_and_access_editor_view_class = EdgeCapacitySecurityTrustAndAccessEditorProcessFormView

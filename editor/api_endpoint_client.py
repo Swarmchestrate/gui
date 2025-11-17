@@ -108,7 +108,7 @@ class ApiEndpointClient(ApiClient):
         new_registration = self.get(new_id)
         return new_registration
 
-    def bulk_register(self, data_list: list[dict]) -> list[str]:
+    def bulk_register(self, data_list: list[dict]) -> list[int]:
         new_ids = self._generate_random_ids(amount=len(data_list))
         try:
             for i, data in enumerate(data_list):

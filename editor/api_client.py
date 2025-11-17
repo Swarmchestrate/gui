@@ -4,8 +4,6 @@ import os
 import requests
 from prance import ResolvingParser
 
-from django.conf import settings
-
 
 logger = logging.getLogger(__name__)
 
