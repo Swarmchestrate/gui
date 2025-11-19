@@ -29,19 +29,21 @@ class BaseOpenApiDefinition:
         return {key: value for key, value in all_fields.items() if key in names}
 
 
-class BaseApiEndpoint(ABC):
-    endpoint_definition: BaseOpenApiDefinition
-    endpoint_definition_class: Type[BaseOpenApiDefinition]
-
-    random_id_min_value: int = 0
-    random_id_max_value: int = 999999
-
+class BaseApiClient(ABC):
     def log_and_raise_response_status_if_error(self, response: requests.Response):
         pass
 
     @abstractmethod
     def get_openapi_spec(self):
         pass
+
+
+class BaseApiEndpoint(BaseApiClient, ABC):
+    endpoint_definition: BaseOpenApiDefinition
+    endpoint_definition_class: Type[BaseOpenApiDefinition]
+
+    random_id_min_value: int = 0
+    random_id_max_value: int = 999999
 
     @abstractmethod
     def _prepare_update_data(self, data: dict) -> dict:

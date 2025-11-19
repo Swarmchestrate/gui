@@ -1,10 +1,10 @@
 from django.test import SimpleTestCase
 
-from editor.api_endpoint_client import ColumnMetadataApiEndpoint
+from editor.api_client import ApiClient
 
 
 class ApiEndpointTestCase(SimpleTestCase):
     def test_get_schema(self):
-        client = ColumnMetadataApiEndpoint()
+        client = ApiClient()
         schema = client.get_openapi_spec()
         self.assertIsInstance(schema, dict)
