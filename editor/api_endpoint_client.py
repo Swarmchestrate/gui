@@ -6,13 +6,12 @@ from datetime import datetime, timezone
 import requests
 
 from .abc import BaseApiEndpointClient
-from .api_client import ApiClient
 from .definitions import ColumnMetadataUserSpecifiableOpenApiDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class ApiEndpointClient(BaseApiEndpointClient, ApiClient):
+class ApiEndpointClient(BaseApiEndpointClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -21,10 +20,22 @@ class ApiEndpointClient(BaseApiEndpointClient, ApiClient):
 
     def __init__(self) -> None:
         super().__init__()
+        self.api_url = os.environ.get("API_URL")
         openapi_spec = self.get_openapi_spec()
         self.endpoint_definition = self.endpoint_definition_class(openapi_spec)
         self.openapi_spec_url = os.environ.get("API_URL")
 
+    # Error handling
+    def log_and_raise_response_status_if_error(self, response: requests.Response):
+        if response.ok:
+            return
+        try:
+            logger.error(json.dumps(response.json(), indent=2))
+        except Exception:
+            logger.exception("Could not log error response.")
+        response.raise_for_status()
+
+    # Class properties
     @property
     def endpoint_url(self):
         return f"{self.api_url}/{self.endpoint}"
@@ -65,8 +76,13 @@ class ApiEndpointClient(BaseApiEndpointClient, ApiClient):
             for data in self.get_registrations(params=params)
         ]
 
+    def get_openapi_spec(self):
+        response = requests.get(self.api_url)
+        self.log_and_raise_response_status_if_error(response)
+        return response.json()
+
     # Registrations
-    def get(self, registration_id: int, params: dict = None):
+    def get(self, registration_id: int, params: dict | None = None) -> dict:
         if not params:
             params = dict()
         params.update(

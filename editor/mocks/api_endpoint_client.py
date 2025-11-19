@@ -8,13 +8,12 @@ from pathlib import Path
 from django.conf import settings
 
 from ..abc import BaseApiEndpointClient
-from .api_client import TestApiClient
 from .definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class MockApiEndpointClient(BaseApiEndpointClient, TestApiClient):
+class MockApiEndpointClient(BaseApiEndpointClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -47,6 +46,21 @@ class MockApiEndpointClient(BaseApiEndpointClient, TestApiClient):
     def _update_temp_data(self, update_data: list):
         with open(self.path_to_temp_data, "w") as f:
             f.write(json.dumps(update_data, indent=4))
+
+    def get_openapi_spec(self):
+        openapi_spec = None
+        cwd = os.getcwd()
+        base_dir = settings.BASE_DIR
+        os.chdir(base_dir)
+        try:
+            with open(
+                os.path.join(base_dir, "editor", "mocks", "data", "openapi_spec.json"),
+                "r",
+            ) as f:
+                openapi_spec = json.loads(f.read())
+        finally:
+            os.chdir(cwd)
+        return openapi_spec
 
     # Registrations
     def get(self, registration_id: int, params: dict | None = None) -> dict:

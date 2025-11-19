@@ -2,6 +2,8 @@ import random
 from abc import ABC, abstractmethod
 from typing import Type
 
+import requests
+
 
 class BaseOpenApiDefinition:
     id_field: str
@@ -33,6 +35,13 @@ class BaseApiEndpointClient(ABC):
 
     random_id_min_value: int = 0
     random_id_max_value: int = 999999
+
+    def log_and_raise_response_status_if_error(self, response: requests.Response):
+        pass
+
+    @abstractmethod
+    def get_openapi_spec(self):
+        pass
 
     @abstractmethod
     def _prepare_update_data(self, data: dict) -> dict:
