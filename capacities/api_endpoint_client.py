@@ -81,7 +81,7 @@ class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
 
 
 class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
-    def get_registrations(self, params: dict = None):
+    def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update(
