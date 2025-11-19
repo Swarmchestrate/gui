@@ -23,12 +23,12 @@ from instance_types.formsets import InstanceTypeFormSet
 # from instance_types.api_endpoint_client import InstanceTypeApiEndpointClient
 from instance_types.mocks.api_endpoint_client import InstanceTypeApiEndpointClient
 
-from .api_endpoint_client import (
-    # CloudCapacityApiEndpointClient,
-    # CloudCapacityColumnMetadataApiEndpointClient,
-    EdgeCapacityApiEndpointClient,
-    EdgeCapacityColumnMetadataApiEndpointClient,
-)
+# from .api_endpoint_client import (
+#     CloudCapacityApiEndpointClient,
+#     CloudCapacityColumnMetadataApiEndpointClient,
+#     EdgeCapacityApiEndpointClient,
+#     EdgeCapacityColumnMetadataApiEndpointClient,
+# )
 from .forms import (
     CapacityEnergyConsumptionEditorForm,
     CapacityGetLocalityByGpsForm,
@@ -56,6 +56,8 @@ from .mixins.view_mixins import (
 from .mocks.api_endpoint_client import (
     CloudCapacityApiEndpointClient,
     CloudCapacityColumnMetadataApiEndpointClient,
+    EdgeCapacityApiEndpointClient,
+    EdgeCapacityColumnMetadataApiEndpointClient,
 )
 
 
