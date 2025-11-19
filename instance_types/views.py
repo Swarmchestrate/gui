@@ -26,8 +26,8 @@ class InstanceTypeEditorView(EditorView):
     editor_overview_url_reverse_base = "instance_types:instance_type_overview"
     registration_type_name_singular = "instance type"
     registration_type_name_plural = "instance types"
-    api_endpoint_client_class = InstanceTypeApiEndpoint
-    column_metadata_api_endpoint_client_class = InstanceTypeColumnMetadataApiEndpoint
+    api_endpoint_class = InstanceTypeApiEndpoint
+    column_metadata_api_endpoint_class = InstanceTypeColumnMetadataApiEndpoint
 
 
 class InstanceTypeEditorStartFormView(InstanceTypeEditorView, EditorStartFormView):

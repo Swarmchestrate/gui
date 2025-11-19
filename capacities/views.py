@@ -381,9 +381,9 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def process_instance_types(
         self,
         formset: InstanceTypeFormSet,
-        api_endpoint_client_class: InstanceTypeApiEndpoint,
+        api_endpoint_class: InstanceTypeApiEndpoint,
     ):
-        instance_type_api_client = api_endpoint_client_class()
+        instance_type_api_client = api_endpoint_class()
         inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
         current_instance_type_id_strs = list(
             map(str, self.registration.get("instance_types"))
@@ -418,7 +418,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         # Deleting instance types
         if instance_type_ids_to_delete:
             instance_type_api_client.delete_many(list(instance_type_ids_to_delete))
-        self.api_endpoint_client.update(
+        self.api_endpoint.update(
             self.registration_id,
             {
                 self.instance_types_property_name: updated_instance_type_ids
@@ -431,13 +431,13 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         form_class,
         formset_prefix: str,
         base_formset_class,
-        api_endpoint_client_class,
+        api_endpoint_class,
         formset_processing_function,
         can_delete: bool | None = None,
         extra_formset_factory_kwargs: dict | None = None,
     ):
         self.manually_processed_formsets[formset_prefix] = {
-            "api_endpoint_client_class": api_endpoint_client_class,
+            "api_endpoint_class": api_endpoint_class,
             "formset_processing_function": formset_processing_function,
         }
         return self.add_formset_class(
@@ -477,17 +477,13 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             formset_prefix,
             formset_metadata,
         ) in self.manually_processed_formsets.items():
-            api_endpoint_client_class = formset_metadata.get(
-                "api_endpoint_client_class"
-            )
+            api_endpoint_class = formset_metadata.get("api_endpoint_class")
             formset_processing_function = formset_metadata.get(
                 "formset_processing_function"
             )
             if not formset_processing_function:
                 continue
-            formset_processing_function(
-                forms.get(formset_prefix), api_endpoint_client_class
-            )
+            formset_processing_function(forms.get(formset_prefix), api_endpoint_class)
         return response
 
     # ProcessFormView
@@ -537,8 +533,8 @@ class CloudCapacityEditorView(EditorView):
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
     registration_type_name_singular = "cloud capacity"
     registration_type_name_plural = "cloud capacities"
-    api_endpoint_client_class = CloudCapacityApiEndpoint
-    column_metadata_api_endpoint_client_class = CloudCapacityColumnMetadataApiEndpoint
+    api_endpoint_class = CloudCapacityApiEndpoint
+    column_metadata_api_endpoint_class = CloudCapacityColumnMetadataApiEndpoint
 
 
 class CloudCapacityEditorStartFormView(
@@ -641,8 +637,8 @@ class EdgeCapacityEditorView(EditorView):
     registration_type_name_singular = "edge capacity"
     registration_type_name_plural = "edge capacities"
     title_base = "New Edge Capacity"
-    api_endpoint_client_class = EdgeCapacityApiEndpoint
-    column_metadata_api_endpoint_client_class = EdgeCapacityColumnMetadataApiEndpoint
+    api_endpoint_class = EdgeCapacityApiEndpoint
+    column_metadata_api_endpoint_class = EdgeCapacityColumnMetadataApiEndpoint
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):

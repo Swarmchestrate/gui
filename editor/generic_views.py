@@ -6,7 +6,7 @@ from .api.endpoints.base import ApiEndpoint, ColumnMetadataApiEndpoint
 class EditorView(TemplateView):
     registration_type_name_singular: str
     registration_type_name_plural: str
-    api_endpoint_client: ApiEndpoint
+    api_endpoint: ApiEndpoint
     id_field: str
 
     editor_registration_list_url_reverse: str
@@ -14,18 +14,18 @@ class EditorView(TemplateView):
     editor_url_reverse_base: str
     editor_overview_url_reverse_base: str
 
-    api_endpoint_client_class: ApiEndpoint
+    api_endpoint_class: ApiEndpoint
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.api_endpoint_client = self.api_endpoint_client_class()
-        self.id_field = self.api_endpoint_client.endpoint_definition.id_field
+        self.api_endpoint = self.api_endpoint_class()
+        self.id_field = self.api_endpoint.endpoint_definition.id_field
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "description": self.api_endpoint_client.endpoint_definition.description,
+                "description": self.api_endpoint.endpoint_definition.description,
                 "registration_type_name_singular": self.registration_type_name_singular,
                 "registration_type_name_plural": self.registration_type_name_plural,
                 "editor_registration_list_url_reverse": self.editor_registration_list_url_reverse,
@@ -39,22 +39,18 @@ class EditorView(TemplateView):
 
 
 class EditorTocView(TemplateView):
-    column_metadata_api_endpoint_client_class: ColumnMetadataApiEndpoint
+    column_metadata_api_endpoint_class: ColumnMetadataApiEndpoint
     categories: dict
     column_metadata: list[dict]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.column_metadata_api_endpoint_client = (
-            self.column_metadata_api_endpoint_client_class()
-        )
+        self.column_metadata_api_endpoint = self.column_metadata_api_endpoint_class()
         self._setup_column_metadata()
         self._setup_categories()
 
     def _setup_column_metadata(self):
-        self.column_metadata = (
-            self.column_metadata_api_endpoint_client.get_registrations()
-        )
+        self.column_metadata = self.column_metadata_api_endpoint.get_registrations()
 
     def _setup_categories(self):
         self.category_names = list(set(r.get("category") for r in self.column_metadata))

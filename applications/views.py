@@ -22,8 +22,8 @@ class ApplicationEditorView(EditorView):
     editor_overview_url_reverse_base = "applications:application_overview"
     registration_type_name_singular = "application"
     registration_type_name_plural = "applications"
-    api_endpoint_client_class = ApplicationApiEndpoint
-    column_metadata_api_endpoint_client_class = ApplicationColumnMetadataApiEndpoint
+    api_endpoint_class = ApplicationApiEndpoint
+    column_metadata_api_endpoint_class = ApplicationColumnMetadataApiEndpoint
 
 
 class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):

@@ -38,14 +38,14 @@ class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
     }
 
     def __init__(self, *args, **kwargs):
-        instance_type_endpoint_client = InstanceTypeApiEndpoint()
+        instance_type_api_endpoint = InstanceTypeApiEndpoint()
         super().__init__(
-            instance_type_endpoint_client,
+            instance_type_api_endpoint,
             InstanceTypeColumnMetadataApiEndpoint(),
             *args,
             **kwargs,
         )
-        self.fields[instance_type_endpoint_client.endpoint_definition.id_field] = (
+        self.fields[instance_type_api_endpoint.endpoint_definition.id_field] = (
             forms.IntegerField(required=False, widget=forms.HiddenInput())
         )
         # Add widget enhancements

@@ -8,15 +8,15 @@ from .api.endpoints.edge_capacity import EdgeCapacityApiEndpoint
 
 
 class CapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
-    api_endpoint_client_class = CapacityApiEndpoint
+    api_endpoint_class = CapacityApiEndpoint
 
     def test_get_registrations(self):
-        capacities = self.api_endpoint_client.get_registrations()
+        capacities = self.api_endpoint.get_registrations()
         self.assertIsInstance(capacities, list)
 
     def test_get_user_specifiable_fields_with_format(self):
         example_format = "text"
-        fields = self.api_endpoint_client.endpoint_definition.get_user_specifiable_fields_with_format(
+        fields = self.api_endpoint.endpoint_definition.get_user_specifiable_fields_with_format(
             example_format
         )
         self.assertIsInstance(fields, dict)
@@ -25,52 +25,52 @@ class CapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase
             self.assertEqual(value.get("format"), example_format)
 
     def test_get_user_specifiable_field_formats(self):
-        field_formats = self.api_endpoint_client.endpoint_definition.get_user_specifiable_field_formats()
+        field_formats = (
+            self.api_endpoint.endpoint_definition.get_user_specifiable_field_formats()
+        )
         self.assertIsInstance(field_formats, list)
 
 
 class CloudCapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
-    api_endpoint_client_class = CloudCapacityApiEndpoint
+    api_endpoint_class = CloudCapacityApiEndpoint
 
     def test_get_registrations(self):
-        capacities = self.api_endpoint_client.get_registrations()
+        capacities = self.api_endpoint.get_registrations()
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        new_registration = self.api_endpoint_client.register()
+        new_registration = self.api_endpoint.register()
         self.assertIsInstance(new_registration, dict)
 
     def test_delete(self):
         registration_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_endpoint_client.delete(registration_id)
+        self.api_endpoint.delete(registration_id)
 
     def test_update(self):
         # Test setup
-        new_registration = self.register_with_api_endpoint_client_for_test()
+        new_registration = self.register_with_api_endpoint_for_test()
         self.assertEqual(new_registration.get("mobility"), None)
         # Update
         update_data = {
             "mobility": True,
         }
-        id_field = self.api_endpoint_client.endpoint_definition.id_field
-        self.api_endpoint_client.update(new_registration.get(id_field), update_data)
-        updated_registration = self.api_endpoint_client.get(
-            new_registration.get(id_field)
-        )
+        id_field = self.api_endpoint.endpoint_definition.id_field
+        self.api_endpoint.update(new_registration.get(id_field), update_data)
+        updated_registration = self.api_endpoint.get(new_registration.get(id_field))
         self.assertEqual(updated_registration.get("mobility"), True)
 
 
 class EdgeCapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
-    api_endpoint_client_class = EdgeCapacityApiEndpoint
+    api_endpoint_class = EdgeCapacityApiEndpoint
 
     def test_get_registrations(self):
-        capacities = self.api_endpoint_client.get_registrations()
+        capacities = self.api_endpoint.get_registrations()
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        new_registration = self.api_endpoint_client.register()
+        new_registration = self.api_endpoint.register()
         self.assertIsInstance(new_registration, dict)
 
     def test_delete(self):
         registration_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_endpoint_client.delete(registration_id)
+        self.api_endpoint.delete(registration_id)
