@@ -1,4 +1,4 @@
-from .api_endpoint_client import ApiEndpointClient
+from ..api_endpoint_client import ApiEndpointClient
 
 
 class ApiEndpointClientTestCaseHelperMixin:
@@ -34,12 +34,16 @@ class ApiEndpointClientTestCaseHelperMixin:
         return new_registration
 
 
-class ApplicationApiEndpointClientTestCaseHelperMixin(ApiEndpointClientTestCaseHelperMixin):
+class ApplicationApiEndpointClientTestCaseHelperMixin(
+    ApiEndpointClientTestCaseHelperMixin
+):
     def register_with_api_endpoint_client_for_test(self, data: dict = None):
         if not data:
             data = dict()
-        data.update({
-            'name': f'Application {len(self.registration_ids) + 1}',
-            'container_image': 'https://hub.docker.com/myorg/weather-analytics:latest',
-        })
+        data.update(
+            {
+                "name": f"Application {len(self.registration_ids) + 1}",
+                "container_image": "https://hub.docker.com/myorg/weather-analytics:latest",
+            }
+        )
         return super().register_with_api_endpoint_client_for_test(data)

@@ -2,12 +2,14 @@ import json
 
 from django.test import SimpleTestCase
 
+from editor.mixins.test_mixins import ApplicationApiEndpointClientTestCaseHelperMixin
+
 from .api_endpoint_client import ApplicationApiEndpointClient
 
-from editor.test_mixins import ApplicationApiEndpointClientTestCaseHelperMixin
 
-
-class ApplicationApiEndpointClientTestCase(ApplicationApiEndpointClientTestCaseHelperMixin, SimpleTestCase):
+class ApplicationApiEndpointClientTestCase(
+    ApplicationApiEndpointClientTestCaseHelperMixin, SimpleTestCase
+):
     api_endpoint_client_class = ApplicationApiEndpointClient
 
     def test_get_registrations(self):
@@ -16,8 +18,8 @@ class ApplicationApiEndpointClientTestCase(ApplicationApiEndpointClientTestCaseH
 
     def test_register(self):
         data = {
-            'name': 'Weather Analytics App',
-            'container_image': 'https://hub.docker.com/myorg/weather-analytics:latest',
+            "name": "Weather Analytics App",
+            "container_image": "https://hub.docker.com/myorg/weather-analytics:latest",
         }
         self.api_endpoint_client.register(data)
 

@@ -1,0 +1,41 @@
+{
+    "required": ["id", "instance_type", "architecture"],
+    "properties": {
+        "id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "capacity_id": { "format": "integer", "type": "integer" },
+        "instance_type_uuid": {
+            "format": "integer",
+            "type": "integer"
+        },
+        "instance_type": {
+            "enum": [
+                "General",
+                "Optimised_CPU",
+                "Optimised_RAM",
+                "Optimised_Storage",
+                "Optimised_GPU"
+            ],
+            "format": "public.instance_type_enum",
+            "type": "string"
+        },
+        "cpu": { "format": "integer", "type": "integer" },
+        "ram_gb": { "format": "integer", "type": "integer" },
+        "storage_gb": { "format": "integer", "type": "integer" },
+        "architecture": {
+            "enum": ["x86", "ARM"],
+            "format": "public.arch_enum",
+            "type": "string"
+        },
+        "energy_consumption_kwh": {
+            "format": "integer",
+            "type": "integer"
+        },
+        "price_per_hr": { "format": "numeric", "type": "number" },
+        "quota": { "format": "integer", "type": "integer" }
+    },
+    "type": "object"
+}

@@ -1,6 +1,6 @@
-import json
-
 from django.test import SimpleTestCase
+
+from editor.mixins.test_mixins import ApiEndpointClientTestCaseHelperMixin
 
 from .api_endpoint_client import (
     CapacityApiEndpointClient,
@@ -8,10 +8,10 @@ from .api_endpoint_client import (
     EdgeCapacityApiEndpointClient,
 )
 
-from editor.test_mixins import ApiEndpointClientTestCaseHelperMixin
 
-
-class CapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin, SimpleTestCase):
+class CapacityApiEndpointClientTestCase(
+    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
+):
     api_endpoint_client_class = CapacityApiEndpointClient
 
     def test_get_registrations(self):
@@ -19,19 +19,23 @@ class CapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin, Si
         self.assertIsInstance(capacities, list)
 
     def test_get_user_specifiable_fields_with_format(self):
-        example_format = 'text'
-        fields = self.api_endpoint_client.endpoint_definition.get_user_specifiable_fields_with_format(example_format)
+        example_format = "text"
+        fields = self.api_endpoint_client.endpoint_definition.get_user_specifiable_fields_with_format(
+            example_format
+        )
         self.assertIsInstance(fields, dict)
         self.assertGreater(len(fields.keys()), 0)
         for value in fields.values():
-            self.assertEqual(value.get('format'), example_format)
+            self.assertEqual(value.get("format"), example_format)
 
     def test_get_user_specifiable_field_formats(self):
         field_formats = self.api_endpoint_client.endpoint_definition.get_user_specifiable_field_formats()
         self.assertIsInstance(field_formats, list)
 
 
-class CloudCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin, SimpleTestCase):
+class CloudCapacityApiEndpointClientTestCase(
+    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
+):
     api_endpoint_client_class = CloudCapacityApiEndpointClient
 
     def test_get_registrations(self):
@@ -49,18 +53,22 @@ class CloudCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixi
     def test_update(self):
         # Test setup
         new_registration = self.register_with_api_endpoint_client_for_test()
-        self.assertEqual(new_registration.get('mobility'), None)
+        self.assertEqual(new_registration.get("mobility"), None)
         # Update
         update_data = {
-            'mobility': True,
+            "mobility": True,
         }
         id_field = self.api_endpoint_client.endpoint_definition.id_field
         self.api_endpoint_client.update(new_registration.get(id_field), update_data)
-        updated_registration = self.api_endpoint_client.get(new_registration.get(id_field))
-        self.assertEqual(updated_registration.get('mobility'), True)
+        updated_registration = self.api_endpoint_client.get(
+            new_registration.get(id_field)
+        )
+        self.assertEqual(updated_registration.get("mobility"), True)
 
 
-class EdgeCapacityApiEndpointClientTestCase(ApiEndpointClientTestCaseHelperMixin, SimpleTestCase):
+class EdgeCapacityApiEndpointClientTestCase(
+    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
+):
     api_endpoint_client_class = EdgeCapacityApiEndpointClient
 
     def test_get_registrations(self):

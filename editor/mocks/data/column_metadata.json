@@ -393,14 +393,6 @@
     },
     {
         "table_name": "capacity",
-        "column_name": "instance_quota",
-        "title": "Instance Quota",
-        "category": "Specs",
-        "description": "Available capacity as number of instances. Either use resource_quota or instance_quota.",
-        "order": null
-    },
-    {
-        "table_name": "capacity",
         "column_name": "price",
         "title": "Price",
         "category": "Metadata",
@@ -410,6 +402,14 @@
     {
         "table_name": "capacity",
         "column_name": "locality",
+        "title": "Locality",
+        "category": "Metadata",
+        "description": "Geographic location(s) of resources: continent, country, city, GPS. Multiple values possible.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "locality_id",
         "title": "Locality",
         "category": "Metadata",
         "description": "Geographic location(s) of resources: continent, country, city, GPS. Multiple values possible.",
@@ -553,10 +553,138 @@
     },
     {
         "table_name": "instance_type",
+        "column_name": "name",
+        "title": "Name",
+        "category": "",
+        "description": "Name of the instance type.",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
         "column_name": "num_cpus",
         "title": "Number of CPUs",
         "category": "",
         "description": "Number of CPUs required (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "mem_size",
+        "title": "Memory Size",
+        "category": "",
+        "description": "Memory requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "disk_size",
+        "title": "Disk Size",
+        "category": "",
+        "description": "Disk size requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "energy_consumption",
+        "title": "Energy Consumption",
+        "category": "",
+        "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "bandwidth",
+        "title": "Bandwidth",
+        "category": "",
+        "description": "Capacity of data transfer supported (Mbps).",
+        "order": null
+    },
+    {
+        "table_name": "instance_type",
+        "column_name": "price",
+        "title": "Price",
+        "category": "",
+        "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "instance_type_uuid",
+        "title": "UUID",
+        "category": "",
+        "description": "The UUID of the instance type.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "instance_type",
+        "title": "Type",
+        "category": "",
+        "description": "Type of instance: General or Optimised (CPU/RAM/Storage/GPU).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "name",
+        "title": "Name",
+        "category": "",
+        "description": "Name of the instance type.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "cpu",
+        "title": "Number of CPUs",
+        "category": "",
+        "description": "Number of CPUs required (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "ram_gb",
+        "title": "RAM (GB)",
+        "category": "",
+        "description": "Memory requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "storage_gb",
+        "title": "Storage (GB)",
+        "category": "",
+        "description": "Disk size requirement (exact or range).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "architecture",
+        "title": "Architecture",
+        "category": "",
+        "description": "Capacity of data transfer supported (Mbps).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "energy_consumption_kwh",
+        "title": "Energy Consumption (kWh)",
+        "category": "",
+        "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "price_per_hr",
+        "title": "Price (per Hour)",
+        "category": "",
+        "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
+        "order": null
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "quota",
+        "title": "Quota",
+        "category": "",
+        "description": "Available capacity as number of instances. Either use resource_quota or instance_quota.",
         "order": null
     }
 ]
