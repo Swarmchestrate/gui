@@ -11,5 +11,5 @@ class CapacityUserSpecifiableOpenApiDefinition(
     CapacityUserSpecifiableOpenApiDefinitionMixin, MockUserSpecifiableOpenApiDefinition
 ):
     path_to_definition = os.path.join(
-        settings.BASE_DIR, "capacities", "mocks", "data", "definitions", "capacity.json"
+        settings.BASE_DIR, "capacities", "mocks", "definitions", "capacity.json"
     )

@@ -35,7 +35,6 @@ class MockColumnMetadataUserSpecifiableOpenApiDefinition(
         settings.BASE_DIR,
         "editor",
         "mocks",
-        "data",
         "definitions",
         "column_metadata.json",
     )

@@ -17,7 +17,6 @@ class CapacityInstanceTypeUserSpecifiableOpenApiDefinition(
         settings.BASE_DIR,
         "instance_types",
         "mocks",
-        "data",
         "definitions",
         "capacity_instance_type.json",
     )
