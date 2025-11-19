@@ -3,9 +3,8 @@ import os
 
 from django.conf import settings
 
-from editor.mixins.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
-
-from ..abc import BaseOpenApiDefinition
+from editor.api.abc import BaseOpenApiDefinition
+from editor.api.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
 
 
 class MockOpenApiDefinition(BaseOpenApiDefinition):
@@ -35,6 +34,7 @@ class MockColumnMetadataUserSpecifiableOpenApiDefinition(
         settings.BASE_DIR,
         "editor",
         "mocks",
+        "jsons",
         "definitions",
         "column_metadata.json",
     )

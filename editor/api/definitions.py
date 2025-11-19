@@ -1,5 +1,5 @@
-from editor.abc import BaseOpenApiDefinition
-from editor.mixins.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
+from editor.api.abc import BaseOpenApiDefinition
+from editor.api.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
 
 
 class OpenApiDefinition(BaseOpenApiDefinition):

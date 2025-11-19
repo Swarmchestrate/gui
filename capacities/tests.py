@@ -1,12 +1,10 @@
 from django.test import SimpleTestCase
 
-from editor.mixins.test_mixins import ApiEndpointTestCaseHelperMixin
+from editor.test_mixins import ApiEndpointTestCaseHelperMixin
 
-from .api_endpoint_client import (
-    CapacityApiEndpoint,
-    CloudCapacityApiEndpoint,
-    EdgeCapacityApiEndpoint,
-)
+from .api.endpoints.base import CapacityApiEndpoint
+from .api.endpoints.cloud_capacity import CloudCapacityApiEndpoint
+from .api.endpoints.edge_capacity import EdgeCapacityApiEndpoint
 
 
 class CapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):

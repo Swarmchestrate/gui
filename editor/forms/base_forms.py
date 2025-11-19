@@ -2,7 +2,7 @@ from enum import Enum
 
 from django import forms
 
-from editor.api_endpoint_client import (
+from editor.api.endpoints.base import (
     ApiEndpoint,
     ColumnMetadataApiEndpoint,
 )

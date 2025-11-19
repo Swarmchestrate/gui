@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from ..forms import (
+from .forms import (
     CapacityGetLocalityByGpsForm,
     CapacityLocalityEditorForm,
     CapacityLocalityOptionsSearchForm,
@@ -9,7 +9,7 @@ from ..forms import (
     EdgeCapacityAccessibleSensorsEditorForm,
     EdgeCapacityDevicesEditorForm,
 )
-from ..formsets import (
+from .formsets import (
     CapacityLocalityEditorFormSet,
     CloudCapacityArchitectureEditorFormSet,
     CloudCapacityOperatingSystemEditorFormSet,

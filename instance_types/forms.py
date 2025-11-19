@@ -10,11 +10,11 @@ from editor.forms.widget_choices import (
     num_cpus_choices,
 )
 
-# from .api_endpoint_client import (
+# from .api.endpoints.instance_type import (
 #     InstanceTypeApiEndpoint,
 #     InstanceTypeColumnMetadataApiEndpoint,
 # )
-from .mocks.api_endpoint_client import (
+from .mocks.endpoints.instance_type import (
     InstanceTypeApiEndpoint,
     InstanceTypeColumnMetadataApiEndpoint,
 )

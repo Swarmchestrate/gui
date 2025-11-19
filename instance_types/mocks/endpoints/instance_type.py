@@ -2,12 +2,13 @@ import os
 
 from django.conf import settings
 
-from editor.mocks.api_endpoint_client import (
+from editor.mocks.endpoints.base import (
     MockApiEndpoint,
     MockColumnMetadataApiEndpoint,
 )
-
-from .definitions import CapacityInstanceTypeUserSpecifiableOpenApiDefinition
+from instance_types.mocks.definitions import (
+    CapacityInstanceTypeUserSpecifiableOpenApiDefinition,
+)
 
 BASE_DIR = settings.BASE_DIR
 
@@ -16,7 +17,7 @@ class InstanceTypeApiEndpoint(MockApiEndpoint):
     endpoint_definition_class = CapacityInstanceTypeUserSpecifiableOpenApiDefinition
 
     path_to_data = os.path.join(
-        BASE_DIR, "instance_types", "mocks", "data", "instance_types.json"
+        BASE_DIR, "instance_types", "mocks", "jsons", "data", "instance_types.json"
     )
     path_to_temp_data_dir = os.path.join(BASE_DIR, "instance_types", "temp")
 

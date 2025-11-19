@@ -1,9 +1,5 @@
-from editor.api_endpoint_client import (
-    ApiEndpoint,
-    ColumnMetadataApiEndpoint,
-)
-
-from .definitions import InstanceTypeUserSpecifiableOpenApiDefinition
+from editor.api.endpoints.base import ApiEndpoint, ColumnMetadataApiEndpoint
+from instance_types.api.definitions import InstanceTypeUserSpecifiableOpenApiDefinition
 
 
 class InstanceTypeApiEndpoint(ApiEndpoint):

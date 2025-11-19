@@ -2,9 +2,9 @@ import json
 
 from django.test import SimpleTestCase
 
-from editor.mixins.test_mixins import ApplicationApiEndpointTestCaseHelperMixin
+from editor.test_mixins import ApplicationApiEndpointTestCaseHelperMixin
 
-from .api_endpoint_client import ApplicationApiEndpoint
+from .api.endpoints.application import ApplicationApiEndpoint
 
 
 class ApplicationApiEndpointTestCase(

@@ -1,4 +1,4 @@
-from ..api_endpoint_client import ApiEndpoint
+from editor.api.endpoints.base import ApiEndpoint
 
 
 class ApiEndpointTestCaseHelperMixin:

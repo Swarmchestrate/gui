@@ -8,7 +8,7 @@ from editor.views import (
     RegistrationsListFormView,
 )
 
-from .api_endpoint_client import (
+from .api.endpoints.application import (
     ApplicationApiEndpoint,
     ApplicationColumnMetadataApiEndpoint,
 )

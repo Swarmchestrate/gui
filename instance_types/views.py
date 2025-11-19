@@ -8,9 +8,12 @@ from editor.views import (
     RegistrationsListFormView,
 )
 
-# from .api_endpoint_client import InstanceTypeApiEndpoint, InstanceTypeColumnMetadataApiEndpoint
+# from .api.endpoints.instance_type import (
+#     InstanceTypeApiEndpoint,
+#     InstanceTypeColumnMetadataApiEndpoint,
+# )
 from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
-from .mocks.api_endpoint_client import (
+from .mocks.endpoints.instance_type import (
     InstanceTypeApiEndpoint,
     InstanceTypeColumnMetadataApiEndpoint,
 )

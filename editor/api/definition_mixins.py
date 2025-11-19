@@ -1,4 +1,4 @@
-from ..abc import BaseOpenApiDefinition
+from .abc import BaseOpenApiDefinition
 
 
 class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):

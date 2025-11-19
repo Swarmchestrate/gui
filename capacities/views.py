@@ -20,12 +20,14 @@ from editor.views import (
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
 
-# from instance_types.api_endpoint_client import InstanceTypeApiEndpoint
-from instance_types.mocks.api_endpoint_client import InstanceTypeApiEndpoint
+# from instance_types.api.endpoints.instance_type import InstanceTypeApiEndpoint
+from instance_types.mocks.endpoints.instance_type import InstanceTypeApiEndpoint
 
-# from .api_endpoint_client import (
+# from .api.endpoints.cloud_capacity import (
 #     CloudCapacityApiEndpoint,
 #     CloudCapacityColumnMetadataApiEndpoint,
+# )
+# from .api.endpoints.edge_capacity import (
 #     EdgeCapacityApiEndpoint,
 #     EdgeCapacityColumnMetadataApiEndpoint,
 # )
@@ -46,18 +48,20 @@ from .formsets import (
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
 )
-from .mixins.view_mixins import (
+from .mocks.endpoints.cloud_capacity import (
+    CloudCapacityApiEndpoint,
+    CloudCapacityColumnMetadataApiEndpoint,
+)
+from .mocks.endpoints.edge_capacity import (
+    EdgeCapacityApiEndpoint,
+    EdgeCapacityColumnMetadataApiEndpoint,
+)
+from .view_mixins import (
     AccessibleSensorsFormsetEditorViewMixin,
     ArchitectureFormSetEditorViewMixin,
     DevicesFormsetEditorViewMixin,
     LocalityFormSetEditorViewMixin,
     OperatingSystemFormSetEditorViewMixin,
-)
-from .mocks.api_endpoint_client import (
-    CloudCapacityApiEndpoint,
-    CloudCapacityColumnMetadataApiEndpoint,
-    EdgeCapacityApiEndpoint,
-    EdgeCapacityColumnMetadataApiEndpoint,
 )
 
 

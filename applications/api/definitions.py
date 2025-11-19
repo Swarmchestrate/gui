@@ -1,8 +1,8 @@
-from editor.definitions import UserSpecifiableOpenApiDefinition
+from editor.api.definitions import UserSpecifiableOpenApiDefinition
 
 
 class ApplicationUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
     def __init__(self, openapi_spec: dict) -> None:
         super().__init__(openapi_spec)
-        self.definition_name = 'application'
-        self.id_field = 'application_id'
+        self.definition_name = "application"
+        self.id_field = "application_id"

@@ -1,4 +1,4 @@
-from editor.mixins.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
+from editor.api.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
 
 
 class CapacityInstanceTypeUserSpecifiableOpenApiDefinitionMixin(

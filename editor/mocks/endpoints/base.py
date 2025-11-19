@@ -7,14 +7,14 @@ from pathlib import Path
 
 from django.conf import settings
 
-from ..abc import BaseApiEndpoint
-from ..api_client import ApiClient
-from .definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
+from editor.api.abc import BaseApiEndpoint
+from editor.mocks.api_client import MockApiClient
+from editor.mocks.definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class MockApiEndpoint(ApiClient, BaseApiEndpoint):
+class MockApiEndpoint(MockApiClient, BaseApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -158,7 +158,7 @@ class MockColumnMetadataApiEndpoint(MockApiEndpoint):
     """
 
     path_to_data = os.path.join(
-        settings.BASE_DIR, "editor", "mocks", "data", "column_metadata.json"
+        settings.BASE_DIR, "editor", "mocks", "jsons", "data", "column_metadata.json"
     )
     path_to_temp_data_dir = os.path.join(settings.BASE_DIR, "editor", "temp")
 
