@@ -1,6 +1,5 @@
+from applications.api.definitions import ApplicationUserSpecifiableOpenApiDefinition
 from editor.api.endpoints.base import ApiEndpoint, ColumnMetadataApiEndpoint
-
-from ..definitions import ApplicationUserSpecifiableOpenApiDefinition
 
 
 class ApplicationApiEndpoint(ApiEndpoint):
