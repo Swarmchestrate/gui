@@ -29,7 +29,7 @@ class BaseOpenApiDefinition:
         return {key: value for key, value in all_fields.items() if key in names}
 
 
-class BaseApiClient(ABC):
+class BaseApiEndpoint(ABC):
     endpoint_definition: BaseOpenApiDefinition
     endpoint_definition_class: Type[BaseOpenApiDefinition]
 

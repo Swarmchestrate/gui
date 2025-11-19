@@ -6,12 +6,12 @@ from datetime import datetime, timezone
 
 import requests
 
-from ..abc import BaseApiClient
+from ..abc import BaseApiEndpoint
 
 logger = logging.getLogger(__name__)
 
 
-class ApiEndpoint(BaseApiClient):
+class ApiEndpoint(BaseApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
