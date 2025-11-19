@@ -3,8 +3,8 @@ import os
 from django.conf import settings
 
 from editor.mocks.api_endpoint_client import (
-    MockApiEndpointClient,
-    MockColumnMetadataApiEndpointClient,
+    MockApiEndpoint,
+    MockColumnMetadataApiEndpoint,
 )
 
 from .definitions import CapacityUserSpecifiableOpenApiDefinition
@@ -13,7 +13,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 # Cloud Capacities
-class CloudCapacityApiEndpointClient(MockApiEndpointClient):
+class CloudCapacityApiEndpoint(MockApiEndpoint):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR, "capacities", "mocks", "data", "cloud_capacities.json"
@@ -21,7 +21,7 @@ class CloudCapacityApiEndpointClient(MockApiEndpointClient):
     path_to_temp_data_dir = os.path.join(BASE_DIR, "capacities", "temp")
 
 
-class CloudCapacityColumnMetadataApiEndpointClient(MockColumnMetadataApiEndpointClient):
+class CloudCapacityColumnMetadataApiEndpoint(MockColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         registrations = super().get_registrations()
         return [
@@ -35,7 +35,7 @@ class CloudCapacityColumnMetadataApiEndpointClient(MockColumnMetadataApiEndpoint
 
 
 # Edge Capacities
-class EdgeCapacityApiEndpointClient(MockApiEndpointClient):
+class EdgeCapacityApiEndpoint(MockApiEndpoint):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR, "capacities", "mocks", "data", "edge_capacities.json"
@@ -43,7 +43,7 @@ class EdgeCapacityApiEndpointClient(MockApiEndpointClient):
     path_to_temp_data_dir = os.path.join(BASE_DIR, "capacities", "temp")
 
 
-class EdgeCapacityColumnMetadataApiEndpointClient(MockColumnMetadataApiEndpointClient):
+class EdgeCapacityColumnMetadataApiEndpoint(MockColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         registrations = super().get_registrations()
         return [

@@ -13,7 +13,7 @@ from .definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
 logger = logging.getLogger(__name__)
 
 
-class MockApiEndpointClient(BaseApiClient):
+class MockApiEndpoint(BaseApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -166,7 +166,7 @@ class MockApiEndpointClient(BaseApiClient):
         return self._update_temp_data(updated_registrations)
 
 
-class MockColumnMetadataApiEndpointClient(MockApiEndpointClient):
+class MockColumnMetadataApiEndpoint(MockApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """

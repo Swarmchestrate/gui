@@ -3,8 +3,8 @@ import os
 from django.conf import settings
 
 from editor.mocks.api_endpoint_client import (
-    MockApiEndpointClient,
-    MockColumnMetadataApiEndpointClient,
+    MockApiEndpoint,
+    MockColumnMetadataApiEndpoint,
 )
 
 from .definitions import CapacityInstanceTypeUserSpecifiableOpenApiDefinition
@@ -12,7 +12,7 @@ from .definitions import CapacityInstanceTypeUserSpecifiableOpenApiDefinition
 BASE_DIR = settings.BASE_DIR
 
 
-class InstanceTypeApiEndpointClient(MockApiEndpointClient):
+class InstanceTypeApiEndpoint(MockApiEndpoint):
     endpoint_definition_class = CapacityInstanceTypeUserSpecifiableOpenApiDefinition
 
     path_to_data = os.path.join(
@@ -27,7 +27,7 @@ class InstanceTypeApiEndpointClient(MockApiEndpointClient):
         return data
 
 
-class InstanceTypeColumnMetadataApiEndpointClient(MockColumnMetadataApiEndpointClient):
+class InstanceTypeColumnMetadataApiEndpoint(MockColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         registrations = super().get_registrations()
         return [

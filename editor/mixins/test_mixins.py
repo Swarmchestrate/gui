@@ -1,9 +1,9 @@
-from ..api_endpoint_client import ApiEndpointClient
+from ..api_endpoint_client import ApiEndpoint
 
 
-class ApiEndpointClientTestCaseHelperMixin:
-    api_endpoint_client_class: ApiEndpointClient
-    api_endpoint_client: ApiEndpointClient
+class ApiEndpointTestCaseHelperMixin:
+    api_endpoint_client_class: ApiEndpoint
+    api_endpoint_client: ApiEndpoint
 
     # unittest.TestCase setUp() hook
     def setUp(self):
@@ -34,9 +34,7 @@ class ApiEndpointClientTestCaseHelperMixin:
         return new_registration
 
 
-class ApplicationApiEndpointClientTestCaseHelperMixin(
-    ApiEndpointClientTestCaseHelperMixin
-):
+class ApplicationApiEndpointTestCaseHelperMixin(ApiEndpointTestCaseHelperMixin):
     def register_with_api_endpoint_client_for_test(self, data: dict = None):
         if not data:
             data = dict()

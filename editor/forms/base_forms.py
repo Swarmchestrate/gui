@@ -3,8 +3,8 @@ from enum import Enum
 from django import forms
 
 from editor.api_endpoint_client import (
-    ApiEndpointClient,
-    ColumnMetadataApiEndpointClient,
+    ApiEndpoint,
+    ColumnMetadataApiEndpoint,
 )
 
 
@@ -40,8 +40,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
     def __init__(
         self,
-        api_endpoint_client: ApiEndpointClient,
-        column_metadata_api_endpoint_client: ColumnMetadataApiEndpointClient,
+        api_endpoint_client: ApiEndpoint,
+        column_metadata_api_endpoint_client: ColumnMetadataApiEndpoint,
         *args,
         **kwargs,
     ):
@@ -184,7 +184,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
     def __init__(
-        self, api_endpoint_client: ApiEndpointClient, category: str, *args, **kwargs
+        self, api_endpoint_client: ApiEndpoint, category: str, *args, **kwargs
     ):
         self.category = category
         super().__init__(api_endpoint_client, *args, **kwargs)

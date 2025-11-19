@@ -20,14 +20,14 @@ from editor.views import (
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
 
-# from instance_types.api_endpoint_client import InstanceTypeApiEndpointClient
-from instance_types.mocks.api_endpoint_client import InstanceTypeApiEndpointClient
+# from instance_types.api_endpoint_client import InstanceTypeApiEndpoint
+from instance_types.mocks.api_endpoint_client import InstanceTypeApiEndpoint
 
 # from .api_endpoint_client import (
-#     CloudCapacityApiEndpointClient,
-#     CloudCapacityColumnMetadataApiEndpointClient,
-#     EdgeCapacityApiEndpointClient,
-#     EdgeCapacityColumnMetadataApiEndpointClient,
+#     CloudCapacityApiEndpoint,
+#     CloudCapacityColumnMetadataApiEndpoint,
+#     EdgeCapacityApiEndpoint,
+#     EdgeCapacityColumnMetadataApiEndpoint,
 # )
 from .forms import (
     CapacityEnergyConsumptionEditorForm,
@@ -54,10 +54,10 @@ from .mixins.view_mixins import (
     OperatingSystemFormSetEditorViewMixin,
 )
 from .mocks.api_endpoint_client import (
-    CloudCapacityApiEndpointClient,
-    CloudCapacityColumnMetadataApiEndpointClient,
-    EdgeCapacityApiEndpointClient,
-    EdgeCapacityColumnMetadataApiEndpointClient,
+    CloudCapacityApiEndpoint,
+    CloudCapacityColumnMetadataApiEndpoint,
+    EdgeCapacityApiEndpoint,
+    EdgeCapacityColumnMetadataApiEndpoint,
 )
 
 
@@ -377,7 +377,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def process_instance_types(
         self,
         formset: InstanceTypeFormSet,
-        api_endpoint_client_class: InstanceTypeApiEndpointClient,
+        api_endpoint_client_class: InstanceTypeApiEndpoint,
     ):
         instance_type_api_client = api_endpoint_client_class()
         inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
@@ -452,7 +452,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             isinstance(instance_type_id, int) for instance_type_id in instance_type_ids
         ):
             return initial
-        instance_type_api_client = InstanceTypeApiEndpointClient()
+        instance_type_api_client = InstanceTypeApiEndpoint()
         instance_types = instance_type_api_client.get_registrations_by_ids(
             instance_type_ids
         )
@@ -493,7 +493,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             InstanceTypeEditorForm,
             self.instance_types_property_name,
             InstanceTypeFormSet,
-            InstanceTypeApiEndpointClient,
+            InstanceTypeApiEndpoint,
             self.process_instance_types,
             extra_formset_factory_kwargs={
                 "extra": 0,
@@ -533,10 +533,8 @@ class CloudCapacityEditorView(EditorView):
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
     registration_type_name_singular = "cloud capacity"
     registration_type_name_plural = "cloud capacities"
-    api_endpoint_client_class = CloudCapacityApiEndpointClient
-    column_metadata_api_endpoint_client_class = (
-        CloudCapacityColumnMetadataApiEndpointClient
-    )
+    api_endpoint_client_class = CloudCapacityApiEndpoint
+    column_metadata_api_endpoint_client_class = CloudCapacityColumnMetadataApiEndpoint
 
 
 class CloudCapacityEditorStartFormView(
@@ -639,10 +637,8 @@ class EdgeCapacityEditorView(EditorView):
     registration_type_name_singular = "edge capacity"
     registration_type_name_plural = "edge capacities"
     title_base = "New Edge Capacity"
-    api_endpoint_client_class = EdgeCapacityApiEndpointClient
-    column_metadata_api_endpoint_client_class = (
-        EdgeCapacityColumnMetadataApiEndpointClient
-    )
+    api_endpoint_client_class = EdgeCapacityApiEndpoint
+    column_metadata_api_endpoint_client_class = EdgeCapacityColumnMetadataApiEndpoint
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):

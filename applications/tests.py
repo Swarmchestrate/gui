@@ -2,15 +2,15 @@ import json
 
 from django.test import SimpleTestCase
 
-from editor.mixins.test_mixins import ApplicationApiEndpointClientTestCaseHelperMixin
+from editor.mixins.test_mixins import ApplicationApiEndpointTestCaseHelperMixin
 
-from .api_endpoint_client import ApplicationApiEndpointClient
+from .api_endpoint_client import ApplicationApiEndpoint
 
 
-class ApplicationApiEndpointClientTestCase(
-    ApplicationApiEndpointClientTestCaseHelperMixin, SimpleTestCase
+class ApplicationApiEndpointTestCase(
+    ApplicationApiEndpointTestCaseHelperMixin, SimpleTestCase
 ):
-    api_endpoint_client_class = ApplicationApiEndpointClient
+    api_endpoint_client_class = ApplicationApiEndpoint
 
     def test_get_registrations(self):
         applications = self.api_endpoint_client.get_registrations()

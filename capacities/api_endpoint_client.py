@@ -1,22 +1,22 @@
 from editor.api_endpoint_client import (
-    ApiEndpointClient,
-    ColumnMetadataApiEndpointClient,
+    ApiEndpoint,
+    ColumnMetadataApiEndpoint,
 )
 
 from .definitions import CapacityUserSpecifiableOpenApiDefinition
 
 
-class BaseCapacityApiEndpointClient(ApiEndpointClient):
+class BaseCapacityApiEndpoint(ApiEndpoint):
     def __init__(self) -> None:
         self.endpoint = "capacity"
         super().__init__()
 
 
-class CapacityApiEndpointClient(BaseCapacityApiEndpointClient):
+class CapacityApiEndpoint(BaseCapacityApiEndpoint):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
 
 
-class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
+class CloudCapacityApiEndpoint(BaseCapacityApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -34,7 +34,7 @@ class CloudCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
         return super().delete(registration_id, params)
 
 
-class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+class CloudCapacityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -62,7 +62,7 @@ class CloudCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClie
         return self.get_registrations(params={"category": f'eq."{category}"'})
 
 
-class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
+class EdgeCapacityApiEndpoint(BaseCapacityApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -80,7 +80,7 @@ class EdgeCapacityApiEndpointClient(BaseCapacityApiEndpointClient):
         return super().delete(registration_id, params)
 
 
-class EdgeCapacityColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+class EdgeCapacityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()

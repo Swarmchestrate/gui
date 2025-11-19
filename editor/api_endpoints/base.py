@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import random
@@ -5,8 +6,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from .abc import BaseApiClient
-from .definitions import ColumnMetadataUserSpecifiableOpenApiDefinition
+from ..abc import BaseApiClient
 
 logger = logging.getLogger(__name__)
 
@@ -181,21 +181,3 @@ class ApiEndpoint(BaseApiClient):
             self.endpoint_url, params=params, json=prepared_update_data
         )
         self.log_and_raise_response_status_if_error(response)
-
-
-class ColumnMetadataApiEndpoint(ApiEndpoint):
-    """This class is intended to be subclassed and shouldn't be
-    instantiated directly.
-    """
-
-    endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
-
-    def __init__(self) -> None:
-        self.endpoint = "column_metadata"
-        super().__init__()
-
-    def get_by_category(self, category: str):
-        return self.get_registrations(params={"category": f"eq.{category}"})
-
-    def get_by_table_name(self, table_name: str):
-        return self.get_registrations(params={"table_name": f"eq.{table_name}"})

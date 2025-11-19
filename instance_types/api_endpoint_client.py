@@ -1,12 +1,12 @@
 from editor.api_endpoint_client import (
-    ApiEndpointClient,
-    ColumnMetadataApiEndpointClient,
+    ApiEndpoint,
+    ColumnMetadataApiEndpoint,
 )
 
 from .definitions import InstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class InstanceTypeApiEndpointClient(ApiEndpointClient):
+class InstanceTypeApiEndpoint(ApiEndpoint):
     endpoint_definition_class = InstanceTypeUserSpecifiableOpenApiDefinition
 
     def __init__(self) -> None:
@@ -20,7 +20,7 @@ class InstanceTypeApiEndpointClient(ApiEndpointClient):
         return data
 
 
-class InstanceTypeColumnMetadataApiEndpointClient(ColumnMetadataApiEndpointClient):
+class InstanceTypeColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()

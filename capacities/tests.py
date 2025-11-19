@@ -1,18 +1,16 @@
 from django.test import SimpleTestCase
 
-from editor.mixins.test_mixins import ApiEndpointClientTestCaseHelperMixin
+from editor.mixins.test_mixins import ApiEndpointTestCaseHelperMixin
 
 from .api_endpoint_client import (
-    CapacityApiEndpointClient,
-    CloudCapacityApiEndpointClient,
-    EdgeCapacityApiEndpointClient,
+    CapacityApiEndpoint,
+    CloudCapacityApiEndpoint,
+    EdgeCapacityApiEndpoint,
 )
 
 
-class CapacityApiEndpointClientTestCase(
-    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
-):
-    api_endpoint_client_class = CapacityApiEndpointClient
+class CapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
+    api_endpoint_client_class = CapacityApiEndpoint
 
     def test_get_registrations(self):
         capacities = self.api_endpoint_client.get_registrations()
@@ -33,10 +31,8 @@ class CapacityApiEndpointClientTestCase(
         self.assertIsInstance(field_formats, list)
 
 
-class CloudCapacityApiEndpointClientTestCase(
-    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
-):
-    api_endpoint_client_class = CloudCapacityApiEndpointClient
+class CloudCapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
+    api_endpoint_client_class = CloudCapacityApiEndpoint
 
     def test_get_registrations(self):
         capacities = self.api_endpoint_client.get_registrations()
@@ -66,10 +62,8 @@ class CloudCapacityApiEndpointClientTestCase(
         self.assertEqual(updated_registration.get("mobility"), True)
 
 
-class EdgeCapacityApiEndpointClientTestCase(
-    ApiEndpointClientTestCaseHelperMixin, SimpleTestCase
-):
-    api_endpoint_client_class = EdgeCapacityApiEndpointClient
+class EdgeCapacityApiEndpointTestCase(ApiEndpointTestCaseHelperMixin, SimpleTestCase):
+    api_endpoint_client_class = EdgeCapacityApiEndpoint
 
     def test_get_registrations(self):
         capacities = self.api_endpoint_client.get_registrations()
