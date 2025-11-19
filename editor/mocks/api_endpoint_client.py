@@ -7,13 +7,13 @@ from pathlib import Path
 
 from django.conf import settings
 
-from ..abc import BaseApiEndpointClient
+from ..abc import BaseApiClient
 from .definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class MockApiEndpointClient(BaseApiEndpointClient):
+class MockApiEndpointClient(BaseApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """

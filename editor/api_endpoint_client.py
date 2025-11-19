@@ -5,13 +5,13 @@ from datetime import datetime, timezone
 
 import requests
 
-from .abc import BaseApiEndpointClient
+from .abc import BaseApiClient
 from .definitions import ColumnMetadataUserSpecifiableOpenApiDefinition
 
 logger = logging.getLogger(__name__)
 
 
-class ApiEndpointClient(BaseApiEndpointClient):
+class ApiEndpointClient(BaseApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
