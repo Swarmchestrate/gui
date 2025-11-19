@@ -80,7 +80,7 @@ class CapacityEditorRouterView(EditorRouterView):
             )
         elif self.category.lower() == "energy":
             return self.energy_editor_view_class.as_view()(request, *args, **kwargs)
-        elif self.category.lower() == "security, trust & access":
+        elif self.category.lower() == "security":
             return self.security_trust_and_access_editor_view_class.as_view()(
                 request, *args, **kwargs
             )

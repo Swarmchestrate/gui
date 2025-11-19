@@ -435,7 +435,7 @@
         "table_name": "capacity",
         "column_name": "energy_type",
         "title": "Energy Type",
-        "category": "Energy",
+        "category": "Metadata",
         "description": "Type of energy used: Green, Brown, Mix.",
         "order": null
     },
@@ -443,7 +443,7 @@
         "table_name": "capacity",
         "column_name": "powered_type",
         "title": "Powered Type",
-        "category": "Energy",
+        "category": "Metadata",
         "description": "Power source type: Battery powered or Mains powered.",
         "order": null
     },
@@ -451,7 +451,7 @@
         "table_name": "capacity",
         "column_name": "energy_consumption",
         "title": "Energy Consumption",
-        "category": "Energy",
+        "category": "Metadata",
         "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
         "order": null
     },
@@ -483,7 +483,7 @@
         "table_name": "capacity",
         "column_name": "security_ports",
         "title": "Security Ports",
-        "category": "Security, Trust & Access",
+        "category": "Security",
         "description": "List of ports that the resource allows to be opened.",
         "order": null
     },
@@ -491,7 +491,7 @@
         "table_name": "capacity",
         "column_name": "trust",
         "title": "Trust",
-        "category": "Security, Trust & Access",
+        "category": "Security",
         "description": "Trust level of the resource (definition TBD).",
         "order": null
     },
@@ -499,7 +499,7 @@
         "table_name": "capacity",
         "column_name": "access_credentials",
         "title": "Access Credentials",
-        "category": "Security, Trust & Access:Access",
+        "category": "Security",
         "description": "Credentials for accessing the resource (e.g., SSH keys).",
         "order": null
     },
@@ -507,7 +507,7 @@
         "table_name": "capacity",
         "column_name": "access_endpoints",
         "title": "Access Endpoints",
-        "category": "Security, Trust & Access:Access",
+        "category": "Security",
         "description": "Endpoints for accessing the resource.",
         "order": null
     },
