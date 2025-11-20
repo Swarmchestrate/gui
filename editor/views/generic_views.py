@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from .api.endpoints.base import ApiEndpoint, ColumnMetadataApiEndpoint
+from editor.api.endpoints.base import ApiEndpoint, ColumnMetadataApiEndpoint
 
 
 class EditorView(TemplateView):

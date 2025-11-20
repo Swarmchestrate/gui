@@ -1,7 +1,6 @@
 from django.urls import path
 
 from .views import (
-    capacity_views,
     cloud_capacity_views,
     edge_capacity_views,
 )
@@ -48,20 +47,5 @@ urlpatterns = [
         "new-edge-capacity/",
         edge_capacity_views.EdgeCapacityEditorStartFormView.as_view(),
         name="new_edge_capacity",
-    ),
-    path(
-        "api/locality/search",
-        capacity_views.CapacityLocalityOptionsSearchProcessFormView.as_view(),
-        name="locality_options_search",
-    ),
-    path(
-        "api/locality-by-name/",
-        capacity_views.CapacityGetLocalityByNameProcessFormView.as_view(),
-        name="get_locality_by_name",
-    ),
-    path(
-        "api/locality-by-gps/",
-        capacity_views.CapacityGetLocalityByGpsProcessFormView.as_view(),
-        name="get_locality_by_gps",
     ),
 ]

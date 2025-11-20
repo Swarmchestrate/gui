@@ -1,10 +1,11 @@
 import {
     getEmptyLocalityTemplate,
     fillLocalityAutomatically,
-} from "/static/capacities/locality_autofill.js";
+} from "/static/editor/locality/locality_autofill.js";
+import { localityFormPrefix } from "/static/editor/locality/locality_section.js";
 
-const latitudeInputSelector = "input[name='locality-gps_location_latitude']";
-const longitudeInputSelector = "input[name='locality-gps_location_longitude']";
+const latitudeInputSelector = `input[name='${localityFormPrefix}-gps_location_latitude']`;
+const longitudeInputSelector = `input[name='${localityFormPrefix}-gps_location_longitude']`;
 
 async function getLocalityByGpsLocation(latitude, longitude) {
     const locality = getEmptyLocalityTemplate();

@@ -12,7 +12,7 @@ from capacities.mocks.endpoints.edge_capacity import (
     EdgeCapacityApiEndpoint,
     EdgeCapacityColumnMetadataApiEndpoint,
 )
-from editor.views import (
+from editor.views.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,

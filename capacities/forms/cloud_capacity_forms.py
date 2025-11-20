@@ -17,7 +17,8 @@ class CloudCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
     disabled_categories = ["Edge Specific", "Networking"]
 
 
-# Sub-forms to faciliate input for certain fields
+# Forms to be used in formsets to help with the input
+# of certain fields.
 class CloudCapacityArchitectureEditorForm(EditorForm):
     architecture_name = forms.CharField(
         label="Architecture Name",

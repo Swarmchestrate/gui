@@ -13,7 +13,7 @@ from capacities.mocks.endpoints.cloud_capacity import (
     CloudCapacityApiEndpoint,
     CloudCapacityColumnMetadataApiEndpoint,
 )
-from editor.views import (
+from editor.views.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,

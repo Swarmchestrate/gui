@@ -16,7 +16,8 @@ class EdgeCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = "capacity"
 
 
-# Sub-forms to faciliate input for certain fields
+# Forms to be used in formsets to help with the input
+# of certain fields.
 class EdgeCapacityAccessibleSensorsEditorForm(EditorForm):
     sensor_name = forms.CharField(
         label="Sensor Name",

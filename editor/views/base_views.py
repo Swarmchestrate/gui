@@ -14,8 +14,9 @@ from django.views.generic import (
 )
 from django.views.generic.edit import ProcessFormView
 
-from .forms.base_forms import RegistrationsListForm
-from .forms.formsets import BaseEditorFormSet
+from editor.forms.base_forms import RegistrationsListForm
+from editor.formsets.base_formsets import BaseEditorFormSet
+
 from .generic_views import EditorTocView, EditorView
 
 logger = logging.getLogger(__name__)

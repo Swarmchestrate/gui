@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from editor.views import (
+from editor.views.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,

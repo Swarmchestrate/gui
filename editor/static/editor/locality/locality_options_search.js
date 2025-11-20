@@ -1,7 +1,8 @@
 import {
     getEmptyLocalityTemplate,
     fillLocalityAutomatically,
-} from "/static/capacities/locality_autofill.js";
+} from "/static/editor/locality/locality_autofill.js";
+import { localityFormPrefix } from "/static/editor/locality/locality_section.js";
 
 async function getLocalityOptions(query, localityOptionsSearchUrl) {
     const response = await fetch(
@@ -58,7 +59,7 @@ async function getLocality(value, getLocalityUrl) {
 }
 
 function setupLocalityTomSelect(localityOptionsSearchUrl) {
-    const localityTomSelect = new TomSelect("#id_locality-query", {
+    const localityTomSelect = new TomSelect(`#id_${localityFormPrefix}-query`, {
         valueField: "value",
         labelField: "name",
         searchField: "name",
