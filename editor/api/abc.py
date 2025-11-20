@@ -117,3 +117,7 @@ class BaseApiEndpoint(BaseApiClient, ABC):
         if len(random_ids) != amount:
             raise Error(f"Failed to generate {amount} new unique IDs.")
         return random_ids
+
+
+class BaseColumnMetadataApiEndpoint(BaseApiEndpoint, ABC):
+    disabled_categories: list[str] = list()

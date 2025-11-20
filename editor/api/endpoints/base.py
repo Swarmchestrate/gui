@@ -1,10 +1,11 @@
 import logging
 import random
+from ast import literal_eval as make_tuple
 from datetime import datetime, timezone
 
 import requests
 
-from editor.api.abc import BaseApiEndpoint
+from editor.api.abc import BaseApiEndpoint, BaseColumnMetadataApiEndpoint
 from editor.api.api_client import ApiClient
 from editor.api.definitions import ColumnMetadataUserSpecifiableOpenApiDefinition
 
@@ -166,7 +167,7 @@ class ApiEndpoint(ApiClient, BaseApiEndpoint):
         self.log_and_raise_response_status_if_error(response)
 
 
-class ColumnMetadataApiEndpoint(ApiEndpoint):
+class ColumnMetadataApiEndpoint(ApiEndpoint, BaseColumnMetadataApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -177,7 +178,27 @@ class ColumnMetadataApiEndpoint(ApiEndpoint):
         self.endpoint = "column_metadata"
         super().__init__()
 
-    def get_by_category(self, category: str):
+    def get_registrations(self, params: dict | None = None) -> list[dict]:
+        if not params:
+            params = dict()
+        and_conditions = set(
+            f"category.neq.{category}" for category in self.disabled_categories
+        )
+        if "and" in params:
+            existing_and_conditions = make_tuple(params.get("and", "()"))
+            for condition in existing_and_conditions:
+                and_conditions.add(condition)
+        if "category" in params:
+            and_conditions.add(f"category.{params.get('category')}")
+            params.pop("category", None)
+        params.update(
+            {
+                "and": f"({','.join(and_conditions)})",
+            }
+        )
+        return super().get_registrations(params)
+
+    def get_registrations_by_category(self, category: str):
         return self.get_registrations(params={"category": f"eq.{category}"})
 
     def get_by_table_name(self, table_name: str):

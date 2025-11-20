@@ -190,8 +190,10 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         super().__init__(api_endpoint, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_endpoint.get_by_category(
-            self.category
+        column_metadata = (
+            self.column_metadata_api_endpoint.get_registrations_by_category(
+                self.category
+            )
         )
         field_names = [r.get("column_name") for r in column_metadata]
         field_data = self.api_endpoint.endpoint_definition.get_user_specifiable_fields_with_names(

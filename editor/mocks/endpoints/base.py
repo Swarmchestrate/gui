@@ -7,7 +7,7 @@ from pathlib import Path
 
 from django.conf import settings
 
-from editor.api.abc import BaseApiEndpoint
+from editor.api.abc import BaseApiEndpoint, BaseColumnMetadataApiEndpoint
 from editor.mocks.api_client import MockApiClient
 from editor.mocks.definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
 
@@ -152,7 +152,7 @@ class MockApiEndpoint(MockApiClient, BaseApiEndpoint):
         return self._update_temp_data(updated_registrations)
 
 
-class MockColumnMetadataApiEndpoint(MockApiEndpoint):
+class MockColumnMetadataApiEndpoint(MockApiEndpoint, BaseColumnMetadataApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -164,10 +164,24 @@ class MockColumnMetadataApiEndpoint(MockApiEndpoint):
 
     endpoint_definition_class = MockColumnMetadataUserSpecifiableOpenApiDefinition
 
-    def get_by_category(self, category: str):
+    def get_registrations_by_category(self, category: str):
         registrations = self.get_registrations()
-        return [r for r in registrations if r.get("category") == category]
+        return [
+            r
+            for r in registrations
+            if (
+                r.get("category") not in self.disabled_categories
+                and r.get("category") == category
+            )
+        ]
 
     def get_by_table_name(self, table_name: str):
         registrations = self.get_registrations()
-        return [r for r in registrations if r.get("table_name") == table_name]
+        return [
+            r
+            for r in registrations
+            if (
+                r.get("category") not in self.disabled_categories
+                and r.get("table_name") == table_name
+            )
+        ]

@@ -4,18 +4,24 @@ import geonamescache
 import reverse_geocode
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
-from django.views.generic import FormView
 from django.views.generic.edit import ProcessFormView
 
+from capacities.forms.capacity_forms import (
+    CapacityEnergyConsumptionEditorForm,
+    CapacityGetLocalityByGpsForm,
+    CapacityGetLocalityByNameForm,
+    CapacityLocalityOptionsSearchForm,
+    CapacityPriceEditorForm,
+    CapacitySecurityPortsEditorForm,
+)
+from capacities.formsets.capacity_formsets import (
+    CapacityEnergyConsumptionEditorFormSet,
+    CapacityPriceEditorFormSet,
+    CapacitySecurityPortsEditorFormSet,
+)
 from editor.views import (
-    EditorOverviewTemplateView,
-    EditorProcessFormView,
     EditorRouterView,
-    EditorStartFormView,
-    EditorView,
     MultipleEditorFormsetProcessFormView,
-    RegistrationsListFormView,
 )
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
@@ -23,46 +29,7 @@ from instance_types.formsets import InstanceTypeFormSet
 # from instance_types.api.endpoints.instance_type import InstanceTypeApiEndpoint
 from instance_types.mocks.endpoints.instance_type import InstanceTypeApiEndpoint
 
-# from .api.endpoints.cloud_capacity import (
-#     CloudCapacityApiEndpoint,
-#     CloudCapacityColumnMetadataApiEndpoint,
-# )
-# from .api.endpoints.edge_capacity import (
-#     EdgeCapacityApiEndpoint,
-#     EdgeCapacityColumnMetadataApiEndpoint,
-# )
-from .forms import (
-    CapacityEnergyConsumptionEditorForm,
-    CapacityGetLocalityByGpsForm,
-    CapacityGetLocalityByNameForm,
-    CapacityLocalityOptionsSearchForm,
-    CapacityPriceEditorForm,
-    CapacitySecurityPortsEditorForm,
-    CloudCapacityEditorForm,
-    CloudCapacityRegistrationForm,
-    EdgeCapacityEditorForm,
-    EdgeCapacityRegistrationForm,
-)
-from .formsets import (
-    CapacityEnergyConsumptionEditorFormSet,
-    CapacityPriceEditorFormSet,
-    CapacitySecurityPortsEditorFormSet,
-)
-from .mocks.endpoints.cloud_capacity import (
-    CloudCapacityApiEndpoint,
-    CloudCapacityColumnMetadataApiEndpoint,
-)
-from .mocks.endpoints.edge_capacity import (
-    EdgeCapacityApiEndpoint,
-    EdgeCapacityColumnMetadataApiEndpoint,
-)
-from .view_mixins import (
-    AccessibleSensorsFormsetEditorViewMixin,
-    ArchitectureFormSetEditorViewMixin,
-    DevicesFormsetEditorViewMixin,
-    LocalityFormSetEditorViewMixin,
-    OperatingSystemFormSetEditorViewMixin,
-)
+from .mixins.capacity_mixins import LocalityFormSetEditorViewMixin
 
 
 # Cloud & Edge Capacities
@@ -523,206 +490,3 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             }
         )
         return context
-
-
-# Cloud Capacity
-class CloudCapacityEditorView(EditorView):
-    editor_registration_list_url_reverse = "capacities:cloud_capacities_list"
-    editor_url_reverse_base = "capacities:cloud_capacity_editor"
-    editor_start_url_reverse_base = "capacities:new_cloud_capacity"
-    editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
-    registration_type_name_singular = "cloud capacity"
-    registration_type_name_plural = "cloud capacities"
-    api_endpoint_class = CloudCapacityApiEndpoint
-    column_metadata_api_endpoint_class = CloudCapacityColumnMetadataApiEndpoint
-
-
-class CloudCapacityEditorStartFormView(
-    CloudCapacityEditorView, EditorStartFormView, FormView
-):
-    template_name = "capacities/new_cloud_capacity_start.html"
-    form_class = CloudCapacityRegistrationForm
-
-
-class CloudCapacityEditorProcessFormView(
-    CloudCapacityEditorView, EditorProcessFormView
-):
-    template_name = "capacities/cloud_capacity_editor.html"
-    main_form_class = CloudCapacityEditorForm
-    success_url = reverse_lazy("capacities:new_cloud_capacity")
-
-
-class CloudCapacityMetadataEditorProcessFormView(
-    CloudCapacityEditorProcessFormView, CapacityMetadataEditorProcessFormView
-):
-    pass
-
-
-class CloudCapacityCostAndLocalityEditorProcessFormView(
-    CloudCapacityEditorProcessFormView, CapacityCostAndLocalityEditorProcessFormView
-):
-    pass
-
-
-class CloudCapacityEnergyEditorProcessFormView(
-    CloudCapacityEditorProcessFormView, CapacityEnergyEditorProcessFormView
-):
-    pass
-
-
-class CloudCapacitySecurityTrustAndAccessEditorProcessFormView(
-    CloudCapacityEditorProcessFormView,
-    CapacitySecurityTrustAndAccessEditorProcessFormView,
-):
-    pass
-
-
-class CloudCapacitySystemSpecificEditorProcessFormView(
-    CloudCapacityEditorProcessFormView,
-    MultipleEditorFormsetProcessFormView,
-    ArchitectureFormSetEditorViewMixin,
-    OperatingSystemFormSetEditorViewMixin,
-):
-    def dispatch(self, request, *args, **kwargs):
-        self.add_architecture_formset_metadata()
-        self.add_operating_system_formset_metadata()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class CloudCapacitySpecsEditorProcessFormView(
-    CloudCapacityEditorProcessFormView, CapacitySpecsEditorProcessFormView
-):
-    pass
-
-
-class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
-    editor_view_class = CloudCapacityEditorProcessFormView
-    metadata_editor_view_class = CloudCapacityMetadataEditorProcessFormView
-    cost_and_locality_editor_view_class = (
-        CloudCapacityCostAndLocalityEditorProcessFormView
-    )
-    energy_editor_view_class = CloudCapacityEnergyEditorProcessFormView
-    security_trust_and_access_editor_view_class = (
-        CloudCapacitySecurityTrustAndAccessEditorProcessFormView
-    )
-    specs_editor_view_class = CloudCapacitySpecsEditorProcessFormView
-
-    def route_to_view(self, request, *args, **kwargs):
-        if self.category.lower() == "system specific":
-            return CloudCapacitySystemSpecificEditorProcessFormView.as_view()(
-                request, *args, **kwargs
-            )
-        return super().route_to_view(request, *args, **kwargs)
-
-
-class CloudCapacityRegistrationsListFormView(
-    CloudCapacityEditorView, RegistrationsListFormView
-):
-    template_name = "capacities/cloud_capacities.html"
-    new_registration_reverse = "capacities:new_cloud_capacity"
-
-
-class CloudCapacityEditorOverviewTemplateView(
-    CloudCapacityEditorView, EditorOverviewTemplateView
-):
-    template_name = "capacities/cloud_capacity_overview.html"
-
-
-# Edge Capacity
-class EdgeCapacityEditorView(EditorView):
-    editor_registration_list_url_reverse = "capacities:edge_capacities_list"
-    editor_url_reverse_base = "capacities:edge_capacity_editor"
-    editor_start_url_reverse_base = "capacities:new_edge_capacity"
-    editor_overview_url_reverse_base = "capacities:edge_capacity_overview"
-    registration_type_name_singular = "edge capacity"
-    registration_type_name_plural = "edge capacities"
-    title_base = "New Edge Capacity"
-    api_endpoint_class = EdgeCapacityApiEndpoint
-    column_metadata_api_endpoint_class = EdgeCapacityColumnMetadataApiEndpoint
-
-
-class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):
-    template_name = "capacities/new_edge_capacity_start.html"
-    form_class = EdgeCapacityRegistrationForm
-
-
-class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFormView):
-    template_name = "capacities/edge_capacity_editor.html"
-    main_form_class = EdgeCapacityEditorForm
-    success_url = reverse_lazy("capacities:new_edge_capacity")
-
-
-class EdgeCapacityMetadataEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView, CapacityMetadataEditorProcessFormView
-):
-    pass
-
-
-class EdgeCapacityCostAndLocalityEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView, CapacityCostAndLocalityEditorProcessFormView
-):
-    pass
-
-
-class EdgeCapacityEnergyEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView, CapacityEnergyEditorProcessFormView
-):
-    pass
-
-
-class EdgeCapacitySpecificEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView,
-    MultipleEditorFormsetProcessFormView,
-    AccessibleSensorsFormsetEditorViewMixin,
-    DevicesFormsetEditorViewMixin,
-):
-    def dispatch(self, request, *args, **kwargs):
-        self.add_accessible_sensors_formset_metadata()
-        self.add_devices_formset_metadata()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class EdgeCapacitySecurityTrustAndAccessEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView,
-    CapacitySecurityTrustAndAccessEditorProcessFormView,
-):
-    pass
-
-
-class EdgeCapacitySpecsEditorProcessFormView(
-    EdgeCapacityEditorProcessFormView, CapacitySpecsEditorProcessFormView
-):
-    pass
-
-
-class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
-    editor_view_class = EdgeCapacityEditorProcessFormView
-    metadata_editor_view_class = EdgeCapacityMetadataEditorProcessFormView
-    cost_and_locality_editor_view_class = (
-        EdgeCapacityCostAndLocalityEditorProcessFormView
-    )
-    energy_editor_view_class = EdgeCapacityEnergyEditorProcessFormView
-    security_trust_and_access_editor_view_class = (
-        EdgeCapacitySecurityTrustAndAccessEditorProcessFormView
-    )
-    specs_editor_view_class = EdgeCapacitySpecsEditorProcessFormView
-
-    def route_to_view(self, request, *args, **kwargs):
-        if self.category.lower() == "edge specific":
-            return EdgeCapacitySpecificEditorProcessFormView.as_view()(
-                request, *args, **kwargs
-            )
-        return super().route_to_view(request, *args, **kwargs)
-
-
-class EdgeCapacityRegistrationsListFormView(
-    EdgeCapacityEditorView, RegistrationsListFormView
-):
-    template_name = "capacities/edge_capacities.html"
-    new_registration_reverse = "capacities:new_edge_capacity"
-
-
-class EdgeCapacityEditorOverviewTemplateView(
-    EdgeCapacityEditorView, EditorOverviewTemplateView
-):
-    template_name = "capacities/edge_capacity_overview.html"

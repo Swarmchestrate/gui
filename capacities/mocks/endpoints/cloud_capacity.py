@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 
+from capacities.api.endpoints.abc import BaseCloudCapacityColumnMetadataApiEndpoint
 from capacities.mocks.definitions import CapacityUserSpecifiableOpenApiDefinition
 from editor.mocks.endpoints.base import (
     MockApiEndpoint,
@@ -20,7 +21,9 @@ class CloudCapacityApiEndpoint(MockApiEndpoint):
     path_to_temp_data_dir = os.path.join(BASE_DIR, "capacities", "temp")
 
 
-class CloudCapacityColumnMetadataApiEndpoint(MockColumnMetadataApiEndpoint):
+class CloudCapacityColumnMetadataApiEndpoint(
+    BaseCloudCapacityColumnMetadataApiEndpoint, MockColumnMetadataApiEndpoint
+):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         registrations = super().get_registrations()
         return [
@@ -28,6 +31,6 @@ class CloudCapacityColumnMetadataApiEndpoint(MockColumnMetadataApiEndpoint):
             for r in registrations
             if (
                 r.get("table_name") == "capacity"
-                and r.get("category") != "Edge Specific"
+                and r.get("category") not in self.disabled_categories
             )
         ]

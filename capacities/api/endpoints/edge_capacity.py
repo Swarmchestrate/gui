@@ -1,9 +1,10 @@
 from editor.api.endpoints.base import ColumnMetadataApiEndpoint
 
-from .base import BaseCapacityApiEndpoint
+from .abc import BaseEdgeCapacityColumnMetadataApiEndpoint
+from .base import CapacityApiEndpoint
 
 
-class EdgeCapacityApiEndpoint(BaseCapacityApiEndpoint):
+class EdgeCapacityApiEndpoint(CapacityApiEndpoint):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -21,7 +22,11 @@ class EdgeCapacityApiEndpoint(BaseCapacityApiEndpoint):
         return super().delete(registration_id, params)
 
 
-class EdgeCapacityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
+class EdgeCapacityColumnMetadataApiEndpoint(
+    BaseEdgeCapacityColumnMetadataApiEndpoint, ColumnMetadataApiEndpoint
+):
+    disabled_categories = ["System Specific"]
+
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -30,20 +35,7 @@ class EdgeCapacityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
                 "table_name": "eq.capacity",
             }
         )
-        if "category" not in params:
-            params.update(
-                {
-                    "category": "neq.System Specific",
-                }
-            )
-            return super().get_registrations(params)
-        params.update(
-            {
-                "and": f"(category.{params.get('category')},category.neq.System Specific)",
-            }
-        )
-        params.pop("category", None)
         return super().get_registrations(params)
 
-    def get_by_category(self, category: str):
+    def get_registrations_by_category(self, category: str):
         return self.get_registrations(params={"category": f'eq."{category}"'})
