@@ -8,15 +8,16 @@ from editor.views.base_views import (
     RegistrationsListFormView,
 )
 
+from .api.mocks.endpoints.instance_type import (
+    InstanceTypeApiEndpoint,
+    InstanceTypeColumnMetadataApiEndpoint,
+)
+
 # from .api.endpoints.instance_type import (
 #     InstanceTypeApiEndpoint,
 #     InstanceTypeColumnMetadataApiEndpoint,
 # )
 from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
-from .mocks.endpoints.instance_type import (
-    InstanceTypeApiEndpoint,
-    InstanceTypeColumnMetadataApiEndpoint,
-)
 
 
 class InstanceTypeEditorView(EditorView):

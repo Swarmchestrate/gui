@@ -1,12 +1,20 @@
 import json
 import logging
 import os
+from abc import ABC, abstractmethod
 
 import requests
 
-from .abc import BaseApiClient
-
 logger = logging.getLogger(__name__)
+
+
+class BaseApiClient(ABC):
+    def log_and_raise_response_status_if_error(self, response: requests.Response):
+        pass
+
+    @abstractmethod
+    def get_openapi_spec(self):
+        pass
 
 
 class ApiClient(BaseApiClient):

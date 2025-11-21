@@ -3,8 +3,10 @@ import os
 
 from django.conf import settings
 
-from editor.api.abc import BaseOpenApiDefinition
-from editor.api.definition_mixins import UserSpecifiableOpenApiDefinitionMixin
+from editor.api.definitions.base import (
+    BaseOpenApiDefinition,
+    UserSpecifiableOpenApiDefinitionMixin,
+)
 
 
 class MockOpenApiDefinition(BaseOpenApiDefinition):
@@ -33,6 +35,7 @@ class MockColumnMetadataUserSpecifiableOpenApiDefinition(
     path_to_definition = os.path.join(
         settings.BASE_DIR,
         "editor",
+        "api",
         "mocks",
         "jsons",
         "definitions",

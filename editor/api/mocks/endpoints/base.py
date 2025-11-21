@@ -7,9 +7,11 @@ from pathlib import Path
 
 from django.conf import settings
 
-from editor.api.abc import BaseApiEndpoint, BaseColumnMetadataApiEndpoint
-from editor.mocks.api_client import MockApiClient
-from editor.mocks.definitions import MockColumnMetadataUserSpecifiableOpenApiDefinition
+from editor.api.endpoints.base import BaseApiEndpoint, BaseColumnMetadataApiEndpoint
+from editor.api.mocks.api_client import MockApiClient
+from editor.api.mocks.definitions.base import (
+    MockColumnMetadataUserSpecifiableOpenApiDefinition,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +160,13 @@ class MockColumnMetadataApiEndpoint(MockApiEndpoint, BaseColumnMetadataApiEndpoi
     """
 
     path_to_data = os.path.join(
-        settings.BASE_DIR, "editor", "mocks", "jsons", "data", "column_metadata.json"
+        settings.BASE_DIR,
+        "editor",
+        "api",
+        "mocks",
+        "jsons",
+        "data",
+        "column_metadata.json",
     )
     path_to_temp_data_dir = os.path.join(settings.BASE_DIR, "editor", "temp")
 

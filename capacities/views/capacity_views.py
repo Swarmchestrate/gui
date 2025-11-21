@@ -15,11 +15,11 @@ from editor.views.base_views import (
     MultipleEditorFormsetProcessFormView,
 )
 from editor.views.mixins.locality_mixins import LocalityFormSetEditorViewMixin
-from instance_types.forms import InstanceTypeEditorForm
-from instance_types.formsets import InstanceTypeFormSet
 
 # from instance_types.api.endpoints.instance_type import InstanceTypeApiEndpoint
-from instance_types.mocks.endpoints.instance_type import InstanceTypeApiEndpoint
+from instance_types.api.mocks.endpoints.instance_type import InstanceTypeApiEndpoint
+from instance_types.forms import InstanceTypeEditorForm
+from instance_types.formsets import InstanceTypeFormSet
 
 
 # Cloud & Edge Capacities

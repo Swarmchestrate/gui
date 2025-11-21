@@ -1,15 +1,104 @@
 import logging
 import random
+from abc import ABC, abstractmethod
 from ast import literal_eval as make_tuple
 from datetime import datetime, timezone
+from typing import Type
 
 import requests
 
-from editor.api.abc import BaseApiEndpoint, BaseColumnMetadataApiEndpoint
-from editor.api.api_client import ApiClient
-from editor.api.definitions import ColumnMetadataUserSpecifiableOpenApiDefinition
+from editor.api.api_client import ApiClient, BaseApiClient
+from editor.api.definitions.base import (
+    BaseOpenApiDefinition,
+    ColumnMetadataUserSpecifiableOpenApiDefinition,
+)
 
 logger = logging.getLogger(__name__)
+
+
+class BaseApiEndpoint(BaseApiClient, ABC):
+    endpoint_definition: BaseOpenApiDefinition
+    endpoint_definition_class: Type[BaseOpenApiDefinition]
+
+    random_id_min_value: int = 0
+    random_id_max_value: int = 999999
+
+    @abstractmethod
+    def _prepare_update_data(self, data: dict) -> dict:
+        pass
+
+    @abstractmethod
+    def get(self, registration_id: int, params: dict | None = None) -> dict:
+        pass
+
+    @abstractmethod
+    def get_registrations_by_ids(
+        self, registration_ids: list[int], params: dict | None = None
+    ) -> list[dict]:
+        pass
+
+    @abstractmethod
+    def get_registrations(self, params: dict | None = None) -> list[dict]:
+        pass
+
+    @abstractmethod
+    def register(self, data: dict) -> dict:
+        pass
+
+    @abstractmethod
+    def bulk_register(self, data_list: list[dict]) -> list[int]:
+        pass
+
+    @abstractmethod
+    def update(self, registration_id: int, data: dict):
+        pass
+
+    @abstractmethod
+    def delete(self, registration_id: int, params: dict | None = None):
+        pass
+
+    @abstractmethod
+    def delete_many(self, registration_ids: list[int]):
+        pass
+
+    def _get_existing_registration_ids(self):
+        params = {"select": f"{self.endpoint_definition.id_field}"}
+        return [
+            data.get(self.endpoint_definition.id_field)
+            for data in self.get_registrations(params=params)
+        ]
+
+    def _generate_random_id(self):
+        existing_registration_ids = self._get_existing_registration_ids()
+        # Credit for random_id solution: https://stackoverflow.com/a/70239671
+        possible_ids_set = set(
+            range(self.random_id_min_value, self.random_id_max_value)
+        )
+        existing_ids_set = set(existing_registration_ids)
+        possible_ids_set = possible_ids_set - existing_ids_set
+        if not len(possible_ids_set):
+            raise Error("There are no new unique IDs that can be used.")
+        random_id = random.choice(possible_ids_set)
+        return random_id
+
+    def _generate_random_ids(self, amount: int = 1):
+        existing_registration_ids = self._get_existing_registration_ids()
+        # Credit for random_id solution: https://stackoverflow.com/a/70239671
+        possible_ids_set = set(
+            range(self.random_id_min_value, self.random_id_max_value)
+        )
+        existing_ids_set = set(existing_registration_ids)
+        possible_ids_set = possible_ids_set - existing_ids_set
+        if not len(possible_ids_set):
+            raise Error("There are no new unique IDs that can be used.")
+        random_ids = random.sample(list(possible_ids_set), int(amount))
+        if len(random_ids) != amount:
+            raise Error(f"Failed to generate {amount} new unique IDs.")
+        return random_ids
+
+
+class BaseColumnMetadataApiEndpoint(BaseApiEndpoint, ABC):
+    disabled_categories: list[str] = list()
 
 
 class ApiEndpoint(ApiClient, BaseApiEndpoint):

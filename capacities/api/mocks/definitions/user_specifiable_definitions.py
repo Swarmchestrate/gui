@@ -2,10 +2,10 @@ import os
 
 from django.conf import settings
 
-from capacities.api.definition_mixins import (
+from capacities.api.definitions.mixins import (
     CapacityUserSpecifiableOpenApiDefinitionMixin,
 )
-from editor.mocks.definitions import MockUserSpecifiableOpenApiDefinition
+from editor.api.mocks.definitions.base import MockUserSpecifiableOpenApiDefinition
 
 
 class CapacityUserSpecifiableOpenApiDefinition(
@@ -14,6 +14,7 @@ class CapacityUserSpecifiableOpenApiDefinition(
     path_to_definition = os.path.join(
         settings.BASE_DIR,
         "capacities",
+        "api",
         "mocks",
         "jsons",
         "definitions",

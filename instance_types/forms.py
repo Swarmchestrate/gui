@@ -14,7 +14,7 @@ from editor.forms.widget_choices import (
 #     InstanceTypeApiEndpoint,
 #     InstanceTypeColumnMetadataApiEndpoint,
 # )
-from .mocks.endpoints.instance_type import (
+from .api.mocks.endpoints.instance_type import (
     InstanceTypeApiEndpoint,
     InstanceTypeColumnMetadataApiEndpoint,
 )

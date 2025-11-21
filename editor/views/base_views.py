@@ -369,21 +369,13 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             can_delete=can_delete,
             **extra_formset_factory_kwargs,
         )
-        self.formset_classes.update(
-            {
-                formset_prefix: formset_class,
-            }
-        )
+        self.formset_classes.update({formset_prefix: formset_class})
         if add_to_main_form:
             return
         self.manually_processed_formset_prefixes.add(formset_prefix)
 
     def add_initial_data_for_formset(self, data: list[dict], formset_prefix: str):
-        self.initial_data_for_formsets.update(
-            {
-                formset_prefix: data,
-            }
-        )
+        self.initial_data_for_formsets.update({formset_prefix: data})
 
     def get_initial_data_for_formset(self, formset_prefix: str):
         return self.initial_data_for_formsets.get(formset_prefix, list())
@@ -399,11 +391,7 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             loaded_formset = formset_class(
                 data=request.POST, initial=initial, prefix=formset_prefix
             )
-            forms.update(
-                {
-                    formset_prefix: loaded_formset,
-                }
-            )
+            forms.update({formset_prefix: loaded_formset})
         return forms
 
     def get_context_data_forms_invalid(self, forms):
@@ -448,37 +436,13 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
             initial = self.get_initial_data_for_formset(formset_prefix)
             initial_formset = formset_class(initial=initial, prefix=formset_prefix)
             if "formsets" not in context:
-                context.update(
-                    {
-                        "formsets": dict(),
-                    }
-                )
-            context.update(
-                {
-                    f"{formset_prefix}_formset": initial_formset,
-                }
-            )
-            context["formsets"].update(
-                {
-                    formset_prefix: initial_formset,
-                }
-            )
+                context.update({"formsets": dict()})
+            context.update({f"{formset_prefix}_formset": initial_formset})
+            context["formsets"].update({formset_prefix: initial_formset})
             if formset_prefix in self.formsets_not_using_table_templates:
                 continue
             if "formset_tables" not in context:
-                context.update(
-                    {
-                        "formset_tables": dict(),
-                    }
-                )
-            context.update(
-                {
-                    f"{formset_prefix}_formset": initial_formset,
-                }
-            )
-            context["formset_tables"].update(
-                {
-                    formset_prefix: initial_formset,
-                }
-            )
+                context.update({"formset_tables": dict()})
+            context.update({f"{formset_prefix}_formset": initial_formset})
+            context["formset_tables"].update({formset_prefix: initial_formset})
         return context

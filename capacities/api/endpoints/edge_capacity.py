@@ -1,7 +1,6 @@
 from editor.api.endpoints.base import ColumnMetadataApiEndpoint
 
-from .abc import BaseEdgeCapacityColumnMetadataApiEndpoint
-from .base import CapacityApiEndpoint
+from .base import BaseEdgeCapacityColumnMetadataApiEndpoint, CapacityApiEndpoint
 
 
 class EdgeCapacityApiEndpoint(CapacityApiEndpoint):

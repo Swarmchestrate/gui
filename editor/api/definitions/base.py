@@ -1,4 +1,39 @@
-from .abc import BaseOpenApiDefinition
+from abc import abstractmethod
+
+
+class BaseOpenApiDefinition:
+    id_field: str
+
+    # Properties
+    @property
+    def description(self) -> str:
+        return self._get_definition().get("description", "")
+
+    # Non-public methods
+    @abstractmethod
+    def _get_definition(self) -> dict:
+        pass
+
+    def _get_required_field_names(self):
+        return self._get_definition().get("required", list())
+
+    def _get_all_fields(self) -> dict:
+        return self._get_definition().get("properties", {})
+
+    def _get_fields_with_names(self, names: list[str]):
+        all_fields = self._get_all_fields()
+        return {key: value for key, value in all_fields.items() if key in names}
+
+
+class OpenApiDefinition(BaseOpenApiDefinition):
+    openapi_spec: dict
+    definition_name: str
+
+    def __init__(self, openapi_spec: dict) -> None:
+        self.openapi_spec = openapi_spec
+
+    def _get_definition(self) -> dict:
+        return self.openapi_spec.get("definitions", {}).get(self.definition_name, {})
 
 
 class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
@@ -72,3 +107,16 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
 
     def get_required_field_names(self):
         return self._get_required_field_names()
+
+
+class UserSpecifiableOpenApiDefinition(
+    OpenApiDefinition, UserSpecifiableOpenApiDefinitionMixin
+):
+    pass
+
+
+class ColumnMetadataUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
+    def __init__(self, openapi_spec: dict) -> None:
+        super().__init__(openapi_spec)
+        self.definition_name = "column_metadata"
+        self.id_field = ""

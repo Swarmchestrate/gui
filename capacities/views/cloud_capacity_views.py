@@ -1,6 +1,11 @@
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from capacities.api.mocks.endpoints.cloud_capacity import (
+    CloudCapacityApiEndpoint,
+    CloudCapacityColumnMetadataApiEndpoint,
+)
+
 # from capacities.api.endpoints.cloud_capacity import (
 #     CloudCapacityApiEndpoint,
 #     CloudCapacityColumnMetadataApiEndpoint,
@@ -8,10 +13,6 @@ from django.views.generic import FormView
 from capacities.forms.cloud_capacity_forms import (
     CloudCapacityEditorForm,
     CloudCapacityRegistrationForm,
-)
-from capacities.mocks.endpoints.cloud_capacity import (
-    CloudCapacityApiEndpoint,
-    CloudCapacityColumnMetadataApiEndpoint,
 )
 from editor.views.base_views import (
     EditorOverviewTemplateView,

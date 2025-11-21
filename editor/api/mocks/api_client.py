@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from editor.api.abc import BaseApiClient
+from editor.api.api_client import BaseApiClient
 
 
 class MockApiClient(BaseApiClient):
@@ -15,7 +15,13 @@ class MockApiClient(BaseApiClient):
         try:
             with open(
                 os.path.join(
-                    base_dir, "editor", "mocks", "jsons", "data", "openapi_spec.json"
+                    base_dir,
+                    "editor",
+                    "api",
+                    "mocks",
+                    "jsons",
+                    "data",
+                    "openapi_spec.json",
                 ),
                 "r",
             ) as f:
