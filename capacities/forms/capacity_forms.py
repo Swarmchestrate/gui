@@ -1,7 +1,7 @@
 from django import forms
 
 from editor.forms.base_forms import EditorForm
-from editor.forms.helpers.locality_forms import LocalityEditorForm
+from locality.forms import LocalityEditorForm
 
 
 # Cloud & Edge Capacity forms

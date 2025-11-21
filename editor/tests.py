@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from editor.api.api_client import ApiClient
+from editor.api.base_api_clients import ApiClient
 
 
 class ApiEndpointTestCase(SimpleTestCase):

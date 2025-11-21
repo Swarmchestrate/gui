@@ -1,6 +1,6 @@
 from django.forms import CheckboxInput
 
-from editor.formsets.base_formsets import BaseEditorFormSet
+from editor.base_formsets import BaseEditorFormSet
 
 
 class InstanceTypeFormSet(BaseEditorFormSet):

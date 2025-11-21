@@ -10,16 +10,16 @@ from capacities.formsets.capacity_formsets import (
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
 )
-from editor.views.base_views import (
+from editor.base_views import (
     EditorRouterView,
     MultipleEditorFormsetProcessFormView,
 )
-from editor.views.mixins.locality_mixins import LocalityFormSetEditorViewMixin
 
 # from instance_types.api.endpoints.instance_type import InstanceTypeApiEndpoint
-from instance_types.api.mocks.endpoints.instance_type import InstanceTypeApiEndpoint
+from instance_types.api.mocks.mock_api_clients import InstanceTypeApiEndpoint
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
+from locality.views import LocalityFormSetEditorViewMixin
 
 
 # Cloud & Edge Capacities

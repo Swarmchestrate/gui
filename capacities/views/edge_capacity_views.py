@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from capacities.api.mocks.endpoints.edge_capacity import (
+from capacities.api.mocks.mock_edge_capacity_clients import (
     EdgeCapacityApiEndpoint,
     EdgeCapacityColumnMetadataApiEndpoint,
 )
@@ -13,7 +13,7 @@ from capacities.forms.edge_capacity_forms import (
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
-from editor.views.base_views import (
+from editor.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,

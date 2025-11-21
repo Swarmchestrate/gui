@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from editor.views.base_views import (
+from editor.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
@@ -8,7 +8,7 @@ from editor.views.base_views import (
     RegistrationsListFormView,
 )
 
-from .api.mocks.endpoints.instance_type import (
+from .api.mocks.mock_api_clients import (
     InstanceTypeApiEndpoint,
     InstanceTypeColumnMetadataApiEndpoint,
 )

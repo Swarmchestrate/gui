@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from editor.views.base_views import (
+from editor.base_views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
@@ -8,7 +8,7 @@ from editor.views.base_views import (
     RegistrationsListFormView,
 )
 
-from .api.endpoints.application import (
+from .api.api_clients import (
     ApplicationApiEndpoint,
     ApplicationColumnMetadataApiEndpoint,
 )

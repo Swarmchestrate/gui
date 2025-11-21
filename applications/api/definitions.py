@@ -1,4 +1,4 @@
-from editor.api.definitions.base import UserSpecifiableOpenApiDefinition
+from editor.api.base_definitions import UserSpecifiableOpenApiDefinition
 
 
 class ApplicationUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):

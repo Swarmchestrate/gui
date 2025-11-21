@@ -2,11 +2,11 @@ from enum import Enum
 
 from django import forms
 
-from editor.api.endpoints.base import (
+from editor.api.base_api_clients import (
     ApiEndpoint,
     ColumnMetadataApiEndpoint,
 )
-from editor.api.mocks.endpoints.locality import LocalityApiEndpoint
+from locality.api.mocks.mock_api_clients import LocalityApiEndpoint
 
 
 class OpenApiPropertyFormat(Enum):
