@@ -6,6 +6,7 @@ from editor.api.endpoints.base import (
     ApiEndpoint,
     ColumnMetadataApiEndpoint,
 )
+from editor.api.mocks.endpoints.locality import LocalityApiEndpoint
 
 
 class OpenApiPropertyFormat(Enum):
@@ -125,6 +126,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "field_class": field_class,
             "widget_class": widget_class,
             "css_classes": css_classes,
+            "extra_field_kwargs": dict(),
         }
 
     def _configure_field_kwargs(
@@ -133,7 +135,10 @@ class OpenApiSpecificationBasedForm(EditorForm):
         widget_class,
         css_classes: list[str],
         is_required: bool,
+        extra_field_kwargs: dict | None = None,
     ):
+        if not extra_field_kwargs:
+            extra_field_kwargs = dict()
         kwargs = {
             "required": is_required,
             "widget": widget_class(
@@ -161,24 +166,63 @@ class OpenApiSpecificationBasedForm(EditorForm):
                     "aria-describedby": f"{field_metadata.get('column_name')}-help-text",
                 }
             )
+        kwargs.update(extra_field_kwargs)
         return kwargs
+
+    def _get_field_components_for_foreign_key_field(self, field_name: str):
+        # Get endpoint for the foreign key
+        locality_api_endpoint = LocalityApiEndpoint()
+        # Get registrations at endpoint
+        registrations = locality_api_endpoint.get_registrations()
+        # Return field components in a dict
+        choices = (
+            (
+                r.get(locality_api_endpoint.endpoint_definition.id_field),
+                f"{locality_api_endpoint.endpoint.title()} {r.get(locality_api_endpoint.endpoint_definition.id_field)}",
+            )
+            for r in registrations
+        )
+        field_class = forms.ChoiceField
+        return {
+            "field_class": field_class,
+            "widget_class": field_class.widget,
+            "css_classes": ["form-select"],
+            "extra_field_kwargs": {
+                "choices": choices,
+            },
+        }
 
     def get_field(
         self, field_metadata: dict, is_required: bool = False
     ) -> list[forms.Field]:
-        # Determine field, widget and/or widget CSS classes
-        # from OpenAPI spec metadata.
-        (
-            field_class,
-            widget_class,
-            css_classes,
-        ) = self._get_initial_field_vars_from_field_format(
-            field_metadata.get("format", "")
-        ).values()
+        if field_metadata.get("column_name") == "locality_id":
+            (
+                field_class,
+                widget_class,
+                css_classes,
+                extra_field_kwargs,
+            ) = self._get_field_components_for_foreign_key_field(
+                field_metadata.get("format", "")
+            ).values()
+        else:
+            # Determine field, widget and/or widget CSS classes
+            # from OpenAPI spec metadata.
+            (
+                field_class,
+                widget_class,
+                css_classes,
+                extra_field_kwargs,
+            ) = self._get_initial_field_vars_from_field_format(
+                field_metadata.get("format", "")
+            ).values()
 
         # Build field kwargs
         kwargs = self._configure_field_kwargs(
-            field_metadata, widget_class, css_classes, is_required
+            field_metadata,
+            widget_class,
+            css_classes,
+            is_required,
+            extra_field_kwargs=extra_field_kwargs,
         )
 
         return field_class(**kwargs)

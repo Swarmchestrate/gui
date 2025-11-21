@@ -2,6 +2,7 @@
 {% load helpers %}
 
 {% if field.name == 'locality_id' %}
+{{ field }}
 {% include 'capacities/sections/locality_section.html' %}
 {% elif field.name == 'instance_types' %}
 {% include 'instance_types/instance_types_section.html' %}
