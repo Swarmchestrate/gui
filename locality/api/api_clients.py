@@ -1,39 +1,23 @@
-import json
-import logging
-import os
-from abc import ABC, abstractmethod
+from editor.api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
 
-import requests
-
-logger = logging.getLogger(__name__)
+from .definitions import LocalityUserSpecifiableOpenApiDefinition
 
 
-class BaseApiClient(ABC):
-    def log_and_raise_response_status_if_error(self, response: requests.Response):
-        pass
+class LocalityApiEndpoint(ApiEndpoint):
+    endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
 
-    @abstractmethod
-    def get_openapi_spec(self):
-        pass
+    def __init__(self) -> None:
+        self.endpoint = "locality"
+        super().__init__()
 
 
-class ApiClient(BaseApiClient):
-    api_url: str
-
-    def __init__(self):
-        self.api_url = os.environ.get("API_URL", "")
-
-    def get_openapi_spec(self):
-        response = requests.get(self.api_url)
-        self.log_and_raise_response_status_if_error(response)
-        return response.json()
-
-    # Error handling
-    def log_and_raise_response_status_if_error(self, response: requests.Response):
-        if response.ok:
-            return
-        try:
-            logger.error(json.dumps(response.json(), indent=2))
-        except Exception:
-            logger.exception("Could not log error response.")
-        response.raise_for_status()
+class LocalityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
+    def get_registrations(self, params: dict | None = None) -> list[dict]:
+        if not params:
+            params = dict()
+        params.update(
+            {
+                "table_name": "eq.locality",
+            }
+        )
+        return super().get_registrations(params=params)
