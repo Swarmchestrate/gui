@@ -1,9 +1,11 @@
-from editor.api.base_api_clients import ColumnMetadataApiEndpoint
+from abc import ABC
 
-from .capacity_api_clients import (
-    BaseEdgeCapacityColumnMetadataApiEndpoint,
-    CapacityApiEndpoint,
+from editor.api.base_api_clients import (
+    BaseColumnMetadataApiEndpoint,
+    ColumnMetadataApiEndpoint,
 )
+
+from .capacity_api_clients import CapacityApiEndpoint
 
 
 class EdgeCapacityApiEndpoint(CapacityApiEndpoint):
@@ -22,6 +24,10 @@ class EdgeCapacityApiEndpoint(CapacityApiEndpoint):
             params = dict()
         params.update({"resource_type": "eq.Edge"})
         return super().delete(registration_id, params)
+
+
+class BaseEdgeCapacityColumnMetadataApiEndpoint(BaseColumnMetadataApiEndpoint, ABC):
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityColumnMetadataApiEndpoint(

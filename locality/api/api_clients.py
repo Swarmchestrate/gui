@@ -1,14 +1,18 @@
-from editor.api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
+from editor.api.base_api_clients import (
+    ApiEndpoint,
+    BaseApiEndpoint,
+    ColumnMetadataApiEndpoint,
+)
 
 from .definitions import LocalityUserSpecifiableOpenApiDefinition
 
 
-class LocalityApiEndpoint(ApiEndpoint):
-    endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
+class BaseLocalityApiEndpoint(BaseApiEndpoint):
+    endpoint = "locality"
 
-    def __init__(self) -> None:
-        self.endpoint = "locality"
-        super().__init__()
+
+class LocalityApiEndpoint(BaseLocalityApiEndpoint, ApiEndpoint):
+    endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
 
 
 class LocalityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):

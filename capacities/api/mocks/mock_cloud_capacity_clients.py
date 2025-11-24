@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 
+from capacities.api.capacity_api_clients import BaseCapacityApiEndpoint
 from capacities.api.cloud_capacity_api_clients import (
     BaseCloudCapacityColumnMetadataApiEndpoint,
 )
@@ -17,7 +18,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 # Cloud Capacities
-class CloudCapacityApiEndpoint(MockApiEndpoint):
+class CloudCapacityApiEndpoint(BaseCapacityApiEndpoint, MockApiEndpoint):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR,

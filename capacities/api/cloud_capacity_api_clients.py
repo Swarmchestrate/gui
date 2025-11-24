@@ -1,7 +1,11 @@
-from editor.api.base_api_clients import ColumnMetadataApiEndpoint
+from abc import ABC
+
+from editor.api.base_api_clients import (
+    BaseColumnMetadataApiEndpoint,
+    ColumnMetadataApiEndpoint,
+)
 
 from .capacity_api_clients import (
-    BaseCloudCapacityColumnMetadataApiEndpoint,
     CapacityApiEndpoint,
 )
 
@@ -22,6 +26,10 @@ class CloudCapacityApiEndpoint(CapacityApiEndpoint):
             params = dict()
         params.update({"resource_type": "eq.Cloud"})
         return super().delete(registration_id, params)
+
+
+class BaseCloudCapacityColumnMetadataApiEndpoint(BaseColumnMetadataApiEndpoint, ABC):
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityColumnMetadataApiEndpoint(

@@ -1,19 +1,23 @@
-from editor.api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
+from editor.api.base_api_clients import (
+    ApiEndpoint,
+    BaseApiEndpoint,
+    ColumnMetadataApiEndpoint,
+)
 from instance_types.api.definitions import InstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class InstanceTypeApiEndpoint(ApiEndpoint):
-    endpoint_definition_class = InstanceTypeUserSpecifiableOpenApiDefinition
-
-    def __init__(self) -> None:
-        self.endpoint = "instance_types"
-        super().__init__()
+class BaseInstanceTypeApiEndpoint(BaseApiEndpoint):
+    endpoint = "instance_types"
 
     def _prepare_update_data(self, data: dict):
         data = super()._prepare_update_data(data)
         data.pop("updated_at", None)
         data.pop(self.endpoint_definition.id_field, None)
         return data
+
+
+class InstanceTypeApiEndpoint(BaseInstanceTypeApiEndpoint, ApiEndpoint):
+    endpoint_definition_class = InstanceTypeUserSpecifiableOpenApiDefinition
 
 
 class InstanceTypeColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):

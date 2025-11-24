@@ -9,6 +9,10 @@ class BaseOpenApiDefinition:
     def description(self) -> str:
         return self._get_definition().get("description", "")
 
+    # Public methods
+    def get_field(self, field_name: str) -> dict:
+        return self._get_definition().get("properties", {}).get(field_name, {})
+
     # Non-public methods
     @abstractmethod
     def _get_definition(self) -> dict:

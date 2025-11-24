@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 
+from capacities.api.capacity_api_clients import BaseCapacityApiEndpoint
 from capacities.api.edge_capacity_api_clients import (
     BaseEdgeCapacityColumnMetadataApiEndpoint,
 )
@@ -17,7 +18,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 # Edge Capacities
-class EdgeCapacityApiEndpoint(MockApiEndpoint):
+class EdgeCapacityApiEndpoint(BaseCapacityApiEndpoint, MockApiEndpoint):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR,

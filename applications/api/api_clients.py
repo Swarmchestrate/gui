@@ -1,13 +1,18 @@
+from editor.api.base_api_clients import (
+    ApiEndpoint,
+    BaseApiEndpoint,
+    ColumnMetadataApiEndpoint,
+)
+
 from .definitions import ApplicationUserSpecifiableOpenApiDefinition
-from editor.api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
 
 
-class ApplicationApiEndpoint(ApiEndpoint):
+class BaseApplicationApiEndpoint(BaseApiEndpoint):
+    endpoint = "application"
+
+
+class ApplicationApiEndpoint(BaseApplicationApiEndpoint, ApiEndpoint):
     endpoint_definition_class = ApplicationUserSpecifiableOpenApiDefinition
-
-    def __init__(self) -> None:
-        self.endpoint = "application"
-        super().__init__()
 
 
 class ApplicationColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):

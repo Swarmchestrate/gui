@@ -6,6 +6,7 @@ from editor.api.mocks.mock_base_api_clients import (
     MockApiEndpoint,
     MockColumnMetadataApiEndpoint,
 )
+from locality.api.api_clients import BaseLocalityApiEndpoint
 from locality.api.mocks.mock_definitions import (
     LocalityUserSpecifiableOpenApiDefinition,
 )
@@ -14,8 +15,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 # Cloud Capacities
-class LocalityApiEndpoint(MockApiEndpoint):
-    endpoint = "locality"
+class LocalityApiEndpoint(BaseLocalityApiEndpoint, MockApiEndpoint):
     endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR,
