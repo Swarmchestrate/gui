@@ -1,4 +1,4 @@
-from applications.api.definitions import ApplicationUserSpecifiableOpenApiDefinition
+from .definitions import ApplicationUserSpecifiableOpenApiDefinition
 from editor.api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
 
 
