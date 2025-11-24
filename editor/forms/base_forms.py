@@ -1,11 +1,13 @@
 from enum import Enum
 
+import lxml.html
 from django import forms
 
 from editor.api.base_api_clients import (
     ApiEndpoint,
     ColumnMetadataApiEndpoint,
 )
+from editor.api.mocks.mock_base_api_clients import MockApiEndpoint
 from locality.api.mocks.mock_api_clients import LocalityApiEndpoint
 
 
@@ -169,16 +171,27 @@ class OpenApiSpecificationBasedForm(EditorForm):
         kwargs.update(extra_field_kwargs)
         return kwargs
 
-    def _get_field_components_for_foreign_key_field(self, field_name: str):
+    def _get_field_components_for_foreign_key_field(
+        self, field_name: str
+    ) -> dict | None:
+        definition = self.api_endpoint.endpoint_definition
+        field_metadata = definition.get_field(field_name)
+        if not field_metadata.get("description"):
+            return
+        field_description = lxml.html.fromstring(field_metadata.get("description"))
+        fk_table_name = next(iter(field_description.xpath("fk/@table")))
+
         # Get endpoint for the foreign key
-        locality_api_endpoint = LocalityApiEndpoint()
+        api_endpoint = MockApiEndpoint.get_client_instance_by_endpoint(fk_table_name)
+        if not api_endpoint:
+            return
         # Get registrations at endpoint
-        registrations = locality_api_endpoint.get_registrations()
+        registrations = api_endpoint.get_registrations()
         # Return field components in a dict
         choices = (
             (
-                r.get(locality_api_endpoint.endpoint_definition.id_field),
-                f"{locality_api_endpoint.endpoint.title()} {r.get(locality_api_endpoint.endpoint_definition.id_field)}",
+                r.get(api_endpoint.endpoint_definition.id_field),
+                f"{api_endpoint.endpoint.title()} {r.get(api_endpoint.endpoint_definition.id_field)}",
             )
             for r in registrations
         )
@@ -195,15 +208,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
     def get_field(
         self, field_metadata: dict, is_required: bool = False
     ) -> list[forms.Field]:
-        if field_metadata.get("column_name") == "locality_id":
+        field_components = self._get_field_components_for_foreign_key_field(
+            field_metadata.get("column_name", "")
+        )
+        if field_components:
             (
                 field_class,
                 widget_class,
                 css_classes,
                 extra_field_kwargs,
-            ) = self._get_field_components_for_foreign_key_field(
-                field_metadata.get("format", "")
-            ).values()
+            ) = field_components.values()
         else:
             # Determine field, widget and/or widget CSS classes
             # from OpenAPI spec metadata.

@@ -51,11 +51,21 @@ class ApiClient(BaseApiClient):
 
 # PostgReST API client for an endpoint
 class BaseApiEndpoint(BaseApiClient, ABC):
+    endpoint: str
     endpoint_definition: BaseOpenApiDefinition
     endpoint_definition_class: Type[BaseOpenApiDefinition]
 
     random_id_min_value: int = 0
     random_id_max_value: int = 999999
+
+    @classmethod
+    def get_client_instance_by_endpoint(cls, endpoint_name: str) -> "BaseApiEndpoint":
+        client_instance = None
+        for subclass in cls.__subclasses__():
+            if not subclass.endpoint == endpoint_name:
+                continue
+            client_instance = subclass()
+        return client_instance
 
     @abstractmethod
     def _prepare_update_data(self, data: dict) -> dict:
@@ -135,8 +145,6 @@ class ApiEndpoint(ApiClient, BaseApiEndpoint):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
-
-    endpoint: str
 
     def __init__(self) -> None:
         super().__init__()
@@ -288,6 +296,7 @@ class ApiEndpoint(ApiClient, BaseApiEndpoint):
 
 # PostgREST API client for the column_metadata endpoint
 class BaseColumnMetadataApiEndpoint(BaseApiEndpoint, ABC):
+    endpoint = "column_metadata"
     disabled_categories: list[str] = list()
 
 
@@ -297,10 +306,6 @@ class ColumnMetadataApiEndpoint(ApiEndpoint, BaseColumnMetadataApiEndpoint):
     """
 
     endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
-
-    def __init__(self) -> None:
-        self.endpoint = "column_metadata"
-        super().__init__()
 
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
