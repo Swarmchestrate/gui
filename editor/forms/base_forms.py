@@ -8,7 +8,6 @@ from editor.api.base_api_clients import (
     ColumnMetadataApiClient,
 )
 from editor.api.mocks.mock_base_api_clients import MockApiClient
-from locality.api.mocks.mock_api_clients import LocalityApiClient
 
 
 class OpenApiPropertyFormat(Enum):
@@ -179,7 +178,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         if not field_metadata.get("description"):
             return
         field_description = lxml.html.fromstring(field_metadata.get("description"))
-        fk_table_name = next(iter(field_description.xpath("fk/@table")))
+        fk_table_name = next(iter(field_description.xpath("fk/@table")), None)
 
         # Get endpoint for the foreign key
         api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
