@@ -1,9 +1,7 @@
 import { setupDialog } from "/static/dialog.js";
 
-const form = document.getElementById("registration-deletion-form");
-const registrationsTableBody = document.querySelector(
-    "#registrations-table tbody",
-);
+const form = document.getElementById("resource-deletion-form");
+const resourcesTableBody = document.querySelector("#resources-table tbody");
 const deleteCheckedButton = document.getElementById("delete-checked-btn");
 const numCheckedElement = document.getElementById("num-checked");
 
@@ -13,7 +11,7 @@ const deleteMultipleDialog = document.querySelector("#delete-multiple-dialog");
 // DataTables setup
 function initialiseDataTable() {
     DataTable.datetime("dd/MM/yyyy, HH:mm:ss");
-    const dataTable = new DataTable("#registrations-table", {
+    const dataTable = new DataTable("#resources-table", {
         columnDefs: [
             {
                 orderable: false,
@@ -41,7 +39,7 @@ function initialiseDataTable() {
 }
 
 function getAllSelectedRows() {
-    return registrationsTableBody.querySelectorAll(
+    return resourcesTableBody.querySelectorAll(
         "input[type='checkbox']:checked",
     );
 }
@@ -89,7 +87,7 @@ function setupRegistrationsTableCheckboxStyling(checkbox) {
 
 function setupRegistrationsTableInputsAndButtons() {
     const selectAllRowsCheckbox = document.querySelector(
-        "#registrations-table thead input[type='checkbox']",
+        "#resources-table thead input[type='checkbox']",
     );
     setupRegistrationsTableCheckboxStyling(selectAllRowsCheckbox);
     selectAllRowsCheckbox.addEventListener("input", () => {
@@ -100,7 +98,7 @@ function setupRegistrationsTableInputsAndButtons() {
             updateDeleteCheckedButtonState(getAllSelectedRows().length);
         }, 25);
     });
-    const tableRows = registrationsTableBody.querySelectorAll("tr");
+    const tableRows = resourcesTableBody.querySelectorAll("tr");
     tableRows.forEach((tr) => {
         // Select row checkbox
         const checkbox = tr.querySelector("input[type='checkbox']");
@@ -108,26 +106,25 @@ function setupRegistrationsTableInputsAndButtons() {
         checkbox.addEventListener("input", () => {
             updateDeleteCheckedButtonState(getAllSelectedRows().length);
         });
-        checkbox.setAttribute("name", "registration_ids_to_delete");
-        const registrationId = tr.dataset.registrationId;
-        if (!registrationId) {
+        checkbox.setAttribute("name", "resource_ids_to_delete");
+        const resourceId = tr.dataset.resourceId;
+        if (!resourceId) {
             return;
         }
-        checkbox.setAttribute("value", registrationId);
+        checkbox.setAttribute("value", resourceId);
         // Delete row button
         const deleteButton = tr.querySelector(".delete-btn");
         deleteButton.addEventListener("click", () => {
             deleteDialog
                 .querySelector(".confirm-btn")
-                .setAttribute("value", tr.dataset.registrationId);
+                .setAttribute("value", tr.dataset.resourceId);
 
             deleteDialog.querySelector(".dialog-id-to-delete").textContent =
-                tr.dataset.registrationId;
+                tr.dataset.resourceId;
         });
     });
     // Delete dialog setup
-    const deleteButtons =
-        registrationsTableBody.querySelectorAll(".delete-btn");
+    const deleteButtons = resourcesTableBody.querySelectorAll(".delete-btn");
     setupDialog(
         deleteDialog,
         [deleteDialog.querySelector(".btn-close")],
@@ -140,7 +137,7 @@ function setupRegistrationsTableInputsAndButtons() {
         }
         const hiddenInput = document.createElement("input");
         hiddenInput.type = "hidden";
-        hiddenInput.name = "registration_ids_to_delete";
+        hiddenInput.name = "resource_ids_to_delete";
         hiddenInput.value = returnValue;
         form.appendChild(hiddenInput);
         form.submit();
@@ -153,7 +150,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // Delete multiple dialog setup
     deleteCheckedButton.addEventListener("click", () => {
         deleteMultipleDialog.querySelector(".num-to-delete").textContent =
-            registrationsTableBody.querySelectorAll(
+            resourcesTableBody.querySelectorAll(
                 "input[type='checkbox']:checked",
             ).length;
     });

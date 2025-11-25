@@ -21,7 +21,7 @@ class InstanceTypeApiClient(BaseInstanceTypeApiClient, ApiClient):
 
 
 class InstanceTypeColumnMetadataApiClient(ColumnMetadataApiClient):
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update(
@@ -29,4 +29,4 @@ class InstanceTypeColumnMetadataApiClient(ColumnMetadataApiClient):
                 "table_name": "eq.instance_types",
             }
         )
-        return super().get_registrations(params=params)
+        return super().get_resources(params=params)

@@ -16,7 +16,7 @@ class ApplicationApiClient(BaseApplicationApiClient, ApiClient):
 
 
 class ApplicationColumnMetadataApiClient(ColumnMetadataApiClient):
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update(
@@ -24,4 +24,4 @@ class ApplicationColumnMetadataApiClient(ColumnMetadataApiClient):
                 "table_name": "eq.application",
             }
         )
-        return super().get_registrations(params=params)
+        return super().get_resources(params=params)

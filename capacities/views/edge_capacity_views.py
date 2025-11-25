@@ -18,7 +18,7 @@ from editor.base_views import (
     EditorStartFormView,
     EditorView,
     MultipleEditorFormsetProcessFormView,
-    RegistrationsListFormView,
+    ResourceListFormView,
 )
 
 from .capacity_views import (
@@ -37,12 +37,12 @@ from .mixins.edge_capacity_mixins import (
 
 # Edge Capacity
 class EdgeCapacityEditorView(EditorView):
-    editor_registration_list_url_reverse = "capacities:edge_capacities_list"
+    editor_resource_list_url_reverse = "capacities:edge_capacity_list"
     editor_url_reverse_base = "capacities:edge_capacity_editor"
     editor_start_url_reverse_base = "capacities:new_edge_capacity"
     editor_overview_url_reverse_base = "capacities:edge_capacity_overview"
-    registration_type_name_singular = "edge capacity"
-    registration_type_name_plural = "edge capacities"
+    resource_type_name_singular = "edge capacity"
+    resource_type_name_plural = "edge capacities"
     title_base = "New Edge Capacity"
     api_client_class = EdgeCapacityApiClient
     column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
@@ -122,11 +122,9 @@ class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterV
         return super().route_to_view(request, *args, **kwargs)
 
 
-class EdgeCapacityRegistrationsListFormView(
-    EdgeCapacityEditorView, RegistrationsListFormView
-):
+class EdgeCapacityListFormView(EdgeCapacityEditorView, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
-    new_registration_reverse = "capacities:new_edge_capacity"
+    new_resource_reverse = "capacities:new_edge_capacity"
 
 
 class EdgeCapacityEditorOverviewTemplateView(

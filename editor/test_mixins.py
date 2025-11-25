@@ -8,30 +8,30 @@ class ApiClientTestCaseHelperMixin:
     # unittest.TestCase setUp() hook
     def setUp(self):
         super().setUp()
-        self.registration_ids = set()
+        self.resource_ids = set()
         self.api_client = self.api_client_class()
 
     def tearDown(self):
         super().tearDown()
-        for registration_id in self.registration_ids:
-            self.api_client.delete(registration_id)
+        for resource_id in self.resource_ids:
+            self.api_client.delete(resource_id)
 
     # Helper methods
     def generate_random_id_and_add_to_test_ids(self):
         random_id = self.api_client._generate_random_id()
-        self.add_registration_id(random_id)
+        self.add_resource_id(random_id)
         return random_id
 
-    def add_registration_id(self, registration_id: int):
-        self.registration_ids.add(registration_id)
+    def add_resource_id(self, resource_id: int):
+        self.resource_ids.add(resource_id)
 
     def register_with_api_client_for_test(self, data: dict = None):
         if not data:
             data = dict()
-        new_registration = self.api_client.register(data)
+        new_resource = self.api_client.register(data)
         id_field = self.api_client.endpoint_definition.id_field
-        self.add_registration_id(new_registration.get(id_field))
-        return new_registration
+        self.add_resource_id(new_resource.get(id_field))
+        return new_resource
 
 
 class ApplicationApiClientTestCaseHelperMixin(ApiClientTestCaseHelperMixin):
@@ -40,7 +40,7 @@ class ApplicationApiClientTestCaseHelperMixin(ApiClientTestCaseHelperMixin):
             data = dict()
         data.update(
             {
-                "name": f"Application {len(self.registration_ids) + 1}",
+                "name": f"Application {len(self.resource_ids) + 1}",
                 "container_image": "https://hub.docker.com/myorg/weather-analytics:latest",
             }
         )

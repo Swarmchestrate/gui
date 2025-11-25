@@ -11,21 +11,21 @@ from .capacity_api_clients import (
 
 
 class CloudCapacityApiClient(CapacityApiClient):
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update({"resource_type": "eq.Cloud"})
-        return super().get_registrations(params=params)
+        return super().get_resources(params=params)
 
     def register(self, data: dict):
         data.update({"resource_type": "Cloud"})
         return super().register(data)
 
-    def delete(self, registration_id: int, params: dict | None = None):
+    def delete(self, resource_id: int, params: dict | None = None):
         if not params:
             params = dict()
         params.update({"resource_type": "eq.Cloud"})
-        return super().delete(registration_id, params)
+        return super().delete(resource_id, params)
 
 
 class BaseCloudCapacityColumnMetadataApiClient(BaseColumnMetadataApiClient, ABC):
@@ -37,7 +37,7 @@ class CloudCapacityColumnMetadataApiClient(
 ):
     disabled_categories = ["Edge Specific", "Networking"]
 
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update(
@@ -45,7 +45,7 @@ class CloudCapacityColumnMetadataApiClient(
                 "table_name": "eq.capacity",
             }
         )
-        return super().get_registrations(params)
+        return super().get_resources(params)
 
-    def get_registrations_by_category(self, category: str):
-        return self.get_registrations(params={"category": f'eq."{category}"'})
+    def get_resources_by_category(self, category: str):
+        return self.get_resources(params={"category": f'eq."{category}"'})

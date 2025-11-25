@@ -14,7 +14,7 @@ from django.views.generic import (
 )
 from django.views.generic.edit import ProcessFormView
 
-from editor.forms.base_forms import RegistrationsListForm
+from editor.forms.base_forms import ResourceDeletionForm
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
@@ -23,12 +23,12 @@ logger = logging.getLogger(__name__)
 
 
 class EditorView(TemplateView):
-    registration_type_name_singular: str
-    registration_type_name_plural: str
+    resource_type_name_singular: str
+    resource_type_name_plural: str
     api_client: ApiClient
     id_field: str
 
-    editor_registration_list_url_reverse: str
+    editor_resource_list_url_reverse: str
     editor_start_url_reverse_base: str
     editor_url_reverse_base: str
     editor_overview_url_reverse_base: str
@@ -45,9 +45,9 @@ class EditorView(TemplateView):
         context.update(
             {
                 "description": self.api_client.endpoint_definition.description,
-                "registration_type_name_singular": self.registration_type_name_singular,
-                "registration_type_name_plural": self.registration_type_name_plural,
-                "editor_registration_list_url_reverse": self.editor_registration_list_url_reverse,
+                "resource_type_name_singular": self.resource_type_name_singular,
+                "resource_type_name_plural": self.resource_type_name_plural,
+                "editor_resource_list_url_reverse": self.editor_resource_list_url_reverse,
                 "editor_url_reverse_base": self.editor_url_reverse_base,
                 "editor_start_url_reverse_base": self.editor_start_url_reverse_base,
                 "editor_overview_url_reverse_base": self.editor_overview_url_reverse_base,
@@ -69,7 +69,7 @@ class EditorTocView(TemplateView):
         self._setup_categories()
 
     def _setup_column_metadata(self):
-        self.column_metadata = self.column_metadata_api_client.get_registrations()
+        self.column_metadata = self.column_metadata_api_client.get_resources()
 
     def _setup_categories(self):
         self.category_names = list(set(r.get("category") for r in self.column_metadata))
@@ -137,7 +137,7 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"New {self.registration_type_name_singular.title()}",
+                "title": f"New {self.resource_type_name_singular.title()}",
             }
         )
         return context
@@ -153,7 +153,7 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
         return kwargs
 
     def form_valid(self, form):
-        new_registration = self.api_client.register(form.cleaned_data)
+        new_resource = self.api_client.register(form.cleaned_data)
         messages.success(
             self.request,
             f"New {self.api_client.endpoint_definition.definition_name} registered.",
@@ -161,7 +161,7 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
         self.success_url = reverse_lazy(
             self.editor_url_reverse_base,
             kwargs={
-                "registration_id": new_registration.get(self.id_field),
+                "resource_id": new_resource.get(self.id_field),
             },
         )
         return super().form_valid(form)
@@ -213,7 +213,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         }
         kwargs.update(
             {
-                "initial": self.registration,
+                "initial": self.resource,
                 "api_client": self.api_client,
                 "column_metadata_api_client": self.column_metadata_api_client,
                 "category": self.category,
@@ -272,7 +272,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
                 reverse_lazy(
                     self.editor_url_reverse_base,
                     kwargs={
-                        "registration_id": self.registration_id,
+                        "resource_id": self.resource_id,
                     },
                 ),
                 urllib.parse.quote_plus(next_list_item),
@@ -281,9 +281,9 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         update_data = form.cleaned_data
         update_data = self.add_formset_data_to_main_form(update_data, forms)
         try:
-            self.api_client.update(self.registration_id, update_data)
+            self.api_client.update(self.resource_id, update_data)
         except Exception:
-            error_msg = f"An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied."
+            error_msg = f"An error occurred whilst updating {self.resource_type_name_singular} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
             return self.forms_invalid(forms, error_msg=error_msg)
 
@@ -300,19 +300,19 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
 
     def setup(self, request, *args, **kwargs):
         response = super().setup(request, *args, **kwargs)
-        self.registration_id = self.kwargs["registration_id"]
-        self.registration = self.api_client.get(self.registration_id)
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
 
     def dispatch(self, request, *args, **kwargs):
         self.category = self.request.GET.get("category", self._get_first_category())
         self.success_url = reverse_lazy(
             self.editor_overview_url_reverse_base,
             kwargs={
-                "registration_id": self.registration_id,
+                "resource_id": self.resource_id,
             },
         )
         self.title_base = (
-            f"{self.registration_type_name_singular.title()} {self.registration_id}"
+            f"{self.resource_type_name_singular.title()} {self.resource_id}"
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -329,30 +329,30 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         context.update(
             {
                 "title": f"{self.title_base} | {category_formatted}",
-                "main_subheading": self.registration_type_name_singular.title(),
+                "main_subheading": self.resource_type_name_singular.title(),
                 "main_heading": category_formatted,
                 "current_category": self.category,
                 "prev_list_item": prev_list_item,
                 "prev_list_item_title": prev_list_item.replace(":", ": "),
                 "next_list_item": next_list_item,
                 "next_list_item_title": next_list_item.replace(":", ": "),
-                "registration": self.registration,
-                "registration_id": self.registration_id,
+                "resource": self.resource,
+                "resource_id": self.resource_id,
                 "form": self.main_form_class(**self.get_form_kwargs()),
             }
         )
         return context
 
 
-class RegistrationsListFormView(EditorView, FormView):
-    template_name = "editor/registration_list.html"
-    form_class = RegistrationsListForm
+class ResourceListFormView(EditorView, FormView):
+    template_name = "editor/resource_list.html"
+    form_class = ResourceDeletionForm
 
-    new_registration_reverse: str
+    new_resource_reverse: str
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.registration_list = self.api_client.get_registrations()
+        self.resource_list = self.api_client.get_resources()
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = request.path
@@ -362,12 +362,12 @@ class RegistrationsListFormView(EditorView, FormView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": self.registration_type_name_plural.title(),
-                "registrations": {
-                    registration.get(self.id_field): registration
-                    for registration in self.registration_list
+                "title": self.resource_type_name_plural.title(),
+                "resources": {
+                    resource.get(self.id_field): resource
+                    for resource in self.resource_list
                 },
-                "new_registration_reverse": self.new_registration_reverse,
+                "new_resource_reverse": self.new_resource_reverse,
             }
         )
         return context
@@ -376,9 +376,8 @@ class RegistrationsListFormView(EditorView, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "registration_ids": [
-                    registration.get(self.id_field)
-                    for registration in self.registration_list
+                "resource_ids": [
+                    resource.get(self.id_field) for resource in self.resource_list
                 ]
             }
         )
@@ -387,18 +386,16 @@ class RegistrationsListFormView(EditorView, FormView):
     def form_invalid(self, form):
         messages.error(
             self.request,
-            "An error occurred whilst deleting registrations. The registrations may not have been deleted.",
+            f"The selected {self.resource_type_name_plural} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        registration_ids_to_delete = form.cleaned_data.get(
-            "registration_ids_to_delete", []
-        )
-        self.api_client.delete_many(registration_ids_to_delete)
-        success_msg = f"Deleted 1 {self.registration_type_name_singular}"
-        if len(registration_ids_to_delete) != 1:
-            success_msg = f"Deleted {len(registration_ids_to_delete)} {self.registration_type_name_plural}"
+        resource_ids_to_delete = form.cleaned_data.get("resource_ids_to_delete", [])
+        self.api_client.delete_many(resource_ids_to_delete)
+        success_msg = f"Deleted 1 {self.resource_type_name_singular}"
+        if len(resource_ids_to_delete) != 1:
+            success_msg = f"Deleted {len(resource_ids_to_delete)} {self.resource_type_name_plural}"
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
@@ -406,8 +403,8 @@ class RegistrationsListFormView(EditorView, FormView):
 class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
     template_name = "editor/overview.html"
 
-    def format_registration_data_for_template(self) -> dict:
-        formatted_registration_data = dict()
+    def format_resource_data_for_template(self) -> dict:
+        formatted_resource_data = dict()
         for category_name in self.category_names:
             field_names_for_category = [
                 (cm.get("column_name"), cm.get("title"))
@@ -416,7 +413,7 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
             ]
             field_data_for_category = dict()
             for field_name, field_title in field_names_for_category:
-                field_value = self.registration.get(field_name)
+                field_value = self.resource.get(field_name)
                 field_data_for_category.update(
                     {
                         field_name: {
@@ -425,27 +422,27 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
                         },
                     }
                 )
-            formatted_registration_data.update(
+            formatted_resource_data.update(
                 {
                     category_name: field_data_for_category,
                 }
             )
-        return formatted_registration_data
+        return formatted_resource_data
 
     def dispatch(self, request, *args, **kwargs):
-        self.registration_id = self.kwargs["registration_id"]
-        self.registration = self.api_client.get(self.registration_id)
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"{self.registration_type_name_singular.title()} {self.registration_id} | Overview",
+                "title": f"{self.resource_type_name_singular.title()} {self.resource_id} | Overview",
                 "main_heading": "Overview",
-                "main_subheading": f"{self.registration_type_name_singular.title()}",
-                "registration_data_by_category": self.format_registration_data_for_template(),
-                "registration": self.registration,
+                "main_subheading": f"{self.resource_type_name_singular.title()}",
+                "resource_data_by_category": self.format_resource_data_for_template(),
+                "resource": self.resource,
             }
         )
         return context

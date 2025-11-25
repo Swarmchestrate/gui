@@ -30,8 +30,6 @@ class InstanceTypeApiClient(BaseInstanceTypeApiClient, MockApiClient):
 
 
 class InstanceTypeColumnMetadataApiClient(MockColumnMetadataApiClient):
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
-        registrations = super().get_registrations()
-        return [
-            r for r in registrations if r.get("table_name") == "capacity_instance_type"
-        ]
+    def get_resources(self, params: dict | None = None) -> list[dict]:
+        resources = super().get_resources()
+        return [r for r in resources if r.get("table_name") == "capacity_instance_type"]

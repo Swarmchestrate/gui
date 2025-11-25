@@ -6,21 +6,21 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
-<script src="{% static 'editor/registration_list.js' %}" type="module"></script>
+<script src="{% static 'editor/resource_list.js' %}" type="module"></script>
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
 <h1>{{ title }}</h1>
 <p class="pb-4">{{ description }}</p>
-{% if not registrations %}
-<p class="text-body-secondary">No {{ registration_type_name_plural|title }} have been registered.</p>
+{% if not resources %}
+<p class="text-body-secondary">No {{ resource_type_name_plural|title }} have been registered.</p>
 {% else %}
-<form id="registration-deletion-form" method="POST" action="{{ request.path }}">
+<form id="resource-deletion-form" method="POST" action="{{ request.path }}">
     {% csrf_token %}
     <div>
         <ul class="d-inline-flex column-gap-3 list-unstyled">
             <li>
-                <a href="{% url new_registration_reverse %}" class="d-inline-flex align-items-center column-gap-2 btn btn-primary">
+                <a href="{% url new_resource_reverse %}" class="d-inline-flex align-items-center column-gap-2 btn btn-primary">
                    <i class="bi bi-plus-lg"></i>
                    New
                 </a>
@@ -36,7 +36,7 @@
             </li>
         </ul>
     </div>
-    <table id="registrations-table" class="table table-hover">
+    <table id="resources-table" class="table table-hover">
         <thead>
             <tr class="table-primary">
                 <th class="align-middle p-3"></th>
@@ -51,25 +51,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for checkbox in form.registration_ids_to_delete %}
-            {% with registration_id=checkbox.data.value %}
-            {% with registration=registrations|get_key_value_or_blank_string:registration_id %}
-            {% if registration %}
-            <tr data-registration-id="{{ registration_id }}">
+            {% for checkbox in form.resource_ids_to_delete %}
+            {% with resource_id=checkbox.data.value %}
+            {% with resource=resources|get_key_value_or_blank_string:resource_id %}
+            {% if resource %}
+            <tr data-resource-id="{{ resource_id }}">
                 <td class="align-middle px-3"></td>
                 <td class="font-monospace align-middle px-3">
-                    <a href="{% url editor_overview_url_reverse_base registration_id %}">{{ registration_id }}</a>
+                    <a href="{% url editor_overview_url_reverse_base resource_id %}">{{ resource_id }}</a>
                 </td>
                 <td class="text-body-secondary align-middle px-3">
-                    {% if 'created_at' in registration %}
-                    {{ registration.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                    {% if 'created_at' in resource %}
+                    {{ resource.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
                     {% else %}
                     -
                     {% endif %}
                 </td>
                 <td class="text-body-secondary align-middle px-3">
-                    {% if 'updated_at' in registration %}
-                    {{ registration.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                    {% if 'updated_at' in resource %}
+                    {{ resource.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
                     {% else %}
                     -
                     {% endif %}
@@ -78,7 +78,7 @@
                     <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
                         <li>
                             <a
-                                href="{% url editor_url_reverse_base registration_id %}"
+                                href="{% url editor_url_reverse_base resource_id %}"
                                 class="btn btn-light edit-btn">
                                 <i class="bi bi-pencil-fill" title="Edit"></i>
                             </a>
@@ -86,7 +86,7 @@
                         <li>
                             <button
                                 class="btn btn-light delete-btn"
-                                data-registration-id="{{ registration_id }}"
+                                data-resource-id="{{ resource_id }}"
                                 type="button">
                                 <i class="bi bi-trash3-fill" title="Delete"></i>
                             </button>

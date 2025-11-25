@@ -74,7 +74,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         return is_valid
 
     def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_client.get_registrations()
+        column_metadata = self.column_metadata_api_client.get_resources()
         field_data = (
             self.api_client.endpoint_definition.get_all_user_specifiable_fields()
         )
@@ -184,15 +184,15 @@ class OpenApiSpecificationBasedForm(EditorForm):
         api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
         if not api_client:
             return
-        # Get registrations at endpoint
-        registrations = api_client.get_registrations()
+        # Get resources at endpoint
+        resources = api_client.get_resources()
         # Return field components in a dict
         choices = (
             (
                 r.get(api_client.endpoint_definition.id_field),
                 f"{api_client.endpoint.title()} {r.get(api_client.endpoint_definition.id_field)}",
             )
-            for r in registrations
+            for r in resources
         )
         field_class = forms.ChoiceField
         return {
@@ -241,7 +241,7 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         super().__init__(api_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_client.get_registrations_by_category(
+        column_metadata = self.column_metadata_api_client.get_resources_by_category(
             self.category
         )
         field_names = [r.get("column_name") for r in column_metadata]
@@ -265,9 +265,7 @@ class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
             "column_name": "in.(%s)"
             % (",".join([f'"{rfn}"' for rfn in self.required_field_names])),
         }
-        column_metadata = self.column_metadata_api_client.get_registrations(
-            params=params
-        )
+        column_metadata = self.column_metadata_api_client.get_resources(params=params)
         field_data = (
             self.api_client.endpoint_definition.get_required_user_specifiable_fields()
         )
@@ -280,14 +278,14 @@ class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
         return field_data
 
 
-class RegistrationsListForm(forms.Form):
-    def __init__(self, registration_ids: list[int], *args, **kwargs):
+class ResourceDeletionForm(forms.Form):
+    def __init__(self, resource_ids: list[int], *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["registration_ids_to_delete"].choices = [
-            (id, id) for id in registration_ids
+        self.fields["resource_ids_to_delete"].choices = [
+            (id, id) for id in resource_ids
         ]
 
-    registration_ids_to_delete = forms.MultipleChoiceField(
+    resource_ids_to_delete = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple(
             attrs={

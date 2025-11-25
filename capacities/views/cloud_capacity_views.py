@@ -19,7 +19,7 @@ from editor.base_views import (
     EditorStartFormView,
     EditorView,
     MultipleEditorFormsetProcessFormView,
-    RegistrationsListFormView,
+    ResourceListFormView,
 )
 
 from .capacity_views import (
@@ -38,12 +38,12 @@ from .mixins.cloud_capacity_mixins import (
 
 # Cloud Capacity
 class CloudCapacityEditorView(EditorView):
-    editor_registration_list_url_reverse = "capacities:cloud_capacities_list"
+    editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
     editor_url_reverse_base = "capacities:cloud_capacity_editor"
     editor_start_url_reverse_base = "capacities:new_cloud_capacity"
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
-    registration_type_name_singular = "cloud capacity"
-    registration_type_name_plural = "cloud capacities"
+    resource_type_name_singular = "cloud capacity"
+    resource_type_name_plural = "cloud capacities"
     api_client_class = CloudCapacityApiClient
     column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
 
@@ -126,11 +126,9 @@ class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRoute
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CloudCapacityRegistrationsListFormView(
-    CloudCapacityEditorView, RegistrationsListFormView
-):
+class CloudCapacityListFormView(CloudCapacityEditorView, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
-    new_registration_reverse = "capacities:new_cloud_capacity"
+    new_resource_reverse = "capacities:new_cloud_capacity"
 
 
 class CloudCapacityEditorOverviewTemplateView(

@@ -72,17 +72,17 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         pass
 
     @abstractmethod
-    def get(self, registration_id: int, params: dict | None = None) -> dict:
+    def get(self, resource_id: int, params: dict | None = None) -> dict:
         pass
 
     @abstractmethod
-    def get_registrations_by_ids(
-        self, registration_ids: list[int], params: dict | None = None
+    def get_resources_by_ids(
+        self, resource_ids: list[int], params: dict | None = None
     ) -> list[dict]:
         pass
 
     @abstractmethod
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         pass
 
     @abstractmethod
@@ -94,31 +94,31 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         pass
 
     @abstractmethod
-    def update(self, registration_id: int, data: dict):
+    def update(self, resource_id: int, data: dict):
         pass
 
     @abstractmethod
-    def delete(self, registration_id: int, params: dict | None = None):
+    def delete(self, resource_id: int, params: dict | None = None):
         pass
 
     @abstractmethod
-    def delete_many(self, registration_ids: list[int]):
+    def delete_many(self, resource_ids: list[int]):
         pass
 
-    def _get_existing_registration_ids(self):
+    def _get_existing_resource_ids(self):
         params = {"select": f"{self.endpoint_definition.id_field}"}
         return [
             data.get(self.endpoint_definition.id_field)
-            for data in self.get_registrations(params=params)
+            for data in self.get_resources(params=params)
         ]
 
     def _generate_random_id(self):
-        existing_registration_ids = self._get_existing_registration_ids()
+        existing_resource_ids = self._get_existing_resource_ids()
         # Credit for random_id solution: https://stackoverflow.com/a/70239671
         possible_ids_set = set(
             range(self.random_id_min_value, self.random_id_max_value)
         )
-        existing_ids_set = set(existing_registration_ids)
+        existing_ids_set = set(existing_resource_ids)
         possible_ids_set = possible_ids_set - existing_ids_set
         if not len(possible_ids_set):
             raise Error("There are no new unique IDs that can be used.")
@@ -126,12 +126,12 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         return random_id
 
     def _generate_random_ids(self, amount: int = 1):
-        existing_registration_ids = self._get_existing_registration_ids()
+        existing_resource_ids = self._get_existing_resource_ids()
         # Credit for random_id solution: https://stackoverflow.com/a/70239671
         possible_ids_set = set(
             range(self.random_id_min_value, self.random_id_max_value)
         )
-        existing_ids_set = set(existing_registration_ids)
+        existing_ids_set = set(existing_resource_ids)
         possible_ids_set = possible_ids_set - existing_ids_set
         if not len(possible_ids_set):
             raise Error("There are no new unique IDs that can be used.")
@@ -158,12 +158,12 @@ class ApiClient(ApiClientMixin, BaseApiClient):
 
     # Helpers
     def _generate_random_id(self):
-        existing_registration_ids = self._get_existing_registration_ids()
+        existing_resource_ids = self._get_existing_resource_ids()
         # Credit for random_id solution: https://stackoverflow.com/a/70239671
         possible_ids_set = set(
             range(self.random_id_min_value, self.random_id_max_value)
         )
-        existing_ids_set = set(existing_registration_ids)
+        existing_ids_set = set(existing_resource_ids)
         possible_ids_set = possible_ids_set - existing_ids_set
         if not len(possible_ids_set):
             raise Error("There are no new unique IDs that can be used.")
@@ -171,12 +171,12 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         return random_id
 
     def _generate_random_ids(self, amount: int = 1):
-        existing_registration_ids = self._get_existing_registration_ids()
+        existing_resource_ids = self._get_existing_resource_ids()
         # Credit for random_id solution: https://stackoverflow.com/a/70239671
         possible_ids_set = set(
             range(self.random_id_min_value, self.random_id_max_value)
         )
-        existing_ids_set = set(existing_registration_ids)
+        existing_ids_set = set(existing_resource_ids)
         possible_ids_set = possible_ids_set - existing_ids_set
         if not len(possible_ids_set):
             raise Error("There are no new unique IDs that can be used.")
@@ -185,47 +185,43 @@ class ApiClient(ApiClientMixin, BaseApiClient):
             raise Error(f"Failed to generate {amount} new unique IDs.")
         return random_ids
 
-    def _get_existing_registration_ids(self):
+    def _get_existing_resource_ids(self):
         params = {"select": f"{self.endpoint_definition.id_field}"}
         return [
             data.get(self.endpoint_definition.id_field)
-            for data in self.get_registrations(params=params)
+            for data in self.get_resources(params=params)
         ]
 
     # Registrations
-    def get(self, registration_id: int, params: dict | None = None) -> dict:
+    def get(self, resource_id: int, params: dict | None = None) -> dict:
         if not params:
             params = dict()
         params.update(
             {
-                self.endpoint_definition.id_field: f"eq.{registration_id}",
+                self.endpoint_definition.id_field: f"eq.{resource_id}",
             }
         )
         response = requests.get(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
         # Responses are returned as lists, so need
         # to get the first list element.
-        registration = next(iter(response.json()))
-        return registration
+        resource = next(iter(response.json()))
+        return resource
 
-    def get_registrations_by_ids(
-        self, registration_ids: list[int], params: dict | None = None
-    ):
+    def get_resources_by_ids(self, resource_ids: list[int], params: dict | None = None):
         if not params:
             params = dict()
         params.update(
             {
                 self.endpoint_definition.id_field: "in.(%s)"
-                % ",".join(
-                    [str(registration_id) for registration_id in registration_ids]
-                )
+                % ",".join([str(resource_id) for resource_id in resource_ids])
             }
         )
         response = requests.get(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
         return response.json()
 
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         response = requests.get(self.endpoint_url, params=params)
@@ -241,8 +237,8 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         )
         response = requests.post(self.endpoint_url, json=data)
         self.log_and_raise_response_status_if_error(response)
-        new_registration = self.get(new_id)
-        return new_registration
+        new_resource = self.get(new_id)
+        return new_resource
 
     def bulk_register(self, data_list: list[dict]) -> list[int]:
         new_ids = self._generate_random_ids(amount=len(data_list))
@@ -255,20 +251,20 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         self.log_and_raise_response_status_if_error(response)
         return new_ids
 
-    def delete(self, registration_id: int, params: dict | None = None):
+    def delete(self, resource_id: int, params: dict | None = None):
         if not params:
             params = dict()
         params.update(
             {
-                self.endpoint_definition.id_field: f"eq.{registration_id}",
+                self.endpoint_definition.id_field: f"eq.{resource_id}",
             }
         )
         response = requests.delete(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
 
-    def delete_many(self, registration_ids: list[int]):
+    def delete_many(self, resource_ids: list[int]):
         params = {
-            self.endpoint_definition.id_field: f"in.({','.join(map(str, registration_ids))})",
+            self.endpoint_definition.id_field: f"in.({','.join(map(str, resource_ids))})",
         }
         response = requests.delete(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
@@ -283,10 +279,10 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         )
         return data
 
-    def update(self, registration_id: int, data: dict):
+    def update(self, resource_id: int, data: dict):
         prepared_update_data = self._prepare_update_data(data)
         params = {
-            self.endpoint_definition.id_field: f"eq.{registration_id}",
+            self.endpoint_definition.id_field: f"eq.{resource_id}",
         }
         response = requests.patch(
             self.endpoint_url, params=params, json=prepared_update_data
@@ -307,7 +303,7 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
 
     endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
 
-    def get_registrations(self, params: dict | None = None) -> list[dict]:
+    def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         and_conditions = set(
@@ -325,10 +321,10 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
                 "and": f"({','.join(and_conditions)})",
             }
         )
-        return super().get_registrations(params)
+        return super().get_resources(params)
 
-    def get_registrations_by_category(self, category: str):
-        return self.get_registrations(params={"category": f"eq.{category}"})
+    def get_resources_by_category(self, category: str):
+        return self.get_resources(params={"category": f"eq.{category}"})
 
     def get_by_table_name(self, table_name: str):
-        return self.get_registrations(params={"table_name": f"eq.{table_name}"})
+        return self.get_resources(params={"table_name": f"eq.{table_name}"})

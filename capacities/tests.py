@@ -10,8 +10,8 @@ from .api.edge_capacity_api_clients import EdgeCapacityApiClient
 class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
     api_client_class = CapacityApiClient
 
-    def test_get_registrations(self):
-        capacities = self.api_client.get_registrations()
+    def test_get_resources(self):
+        capacities = self.api_client.get_resources()
         self.assertIsInstance(capacities, list)
 
     def test_get_user_specifiable_fields_with_format(self):
@@ -36,43 +36,43 @@ class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
 class CloudCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
     api_client_class = CloudCapacityApiClient
 
-    def test_get_registrations(self):
-        capacities = self.api_client.get_registrations()
+    def test_get_resources(self):
+        capacities = self.api_client.get_resources()
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        new_registration = self.api_client.register()
-        self.assertIsInstance(new_registration, dict)
+        new_resource = self.api_client.register()
+        self.assertIsInstance(new_resource, dict)
 
     def test_delete(self):
-        registration_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_client.delete(registration_id)
+        resource_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_client.delete(resource_id)
 
     def test_update(self):
         # Test setup
-        new_registration = self.register_with_api_client_for_test()
-        self.assertEqual(new_registration.get("mobility"), None)
+        new_resource = self.register_with_api_client_for_test()
+        self.assertEqual(new_resource.get("mobility"), None)
         # Update
         update_data = {
             "mobility": True,
         }
         id_field = self.api_client.endpoint_definition.id_field
-        self.api_client.update(new_registration.get(id_field), update_data)
-        updated_registration = self.api_client.get(new_registration.get(id_field))
-        self.assertEqual(updated_registration.get("mobility"), True)
+        self.api_client.update(new_resource.get(id_field), update_data)
+        updated_resource = self.api_client.get(new_resource.get(id_field))
+        self.assertEqual(updated_resource.get("mobility"), True)
 
 
 class EdgeCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
     api_client_class = EdgeCapacityApiClient
 
-    def test_get_registrations(self):
-        capacities = self.api_client.get_registrations()
+    def test_get_resources(self):
+        capacities = self.api_client.get_resources()
         self.assertIsInstance(capacities, list)
 
     def test_register(self):
-        new_registration = self.api_client.register()
-        self.assertIsInstance(new_registration, dict)
+        new_resource = self.api_client.register()
+        self.assertIsInstance(new_resource, dict)
 
     def test_delete(self):
-        registration_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_client.delete(registration_id)
+        resource_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_client.delete(resource_id)

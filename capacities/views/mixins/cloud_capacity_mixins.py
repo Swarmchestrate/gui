@@ -23,7 +23,7 @@ class ArchitectureFormSetEditorViewMixin:
 
         # Configure initial formset data
         initial = list()
-        architecture_names = self.registration.get(property_name)
+        architecture_names = self.resource.get(property_name)
         if not architecture_names:
             architecture_names = list()
         for architecture_name in architecture_names:
@@ -46,7 +46,7 @@ class OperatingSystemFormSetEditorViewMixin:
 
         # Configure initial formset data
         initial = list()
-        operating_systems = self.registration.get(property_name)
+        operating_systems = self.resource.get(property_name)
         if not operating_systems or not isinstance(operating_systems, dict):
             operating_systems = dict()
         for os_name, os_id in operating_systems.items():

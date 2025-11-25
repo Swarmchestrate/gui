@@ -70,7 +70,7 @@ class CapacityCostAndLocalityEditorProcessFormView(
 
         # Configure initial formset data
         initial_price = list()
-        price_data = self.registration.get(price_property_name)
+        price_data = self.resource.get(price_property_name)
         if not price_data:
             price_data = dict()
         for instance_type, credits_per_hour in price_data.items():
@@ -97,7 +97,7 @@ class CapacityEnergyEditorProcessFormView(MultipleEditorFormsetProcessFormView):
 
         # Configure initial formset data
         initial = list()
-        energy_consumption_data = self.registration.get(property_name)
+        energy_consumption_data = self.resource.get(property_name)
         if not energy_consumption_data:
             energy_consumption_data = dict()
         for type, amount in energy_consumption_data.items():
@@ -124,7 +124,7 @@ class CapacitySecurityTrustAndAccessEditorProcessFormView(
 
         # Configure initial formset data
         initial = list()
-        security_ports = self.registration.get(property_name)
+        security_ports = self.resource.get(property_name)
         if not security_ports:
             security_ports = list()
         for port_number in security_ports:
@@ -148,7 +148,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         instance_type_api_client = api_client_class()
         inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
         current_instance_type_id_strs = list(
-            map(str, self.registration.get("instance_types"))
+            map(str, self.resource.get("instance_types"))
         )
         instance_types_to_add = list()
         instance_types_to_update = list()
@@ -181,7 +181,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         if instance_type_ids_to_delete:
             instance_type_api_client.delete_many(list(instance_type_ids_to_delete))
         self.api_client.update(
-            self.registration_id,
+            self.resource_id,
             {
                 self.instance_types_property_name: updated_instance_type_ids
                 + new_instance_type_ids,
@@ -213,13 +213,13 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
 
     def get_instance_type_formset_initial(self):
         initial = list()
-        instance_type_ids = self.registration.get(self.instance_types_property_name)
+        instance_type_ids = self.resource.get(self.instance_types_property_name)
         if not all(
             isinstance(instance_type_id, int) for instance_type_id in instance_type_ids
         ):
             return initial
         instance_type_api_client = InstanceTypeApiClient()
-        instance_types = instance_type_api_client.get_registrations_by_ids(
+        instance_types = instance_type_api_client.get_resources_by_ids(
             instance_type_ids
         )
         if not instance_types or not isinstance(instance_types, list):

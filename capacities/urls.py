@@ -10,16 +10,16 @@ app_name = "capacities"
 urlpatterns = [
     path(
         "cloud-capacities/",
-        cloud_capacity_views.CloudCapacityRegistrationsListFormView.as_view(),
-        name="cloud_capacities_list",
+        cloud_capacity_views.CloudCapacityListFormView.as_view(),
+        name="cloud_capacity_list",
     ),
     path(
-        "cloud-capacities/<registration_id>/edit/",
+        "cloud-capacities/<resource_id>/edit/",
         cloud_capacity_views.CloudCapacityEditorRouterView.as_view(),
         name="cloud_capacity_editor",
     ),
     path(
-        "cloud-capacities/<registration_id>/overview/",
+        "cloud-capacities/<resource_id>/overview/",
         cloud_capacity_views.CloudCapacityEditorOverviewTemplateView.as_view(),
         name="cloud_capacity_overview",
     ),
@@ -30,16 +30,16 @@ urlpatterns = [
     ),
     path(
         "edge-capacities/",
-        edge_capacity_views.EdgeCapacityRegistrationsListFormView.as_view(),
-        name="edge_capacities_list",
+        edge_capacity_views.EdgeCapacityListFormView.as_view(),
+        name="edge_capacity_list",
     ),
     path(
-        "edge-capacities/<registration_id>/edit/",
+        "edge-capacities/<resource_id>/edit/",
         edge_capacity_views.EdgeCapacityEditorRouterView.as_view(),
         name="edge_capacity_editor",
     ),
     path(
-        "edge-capacities/<registration_id>/overview/",
+        "edge-capacities/<resource_id>/overview/",
         edge_capacity_views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
     ),

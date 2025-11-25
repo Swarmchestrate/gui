@@ -12,8 +12,8 @@ class ApplicationApiClientTestCase(
 ):
     api_client_class = ApplicationApiClient
 
-    def test_get_registrations(self):
-        applications = self.api_client.get_registrations()
+    def test_get_resources(self):
+        applications = self.api_client.get_resources()
         self.assertIsInstance(applications, list)
 
     def test_register(self):
@@ -24,5 +24,5 @@ class ApplicationApiClientTestCase(
         self.api_client.register(data)
 
     def test_delete(self):
-        registration_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_client.delete(registration_id)
+        resource_id = self.generate_random_id_and_add_to_test_ids()
+        self.api_client.delete(resource_id)

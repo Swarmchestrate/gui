@@ -23,7 +23,7 @@ class AccessibleSensorsFormsetEditorViewMixin:
 
         # Configure initial formset data
         initial = list()
-        sensor_names = self.registration.get(property_name)
+        sensor_names = self.resource.get(property_name)
         if not sensor_names:
             sensor_names = list()
         for sensor_name in sensor_names:
@@ -46,7 +46,7 @@ class DevicesFormsetEditorViewMixin:
 
         # Configure initial formset data
         initial = list()
-        devices = self.registration.get(property_name)
+        devices = self.resource.get(property_name)
         if not devices:
             devices = dict()
         for device_type, device_name in devices.items():

@@ -31,7 +31,7 @@ class LocalityFormSetEditorViewMixin:
 
         # Configure initial formset data
         initial_locality = list()
-        locality_data = self.registration.get(self.locality_property_name)
+        locality_data = self.resource.get(self.locality_property_name)
         if not locality_data or not isinstance(locality_data, dict):
             locality_data = {
                 "form_prefix": self.locality_property_name,
