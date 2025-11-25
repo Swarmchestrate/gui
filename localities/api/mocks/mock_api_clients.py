@@ -6,8 +6,8 @@ from editor.api.mocks.mock_base_api_clients import (
     MockApiClient,
     MockColumnMetadataApiClient,
 )
-from locality.api.api_clients import BaseLocalityApiClient
-from locality.api.mocks.mock_definitions import (
+from localities.api.api_clients import BaseLocalityApiClient
+from localities.api.mocks.mock_definitions import (
     LocalityUserSpecifiableOpenApiDefinition,
 )
 
@@ -19,7 +19,7 @@ class LocalityApiClient(BaseLocalityApiClient, MockApiClient):
     endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
         BASE_DIR,
-        "locality",
+        "localities",
         "api",
         "mocks",
         "jsons",

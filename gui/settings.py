@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "capacities.apps.CapacitiesConfig",
     "editor.apps.EditorConfig",
     "instance_types.apps.InstanceTypesConfig",
-    "locality.apps.LocalityConfig",
+    "localities.apps.LocalitiesConfig",
 ]
 
 MIDDLEWARE = [

@@ -54,13 +54,13 @@ class LocalityFormSetEditorViewMixin:
                     prefix=self.locality_property_name
                 ),
                 "locality_options_search_form_url_reverse": reverse_lazy(
-                    "locality:locality_options_search"
+                    "localities:locality_options_search"
                 ),
                 "get_locality_by_name_url_reverse": reverse_lazy(
-                    "locality:get_locality_by_name"
+                    "localities:get_locality_by_name"
                 ),
                 "get_locality_by_gps_url_reverse": reverse_lazy(
-                    "locality:get_locality_by_gps"
+                    "localities:get_locality_by_gps"
                 ),
             }
         )

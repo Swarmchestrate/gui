@@ -76,7 +76,7 @@ class GetLocalityByNameForm(forms.Form):
 
 
 class SplitGpsLocationWidget(forms.MultiWidget):
-    template_name = "locality/gps_location_widget.html"
+    template_name = "localities/gps_location_widget.html"
 
     def decompress(self, value):
         if value:

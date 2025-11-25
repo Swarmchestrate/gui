@@ -3,7 +3,7 @@
 
 {% if field.name == 'locality_id' %}
 {{ field }}
-{% include 'locality/locality_section.html' %}
+{% include 'localities/locality_section.html' %}
 {% elif field.name == 'instance_types' %}
 {% include 'instance_types/instance_types_section.html' %}
 {% elif field.name in formset_tables %}

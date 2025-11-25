@@ -1,8 +1,8 @@
 import {
     getEmptyLocalityTemplate,
     fillLocalityAutomatically,
-} from "/static/locality/locality_autofill.js";
-import { localityFormPrefix } from "/static/locality/locality_section.js";
+} from "/static/localities/locality_autofill.js";
+import { localityFormPrefix } from "/static/localities/locality_section.js";
 
 async function getLocalityOptions(query, localityOptionsSearchUrl) {
     const response = await fetch(

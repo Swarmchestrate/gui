@@ -2,7 +2,7 @@ from editor.forms.base_forms import (
     OpenApiSpecificationBasedRegistrationForm,
     OpenApiSpecificationCategoryBasedForm,
 )
-from locality.forms import LocalityEditorForm
+from localities.forms import LocalityEditorForm
 
 
 class ApplicationRegistrationForm(OpenApiSpecificationBasedRegistrationForm):

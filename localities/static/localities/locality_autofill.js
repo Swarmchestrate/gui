@@ -1,4 +1,4 @@
-import { localityFormPrefix } from "/static/locality/locality_section.js";
+import { localityFormPrefix } from "/static/localities/locality_section.js";
 
 export function getEmptyLocalityTemplate() {
     return {

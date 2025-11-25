@@ -19,7 +19,7 @@ from editor.base_views import (
 from instance_types.api.mocks.mock_api_clients import InstanceTypeApiClient
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
-from locality.views import LocalityFormSetEditorViewMixin
+from localities.views import LocalityFormSetEditorViewMixin
 
 
 # Cloud & Edge Capacities

@@ -26,5 +26,5 @@ urlpatterns = [
     path("", include("applications.urls")),
     path("", include("capacities.urls")),
     path("", include("instance_types.urls")),
-    path("", include("locality.urls")),
+    path("", include("localities.urls")),
 ]
