@@ -211,24 +211,18 @@ class OpenApiSpecificationBasedForm(EditorForm):
         field_components = self._get_field_components_for_foreign_key_field(
             field_metadata.get("column_name", "")
         )
-        if field_components:
-            (
-                field_class,
-                widget_class,
-                css_classes,
-                extra_field_kwargs,
-            ) = field_components.values()
-        else:
+        if not field_components:
             # Determine field, widget and/or widget CSS classes
             # from OpenAPI spec metadata.
-            (
-                field_class,
-                widget_class,
-                css_classes,
-                extra_field_kwargs,
-            ) = self._get_initial_field_vars_from_field_format(
+            field_components = self._get_initial_field_vars_from_field_format(
                 field_metadata.get("format", "")
-            ).values()
+            )
+        (
+            field_class,
+            widget_class,
+            css_classes,
+            extra_field_kwargs,
+        ) = field_components.values()
 
         # Build field kwargs
         kwargs = self._configure_field_kwargs(
