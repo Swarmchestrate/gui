@@ -8,15 +8,14 @@ from editor.base_views import (
     RegistrationsListFormView,
 )
 
-from .api.mocks.mock_api_clients import (
-    InstanceTypeApiEndpoint,
-    InstanceTypeColumnMetadataApiEndpoint,
-)
-
-# from .api.endpoints.instance_type import (
-#     InstanceTypeApiEndpoint,
-#     InstanceTypeColumnMetadataApiEndpoint,
+# from .api.api_clients import (
+#     InstanceTypeApiClient,
+#     InstanceTypeColumnMetadataApiClient,
 # )
+from .api.mocks.mock_api_clients import (
+    InstanceTypeApiClient,
+    InstanceTypeColumnMetadataApiClient,
+)
 from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
 
 
@@ -27,8 +26,8 @@ class InstanceTypeEditorView(EditorView):
     editor_overview_url_reverse_base = "instance_types:instance_type_overview"
     registration_type_name_singular = "instance type"
     registration_type_name_plural = "instance types"
-    api_endpoint_class = InstanceTypeApiEndpoint
-    column_metadata_api_endpoint_class = InstanceTypeColumnMetadataApiEndpoint
+    api_client_class = InstanceTypeApiClient
+    column_metadata_api_client_class = InstanceTypeColumnMetadataApiClient
 
 
 class InstanceTypeEditorStartFormView(InstanceTypeEditorView, EditorStartFormView):

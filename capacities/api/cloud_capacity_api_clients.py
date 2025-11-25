@@ -1,16 +1,16 @@
 from abc import ABC
 
 from editor.api.base_api_clients import (
-    BaseColumnMetadataApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    BaseColumnMetadataApiClient,
+    ColumnMetadataApiClient,
 )
 
 from .capacity_api_clients import (
-    CapacityApiEndpoint,
+    CapacityApiClient,
 )
 
 
-class CloudCapacityApiEndpoint(CapacityApiEndpoint):
+class CloudCapacityApiClient(CapacityApiClient):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -28,12 +28,12 @@ class CloudCapacityApiEndpoint(CapacityApiEndpoint):
         return super().delete(registration_id, params)
 
 
-class BaseCloudCapacityColumnMetadataApiEndpoint(BaseColumnMetadataApiEndpoint, ABC):
+class BaseCloudCapacityColumnMetadataApiClient(BaseColumnMetadataApiClient, ABC):
     disabled_categories = ["Edge Specific", "Networking"]
 
 
-class CloudCapacityColumnMetadataApiEndpoint(
-    BaseCloudCapacityColumnMetadataApiEndpoint, ColumnMetadataApiEndpoint
+class CloudCapacityColumnMetadataApiClient(
+    BaseCloudCapacityColumnMetadataApiClient, ColumnMetadataApiClient
 ):
     disabled_categories = ["Edge Specific", "Networking"]
 

@@ -1,6 +1,6 @@
 from editor.api.base_api_clients import (
-    ApiEndpoint,
-    BaseApiEndpoint,
+    ApiClient,
+    BaseApiClient,
 )
 
 from .definitions import (
@@ -8,9 +8,9 @@ from .definitions import (
 )
 
 
-class BaseCapacityApiEndpoint(BaseApiEndpoint):
+class BaseCapacityApiClient(BaseApiClient):
     endpoint = "capacity"
 
 
-class CapacityApiEndpoint(BaseCapacityApiEndpoint, ApiEndpoint):
+class CapacityApiClient(BaseCapacityApiClient, ApiClient):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition

@@ -15,8 +15,8 @@ from editor.base_views import (
     MultipleEditorFormsetProcessFormView,
 )
 
-# from instance_types.api.endpoints.instance_type import InstanceTypeApiEndpoint
-from instance_types.api.mocks.mock_api_clients import InstanceTypeApiEndpoint
+# from instance_types.api.api_clients import InstanceTypeApiClient
+from instance_types.api.mocks.mock_api_clients import InstanceTypeApiClient
 from instance_types.forms import InstanceTypeEditorForm
 from instance_types.formsets import InstanceTypeFormSet
 from locality.views import LocalityFormSetEditorViewMixin
@@ -143,9 +143,9 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def process_instance_types(
         self,
         formset: InstanceTypeFormSet,
-        api_endpoint_class: InstanceTypeApiEndpoint,
+        api_client_class: InstanceTypeApiClient,
     ):
-        instance_type_api_client = api_endpoint_class()
+        instance_type_api_client = api_client_class()
         inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
         current_instance_type_id_strs = list(
             map(str, self.registration.get("instance_types"))
@@ -180,7 +180,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         # Deleting instance types
         if instance_type_ids_to_delete:
             instance_type_api_client.delete_many(list(instance_type_ids_to_delete))
-        self.api_endpoint.update(
+        self.api_client.update(
             self.registration_id,
             {
                 self.instance_types_property_name: updated_instance_type_ids
@@ -193,13 +193,13 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         form_class,
         formset_prefix: str,
         base_formset_class,
-        api_endpoint_class,
+        api_client_class,
         formset_processing_function,
         can_delete: bool | None = None,
         extra_formset_factory_kwargs: dict | None = None,
     ):
         self.manually_processed_formsets[formset_prefix] = {
-            "api_endpoint_class": api_endpoint_class,
+            "api_client_class": api_client_class,
             "formset_processing_function": formset_processing_function,
         }
         return self.add_formset_class(
@@ -218,7 +218,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             isinstance(instance_type_id, int) for instance_type_id in instance_type_ids
         ):
             return initial
-        instance_type_api_client = InstanceTypeApiEndpoint()
+        instance_type_api_client = InstanceTypeApiClient()
         instance_types = instance_type_api_client.get_registrations_by_ids(
             instance_type_ids
         )
@@ -239,13 +239,13 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             formset_prefix,
             formset_metadata,
         ) in self.manually_processed_formsets.items():
-            api_endpoint_class = formset_metadata.get("api_endpoint_class")
+            api_client_class = formset_metadata.get("api_client_class")
             formset_processing_function = formset_metadata.get(
                 "formset_processing_function"
             )
             if not formset_processing_function:
                 continue
-            formset_processing_function(forms.get(formset_prefix), api_endpoint_class)
+            formset_processing_function(forms.get(formset_prefix), api_client_class)
         return response
 
     # ProcessFormView
@@ -255,7 +255,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             InstanceTypeEditorForm,
             self.instance_types_property_name,
             InstanceTypeFormSet,
-            InstanceTypeApiEndpoint,
+            InstanceTypeApiClient,
             self.process_instance_types,
             extra_formset_factory_kwargs={
                 "extra": 0,

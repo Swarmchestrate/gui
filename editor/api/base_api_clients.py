@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 # PostgREST API client
-class BaseApiClient(ABC):
+class BaseApiClientMixin(ABC):
     def log_and_raise_response_status_if_error(self, response: requests.Response):
         pass
 
@@ -27,7 +27,7 @@ class BaseApiClient(ABC):
         pass
 
 
-class ApiClient(BaseApiClient):
+class ApiClientMixin(BaseApiClientMixin):
     api_url: str
 
     def __init__(self):
@@ -50,7 +50,7 @@ class ApiClient(BaseApiClient):
 
 
 # PostgReST API client for an endpoint
-class BaseApiEndpoint(BaseApiClient, ABC):
+class BaseApiClient(BaseApiClientMixin, ABC):
     endpoint: str
     endpoint_definition: BaseOpenApiDefinition
     endpoint_definition_class: Type[BaseOpenApiDefinition]
@@ -59,7 +59,7 @@ class BaseApiEndpoint(BaseApiClient, ABC):
     random_id_max_value: int = 999999
 
     @classmethod
-    def get_client_instance_by_endpoint(cls, endpoint_name: str) -> "BaseApiEndpoint":
+    def get_client_instance_by_endpoint(cls, endpoint_name: str) -> "BaseApiClient":
         client_instance = None
         for subclass in cls.__subclasses__():
             if not subclass.endpoint == endpoint_name:
@@ -141,7 +141,7 @@ class BaseApiEndpoint(BaseApiClient, ABC):
         return random_ids
 
 
-class ApiEndpoint(ApiClient, BaseApiEndpoint):
+class ApiClient(ApiClientMixin, BaseApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -295,12 +295,12 @@ class ApiEndpoint(ApiClient, BaseApiEndpoint):
 
 
 # PostgREST API client for the column_metadata endpoint
-class BaseColumnMetadataApiEndpoint(BaseApiEndpoint, ABC):
+class BaseColumnMetadataApiClient(BaseApiClient, ABC):
     endpoint = "column_metadata"
     disabled_categories: list[str] = list()
 
 
-class ColumnMetadataApiEndpoint(ApiEndpoint, BaseColumnMetadataApiEndpoint):
+class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """

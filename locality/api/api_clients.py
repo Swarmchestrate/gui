@@ -1,21 +1,21 @@
 from editor.api.base_api_clients import (
-    ApiEndpoint,
-    BaseApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    ApiClient,
+    BaseApiClient,
+    ColumnMetadataApiClient,
 )
 
 from .definitions import LocalityUserSpecifiableOpenApiDefinition
 
 
-class BaseLocalityApiEndpoint(BaseApiEndpoint):
+class BaseLocalityApiClient(BaseApiClient):
     endpoint = "locality"
 
 
-class LocalityApiEndpoint(BaseLocalityApiEndpoint, ApiEndpoint):
+class LocalityApiClient(BaseLocalityApiClient, ApiClient):
     endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
 
 
-class LocalityColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
+class LocalityColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()

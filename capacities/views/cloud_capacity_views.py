@@ -1,15 +1,14 @@
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from capacities.api.mocks.mock_cloud_capacity_clients import (
-    CloudCapacityApiEndpoint,
-    CloudCapacityColumnMetadataApiEndpoint,
-)
-
-# from capacities.api.endpoints.cloud_capacity import (
-#     CloudCapacityApiEndpoint,
-#     CloudCapacityColumnMetadataApiEndpoint,
+# from capacities.api.cloud_capacity_api_clients import (
+#     CloudCapacityApiClient,
+#     CloudCapacityColumnMetadataApiClient,
 # )
+from capacities.api.mocks.mock_cloud_capacity_clients import (
+    CloudCapacityApiClient,
+    CloudCapacityColumnMetadataApiClient,
+)
 from capacities.forms.cloud_capacity_forms import (
     CloudCapacityEditorForm,
     CloudCapacityRegistrationForm,
@@ -45,8 +44,8 @@ class CloudCapacityEditorView(EditorView):
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
     registration_type_name_singular = "cloud capacity"
     registration_type_name_plural = "cloud capacities"
-    api_endpoint_class = CloudCapacityApiEndpoint
-    column_metadata_api_endpoint_class = CloudCapacityColumnMetadataApiEndpoint
+    api_client_class = CloudCapacityApiClient
+    column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
 
 
 class CloudCapacityEditorStartFormView(

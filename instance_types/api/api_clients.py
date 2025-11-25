@@ -1,12 +1,12 @@
 from editor.api.base_api_clients import (
-    ApiEndpoint,
-    BaseApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    ApiClient,
+    BaseApiClient,
+    ColumnMetadataApiClient,
 )
 from instance_types.api.definitions import InstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class BaseInstanceTypeApiEndpoint(BaseApiEndpoint):
+class BaseInstanceTypeApiClient(BaseApiClient):
     endpoint = "instance_types"
 
     def _prepare_update_data(self, data: dict):
@@ -16,11 +16,11 @@ class BaseInstanceTypeApiEndpoint(BaseApiEndpoint):
         return data
 
 
-class InstanceTypeApiEndpoint(BaseInstanceTypeApiEndpoint, ApiEndpoint):
+class InstanceTypeApiClient(BaseInstanceTypeApiClient, ApiClient):
     endpoint_definition_class = InstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class InstanceTypeColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
+class InstanceTypeColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()

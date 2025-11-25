@@ -10,13 +10,13 @@ from editor.forms.widget_choices import (
     num_cpus_choices,
 )
 
-# from .api.endpoints.instance_type import (
-#     InstanceTypeApiEndpoint,
-#     InstanceTypeColumnMetadataApiEndpoint,
+# from .api.api_clients import (
+#     InstanceTypeApiClient,
+#     InstanceTypeColumnMetadataApiClient,
 # )
 from .api.mocks.mock_api_clients import (
-    InstanceTypeApiEndpoint,
-    InstanceTypeColumnMetadataApiEndpoint,
+    InstanceTypeApiClient,
+    InstanceTypeColumnMetadataApiClient,
 )
 
 
@@ -38,14 +38,14 @@ class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
     }
 
     def __init__(self, *args, **kwargs):
-        instance_type_api_endpoint = InstanceTypeApiEndpoint()
+        instance_type_api_client = InstanceTypeApiClient()
         super().__init__(
-            instance_type_api_endpoint,
-            InstanceTypeColumnMetadataApiEndpoint(),
+            instance_type_api_client,
+            InstanceTypeColumnMetadataApiClient(),
             *args,
             **kwargs,
         )
-        self.fields[instance_type_api_endpoint.endpoint_definition.id_field] = (
+        self.fields[instance_type_api_client.endpoint_definition.id_field] = (
             forms.IntegerField(required=False, widget=forms.HiddenInput())
         )
         # Add widget enhancements

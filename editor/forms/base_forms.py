@@ -4,11 +4,11 @@ import lxml.html
 from django import forms
 
 from editor.api.base_api_clients import (
-    ApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    ApiClient,
+    ColumnMetadataApiClient,
 )
-from editor.api.mocks.mock_base_api_clients import MockApiEndpoint
-from locality.api.mocks.mock_api_clients import LocalityApiEndpoint
+from editor.api.mocks.mock_base_api_clients import MockApiClient
+from locality.api.mocks.mock_api_clients import LocalityApiClient
 
 
 class OpenApiPropertyFormat(Enum):
@@ -43,16 +43,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
     def __init__(
         self,
-        api_endpoint: ApiEndpoint,
-        column_metadata_api_endpoint: ColumnMetadataApiEndpoint,
+        api_client: ApiClient,
+        column_metadata_api_client: ColumnMetadataApiClient,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.api_endpoint = api_endpoint
-        self.column_metadata_api_endpoint = column_metadata_api_endpoint
+        self.api_client = api_client
+        self.column_metadata_api_client = column_metadata_api_client
         self.required_field_names = (
-            self.api_endpoint.endpoint_definition.get_required_field_names()
+            self.api_client.endpoint_definition.get_required_field_names()
         )
         field_data = self.get_data_for_form_fields()
         self.populate_form_fields(field_data)
@@ -75,9 +75,9 @@ class OpenApiSpecificationBasedForm(EditorForm):
         return is_valid
 
     def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_endpoint.get_registrations()
+        column_metadata = self.column_metadata_api_client.get_registrations()
         field_data = (
-            self.api_endpoint.endpoint_definition.get_all_user_specifiable_fields()
+            self.api_client.endpoint_definition.get_all_user_specifiable_fields()
         )
         for cm in column_metadata:
             field_name = cm.get("column_name")
@@ -174,7 +174,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
     def _get_field_components_for_foreign_key_field(
         self, field_name: str
     ) -> dict | None:
-        definition = self.api_endpoint.endpoint_definition
+        definition = self.api_client.endpoint_definition
         field_metadata = definition.get_field(field_name)
         if not field_metadata.get("description"):
             return
@@ -182,16 +182,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
         fk_table_name = next(iter(field_description.xpath("fk/@table")))
 
         # Get endpoint for the foreign key
-        api_endpoint = MockApiEndpoint.get_client_instance_by_endpoint(fk_table_name)
-        if not api_endpoint:
+        api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+        if not api_client:
             return
         # Get registrations at endpoint
-        registrations = api_endpoint.get_registrations()
+        registrations = api_client.get_registrations()
         # Return field components in a dict
         choices = (
             (
-                r.get(api_endpoint.endpoint_definition.id_field),
-                f"{api_endpoint.endpoint.title()} {r.get(api_endpoint.endpoint_definition.id_field)}",
+                r.get(api_client.endpoint_definition.id_field),
+                f"{api_client.endpoint.title()} {r.get(api_client.endpoint_definition.id_field)}",
             )
             for r in registrations
         )
@@ -237,19 +237,19 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
-    def __init__(self, api_endpoint: ApiEndpoint, category: str, *args, **kwargs):
+    def __init__(self, api_client: ApiClient, category: str, *args, **kwargs):
         self.category = category
-        super().__init__(api_endpoint, *args, **kwargs)
+        super().__init__(api_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        column_metadata = (
-            self.column_metadata_api_endpoint.get_registrations_by_category(
-                self.category
-            )
+        column_metadata = self.column_metadata_api_client.get_registrations_by_category(
+            self.category
         )
         field_names = [r.get("column_name") for r in column_metadata]
-        field_data = self.api_endpoint.endpoint_definition.get_user_specifiable_fields_with_names(
-            field_names
+        field_data = (
+            self.api_client.endpoint_definition.get_user_specifiable_fields_with_names(
+                field_names
+            )
         )
         for cm in column_metadata:
             field_name = cm.get("column_name")
@@ -266,11 +266,11 @@ class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
             "column_name": "in.(%s)"
             % (",".join([f'"{rfn}"' for rfn in self.required_field_names])),
         }
-        column_metadata = self.column_metadata_api_endpoint.get_registrations(
+        column_metadata = self.column_metadata_api_client.get_registrations(
             params=params
         )
         field_data = (
-            self.api_endpoint.endpoint_definition.get_required_user_specifiable_fields()
+            self.api_client.endpoint_definition.get_required_user_specifiable_fields()
         )
         for cm in column_metadata:
             field_name = cm.get("column_name")

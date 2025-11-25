@@ -1,14 +1,13 @@
 from django.urls import reverse_lazy
 
-from capacities.api.mocks.mock_edge_capacity_clients import (
-    EdgeCapacityApiEndpoint,
-    EdgeCapacityColumnMetadataApiEndpoint,
-)
-
-# from capacities.api.endpoints.edge_capacity import (
-#     EdgeCapacityApiEndpoint,
-#     EdgeCapacityColumnMetadataApiEndpoint,
+# from capacities.api.edge_capacity_api_clients import (
+#     EdgeCapacityApiClient,
+#     EdgeCapacityColumnMetadataApiClient,
 # )
+from capacities.api.mocks.mock_edge_capacity_clients import (
+    EdgeCapacityApiClient,
+    EdgeCapacityColumnMetadataApiClient,
+)
 from capacities.forms.edge_capacity_forms import (
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
@@ -45,8 +44,8 @@ class EdgeCapacityEditorView(EditorView):
     registration_type_name_singular = "edge capacity"
     registration_type_name_plural = "edge capacities"
     title_base = "New Edge Capacity"
-    api_endpoint_class = EdgeCapacityApiEndpoint
-    column_metadata_api_endpoint_class = EdgeCapacityColumnMetadataApiEndpoint
+    api_client_class = EdgeCapacityApiClient
+    column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):

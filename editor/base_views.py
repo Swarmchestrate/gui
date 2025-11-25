@@ -16,7 +16,7 @@ from django.views.generic.edit import ProcessFormView
 
 from editor.forms.base_forms import RegistrationsListForm
 
-from .api.base_api_clients import ApiEndpoint, ColumnMetadataApiEndpoint
+from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class EditorView(TemplateView):
     registration_type_name_singular: str
     registration_type_name_plural: str
-    api_endpoint: ApiEndpoint
+    api_client: ApiClient
     id_field: str
 
     editor_registration_list_url_reverse: str
@@ -33,18 +33,18 @@ class EditorView(TemplateView):
     editor_url_reverse_base: str
     editor_overview_url_reverse_base: str
 
-    api_endpoint_class: ApiEndpoint
+    api_client_class: ApiClient
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.api_endpoint = self.api_endpoint_class()
-        self.id_field = self.api_endpoint.endpoint_definition.id_field
+        self.api_client = self.api_client_class()
+        self.id_field = self.api_client.endpoint_definition.id_field
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "description": self.api_endpoint.endpoint_definition.description,
+                "description": self.api_client.endpoint_definition.description,
                 "registration_type_name_singular": self.registration_type_name_singular,
                 "registration_type_name_plural": self.registration_type_name_plural,
                 "editor_registration_list_url_reverse": self.editor_registration_list_url_reverse,
@@ -58,18 +58,18 @@ class EditorView(TemplateView):
 
 
 class EditorTocView(TemplateView):
-    column_metadata_api_endpoint_class: ColumnMetadataApiEndpoint
+    column_metadata_api_client_class: ColumnMetadataApiClient
     categories: dict
     column_metadata: list[dict]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.column_metadata_api_endpoint = self.column_metadata_api_endpoint_class()
+        self.column_metadata_api_client = self.column_metadata_api_client_class()
         self._setup_column_metadata()
         self._setup_categories()
 
     def _setup_column_metadata(self):
-        self.column_metadata = self.column_metadata_api_endpoint.get_registrations()
+        self.column_metadata = self.column_metadata_api_client.get_registrations()
 
     def _setup_categories(self):
         self.category_names = list(set(r.get("category") for r in self.column_metadata))
@@ -146,17 +146,17 @@ class EditorStartFormView(EditorView, EditorTocView, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "api_endpoint": self.api_endpoint,
-                "column_metadata_api_endpoint": self.column_metadata_api_endpoint,
+                "api_client": self.api_client,
+                "column_metadata_api_client": self.column_metadata_api_client,
             }
         )
         return kwargs
 
     def form_valid(self, form):
-        new_registration = self.api_endpoint.register(form.cleaned_data)
+        new_registration = self.api_client.register(form.cleaned_data)
         messages.success(
             self.request,
-            f"New {self.api_endpoint.endpoint_definition.definition_name} registered.",
+            f"New {self.api_client.endpoint_definition.definition_name} registered.",
         )
         self.success_url = reverse_lazy(
             self.editor_url_reverse_base,
@@ -214,8 +214,8 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         kwargs.update(
             {
                 "initial": self.registration,
-                "api_endpoint": self.api_endpoint,
-                "column_metadata_api_endpoint": self.column_metadata_api_endpoint,
+                "api_client": self.api_client,
+                "column_metadata_api_client": self.column_metadata_api_client,
                 "category": self.category,
             }
         )
@@ -281,7 +281,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         update_data = form.cleaned_data
         update_data = self.add_formset_data_to_main_form(update_data, forms)
         try:
-            self.api_endpoint.update(self.registration_id, update_data)
+            self.api_client.update(self.registration_id, update_data)
         except Exception:
             error_msg = f"An error occurred whilst updating {self.registration_type_name_singular} {self.registration_id}. The update may not have been applied."
             logger.exception(error_msg)
@@ -301,7 +301,7 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
     def setup(self, request, *args, **kwargs):
         response = super().setup(request, *args, **kwargs)
         self.registration_id = self.kwargs["registration_id"]
-        self.registration = self.api_endpoint.get(self.registration_id)
+        self.registration = self.api_client.get(self.registration_id)
 
     def dispatch(self, request, *args, **kwargs):
         self.category = self.request.GET.get("category", self._get_first_category())
@@ -352,7 +352,7 @@ class RegistrationsListFormView(EditorView, FormView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.registration_list = self.api_endpoint.get_registrations()
+        self.registration_list = self.api_client.get_registrations()
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = request.path
@@ -395,7 +395,7 @@ class RegistrationsListFormView(EditorView, FormView):
         registration_ids_to_delete = form.cleaned_data.get(
             "registration_ids_to_delete", []
         )
-        self.api_endpoint.delete_many(registration_ids_to_delete)
+        self.api_client.delete_many(registration_ids_to_delete)
         success_msg = f"Deleted 1 {self.registration_type_name_singular}"
         if len(registration_ids_to_delete) != 1:
             success_msg = f"Deleted {len(registration_ids_to_delete)} {self.registration_type_name_plural}"
@@ -434,7 +434,7 @@ class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.registration_id = self.kwargs["registration_id"]
-        self.registration = self.api_endpoint.get(self.registration_id)
+        self.registration = self.api_client.get(self.registration_id)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

@@ -9,8 +9,8 @@ from django.conf import settings
 
 from editor.api.base_api_clients import (
     BaseApiClient,
-    BaseApiEndpoint,
-    BaseColumnMetadataApiEndpoint,
+    BaseApiClientMixin,
+    BaseColumnMetadataApiClient,
 )
 from editor.api.mocks.mock_base_definitions import (
     MockColumnMetadataUserSpecifiableOpenApiDefinition,
@@ -19,7 +19,7 @@ from editor.api.mocks.mock_base_definitions import (
 logger = logging.getLogger(__name__)
 
 
-class MockApiClient(BaseApiClient):
+class MockApiClientMixin(BaseApiClientMixin):
     def get_openapi_spec(self):
         openapi_spec = None
         cwd = os.getcwd()
@@ -44,7 +44,7 @@ class MockApiClient(BaseApiClient):
         return openapi_spec
 
 
-class MockApiEndpoint(MockApiClient, BaseApiEndpoint):
+class MockApiClient(MockApiClientMixin, BaseApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """
@@ -182,7 +182,7 @@ class MockApiEndpoint(MockApiClient, BaseApiEndpoint):
         return self._update_temp_data(updated_registrations)
 
 
-class MockColumnMetadataApiEndpoint(MockApiEndpoint, BaseColumnMetadataApiEndpoint):
+class MockColumnMetadataApiClient(MockApiClient, BaseColumnMetadataApiClient):
     """This class is intended to be subclassed and shouldn't be
     instantiated directly.
     """

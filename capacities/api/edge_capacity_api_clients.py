@@ -1,14 +1,14 @@
 from abc import ABC
 
 from editor.api.base_api_clients import (
-    BaseColumnMetadataApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    BaseColumnMetadataApiClient,
+    ColumnMetadataApiClient,
 )
 
-from .capacity_api_clients import CapacityApiEndpoint
+from .capacity_api_clients import CapacityApiClient
 
 
-class EdgeCapacityApiEndpoint(CapacityApiEndpoint):
+class EdgeCapacityApiClient(CapacityApiClient):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -26,12 +26,12 @@ class EdgeCapacityApiEndpoint(CapacityApiEndpoint):
         return super().delete(registration_id, params)
 
 
-class BaseEdgeCapacityColumnMetadataApiEndpoint(BaseColumnMetadataApiEndpoint, ABC):
+class BaseEdgeCapacityColumnMetadataApiClient(BaseColumnMetadataApiClient, ABC):
     disabled_categories = ["System Specific"]
 
 
-class EdgeCapacityColumnMetadataApiEndpoint(
-    BaseEdgeCapacityColumnMetadataApiEndpoint, ColumnMetadataApiEndpoint
+class EdgeCapacityColumnMetadataApiClient(
+    BaseEdgeCapacityColumnMetadataApiClient, ColumnMetadataApiClient
 ):
     disabled_categories = ["System Specific"]
 

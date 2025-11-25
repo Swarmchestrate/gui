@@ -1,10 +1,10 @@
 from django.test import SimpleTestCase
 
-from editor.api.base_api_clients import ApiClient
+from editor.api.base_api_clients import ApiClientMixin
 
 
-class ApiEndpointTestCase(SimpleTestCase):
+class ApiClientTestCase(SimpleTestCase):
     def test_get_schema(self):
-        client = ApiClient()
+        client = ApiClientMixin()
         schema = client.get_openapi_spec()
         self.assertIsInstance(schema, dict)

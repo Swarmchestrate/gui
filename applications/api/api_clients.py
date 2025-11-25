@@ -1,21 +1,21 @@
 from editor.api.base_api_clients import (
-    ApiEndpoint,
-    BaseApiEndpoint,
-    ColumnMetadataApiEndpoint,
+    ApiClient,
+    BaseApiClient,
+    ColumnMetadataApiClient,
 )
 
 from .definitions import ApplicationUserSpecifiableOpenApiDefinition
 
 
-class BaseApplicationApiEndpoint(BaseApiEndpoint):
+class BaseApplicationApiClient(BaseApiClient):
     endpoint = "application"
 
 
-class ApplicationApiEndpoint(BaseApplicationApiEndpoint, ApiEndpoint):
+class ApplicationApiClient(BaseApplicationApiClient, ApiClient):
     endpoint_definition_class = ApplicationUserSpecifiableOpenApiDefinition
 
 
-class ApplicationColumnMetadataApiEndpoint(ColumnMetadataApiEndpoint):
+class ApplicationColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_registrations(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
