@@ -13,7 +13,7 @@ class LocalityUserSpecifiableOpenApiDefinition(
 ):
     path_to_definition = os.path.join(
         settings.BASE_DIR,
-        "editor",
+        "locality",
         "api",
         "mocks",
         "jsons",
