@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "editor.apps.EditorConfig",
     "instance_types.apps.InstanceTypesConfig",
     "localities.apps.LocalitiesConfig",
+    "resource_management.apps.ResourceManagementConfig",
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,10 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
-            "libraries": {"breadcrumbs": "utils.templatetags.breadcrumbs"},
+            "libraries": {
+                "breadcrumbs": "utils.templatetags.breadcrumbs",
+                "helpers": "utils.templatetags.helpers",
+            },
         },
     },
 ]

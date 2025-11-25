@@ -14,8 +14,6 @@ from django.views.generic import (
 )
 from django.views.generic.edit import ProcessFormView
 
-from editor.forms.base_forms import ResourceDeletionForm
-
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
 
@@ -344,110 +342,6 @@ class EditorProcessFormView(EditorView, EditorTocView, ProcessFormView):
         return context
 
 
-class ResourceListFormView(EditorView, FormView):
-    template_name = "editor/resource_list.html"
-    form_class = ResourceDeletionForm
-
-    new_resource_reverse: str
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.resource_list = self.api_client.get_resources()
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = request.path
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": self.resource_type_name_plural.title(),
-                "resources": {
-                    resource.get(self.id_field): resource
-                    for resource in self.resource_list
-                },
-                "new_resource_reverse": self.new_resource_reverse,
-            }
-        )
-        return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "resource_ids": [
-                    resource.get(self.id_field) for resource in self.resource_list
-                ]
-            }
-        )
-        return kwargs
-
-    def form_invalid(self, form):
-        messages.error(
-            self.request,
-            f"The selected {self.resource_type_name_plural} may not have been deleted as an error occurred during deletion. Please try again later.",
-        )
-        return super().form_invalid(form)
-
-    def form_valid(self, form):
-        resource_ids_to_delete = form.cleaned_data.get("resource_ids_to_delete", [])
-        self.api_client.delete_many(resource_ids_to_delete)
-        success_msg = f"Deleted 1 {self.resource_type_name_singular}"
-        if len(resource_ids_to_delete) != 1:
-            success_msg = f"Deleted {len(resource_ids_to_delete)} {self.resource_type_name_plural}"
-        messages.success(self.request, success_msg)
-        return super().form_valid(form)
-
-
-class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
-    template_name = "editor/overview.html"
-
-    def format_resource_data_for_template(self) -> dict:
-        formatted_resource_data = dict()
-        for category_name in self.category_names:
-            field_names_for_category = [
-                (cm.get("column_name"), cm.get("title"))
-                for cm in self.column_metadata
-                if cm.get("category") == category_name
-            ]
-            field_data_for_category = dict()
-            for field_name, field_title in field_names_for_category:
-                field_value = self.resource.get(field_name)
-                field_data_for_category.update(
-                    {
-                        field_name: {
-                            "title": field_title,
-                            "value": field_value,
-                        },
-                    }
-                )
-            formatted_resource_data.update(
-                {
-                    category_name: field_data_for_category,
-                }
-            )
-        return formatted_resource_data
-
-    def dispatch(self, request, *args, **kwargs):
-        self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.api_client.get(self.resource_id)
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": f"{self.resource_type_name_singular.title()} {self.resource_id} | Overview",
-                "main_heading": "Overview",
-                "main_subheading": f"{self.resource_type_name_singular.title()}",
-                "resource_data_by_category": self.format_resource_data_for_template(),
-                "resource": self.resource,
-            }
-        )
-        return context
-
-
 class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
     formset_classes: dict
     initial_data_for_formsets: dict[str, list[dict]]
@@ -552,4 +446,52 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
                 context.update({"formset_tables": dict()})
             context.update({f"{formset_prefix}_formset": initial_formset})
             context["formset_tables"].update({formset_prefix: initial_formset})
+        return context
+
+
+class EditorOverviewTemplateView(EditorView, EditorTocView, TemplateView):
+    template_name = "editor/overview.html"
+
+    def format_resource_data_for_template(self) -> dict:
+        formatted_resource_data = dict()
+        for category_name in self.category_names:
+            field_names_for_category = [
+                (cm.get("column_name"), cm.get("title"))
+                for cm in self.column_metadata
+                if cm.get("category") == category_name
+            ]
+            field_data_for_category = dict()
+            for field_name, field_title in field_names_for_category:
+                field_value = self.resource.get(field_name)
+                field_data_for_category.update(
+                    {
+                        field_name: {
+                            "title": field_title,
+                            "value": field_value,
+                        },
+                    }
+                )
+            formatted_resource_data.update(
+                {
+                    category_name: field_data_for_category,
+                }
+            )
+        return formatted_resource_data
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "title": f"{self.resource_type_name_singular.title()} {self.resource_id} | Overview",
+                "main_heading": "Overview",
+                "main_subheading": f"{self.resource_type_name_singular.title()}",
+                "resource_data_by_category": self.format_resource_data_for_template(),
+                "resource": self.resource,
+            }
+        )
         return context

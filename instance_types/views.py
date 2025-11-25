@@ -5,8 +5,8 @@ from editor.base_views import (
     EditorProcessFormView,
     EditorStartFormView,
     EditorView,
-    ResourceListFormView,
 )
+from resource_management.views import ResourceListFormView
 
 # from .api.api_clients import (
 #     InstanceTypeApiClient,

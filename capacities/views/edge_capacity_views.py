@@ -18,8 +18,8 @@ from editor.base_views import (
     EditorStartFormView,
     EditorView,
     MultipleEditorFormsetProcessFormView,
-    ResourceListFormView,
 )
+from resource_management.views import ResourceListFormView
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,

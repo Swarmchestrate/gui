@@ -6,7 +6,7 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
-<script src="{% static 'editor/resource_list.js' %}" type="module"></script>
+<script src="{% static 'resource_management/resource_list.js' %}" type="module"></script>
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
@@ -103,9 +103,9 @@
 </form>
 {% endif %}
 {% with dialog_id='delete-dialog' %}
-{% include 'editor/dialogs/delete_dialog.html' %}
+{% include 'resource_management/dialogs/delete_dialog.html' %}
 {% endwith %}
 {% with dialog_id='delete-multiple-dialog' %}
-{% include 'editor/dialogs/delete_multiple_dialog.html' %}
+{% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
 {% endwith %}
 {% endblock content %}
