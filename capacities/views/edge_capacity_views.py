@@ -13,7 +13,7 @@ from capacities.forms.edge_capacity_forms import (
     EdgeCapacityRegistrationForm,
 )
 from editor.base_views import (
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
@@ -42,7 +42,7 @@ from .mixins.edge_capacity_mixins import (
 
 # Edge Capacity
 class EdgeCapacityViewMixin(
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,

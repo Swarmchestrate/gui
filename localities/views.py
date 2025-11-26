@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import ProcessFormView
 
 from editor.base_views import (
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     ResourceTypeNameContextMixin,
 )
@@ -24,7 +24,7 @@ from .formsets import LocalityEditorFormSet
 
 
 class LocalityViewMixin(
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     ResourceTypeNameContextMixin,
     ResourceListContextMixin,

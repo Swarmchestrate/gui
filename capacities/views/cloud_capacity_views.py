@@ -16,7 +16,7 @@ from capacities.forms.cloud_capacity_forms import (
     CloudCapacityRegistrationForm,
 )
 from editor.base_views import (
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
@@ -46,7 +46,7 @@ from .mixins.cloud_capacity_mixins import (
 # Cloud Capacity
 @dataclass
 class CloudCapacityViewMixin(
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,

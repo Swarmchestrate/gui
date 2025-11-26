@@ -11,9 +11,12 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
     TemplateView,
+    View,
 )
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import ProcessFormView
+
+from editor.base_views import EditorContextMixin
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
@@ -21,22 +24,26 @@ from .base_formsets import BaseEditorFormSet
 logger = logging.getLogger(__name__)
 
 
-class EditorTocContextMixin(ContextMixin):
+class EditorTocTemplateView(TemplateView):
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
+    column_metadata_api_client: ColumnMetadataApiClient
     categories: dict
+    category_names: list[str]
     column_metadata: list[dict]
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def setup(self, request, *args, **kwargs):
         self.column_metadata_api_client = self.column_metadata_api_client_class()
-        self._setup_column_metadata()
-        self._setup_categories()
+        self.setup_column_metadata()
+        self.setup_categories()
+        return super().setup(request, *args, **kwargs)
 
-    def _setup_column_metadata(self):
+    def setup_column_metadata(self):
         self.column_metadata = self.column_metadata_api_client.get_resources()
 
-    def _setup_categories(self):
-        self.category_names = list(set(r.get("category") for r in self.column_metadata))
+    def setup_categories(self):
+        self.category_names = list(
+            set(r.get("category", "") for r in self.column_metadata)
+        )
         self.category_names.sort()
         processed_categories = set()
 
@@ -97,10 +104,11 @@ class EditorTocContextMixin(ContextMixin):
 
 
 class EditorStartFormView(
-    EditorTocContextMixin,
+    EditorTocTemplateView,
     FormView,
 ):
     api_client: ApiClient
+    id_field: str
     editor_url_reverse_base: str
     resource_type_name_singular: str
 
@@ -138,8 +146,8 @@ class EditorStartFormView(
         return super().form_valid(form)
 
 
-class EditorRouterView(EditorTocContextMixin, ProcessFormView):
-    editor_view_class = None
+class EditorRouterView(EditorTocTemplateView, ProcessFormView):
+    editor_view_class: TemplateView
 
     def route_to_view(self, request, *args, **kwargs):
         return self.editor_view_class.as_view()(request, *args, **kwargs)
@@ -155,7 +163,7 @@ class EditorRouterView(EditorTocContextMixin, ProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class EditorProcessFormView(EditorTocContextMixin, ProcessFormView, TemplateView):
+class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView):
     main_form_class: forms.Form
 
     api_client: ApiClient
@@ -426,7 +434,7 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
         return context
 
 
-class EditorOverviewTemplateView(EditorTocContextMixin, TemplateView):
+class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
     template_name = "editor/overview.html"
 
     api_client: ApiClient

@@ -1,5 +1,6 @@
 import logging
 
+from django.views.generic import TemplateView
 from django.views.generic.base import ContextMixin
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
@@ -7,13 +8,13 @@ from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 logger = logging.getLogger(__name__)
 
 
-class ApiClientContextMixin(ContextMixin):
+class ApiClientTemplateView(TemplateView):
     api_client_class: type[ApiClient]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def setup(self, request, *args, **kwargs):
         self.api_client = self.api_client_class()
         self.id_field = self.api_client.endpoint_definition.id_field
+        return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

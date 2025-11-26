@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 
 from editor.base_views import (
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
@@ -25,7 +25,7 @@ from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
 
 
 class InstanceTypeViewMixin(
-    ApiClientContextMixin,
+    ApiClientTemplateView,
     ColumnMetadataApiClientMixin,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
