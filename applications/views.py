@@ -34,7 +34,7 @@ class ApplicationViewMixin(
     column_metadata_api_client_class = ApplicationColumnMetadataApiClient
     resource_type_name_singular = "application"
     resource_type_name_plural = "applications"
-    editor_resource_list_url_reverse = "applications:applications_list"
+    editor_resource_list_url_reverse = "applications:application_list"
 
 
 class ApplicationEditorStartFormView(EditorStartFormView, ApplicationViewMixin):

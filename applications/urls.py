@@ -8,7 +8,7 @@ urlpatterns = [
     path(
         "applications/",
         views.ApplicationListFormView.as_view(),
-        name="applications_list",
+        name="application_list",
     ),
     path(
         "applications/<resource_id>/edit/",
