@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
@@ -14,10 +16,10 @@ from capacities.forms.cloud_capacity_forms import (
     CloudCapacityRegistrationForm,
 )
 from editor.base_views import (
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -25,7 +27,7 @@ from editor.views import (
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListFormView, ResourceListViewMixin
+from resource_management.views import ResourceListContextMixin, ResourceListFormView
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -42,12 +44,13 @@ from .mixins.cloud_capacity_mixins import (
 
 
 # Cloud Capacity
+@dataclass
 class CloudCapacityViewMixin(
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
-    ResourceListViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
+    ResourceListContextMixin,
 ):
     api_client_class = CloudCapacityApiClient
     editor_url_reverse_base = "capacities:cloud_capacity_editor"

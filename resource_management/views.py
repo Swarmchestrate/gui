@@ -1,21 +1,16 @@
 from django.contrib import messages
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
+from django.views.generic.base import ContextMixin
 
-from editor.base_views import (
-    ApiClientTemplateView,
-    EditorTemplateView,
-    ResourceTypeNameTemplateView,
-)
+from editor.api.base_api_clients import ApiClient
 
 from .forms import ResourceDeletionForm
 
 
 # Create your views here.
-class ResourceListViewMixin:
+class ResourceListContextMixin(ContextMixin):
     editor_resource_list_url_reverse: str
 
-
-class ResourceListTemplateView(ResourceListViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
@@ -26,11 +21,14 @@ class ResourceListTemplateView(ResourceListViewMixin, TemplateView):
         return context
 
 
-class ResourceListFormView(
-    ApiClientTemplateView, EditorTemplateView, ResourceTypeNameTemplateView, FormView
-):
+class ResourceListFormView(FormView):
     template_name = "resource_management/resource_list.html"
     form_class = ResourceDeletionForm
+
+    api_client: ApiClient
+    id_field: str
+    resource_type_name_singular: str
+    resource_type_name_plural: str
 
     new_resource_reverse: str
 

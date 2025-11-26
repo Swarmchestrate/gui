@@ -13,10 +13,10 @@ from capacities.forms.edge_capacity_forms import (
     EdgeCapacityRegistrationForm,
 )
 from editor.base_views import (
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -24,7 +24,7 @@ from editor.views import (
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListFormView, ResourceListViewMixin
+from resource_management.views import ResourceListContextMixin, ResourceListFormView
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -42,11 +42,11 @@ from .mixins.edge_capacity_mixins import (
 
 # Edge Capacity
 class EdgeCapacityViewMixin(
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
-    ResourceListViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
+    ResourceListContextMixin,
 ):
     api_client_class = EdgeCapacityApiClient
     editor_url_reverse_base = "capacities:edge_capacity_editor"

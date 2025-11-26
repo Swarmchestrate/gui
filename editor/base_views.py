@@ -1,19 +1,15 @@
 import logging
 
-from django.views.generic import TemplateView
+from django.views.generic.base import ContextMixin
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 
 logger = logging.getLogger(__name__)
 
 
-class ApiClientViewMixin:
-    api_client_class: ApiClient
-    api_client: ApiClient
-    id_field: str
+class ApiClientContextMixin(ContextMixin):
+    api_client_class: type[ApiClient]
 
-
-class ApiClientTemplateView(TemplateView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.api_client = self.api_client_class()
@@ -30,13 +26,11 @@ class ApiClientTemplateView(TemplateView):
         return context
 
 
-class EditorViewMixin:
+class EditorContextMixin(ContextMixin):
     editor_start_url_reverse_base: str
     editor_url_reverse_base: str
     editor_overview_url_reverse_base: str
 
-
-class EditorTemplateView(EditorViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
@@ -49,16 +43,14 @@ class EditorTemplateView(EditorViewMixin, TemplateView):
         return context
 
 
-class ResourceColumnMetadataViewMixin:
-    column_metadata_api_client_class: ColumnMetadataApiClient
+class ColumnMetadataApiClientMixin:
+    column_metadata_api_client_class: type[ColumnMetadataApiClient]
 
 
-class ResourceTypeNameViewMixin:
+class ResourceTypeNameContextMixin(ContextMixin):
     resource_type_name_singular: str
     resource_type_name_plural: str
 
-
-class ResourceTypeNameTemplateView(ResourceTypeNameViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(

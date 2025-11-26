@@ -1,17 +1,17 @@
 from django.urls import reverse_lazy
 
 from editor.base_views import (
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
 )
 from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
 )
-from resource_management.views import ResourceListFormView, ResourceListViewMixin
+from resource_management.views import ResourceListContextMixin, ResourceListFormView
 
 # from .api.api_clients import (
 #     InstanceTypeApiClient,
@@ -25,11 +25,11 @@ from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
 
 
 class InstanceTypeViewMixin(
-    ApiClientViewMixin,
-    EditorViewMixin,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameViewMixin,
-    ResourceListViewMixin,
+    ApiClientContextMixin,
+    ColumnMetadataApiClientMixin,
+    EditorContextMixin,
+    ResourceTypeNameContextMixin,
+    ResourceListContextMixin,
 ):
     api_client_class = InstanceTypeApiClient
     editor_url_reverse_base = "instance_types:instance_type_editor"

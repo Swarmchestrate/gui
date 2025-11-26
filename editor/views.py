@@ -12,24 +12,17 @@ from django.views.generic import (
     FormView,
     TemplateView,
 )
+from django.views.generic.base import ContextMixin
 from django.views.generic.edit import ProcessFormView
 
-from resource_management.views import ResourceListTemplateView
-
-from .api.base_api_clients import ColumnMetadataApiClient
+from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
-from .base_views import (
-    ApiClientTemplateView,
-    EditorTemplateView,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameTemplateView,
-)
 
 logger = logging.getLogger(__name__)
 
 
-class EditorTocView(TemplateView):
-    column_metadata_api_client_class: ColumnMetadataApiClient
+class EditorTocContextMixin(ContextMixin):
+    column_metadata_api_client_class: type[ColumnMetadataApiClient]
     categories: dict
     column_metadata: list[dict]
 
@@ -104,12 +97,13 @@ class EditorTocView(TemplateView):
 
 
 class EditorStartFormView(
-    ApiClientTemplateView,
-    EditorTemplateView,
-    ResourceTypeNameTemplateView,
-    EditorTocView,
+    EditorTocContextMixin,
     FormView,
 ):
+    api_client: ApiClient
+    editor_url_reverse_base: str
+    resource_type_name_singular: str
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
@@ -144,7 +138,7 @@ class EditorStartFormView(
         return super().form_valid(form)
 
 
-class EditorRouterView(EditorTocView, ProcessFormView):
+class EditorRouterView(EditorTocContextMixin, ProcessFormView):
     editor_view_class = None
 
     def route_to_view(self, request, *args, **kwargs):
@@ -161,16 +155,13 @@ class EditorRouterView(EditorTocView, ProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class EditorProcessFormView(
-    ApiClientTemplateView,
-    EditorTemplateView,
-    ResourceColumnMetadataViewMixin,
-    ResourceTypeNameTemplateView,
-    ResourceListTemplateView,
-    EditorTocView,
-    ProcessFormView,
-):
+class EditorProcessFormView(EditorTocContextMixin, ProcessFormView, TemplateView):
     main_form_class: forms.Form
+
+    api_client: ApiClient
+    editor_url_reverse_base: str
+    editor_overview_url_reverse_base: str
+    resource_type_name_singular: str
 
     def get_prev_and_next_list_items(self):
         index_of_current_category = self.category_names.index(self.category)
@@ -231,7 +222,7 @@ class EditorProcessFormView(
     def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
         return cleaned_data
 
-    def forms_invalid(self, forms: dict, error_msg: str = None):
+    def forms_invalid(self, forms: dict, error_msg: str | None = None):
         if not error_msg:
             error_msg = "Some fields were invalid. Please see feedback below."
         if self.request.accepts("text/html"):
@@ -283,7 +274,7 @@ class EditorProcessFormView(
         )
 
     def setup(self, request, *args, **kwargs):
-        response = super().setup(request, *args, **kwargs)
+        super().setup(request, *args, **kwargs)
         self.resource_id = self.kwargs["resource_id"]
         self.resource = self.api_client.get(self.resource_id)
 
@@ -435,14 +426,11 @@ class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
         return context
 
 
-class EditorOverviewTemplateView(
-    ApiClientTemplateView,
-    EditorTemplateView,
-    ResourceTypeNameTemplateView,
-    ResourceListTemplateView,
-    EditorTocView,
-):
+class EditorOverviewTemplateView(EditorTocContextMixin, TemplateView):
     template_name = "editor/overview.html"
+
+    api_client: ApiClient
+    resource_type_name_singular: str
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
