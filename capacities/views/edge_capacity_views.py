@@ -13,13 +13,18 @@ from capacities.forms.edge_capacity_forms import (
     EdgeCapacityRegistrationForm,
 )
 from editor.base_views import (
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+)
+from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
-    EditorView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListFormView
+from resource_management.views import ResourceListFormView, ResourceListViewMixin
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -36,24 +41,29 @@ from .mixins.edge_capacity_mixins import (
 
 
 # Edge Capacity
-class EdgeCapacityEditorView(EditorView):
-    editor_resource_list_url_reverse = "capacities:edge_capacity_list"
+class EdgeCapacityViewMixin(
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+    ResourceListViewMixin,
+):
+    api_client_class = EdgeCapacityApiClient
     editor_url_reverse_base = "capacities:edge_capacity_editor"
     editor_start_url_reverse_base = "capacities:new_edge_capacity"
     editor_overview_url_reverse_base = "capacities:edge_capacity_overview"
+    column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
+    editor_resource_list_url_reverse = "capacities:edge_capacity_list"
     resource_type_name_singular = "edge capacity"
     resource_type_name_plural = "edge capacities"
-    title_base = "New Edge Capacity"
-    api_client_class = EdgeCapacityApiClient
-    column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
 
 
-class EdgeCapacityEditorStartFormView(EdgeCapacityEditorView, EditorStartFormView):
+class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     form_class = EdgeCapacityRegistrationForm
 
 
-class EdgeCapacityEditorProcessFormView(EdgeCapacityEditorView, EditorProcessFormView):
+class EdgeCapacityEditorProcessFormView(EdgeCapacityViewMixin, EditorProcessFormView):
     template_name = "capacities/edge_capacity_editor.html"
     main_form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy("capacities:new_edge_capacity")
@@ -102,7 +112,7 @@ class EdgeCapacitySpecsEditorProcessFormView(
     pass
 
 
-class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterView):
+class EdgeCapacityEditorRouterView(EdgeCapacityViewMixin, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
     metadata_editor_view_class = EdgeCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = (
@@ -122,12 +132,12 @@ class EdgeCapacityEditorRouterView(EdgeCapacityEditorView, CapacityEditorRouterV
         return super().route_to_view(request, *args, **kwargs)
 
 
-class EdgeCapacityListFormView(EdgeCapacityEditorView, ResourceListFormView):
+class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
     new_resource_reverse = "capacities:new_edge_capacity"
 
 
 class EdgeCapacityEditorOverviewTemplateView(
-    EdgeCapacityEditorView, EditorOverviewTemplateView
+    EdgeCapacityViewMixin, EditorOverviewTemplateView
 ):
     template_name = "capacities/edge_capacity_overview.html"

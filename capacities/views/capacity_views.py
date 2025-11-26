@@ -10,7 +10,7 @@ from capacities.formsets.capacity_formsets import (
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
 )
-from editor.base_views import (
+from editor.views import (
     EditorRouterView,
     MultipleEditorFormsetProcessFormView,
 )

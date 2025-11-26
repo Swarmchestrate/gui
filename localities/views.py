@@ -6,6 +6,14 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic.edit import ProcessFormView
 
+from editor.base_views import (
+    ApiClientViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+)
+from resource_management.views import ResourceListViewMixin
+
+from .api.api_clients import LocalityApiClient, LocalityColumnMetadataApiClient
 from .forms import (
     GetLocalityByGpsForm,
     GetLocalityByNameForm,
@@ -13,6 +21,19 @@ from .forms import (
     LocalityOptionsSearchForm,
 )
 from .formsets import LocalityEditorFormSet
+
+
+class LocalityViewMixin(
+    ApiClientViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+    ResourceListViewMixin,
+):
+    api_client_class = LocalityApiClient
+    column_metadata_api_client_class = LocalityColumnMetadataApiClient
+    editor_resource_list_url_reverse = "localities:localities_list"
+    resource_type_name_singular = "locality"
+    resource_type_name_plural = "localities"
 
 
 class LocalityFormSetEditorViewMixin:

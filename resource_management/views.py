@@ -1,12 +1,34 @@
-from django.views.generic import FormView
+from django.contrib import messages
+from django.views.generic import FormView, TemplateView
 
-from editor.base_views import EditorView
+from editor.base_views import (
+    ApiClientTemplateView,
+    EditorTemplateView,
+    ResourceTypeNameTemplateView,
+)
 
 from .forms import ResourceDeletionForm
 
 
 # Create your views here.
-class ResourceListFormView(EditorView, FormView):
+class ResourceListViewMixin:
+    editor_resource_list_url_reverse: str
+
+
+class ResourceListTemplateView(ResourceListViewMixin, TemplateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "editor_resource_list_url_reverse": self.editor_resource_list_url_reverse,
+            }
+        )
+        return context
+
+
+class ResourceListFormView(
+    ApiClientTemplateView, EditorTemplateView, ResourceTypeNameTemplateView, FormView
+):
     template_name = "resource_management/resource_list.html"
     form_class = ResourceDeletionForm
 

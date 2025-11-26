@@ -14,13 +14,18 @@ from capacities.forms.cloud_capacity_forms import (
     CloudCapacityRegistrationForm,
 )
 from editor.base_views import (
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+)
+from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
-    EditorView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListFormView
+from resource_management.views import ResourceListFormView, ResourceListViewMixin
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -37,27 +42,31 @@ from .mixins.cloud_capacity_mixins import (
 
 
 # Cloud Capacity
-class CloudCapacityEditorView(EditorView):
-    editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
+class CloudCapacityViewMixin(
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+    ResourceListViewMixin,
+):
+    api_client_class = CloudCapacityApiClient
     editor_url_reverse_base = "capacities:cloud_capacity_editor"
     editor_start_url_reverse_base = "capacities:new_cloud_capacity"
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
+    column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
+    editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
     resource_type_name_singular = "cloud capacity"
     resource_type_name_plural = "cloud capacities"
-    api_client_class = CloudCapacityApiClient
-    column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
 
 
 class CloudCapacityEditorStartFormView(
-    CloudCapacityEditorView, EditorStartFormView, FormView
+    CloudCapacityViewMixin, EditorStartFormView, FormView
 ):
     template_name = "capacities/new_cloud_capacity_start.html"
     form_class = CloudCapacityRegistrationForm
 
 
-class CloudCapacityEditorProcessFormView(
-    CloudCapacityEditorView, EditorProcessFormView
-):
+class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFormView):
     template_name = "capacities/cloud_capacity_editor.html"
     main_form_class = CloudCapacityEditorForm
     success_url = reverse_lazy("capacities:new_cloud_capacity")
@@ -106,7 +115,7 @@ class CloudCapacitySpecsEditorProcessFormView(
     pass
 
 
-class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRouterView):
+class CloudCapacityEditorRouterView(CloudCapacityViewMixin, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
     metadata_editor_view_class = CloudCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = (
@@ -126,12 +135,12 @@ class CloudCapacityEditorRouterView(CloudCapacityEditorView, CapacityEditorRoute
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CloudCapacityListFormView(CloudCapacityEditorView, ResourceListFormView):
+class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
     new_resource_reverse = "capacities:new_cloud_capacity"
 
 
 class CloudCapacityEditorOverviewTemplateView(
-    CloudCapacityEditorView, EditorOverviewTemplateView
+    CloudCapacityViewMixin, EditorOverviewTemplateView
 ):
     template_name = "capacities/cloud_capacity_overview.html"

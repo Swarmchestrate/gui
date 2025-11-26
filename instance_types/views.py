@@ -1,12 +1,17 @@
 from django.urls import reverse_lazy
 
 from editor.base_views import (
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+)
+from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
-    EditorView,
 )
-from resource_management.views import ResourceListFormView
+from resource_management.views import ResourceListFormView, ResourceListViewMixin
 
 # from .api.api_clients import (
 #     InstanceTypeApiClient,
@@ -19,34 +24,40 @@ from .api.mocks.mock_api_clients import (
 from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
 
 
-class InstanceTypeEditorView(EditorView):
-    editor_resource_list_url_reverse = "instance_types:instance_type_list"
+class InstanceTypeViewMixin(
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+    ResourceListViewMixin,
+):
+    api_client_class = InstanceTypeApiClient
     editor_url_reverse_base = "instance_types:instance_type_editor"
     editor_start_url_reverse_base = "instance_types:new_instance_type"
     editor_overview_url_reverse_base = "instance_types:instance_type_overview"
+    column_metadata_api_client_class = InstanceTypeColumnMetadataApiClient
+    editor_resource_list_url_reverse = "instance_types:instance_type_list"
     resource_type_name_singular = "instance type"
     resource_type_name_plural = "instance types"
-    api_client_class = InstanceTypeApiClient
-    column_metadata_api_client_class = InstanceTypeColumnMetadataApiClient
 
 
-class InstanceTypeEditorStartFormView(InstanceTypeEditorView, EditorStartFormView):
+class InstanceTypeEditorStartFormView(InstanceTypeViewMixin, EditorStartFormView):
     template_name = "instance_types/new_instance_type_start.html"
     form_class = InstanceTypeRegistrationForm
     success_url = reverse_lazy("instance_types:new_instance_type")
 
 
-class InstanceTypeEditorProcessFormView(InstanceTypeEditorView, EditorProcessFormView):
+class InstanceTypeEditorProcessFormView(InstanceTypeViewMixin, EditorProcessFormView):
     template_name = "instance_types/instance_type_editor.html"
     main_form_class = InstanceTypeEditorForm
     success_url = reverse_lazy("instance_types:new_instance_type")
 
 
-class InstanceTypeListFormView(InstanceTypeEditorView, ResourceListFormView):
+class InstanceTypeListFormView(InstanceTypeViewMixin, ResourceListFormView):
     new_resource_reverse = "instance_types:new_instance_type"
 
 
 class InstanceTypeEditorOverviewTemplateView(
-    InstanceTypeEditorView, EditorOverviewTemplateView
+    InstanceTypeViewMixin, EditorOverviewTemplateView
 ):
     pass

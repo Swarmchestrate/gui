@@ -1,12 +1,17 @@
 from django.urls import reverse_lazy
 
 from editor.base_views import (
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+)
+from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
-    EditorView,
 )
-from resource_management.views import ResourceListFormView
+from resource_management.views import ResourceListFormView, ResourceListViewMixin
 
 from .api.api_clients import (
     ApplicationApiClient,
@@ -15,35 +20,41 @@ from .api.api_clients import (
 from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 
 
-class ApplicationEditorView(EditorView):
-    editor_resource_list_url_reverse = "applications:applications_list"
+class ApplicationViewMixin(
+    ApiClientViewMixin,
+    EditorViewMixin,
+    ResourceColumnMetadataViewMixin,
+    ResourceTypeNameViewMixin,
+    ResourceListViewMixin,
+):
+    api_client_class = ApplicationApiClient
     editor_url_reverse_base = "applications:application_editor"
     editor_start_url_reverse_base = "applications:new_application"
     editor_overview_url_reverse_base = "applications:application_overview"
+    column_metadata_api_client_class = ApplicationColumnMetadataApiClient
     resource_type_name_singular = "application"
     resource_type_name_plural = "applications"
-    api_client_class = ApplicationApiClient
-    column_metadata_api_client_class = ApplicationColumnMetadataApiClient
+    editor_resource_list_url_reverse = "applications:applications_list"
 
 
-class ApplicationEditorStartFormView(ApplicationEditorView, EditorStartFormView):
+class ApplicationEditorStartFormView(EditorStartFormView, ApplicationViewMixin):
     template_name = "applications/new_application_start.html"
     form_class = ApplicationRegistrationForm
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationEditorProcessFormView(ApplicationEditorView, EditorProcessFormView):
+class ApplicationEditorProcessFormView(EditorProcessFormView, ApplicationViewMixin):
     template_name = "applications/application_editor.html"
     main_form_class = ApplicationEditorForm
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationListFormView(ApplicationEditorView, ResourceListFormView):
+class ApplicationListFormView(ResourceListFormView, ApplicationViewMixin):
     template_name = "applications/applications.html"
     new_resource_reverse = "applications:new_application"
 
 
 class ApplicationEditorOverviewTemplateView(
-    ApplicationEditorView, EditorOverviewTemplateView
+    EditorOverviewTemplateView, ApplicationViewMixin
 ):
     template_name = "applications/application_overview.html"
