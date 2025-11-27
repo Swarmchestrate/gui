@@ -213,7 +213,9 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
 
     def get_instance_type_formset_initial(self):
         initial = list()
-        instance_type_ids = self.resource.get(self.instance_types_property_name)
+        instance_type_ids = self.resource.get(self.instance_types_property_name, list())
+        if not isinstance(instance_type_ids, list):
+            instance_type_ids = list()
         if not all(
             isinstance(instance_type_id, int) for instance_type_id in instance_type_ids
         ):
