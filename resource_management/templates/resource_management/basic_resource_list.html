@@ -31,24 +31,14 @@
 </button>
 {% endblock td_name_content %}
 
-{% block resource_actions %}
-<li>
-    <button
-        class="btn btn-light edit-btn"
-        type="button"
-        data-dialog-id="update-{{ resource_id }}-dialog">
-        <i class="bi bi-pencil-fill" title="Edit"></i>
-    </button>
-</li>
-<li>
-    <button
-        class="btn btn-light delete-btn"
-        data-resource-id="{{ resource_id }}"
-        type="button">
-        <i class="bi bi-trash3-fill" title="Delete"></i>
-    </button>
-</li>
-{% endblock resource_actions %}
+{% block edit_button %}
+<button
+    class="btn btn-light edit-btn"
+    type="button"
+    data-dialog-id="update-{{ resource_id }}-dialog">
+    <i class="bi bi-pencil-fill" title="Edit"></i>
+</button>
+{% endblock edit_button %}
 
 {% block extra_dialogs %}
 {% with dialog_id='new-dialog' form=new_resource_form dialog_extra_classes='col-lg-6' %}

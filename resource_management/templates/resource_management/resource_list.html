@@ -100,23 +100,22 @@
                         </td>
                         <td class="align-middle text-center px-3">
                             <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
-                                {% block resource_actions %}
                                 <li>
+                                    {% block edit_button %}
                                     <a
                                         href="{% url editor_url_reverse_base resource_id %}"
                                         class="btn btn-light edit-btn">
                                         <i class="bi bi-pencil-fill" title="Edit"></i>
                                     </a>
+                                    {% endblock edit_button %}
                                 </li>
                                 <li>
                                     <button
                                         class="btn btn-light delete-btn"
-                                        data-resource-id="{{ resource_id }}"
                                         type="button">
                                         <i class="bi bi-trash3-fill" title="Delete"></i>
                                     </button>
                                 </li>
-                                {% endblock resource_actions %}
                             </ul>
                         </td>
                     </tr>
