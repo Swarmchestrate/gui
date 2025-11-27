@@ -156,7 +156,7 @@ class ApiClient(ApiClientMixin, BaseApiClient):
     def endpoint_url(self):
         return f"{self.api_url}/{self.endpoint}"
 
-    # Registrations
+    # Resources
     def get(self, resource_id: int, params: dict | None = None) -> dict:
         if not params:
             params = dict()

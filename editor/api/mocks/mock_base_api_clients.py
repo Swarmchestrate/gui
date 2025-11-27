@@ -78,7 +78,7 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         with open(self.path_to_temp_data, "w") as f:
             f.write(json.dumps(update_data, indent=4))
 
-    # Registrations
+    # Resources
     def get(self, resource_id: int, params: dict | None = None) -> dict:
         resources = self._get_temp_data_and_create_if_not_exists()
         resource = {}
