@@ -14,7 +14,6 @@ from localities.api.mocks.mock_definitions import (
 BASE_DIR = settings.BASE_DIR
 
 
-# Cloud Capacities
 class LocalityApiClient(BaseLocalityApiClient, MockApiClient):
     endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
     path_to_data = os.path.join(
@@ -32,4 +31,4 @@ class LocalityApiClient(BaseLocalityApiClient, MockApiClient):
 class LocalityColumnMetadataApiClient(MockColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         resources = super().get_resources()
-        return [r for r in resources if r.get("table_name") == "capacity"]
+        return [r for r in resources if r.get("table_name") == "locality"]
