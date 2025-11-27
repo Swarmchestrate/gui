@@ -270,6 +270,8 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
+        if not self.disabled_categories:
+            return super().get_resources(params)
         and_conditions = set(
             f"category.neq.{category}" for category in self.disabled_categories
         )
