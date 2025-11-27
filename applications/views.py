@@ -43,13 +43,13 @@ class ApplicationViewMixin(
     resource_type_name_plural = "applications"
 
 
-class ApplicationEditorStartFormView(EditorStartFormView, ApplicationViewMixin):
+class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
     template_name = "applications/new_application_start.html"
     form_class = ApplicationRegistrationForm
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationEditorProcessFormView(EditorProcessFormView, ApplicationViewMixin):
+class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormView):
     template_name = "applications/application_editor.html"
     main_form_class = ApplicationEditorForm
     success_url = reverse_lazy("applications:new_application")
@@ -64,6 +64,6 @@ class ApplicationListFormView(ApplicationViewMixin, ResourceListFormView):
 
 
 class ApplicationEditorOverviewTemplateView(
-    EditorOverviewTemplateView, ApplicationViewMixin
+    ApplicationViewMixin, EditorOverviewTemplateView
 ):
     template_name = "applications/application_overview.html"
