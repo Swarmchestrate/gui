@@ -17,7 +17,7 @@ from capacities.forms.cloud_capacity_forms import (
 )
 from editor.base_views import (
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
 )
@@ -27,7 +27,11 @@ from editor.views import (
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListContextMixin, ResourceListFormView
+from resource_management.views import (
+    ResourceDeletionFormView,
+    ResourceListContextMixin,
+    ResourceListFormView,
+)
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -47,7 +51,7 @@ from .mixins.cloud_capacity_mixins import (
 @dataclass
 class CloudCapacityViewMixin(
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
     ResourceListContextMixin,
@@ -58,6 +62,8 @@ class CloudCapacityViewMixin(
     editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
     column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
     editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
+    new_resource_reverse = "capacities:new_cloud_capacity"
+    resource_deletion_reverse = "capacities:delete_cloud_capacities"
     resource_type_name_singular = "cloud capacity"
     resource_type_name_plural = "cloud capacities"
 
@@ -138,9 +144,12 @@ class CloudCapacityEditorRouterView(CloudCapacityViewMixin, CapacityEditorRouter
         return super().route_to_view(request, *args, **kwargs)
 
 
+class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
+    success_url = reverse_lazy("capacities:delete_cloud_capacities")
+
+
 class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
-    new_resource_reverse = "capacities:new_cloud_capacity"
 
 
 class CloudCapacityEditorOverviewTemplateView(

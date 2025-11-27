@@ -8,32 +8,66 @@ from django.views.generic.edit import ProcessFormView
 
 from editor.base_views import (
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     ResourceTypeNameContextMixin,
 )
-from resource_management.views import ResourceListContextMixin
+from resource_management.formsets import OpenApiDefinitionBasedFormSet
+from resource_management.views import (
+    BasicResourceListFormView,
+    NewResourceFormView,
+    ResourceDeletionFormView,
+    ResourceListContextMixin,
+    ResourceUpdateFormView,
+)
 
-from .api.api_clients import LocalityApiClient, LocalityColumnMetadataApiClient
+# from .api.api_clients import LocalityApiClient, LocalityColumnMetadataApiClient
+from .api.mocks.mock_api_clients import (
+    LocalityApiClient,
+    LocalityColumnMetadataApiClient,
+)
 from .forms import (
     GetLocalityByGpsForm,
     GetLocalityByNameForm,
     LocalityEditorForm,
     LocalityOptionsSearchForm,
+    LocalityRegistrationForm,
+    LocalityUpdateForm,
 )
 from .formsets import LocalityEditorFormSet
 
 
 class LocalityViewMixin(
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     ResourceTypeNameContextMixin,
     ResourceListContextMixin,
 ):
     api_client_class = LocalityApiClient
     column_metadata_api_client_class = LocalityColumnMetadataApiClient
-    editor_resource_list_url_reverse = "localities:localities_list"
+    editor_resource_list_url_reverse = "localities:locality_list"
+    resource_update_reverse = "localities:update_locality"
+    new_resource_reverse = "localities:new_locality"
+    resource_deletion_reverse = "localities:delete_localities"
     resource_type_name_singular = "locality"
     resource_type_name_plural = "localities"
+
+
+class LocalityUpdateFormView(LocalityViewMixin, ResourceUpdateFormView):
+    form_class = LocalityUpdateForm
+
+
+class LocalityEditorStartFormView(LocalityViewMixin, NewResourceFormView):
+    form_class = LocalityRegistrationForm
+
+
+class LocalityDeletionFormView(LocalityViewMixin, ResourceDeletionFormView):
+    pass
+
+
+class LocalityListFormView(LocalityViewMixin, BasicResourceListFormView):
+    template_name = "localities/localities.html"
+    new_resource_form_class = LocalityRegistrationForm
+    resource_update_form_class = LocalityUpdateForm
 
 
 class LocalityFormSetEditorViewMixin:

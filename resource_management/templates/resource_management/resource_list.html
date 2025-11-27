@@ -7,105 +7,135 @@
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/resource_list.js' %}" type="module"></script>
+{% block extra_scripts %}
+{% endblock extra_scripts %}
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
 <h1>{{ title }}</h1>
+{% if description %}
 <p class="pb-4">{{ description }}</p>
-{% if not resources %}
-<p class="text-body-secondary">No {{ resource_type_name_plural|title }} have been registered.</p>
-{% else %}
-<form id="resource-deletion-form" method="POST" action="{{ request.path }}">
-    {% csrf_token %}
-    <div>
+{% endif %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="col-lg-2 pb-4">
+            {% block extra_links %}
+            {% endblock extra_links %}
+        </div>
+        {% if not resources %}
         <ul class="d-inline-flex column-gap-3 list-unstyled">
             <li>
+                {% block new_button %}
                 <a href="{% url new_resource_reverse %}" class="d-inline-flex align-items-center column-gap-2 btn btn-primary">
-                   <i class="bi bi-plus-lg"></i>
-                   New
+                    <i class="bi bi-plus-lg"></i>
+                    New
                 </a>
-            </li>
-            <li>
-                <button
-                    id="delete-checked-btn"
-                    class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
-                    type="button">
-                    <i class="bi bi-trash3-fill" title="Delete"></i>
-                    <span>Delete selected (<span id="num-checked"></span>)</span>
-                </button>
+                {% endblock new_button %}
             </li>
         </ul>
+        <p class="text-body-secondary">No {{ resource_type_name_plural|title }} have been registered.</p>
+        {% else %}
+        <form id="resource-deletion-form" method="POST" action="{% url resource_deletion_reverse %}">
+            {% csrf_token %}
+            <div>
+                <ul class="d-inline-flex column-gap-3 list-unstyled">
+                    <li>
+                        {% block new_button_2 %}
+                        <a href="{% url new_resource_reverse %}" class="d-inline-flex align-items-center column-gap-2 btn btn-primary">
+                           <i class="bi bi-plus-lg"></i>
+                           New
+                        </a>
+                        {% endblock new_button_2 %}
+                    </li>
+                    <li>
+                        <button
+                            id="delete-checked-btn"
+                            class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
+                            type="button">
+                            <i class="bi bi-trash3-fill" title="Delete"></i>
+                            <span>Delete selected (<span id="num-checked"></span>)</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <table id="resources-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="align-middle p-3"></th>
+                        <th class="align-middle p-3">ID</th>
+                        <th class="align-middle p-3">Created At</th>
+                        <th class="align-middle p-3">Updated At</th>
+                        <th
+                            class="align-middle text-end p-3"
+                            data-dt-order="disable">
+                            <span class="visually-hidden">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for checkbox in delete_form.resource_ids_to_delete %}
+                    {% with resource_id=checkbox.data.value %}
+                    {% with resource=resources|get_key_value_or_blank_string:resource_id %}
+                    {% if resource %}
+                    <tr data-resource-id="{{ resource_id }}">
+                        <td class="align-middle px-3"></td>
+                        <td class="font-monospace align-middle px-3">
+                            {% block td_name_content %}
+                            <a href="{% url editor_overview_url_reverse_base resource_id %}">{{ resource_id }}</a>
+                            {% endblock td_name_content %}
+                        </td>
+                        <td class="text-body-secondary align-middle px-3">
+                            {% if 'created_at' in resource %}
+                            {{ resource.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td class="text-body-secondary align-middle px-3">
+                            {% if 'updated_at' in resource %}
+                            {{ resource.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-center px-3">
+                            <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
+                                {% block resource_actions %}
+                                <li>
+                                    <a
+                                        href="{% url editor_url_reverse_base resource_id %}"
+                                        class="btn btn-light edit-btn">
+                                        <i class="bi bi-pencil-fill" title="Edit"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <button
+                                        class="btn btn-light delete-btn"
+                                        data-resource-id="{{ resource_id }}"
+                                        type="button">
+                                        <i class="bi bi-trash3-fill" title="Delete"></i>
+                                    </button>
+                                </li>
+                                {% endblock resource_actions %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        {% endif %}
     </div>
-    <table id="resources-table" class="table table-hover">
-        <thead>
-            <tr class="table-primary">
-                <th class="align-middle p-3"></th>
-                <th class="align-middle p-3">ID</th>
-                <th class="align-middle p-3">Created At</th>
-                <th class="align-middle p-3">Updated At</th>
-                <th
-                    class="align-middle text-end p-3"
-                    data-dt-order="disable">
-                    <span class="visually-hidden">Actions</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for checkbox in form.resource_ids_to_delete %}
-            {% with resource_id=checkbox.data.value %}
-            {% with resource=resources|get_key_value_or_blank_string:resource_id %}
-            {% if resource %}
-            <tr data-resource-id="{{ resource_id }}">
-                <td class="align-middle px-3"></td>
-                <td class="font-monospace align-middle px-3">
-                    <a href="{% url editor_overview_url_reverse_base resource_id %}">{{ resource_id }}</a>
-                </td>
-                <td class="text-body-secondary align-middle px-3">
-                    {% if 'created_at' in resource %}
-                    {{ resource.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td class="text-body-secondary align-middle px-3">
-                    {% if 'updated_at' in resource %}
-                    {{ resource.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td class="align-middle text-center px-3">
-                    <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
-                        <li>
-                            <a
-                                href="{% url editor_url_reverse_base resource_id %}"
-                                class="btn btn-light edit-btn">
-                                <i class="bi bi-pencil-fill" title="Edit"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <button
-                                class="btn btn-light delete-btn"
-                                data-resource-id="{{ resource_id }}"
-                                type="button">
-                                <i class="bi bi-trash3-fill" title="Delete"></i>
-                            </button>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
-            {% endif %}
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-        </tbody>
-    </table>
-</form>
-{% endif %}
+</div>
 {% with dialog_id='delete-dialog' %}
 {% include 'resource_management/dialogs/delete_dialog.html' %}
 {% endwith %}
 {% with dialog_id='delete-multiple-dialog' %}
 {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
 {% endwith %}
+{% block extra_dialogs %}
+{% endblock extra_dialogs %}
 {% endblock content %}

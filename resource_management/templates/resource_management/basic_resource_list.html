@@ -1,0 +1,62 @@
+{% extends 'resource_management/resource_list.html' %}
+{% load static %}
+
+{% block extra_scripts %}
+<script src="{% static 'resource_management/basic_resource_list.js' %}" type="module"></script>
+{% endblock extra_scripts %}
+
+{% block new_button %}
+<button
+    id="new-dialog-button"
+    class="d-inline-flex align-items-center column-gap-2 btn btn-primary"
+    type="button">
+    <i class="bi bi-plus-lg"></i>
+    New
+</button>
+{% endblock new_button %}
+
+{% block new_button_2 %}
+<button
+    id="new-dialog-button"
+    class="d-inline-flex align-items-center column-gap-2 btn btn-primary"
+    type="button">
+    <i class="bi bi-plus-lg"></i>
+    New
+</button>
+{% endblock new_button_2 %}
+
+{% block td_name_content %}
+{{ resource_id }}
+{% endblock td_name_content %}
+
+{% block resource_actions %}
+<li>
+    <button
+        class="btn btn-light edit-btn"
+        type="button"
+        data-dialog-id="update-{{ resource_id }}-dialog">
+        <i class="bi bi-pencil-fill" title="Edit"></i>
+    </button>
+</li>
+<li>
+    <button
+        class="btn btn-light delete-btn"
+        data-resource-id="{{ resource_id }}"
+        type="button">
+        <i class="bi bi-trash3-fill" title="Delete"></i>
+    </button>
+</li>
+{% endblock resource_actions %}
+
+{% block extra_dialogs %}
+{% with dialog_id='new-dialog' form=new_resource_form dialog_extra_classes='col-lg-6' %}
+{% include 'resource_management/dialogs/new_dialog.html' %}
+{% endwith %}
+{% for resource_id, form in resource_update_forms.items %}
+{% with resource_id_str=resource_id|stringformat:'s' %}
+{% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='col-lg-6' %}
+{% include 'resource_management/dialogs/update_dialog.html' %}
+{% endwith %}
+{% endwith %}
+{% endfor %}
+{% endblock extra_dialogs %}

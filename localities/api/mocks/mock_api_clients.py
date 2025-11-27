@@ -26,7 +26,7 @@ class LocalityApiClient(BaseLocalityApiClient, MockApiClient):
         "data",
         "localities.json",
     )
-    path_to_temp_data_dir = os.path.join(BASE_DIR, "editor", "temp")
+    path_to_temp_data_dir = os.path.join(BASE_DIR, "localities", "temp")
 
 
 class LocalityColumnMetadataApiClient(MockColumnMetadataApiClient):

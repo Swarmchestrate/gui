@@ -1,0 +1,23 @@
+{% extends 'dialog_base.html' %}
+
+{% block dialog_header_content %}
+<div>
+    Update {{ resource_type_name_singular|title }} {{ resource_id }}
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+<form method="POST" action="{% url resource_update_reverse resource_id %}">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.field.widget.input_type == 'checkbox' %}
+    {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+    {% else %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endif %}
+    {% endfor %}
+    <div class="pt-4">
+        <button class="btn btn-primary" type="submit">Update</button>
+    </div>
+</form>
+{% endblock dialog_body_content %}

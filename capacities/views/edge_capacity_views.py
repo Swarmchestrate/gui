@@ -14,7 +14,7 @@ from capacities.forms.edge_capacity_forms import (
 )
 from editor.base_views import (
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
 )
@@ -24,7 +24,11 @@ from editor.views import (
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
 )
-from resource_management.views import ResourceListContextMixin, ResourceListFormView
+from resource_management.views import (
+    ResourceDeletionFormView,
+    ResourceListContextMixin,
+    ResourceListFormView,
+)
 
 from .capacity_views import (
     CapacityCostAndLocalityEditorProcessFormView,
@@ -43,7 +47,7 @@ from .mixins.edge_capacity_mixins import (
 # Edge Capacity
 class EdgeCapacityViewMixin(
     ApiClientTemplateView,
-    ColumnMetadataApiClientMixin,
+    ColumnMetadataApiClientTemplateView,
     EditorContextMixin,
     ResourceTypeNameContextMixin,
     ResourceListContextMixin,
@@ -54,6 +58,8 @@ class EdgeCapacityViewMixin(
     editor_overview_url_reverse_base = "capacities:edge_capacity_overview"
     column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
     editor_resource_list_url_reverse = "capacities:edge_capacity_list"
+    new_resource_reverse = "capacities:new_edge_capacity"
+    resource_deletion_reverse = "capacities:delete_edge_capacities"
     resource_type_name_singular = "edge capacity"
     resource_type_name_plural = "edge capacities"
 
@@ -132,9 +138,12 @@ class EdgeCapacityEditorRouterView(EdgeCapacityViewMixin, CapacityEditorRouterVi
         return super().route_to_view(request, *args, **kwargs)
 
 
+class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
+    success_url = reverse_lazy("capacities:delete_edge_capacities")
+
+
 class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
-    new_resource_reverse = "capacities:new_edge_capacity"
 
 
 class EdgeCapacityEditorOverviewTemplateView(

@@ -14,6 +14,16 @@ urlpatterns = [
         name="cloud_capacity_list",
     ),
     path(
+        "cloud-capacities/new/",
+        cloud_capacity_views.CloudCapacityEditorStartFormView.as_view(),
+        name="new_cloud_capacity",
+    ),
+    path(
+        "cloud-capacities/deletes/",
+        cloud_capacity_views.CloudCapacityDeletionFormView.as_view(),
+        name="delete_cloud_capacities",
+    ),
+    path(
         "cloud-capacities/<resource_id>/edit/",
         cloud_capacity_views.CloudCapacityEditorRouterView.as_view(),
         name="cloud_capacity_editor",
@@ -24,14 +34,19 @@ urlpatterns = [
         name="cloud_capacity_overview",
     ),
     path(
-        "new-cloud-capacity/",
-        cloud_capacity_views.CloudCapacityEditorStartFormView.as_view(),
-        name="new_cloud_capacity",
-    ),
-    path(
         "edge-capacities/",
         edge_capacity_views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",
+    ),
+    path(
+        "edge-capacities/new/",
+        edge_capacity_views.EdgeCapacityEditorStartFormView.as_view(),
+        name="new_edge_capacity",
+    ),
+    path(
+        "edge-capacities/deletes/",
+        edge_capacity_views.EdgeCapacityDeletionFormView.as_view(),
+        name="delete_edge_capacities",
     ),
     path(
         "edge-capacities/<resource_id>/edit/",
@@ -42,10 +57,5 @@ urlpatterns = [
         "edge-capacities/<resource_id>/overview/",
         edge_capacity_views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
-    ),
-    path(
-        "new-edge-capacity/",
-        edge_capacity_views.EdgeCapacityEditorStartFormView.as_view(),
-        name="new_edge_capacity",
     ),
 ]

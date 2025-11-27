@@ -11,12 +11,8 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
     TemplateView,
-    View,
 )
-from django.views.generic.base import ContextMixin
 from django.views.generic.edit import ProcessFormView
-
-from editor.base_views import EditorContextMixin
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
@@ -32,7 +28,6 @@ class EditorTocTemplateView(TemplateView):
     column_metadata: list[dict]
 
     def setup(self, request, *args, **kwargs):
-        self.column_metadata_api_client = self.column_metadata_api_client_class()
         self.setup_column_metadata()
         self.setup_categories()
         return super().setup(request, *args, **kwargs)

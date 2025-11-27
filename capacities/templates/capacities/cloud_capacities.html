@@ -3,3 +3,11 @@
 {% include 'breadcrumbs/index_item.html' %}
 {% include 'capacities/breadcrumbs/cloud_capacities_item.html' with active=True %}
 {% endblock breadcrumb_items %}
+
+{% block extra_links %}
+<ul class="d-inline list-unstyled">
+    <li>
+        <a href="{% url 'localities:locality_list' %}">Manage Localities</a>
+    </li>
+</ul>
+{% endblock extra_links %}

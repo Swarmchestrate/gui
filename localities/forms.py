@@ -1,6 +1,18 @@
 from django import forms
 
-from editor.forms.base_forms import EditorForm
+from editor.forms.base_forms import EditorForm, OpenApiSpecificationBasedForm
+from resource_management.forms import OpenApiSpecificationBasedFormWithSuffix
+
+
+class LocalityRegistrationForm(OpenApiSpecificationBasedForm):
+    definition_name = "locality"
+
+    def add_prefix(self, field_name):
+        return "new-" + field_name
+
+
+class LocalityUpdateForm(OpenApiSpecificationBasedFormWithSuffix):
+    definition_name = "locality"
 
 
 class LocalityEditorForm(EditorForm):
