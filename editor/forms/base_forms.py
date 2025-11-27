@@ -115,11 +115,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 field_class = forms.IntegerField
             case OpenApiPropertyFormat.NUMERIC | OpenApiPropertyFormat.DOUBLE_PRECISION:
                 field_class = forms.FloatField
-            case (
-                OpenApiPropertyFormat.TEXT
-                | OpenApiPropertyFormat.TEXT_ARRAY
-                | OpenApiPropertyFormat.JSONB
-            ):
+            case OpenApiPropertyFormat.TEXT_ARRAY | OpenApiPropertyFormat.JSONB:
                 widget_class = forms.Textarea
         if not widget_class:
             widget_class = field_class.widget
