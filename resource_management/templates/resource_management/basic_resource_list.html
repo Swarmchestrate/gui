@@ -26,7 +26,9 @@
 {% endblock new_button_2 %}
 
 {% block td_name_content %}
-{{ resource_id }}
+<button class="btn btn-link edit-btn" data-dialog-id="update-{{ resource_id }}-dialog" type="button">
+    {{ resource_id }}
+</button>
 {% endblock td_name_content %}
 
 {% block resource_actions %}
@@ -54,7 +56,7 @@
 {% endwith %}
 {% for resource_id, form in resource_update_forms.items %}
 {% with resource_id_str=resource_id|stringformat:'s' %}
-{% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='col-lg-6' %}
+{% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='update-dialog col-lg-6' %}
 {% include 'resource_management/dialogs/update_dialog.html' %}
 {% endwith %}
 {% endwith %}

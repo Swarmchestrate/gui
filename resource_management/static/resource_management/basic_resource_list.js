@@ -1,9 +1,7 @@
 import { setupDialog } from "/static/dialog.js";
 
 const newDialog = document.querySelector("#new-dialog");
-const updateDialogOpenButtons = document.querySelectorAll(
-    ".edit-btn[data-dialog-id]",
-);
+const updateDialogs = document.querySelectorAll(".update-dialog[id]");
 
 window.addEventListener("DOMContentLoaded", () => {
     setupDialog(
@@ -11,14 +9,14 @@ window.addEventListener("DOMContentLoaded", () => {
         [newDialog.querySelector(".btn-close")],
         [document.querySelector("#new-dialog-button")],
     );
-    updateDialogOpenButtons.forEach((button) => {
-        const updateDialog = document.querySelector(
-            `#${button.dataset.dialogId}`,
+    updateDialogs.forEach((updateDialog) => {
+        const openButtons = document.querySelectorAll(
+            `.edit-btn[data-dialog-id="${updateDialog.id}"]`,
         );
         setupDialog(
             updateDialog,
             [updateDialog.querySelector(".btn-close")],
-            [button],
+            Array.from(openButtons),
         );
     });
 });

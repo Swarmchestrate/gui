@@ -95,7 +95,7 @@ class ResourceUpdateFormView(FormView):
 
     def form_valid(self, form):
         self.api_client.update(self.resource_id, form.cleaned_data)
-        success_msg = f"Updated {self.resource_type_name_singular}."
+        success_msg = f"Updated {self.resource_type_name_singular} {self.resource_id}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
