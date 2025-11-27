@@ -21,7 +21,7 @@ class ResourceDeletionForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(
             attrs={
                 "class": "form-check-input",
-                "aria-label": "Select",
+                "aria-label": "Select row",
             }
         ),
     )
