@@ -44,8 +44,12 @@ class EditorContextMixin(ContextMixin):
         return context
 
 
-class ColumnMetadataApiClientMixin:
+class ColumnMetadataApiClientTemplateView(TemplateView):
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
+
+    def setup(self, request, *args, **kwargs):
+        self.column_metadata_api_client = self.column_metadata_api_client_class()
+        return super().setup(request, *args, **kwargs)
 
 
 class ResourceTypeNameContextMixin(ContextMixin):
