@@ -8,11 +8,10 @@ class LocalityUserSpecifiableOpenApiDefinitionMixin(
     UserSpecifiableOpenApiDefinitionMixin
 ):
     id_field = "locality_id"
+    definition_name = "locality"
 
 
 class LocalityUserSpecifiableOpenApiDefinition(
     OpenApiDefinition, LocalityUserSpecifiableOpenApiDefinitionMixin
 ):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "locality"
+    pass

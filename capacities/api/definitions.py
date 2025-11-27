@@ -8,6 +8,7 @@ class CapacityUserSpecifiableOpenApiDefinitionMixin(
     UserSpecifiableOpenApiDefinitionMixin
 ):
     id_field = "capacity_id"
+    definition_name = "capacity"
 
     def _get_auto_generated_field_names(self) -> list:
         names = super()._get_auto_generated_field_names()
@@ -30,6 +31,4 @@ class CapacityUserSpecifiableOpenApiDefinitionMixin(
 class CapacityUserSpecifiableOpenApiDefinition(
     OpenApiDefinition, CapacityUserSpecifiableOpenApiDefinitionMixin
 ):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "capacity"
+    pass
