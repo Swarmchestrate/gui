@@ -122,7 +122,7 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         possible_ids_set = possible_ids_set - existing_ids_set
         if not len(possible_ids_set):
             raise Error("There are no new unique IDs that can be used.")
-        random_id = random.choice(possible_ids_set)
+        random_id = random.choice(list(possible_ids_set))
         return random_id
 
     def _generate_random_ids(self, amount: int = 1):
@@ -155,42 +155,6 @@ class ApiClient(ApiClientMixin, BaseApiClient):
     @property
     def endpoint_url(self):
         return f"{self.api_url}/{self.endpoint}"
-
-    # Helpers
-    def _generate_random_id(self):
-        existing_resource_ids = self._get_existing_resource_ids()
-        # Credit for random_id solution: https://stackoverflow.com/a/70239671
-        possible_ids_set = set(
-            range(self.random_id_min_value, self.random_id_max_value)
-        )
-        existing_ids_set = set(existing_resource_ids)
-        possible_ids_set = possible_ids_set - existing_ids_set
-        if not len(possible_ids_set):
-            raise Error("There are no new unique IDs that can be used.")
-        random_id = random.choice(possible_ids_set)
-        return random_id
-
-    def _generate_random_ids(self, amount: int = 1):
-        existing_resource_ids = self._get_existing_resource_ids()
-        # Credit for random_id solution: https://stackoverflow.com/a/70239671
-        possible_ids_set = set(
-            range(self.random_id_min_value, self.random_id_max_value)
-        )
-        existing_ids_set = set(existing_resource_ids)
-        possible_ids_set = possible_ids_set - existing_ids_set
-        if not len(possible_ids_set):
-            raise Error("There are no new unique IDs that can be used.")
-        random_ids = random.sample(list(possible_ids_set), int(amount))
-        if len(random_ids) != amount:
-            raise Error(f"Failed to generate {amount} new unique IDs.")
-        return random_ids
-
-    def _get_existing_resource_ids(self):
-        params = {"select": f"{self.endpoint_definition.id_field}"}
-        return [
-            data.get(self.endpoint_definition.id_field)
-            for data in self.get_resources(params=params)
-        ]
 
     # Registrations
     def get(self, resource_id: int, params: dict | None = None) -> dict:
