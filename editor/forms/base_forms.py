@@ -101,6 +101,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         widget_class = None
         css_classes: list = ["form-control"]
         format_enum = None
+        extra_field_kwargs = dict()
         try:
             format_enum = OpenApiPropertyFormat(field_format)
         except ValueError:
@@ -113,6 +114,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 field_class = forms.DateField
             case OpenApiPropertyFormat.INTEGER:
                 field_class = forms.IntegerField
+                extra_field_kwargs.update({"min_value": 1, "step_size": 1})
             case OpenApiPropertyFormat.NUMERIC | OpenApiPropertyFormat.DOUBLE_PRECISION:
                 field_class = forms.FloatField
             case OpenApiPropertyFormat.TEXT_ARRAY | OpenApiPropertyFormat.JSONB:
@@ -123,7 +125,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "field_class": field_class,
             "widget_class": widget_class,
             "css_classes": css_classes,
-            "extra_field_kwargs": dict(),
+            "extra_field_kwargs": extra_field_kwargs,
         }
 
     def _configure_field_kwargs(

@@ -53,6 +53,7 @@ class InstanceTypeViewMixin(
 
 
 class InstanceTypeUpdateFormView(InstanceTypeViewMixin, ResourceUpdateFormView):
+    template_name = "instance_types/instance_types.html"
     form_class = InstanceTypeUpdateForm
 
 

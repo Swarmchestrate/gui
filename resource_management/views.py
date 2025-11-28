@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -12,6 +14,8 @@ from .forms import (
     OpenApiSpecificationBasedFormWithIdAttributeSuffix,
     ResourceDeletionForm,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -96,7 +100,7 @@ class ResourceUpdateFormView(FormView):
             self.request,
             "The form submitted was not valid.",
         )
-        return super().form_invalid(form)
+        return redirect(self.editor_resource_list_url_reverse)
 
     def form_valid(self, form):
         self.api_client.update(self.resource_id, form.cleaned_data)
