@@ -11,9 +11,9 @@ urlpatterns = [
         name="instance_type_list",
     ),
     path(
-        "instance-types/<resource_id>/edit/",
-        views.InstanceTypeEditorProcessFormView.as_view(),
-        name="instance_type_editor",
+        "instance-types/new/",
+        views.InstanceTypeEditorStartFormView.as_view(),
+        name="new_instance_type",
     ),
     path(
         "instance-types/<resource_id>/overview/",
@@ -21,8 +21,8 @@ urlpatterns = [
         name="instance_type_overview",
     ),
     path(
-        "new-instance-type/",
-        views.InstanceTypeEditorStartFormView.as_view(),
-        name="new_instance_type",
+        "instance-types/<resource_id>/edit/",
+        views.InstanceTypeEditorProcessFormView.as_view(),
+        name="instance_type_editor",
     ),
 ]

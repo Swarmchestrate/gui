@@ -14,8 +14,8 @@ from editor.base_views import (
 from resource_management.formsets import OpenApiDefinitionBasedFormSet
 from resource_management.views import (
     BasicResourceListFormView,
+    MultiResourceDeletionFormView,
     NewResourceFormView,
-    ResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceUpdateFormView,
 )
@@ -60,7 +60,7 @@ class LocalityEditorStartFormView(LocalityViewMixin, NewResourceFormView):
     form_class = LocalityRegistrationForm
 
 
-class LocalityDeletionFormView(LocalityViewMixin, ResourceDeletionFormView):
+class MultiLocalityDeletionFormView(LocalityViewMixin, MultiResourceDeletionFormView):
     pass
 
 

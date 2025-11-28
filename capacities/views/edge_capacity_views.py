@@ -25,7 +25,7 @@ from editor.views import (
     MultipleEditorFormsetProcessFormView,
 )
 from resource_management.views import (
-    ResourceDeletionFormView,
+    MultiResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -138,7 +138,9 @@ class EdgeCapacityEditorRouterView(EdgeCapacityViewMixin, CapacityEditorRouterVi
         return super().route_to_view(request, *args, **kwargs)
 
 
-class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
+class MultiEdgeCapacityDeletionFormView(
+    EdgeCapacityViewMixin, MultiResourceDeletionFormView
+):
     success_url = reverse_lazy("capacities:delete_edge_capacities")
 
 

@@ -17,17 +17,17 @@ urlpatterns = [
     ),
     path(
         "applications/deletes/",
-        views.ApplicationDeletionFormView.as_view(),
+        views.MultiApplicationDeletionFormView.as_view(),
         name="delete_applications",
-    ),
-    path(
-        "applications/<resource_id>/edit/",
-        views.ApplicationEditorProcessFormView.as_view(),
-        name="application_editor",
     ),
     path(
         "applications/<resource_id>/overview/",
         views.ApplicationEditorOverviewTemplateView.as_view(),
         name="application_overview",
+    ),
+    path(
+        "applications/<resource_id>/edit/",
+        views.ApplicationEditorProcessFormView.as_view(),
+        name="application_editor",
     ),
 ]

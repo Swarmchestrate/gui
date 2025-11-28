@@ -28,7 +28,7 @@ from editor.views import (
     MultipleEditorFormsetProcessFormView,
 )
 from resource_management.views import (
-    ResourceDeletionFormView,
+    MultiResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -144,7 +144,9 @@ class CloudCapacityEditorRouterView(CloudCapacityViewMixin, CapacityEditorRouter
         return super().route_to_view(request, *args, **kwargs)
 
 
-class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
+class MultiCloudCapacityDeletionFormView(
+    CloudCapacityViewMixin, MultiResourceDeletionFormView
+):
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
 
 

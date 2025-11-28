@@ -20,18 +20,18 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/deletes/",
-        cloud_capacity_views.CloudCapacityDeletionFormView.as_view(),
+        cloud_capacity_views.MultiCloudCapacityDeletionFormView.as_view(),
         name="delete_cloud_capacities",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/edit/",
-        cloud_capacity_views.CloudCapacityEditorRouterView.as_view(),
-        name="cloud_capacity_editor",
     ),
     path(
         "cloud-capacities/<resource_id>/overview/",
         cloud_capacity_views.CloudCapacityEditorOverviewTemplateView.as_view(),
         name="cloud_capacity_overview",
+    ),
+    path(
+        "cloud-capacities/<resource_id>/edit/",
+        cloud_capacity_views.CloudCapacityEditorRouterView.as_view(),
+        name="cloud_capacity_editor",
     ),
     path(
         "edge-capacities/",
@@ -45,17 +45,17 @@ urlpatterns = [
     ),
     path(
         "edge-capacities/deletes/",
-        edge_capacity_views.EdgeCapacityDeletionFormView.as_view(),
+        edge_capacity_views.MultiEdgeCapacityDeletionFormView.as_view(),
         name="delete_edge_capacities",
-    ),
-    path(
-        "edge-capacities/<resource_id>/edit/",
-        edge_capacity_views.EdgeCapacityEditorRouterView.as_view(),
-        name="edge_capacity_editor",
     ),
     path(
         "edge-capacities/<resource_id>/overview/",
         edge_capacity_views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
+    ),
+    path(
+        "edge-capacities/<resource_id>/edit/",
+        edge_capacity_views.EdgeCapacityEditorRouterView.as_view(),
+        name="edge_capacity_editor",
     ),
 ]

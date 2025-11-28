@@ -100,7 +100,7 @@ class ResourceUpdateFormView(FormView):
         return super().form_valid(form)
 
 
-class ResourceDeletionFormView(FormView):
+class MultiResourceDeletionFormView(FormView):
     form_class = ResourceDeletionForm
 
     api_client: ApiClient

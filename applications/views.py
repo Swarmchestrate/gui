@@ -12,7 +12,7 @@ from editor.views import (
     EditorStartFormView,
 )
 from resource_management.views import (
-    ResourceDeletionFormView,
+    MultiResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -55,7 +55,9 @@ class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormVi
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
+class MultiApplicationDeletionFormView(
+    ApplicationViewMixin, MultiResourceDeletionFormView
+):
     success_url = "applications:application_list"
 
 

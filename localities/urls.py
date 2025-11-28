@@ -17,7 +17,7 @@ urlpatterns = [
     ),
     path(
         "localities/deletes/",
-        views.LocalityDeletionFormView.as_view(),
+        views.MultiLocalityDeletionFormView.as_view(),
         name="delete_localities",
     ),
     path(
