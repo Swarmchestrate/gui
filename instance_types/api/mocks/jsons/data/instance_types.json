@@ -3,77 +3,77 @@
         "id": 1,
         "provider": "aws",
         "name": "t3.micro",
-        "num_cpus": 2,
-        "mem_size": 1,
-        "disk_size": 20,
-        "energy_consumption": 13.0,
+        "cpu": 2,
+        "ram_gb": 1,
+        "storage_gb": 20,
+        "energy_consumption_kwh": 13.0,
         "bandwidth": 100,
-        "price": 0.0139
+        "price_per_hr": 0.0139
     },
     {
         "id": 2,
         "provider": "aws",
         "name": "t2.small",
-        "num_cpus": 1,
-        "mem_size": 1,
-        "disk_size": 20,
-        "energy_consumption": 7.0,
+        "cpu": 1,
+        "ram_gb": 1,
+        "storage_gb": 20,
+        "energy_consumption_kwh": 7.0,
         "bandwidth": 100,
-        "price": 0.0134
+        "price_per_hr": 0.0134
     },
     {
         "id": 805877,
         "provider": null,
         "name": "t2.micro",
-        "num_cpus": 1,
-        "mem_size": 1,
-        "disk_size": 1,
-        "energy_consumption": 1.0,
+        "cpu": 1,
+        "ram_gb": 1,
+        "storage_gb": 1,
+        "energy_consumption_kwh": 1.0,
         "bandwidth": 1,
-        "price": 0.0004
+        "price_per_hr": 0.0004
     },
     {
         "id": 483950,
         "provider": null,
         "name": "t3.medium",
-        "num_cpus": 8,
-        "mem_size": 8,
-        "disk_size": 128,
-        "energy_consumption": 15.0,
+        "cpu": 8,
+        "ram_gb": 8,
+        "storage_gb": 128,
+        "energy_consumption_kwh": 15.0,
         "bandwidth": 150,
-        "price": 0.003
+        "price_per_hr": 0.003
     },
     {
         "id": 285620,
         "provider": null,
         "name": "t3.large",
-        "num_cpus": 12,
-        "mem_size": 16,
-        "disk_size": 512,
-        "energy_consumption": 30.0,
+        "cpu": 12,
+        "ram_gb": 16,
+        "storage_gb": 512,
+        "energy_consumption_kwh": 30.0,
         "bandwidth": 200,
-        "price": 0.005
+        "price_per_hr": 0.005
     },
     {
         "id": 725835,
         "provider": null,
         "name": "t2.small",
-        "num_cpus": 2,
-        "mem_size": 4,
-        "disk_size": 8,
-        "energy_consumption": 5.0,
+        "cpu": 2,
+        "ram_gb": 4,
+        "storage_gb": 8,
+        "energy_consumption_kwh": 5.0,
         "bandwidth": 150,
-        "price": 0.005
+        "price_per_hr": 0.005
     },
     {
         "id": 676146,
         "provider": null,
         "name": "t2.micro",
-        "num_cpus": 1,
-        "mem_size": 1,
-        "disk_size": 1,
-        "energy_consumption": 2.5,
+        "cpu": 1,
+        "ram_gb": 1,
+        "storage_gb": 1,
+        "energy_consumption_kwh": 2.5,
         "bandwidth": 1,
-        "price": 0.0015
+        "price_per_hr": 0.0015
     }
 ]
