@@ -3,7 +3,7 @@
     <div class="d-flex align-items-baseline column-gap-3">
         <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.non_toc_title }}</h{{ heading_level }}>
         <a
-            href="{% url editor_url_reverse_base resource_id %}?category={{ list_item|urlencode }}"
+            href="{% url editor_reverse_base resource_id %}?category={{ list_item|urlencode }}"
             class="btn btn-success">Edit</a>
     </div>
     <div class="bg-body-tertiary rounded p-3">

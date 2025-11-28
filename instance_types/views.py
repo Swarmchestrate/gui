@@ -43,7 +43,7 @@ class InstanceTypeViewMixin(
 ):
     api_client_class = InstanceTypeApiClient
     column_metadata_api_client_class = InstanceTypeColumnMetadataApiClient
-    editor_resource_list_url_reverse = "instance_types:instance_type_list"
+    resource_list_reverse = "instance_types:instance_type_list"
     resource_update_reverse = "instance_types:update_instance_type"
     new_resource_reverse = "instance_types:new_instance_type"
     resource_deletion_reverse = "instance_types:delete_instance_type"

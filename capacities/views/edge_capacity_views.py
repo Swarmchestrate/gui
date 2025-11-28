@@ -54,11 +54,11 @@ class EdgeCapacityViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = EdgeCapacityApiClient
-    editor_url_reverse_base = "capacities:edge_capacity_editor"
-    editor_start_url_reverse_base = "capacities:new_edge_capacity"
-    editor_overview_url_reverse_base = "capacities:edge_capacity_overview"
+    editor_reverse_base = "capacities:edge_capacity_editor"
+    editor_start_reverse_base = "capacities:new_edge_capacity"
+    editor_overview_reverse_base = "capacities:edge_capacity_overview"
     column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
-    editor_resource_list_url_reverse = "capacities:edge_capacity_list"
+    resource_list_reverse = "capacities:edge_capacity_list"
     new_resource_reverse = "capacities:new_edge_capacity"
     resource_deletion_reverse = "capacities:delete_edge_capacity"
     multi_resource_deletion_reverse = "capacities:delete_edge_capacities"

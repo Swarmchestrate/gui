@@ -44,7 +44,7 @@ class LocalityViewMixin(
 ):
     api_client_class = LocalityApiClient
     column_metadata_api_client_class = LocalityColumnMetadataApiClient
-    editor_resource_list_url_reverse = "localities:locality_list"
+    resource_list_reverse = "localities:locality_list"
     resource_update_reverse = "localities:update_locality"
     new_resource_reverse = "localities:new_locality"
     resource_deletion_reverse = "localities:delete_locality"

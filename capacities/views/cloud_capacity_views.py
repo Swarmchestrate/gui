@@ -58,11 +58,11 @@ class CloudCapacityViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = CloudCapacityApiClient
-    editor_url_reverse_base = "capacities:cloud_capacity_editor"
-    editor_start_url_reverse_base = "capacities:new_cloud_capacity"
-    editor_overview_url_reverse_base = "capacities:cloud_capacity_overview"
+    editor_reverse_base = "capacities:cloud_capacity_editor"
+    editor_start_reverse_base = "capacities:new_cloud_capacity"
+    editor_overview_reverse_base = "capacities:cloud_capacity_overview"
     column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
-    editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
+    resource_list_reverse = "capacities:cloud_capacity_list"
     new_resource_reverse = "capacities:new_cloud_capacity"
     resource_deletion_reverse = "capacities:delete_cloud_capacity"
     multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"

@@ -28,17 +28,17 @@ class ApiClientTemplateView(TemplateView):
 
 
 class EditorContextMixin(ContextMixin):
-    editor_start_url_reverse_base: str
-    editor_url_reverse_base: str
-    editor_overview_url_reverse_base: str
+    editor_start_reverse_base: str
+    editor_reverse_base: str
+    editor_overview_reverse_base: str
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "editor_url_reverse_base": self.editor_url_reverse_base,
-                "editor_start_url_reverse_base": self.editor_start_url_reverse_base,
-                "editor_overview_url_reverse_base": self.editor_overview_url_reverse_base,
+                "editor_reverse_base": self.editor_reverse_base,
+                "editor_start_reverse_base": self.editor_start_reverse_base,
+                "editor_overview_reverse_base": self.editor_overview_reverse_base,
             }
         )
         return context

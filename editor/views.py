@@ -104,7 +104,7 @@ class EditorStartFormView(
 ):
     api_client: ApiClient
     id_field: str
-    editor_url_reverse_base: str
+    editor_reverse_base: str
     resource_type_name_singular: str
 
     def get_context_data(self, **kwargs):
@@ -133,10 +133,8 @@ class EditorStartFormView(
             f"New {self.api_client.endpoint_definition.definition_name} registered.",
         )
         self.success_url = reverse_lazy(
-            self.editor_url_reverse_base,
-            kwargs={
-                "resource_id": new_resource.get(self.id_field),
-            },
+            self.editor_reverse_base,
+            kwargs={"resource_id": new_resource.get(self.id_field)},
         )
         return super().form_valid(form)
 
@@ -162,8 +160,8 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
     main_form_class: forms.Form
 
     api_client: ApiClient
-    editor_url_reverse_base: str
-    editor_overview_url_reverse_base: str
+    editor_reverse_base: str
+    editor_overview_reverse_base: str
     resource_type_name_singular: str
 
     def get_prev_and_next_list_items(self):
@@ -248,7 +246,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
         if next_list_item:
             self.success_url = "%s?category=%s" % (
                 reverse_lazy(
-                    self.editor_url_reverse_base,
+                    self.editor_reverse_base,
                     kwargs={
                         "resource_id": self.resource_id,
                     },
@@ -284,7 +282,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
     def dispatch(self, request, *args, **kwargs):
         self.category = self.request.GET.get("category", self._get_first_category())
         self.success_url = reverse_lazy(
-            self.editor_overview_url_reverse_base,
+            self.editor_overview_reverse_base,
             kwargs={
                 "resource_id": self.resource_id,
             },

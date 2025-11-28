@@ -81,7 +81,7 @@
                         <td class="align-middle px-3"></td>
                         <td class="font-monospace align-middle px-3">
                             {% block td_name_content %}
-                            <a href="{% url editor_overview_url_reverse_base resource_id %}">{{ resource_id }}</a>
+                            <a href="{% url editor_overview_reverse_base resource_id %}">{{ resource_id }}</a>
                             {% endblock td_name_content %}
                         </td>
                         <td class="text-body-secondary align-middle px-3">
@@ -103,7 +103,7 @@
                                 <li>
                                     {% block edit_button %}
                                     <a
-                                        href="{% url editor_url_reverse_base resource_id %}"
+                                        href="{% url editor_reverse_base resource_id %}"
                                         class="btn btn-light edit-btn">
                                         <i class="bi bi-pencil-fill" title="Edit"></i>
                                     </a>

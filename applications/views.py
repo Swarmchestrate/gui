@@ -33,11 +33,11 @@ class ApplicationViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = ApplicationApiClient
-    editor_url_reverse_base = "applications:application_editor"
-    editor_start_url_reverse_base = "applications:new_application"
-    editor_overview_url_reverse_base = "applications:application_overview"
+    editor_reverse_base = "applications:application_editor"
+    editor_start_reverse_base = "applications:new_application"
+    editor_overview_reverse_base = "applications:application_overview"
     column_metadata_api_client_class = ApplicationColumnMetadataApiClient
-    editor_resource_list_url_reverse = "applications:application_list"
+    resource_list_reverse = "applications:application_list"
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"
     multi_resource_deletion_reverse = "applications:delete_applications"

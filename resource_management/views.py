@@ -20,15 +20,11 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 class ResourceListContextMixin(ContextMixin):
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "editor_resource_list_url_reverse": self.editor_resource_list_url_reverse,
-            }
-        )
+        context.update({"resource_list_reverse": self.resource_list_reverse})
         return context
 
 
@@ -40,10 +36,10 @@ class NewResourceFormView(FormView):
     id_field: str
     resource_type_name_singular: str
 
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
 
     def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(self.editor_resource_list_url_reverse)
+        self.success_url = reverse_lazy(self.resource_list_reverse)
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -78,11 +74,11 @@ class ResourceUpdateFormView(FormView):
     id_field: str
     resource_type_name_singular: str
 
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        self.success_url = reverse_lazy(self.editor_resource_list_url_reverse)
+        self.success_url = reverse_lazy(self.resource_list_reverse)
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -100,7 +96,7 @@ class ResourceUpdateFormView(FormView):
             self.request,
             "The form submitted was not valid.",
         )
-        return redirect(self.editor_resource_list_url_reverse)
+        return redirect(self.resource_list_reverse)
 
     def form_valid(self, form):
         self.api_client.update(self.resource_id, form.cleaned_data)
@@ -115,11 +111,11 @@ class ResourceDeletionFormView(FormView):
     api_client: ApiClient
     resource_type_name_singular: str
 
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_list = self.api_client.get_resources()
-        self.success_url = reverse_lazy(self.editor_resource_list_url_reverse)
+        self.success_url = reverse_lazy(self.resource_list_reverse)
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
@@ -127,7 +123,7 @@ class ResourceDeletionFormView(FormView):
             self.request,
             f"The selected {self.resource_type_name_singular} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
-        return redirect(self.editor_resource_list_url_reverse)
+        return redirect(self.resource_list_reverse)
 
     def form_valid(self, form):
         resource_id_to_delete = form.cleaned_data.get("resource_id_to_delete")
@@ -147,11 +143,11 @@ class MultiResourceDeletionFormView(FormView):
     resource_type_name_singular: str
     resource_type_name_plural: str
 
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_list = self.api_client.get_resources()
-        self.success_url = reverse_lazy(self.editor_resource_list_url_reverse)
+        self.success_url = reverse_lazy(self.resource_list_reverse)
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -170,7 +166,7 @@ class MultiResourceDeletionFormView(FormView):
             self.request,
             f"The selected {self.resource_type_name_plural} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
-        return redirect(self.editor_resource_list_url_reverse)
+        return redirect(self.resource_list_reverse)
 
     def form_valid(self, form):
         resource_ids_to_delete = [
@@ -197,7 +193,7 @@ class ResourceListFormView(TemplateView):
     id_field: str
     resource_type_name_plural: str
 
-    editor_resource_list_url_reverse: str
+    resource_list_reverse: str
     new_resource_reverse: str
     resource_deletion_reverse: str
     multi_resource_deletion_reverse: str
