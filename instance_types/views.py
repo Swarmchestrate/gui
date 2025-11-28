@@ -52,29 +52,34 @@ class InstanceTypeViewMixin(
     resource_type_name_plural = "instance types"
 
 
-class InstanceTypeUpdateFormView(InstanceTypeViewMixin, ResourceUpdateFormView):
+class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView):
     template_name = "instance_types/instance_types.html"
-    form_class = InstanceTypeUpdateForm
+    new_resource_form_class = InstanceTypeRegistrationForm
+    resource_update_form_class = InstanceTypeUpdateForm
 
 
 class NewInstanceTypeFormView(InstanceTypeViewMixin, NewResourceFormView):
+    template_name = "instance_types/instance_types.html"
     form_class = InstanceTypeRegistrationForm
+    new_resource_form_class = InstanceTypeRegistrationForm
+    resource_update_form_class = InstanceTypeUpdateForm
+
+
+class InstanceTypeUpdateFormView(InstanceTypeViewMixin, ResourceUpdateFormView):
+    template_name = "instance_types/instance_types.html"
+    form_class = InstanceTypeUpdateForm
+    new_resource_form_class = InstanceTypeRegistrationForm
+    resource_update_form_class = InstanceTypeUpdateForm
 
 
 class InstanceTypeDeletionFormView(InstanceTypeViewMixin, ResourceDeletionFormView):
-    template_name = "instance_types/instance_types.html"
+    pass
 
 
 class MultiInstanceTypeDeletionFormView(
     InstanceTypeViewMixin, MultiResourceDeletionFormView
 ):
-    template_name = "instance_types/instance_types.html"
-
-
-class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView):
-    template_name = "instance_types/instance_types.html"
-    new_resource_form_class = InstanceTypeRegistrationForm
-    resource_update_form_class = InstanceTypeUpdateForm
+    pass
 
 
 class InstanceTypeEditorStartFormView(InstanceTypeViewMixin, EditorStartFormView):

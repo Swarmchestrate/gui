@@ -28,7 +28,93 @@ class ResourceListContextMixin(ContextMixin):
         return context
 
 
-class NewResourceFormView(FormView):
+class ResourceListFormView(TemplateView):
+    template_name = "resource_management/resource_list.html"
+    resource_deletion_form_class: type[ResourceDeletionForm] = ResourceDeletionForm
+    multi_resource_deletion_form_class: type[MultiResourceDeletionForm] = (
+        MultiResourceDeletionForm
+    )
+
+    api_client: ApiClient
+    column_metadata_api_client: ColumnMetadataApiClient
+    id_field: str
+    resource_type_name_plural: str
+
+    resource_list_reverse: str
+    new_resource_reverse: str
+    resource_deletion_reverse: str
+    multi_resource_deletion_reverse: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_list = self.api_client.get_resources()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "title": self.resource_type_name_plural.title(),
+                "new_resource_reverse": self.new_resource_reverse,
+                "resource_deletion_reverse": self.resource_deletion_reverse,
+                "resource_deletion_forms": {
+                    resource.get(self.id_field): self.resource_deletion_form_class(
+                        id_suffix=str(i),
+                        initial={"resource_id_to_delete": resource.get(self.id_field)},
+                    )
+                    for i, resource in enumerate(self.resource_list)
+                },
+                "multi_resource_deletion_reverse": self.multi_resource_deletion_reverse,
+                "multi_resource_deletion_form": self.multi_resource_deletion_form_class(
+                    resource_ids=[
+                        resource[self.id_field] for resource in self.resource_list
+                    ]
+                ),
+                "resources": {
+                    resource.get(self.id_field): resource
+                    for resource in self.resource_list
+                },
+            }
+        )
+        return context
+
+
+class BasicResourceListFormView(ResourceListFormView):
+    new_resource_form_class: type[forms.Form]
+    resource_update_form_class: type[OpenApiSpecificationBasedFormWithIdAttributeSuffix]
+
+    resource_update_reverse: str
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        new_resource_form = context.get("invalid_new_resource_form")
+        if not new_resource_form:
+            new_resource_form = self.new_resource_form_class(
+                self.api_client, self.column_metadata_api_client
+            )
+        invalid_update_form = context.get("invalid_update_form", dict())
+        resource_update_forms = {
+            str(resource.get(self.id_field)): self.resource_update_form_class(
+                self.api_client,
+                self.column_metadata_api_client,
+                id_suffix=str(resource.get(self.id_field)),
+                initial=resource,
+            )
+            for resource in self.resource_list
+        }
+        if invalid_update_form:
+            resource_update_forms.update(invalid_update_form)
+        context.update(
+            {
+                "new_resource_reverse": self.new_resource_reverse,
+                "resource_update_reverse": self.resource_update_reverse,
+                "new_resource_form": new_resource_form,
+                "resource_update_forms": resource_update_forms,
+            }
+        )
+        return context
+
+
+class NewResourceFormView(FormView, BasicResourceListFormView):
     form_class: type[forms.Form]
 
     api_client: ApiClient
@@ -57,7 +143,9 @@ class NewResourceFormView(FormView):
             self.request,
             "The form submitted was not valid.",
         )
-        return super().form_invalid(form)
+        return self.render_to_response(
+            self.get_context_data(invalid_new_resource_form=form)
+        )
 
     def form_valid(self, form):
         new_resource = self.api_client.register(form.cleaned_data)
@@ -66,7 +154,7 @@ class NewResourceFormView(FormView):
         return super().form_valid(form)
 
 
-class ResourceUpdateFormView(FormView):
+class ResourceUpdateFormView(FormView, BasicResourceListFormView):
     form_class: type[forms.Form]
 
     api_client: ApiClient
@@ -96,7 +184,9 @@ class ResourceUpdateFormView(FormView):
             self.request,
             "The form submitted was not valid.",
         )
-        return redirect(self.resource_list_reverse)
+        return self.render_to_response(
+            self.get_context_data(invalid_update_form={self.resource_id: form})
+        )
 
     def form_valid(self, form):
         self.api_client.update(self.resource_id, form.cleaned_data)
@@ -179,82 +269,3 @@ class MultiResourceDeletionFormView(FormView):
             success_msg = f"Deleted {len(resource_ids_to_delete)} {self.resource_type_name_plural}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
-
-
-class ResourceListFormView(TemplateView):
-    template_name = "resource_management/resource_list.html"
-    resource_deletion_form_class: type[ResourceDeletionForm] = ResourceDeletionForm
-    multi_resource_deletion_form_class: type[MultiResourceDeletionForm] = (
-        MultiResourceDeletionForm
-    )
-
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
-    id_field: str
-    resource_type_name_plural: str
-
-    resource_list_reverse: str
-    new_resource_reverse: str
-    resource_deletion_reverse: str
-    multi_resource_deletion_reverse: str
-
-    def dispatch(self, request, *args, **kwargs):
-        self.resource_list = self.api_client.get_resources()
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": self.resource_type_name_plural.title(),
-                "new_resource_reverse": self.new_resource_reverse,
-                "resource_deletion_reverse": self.resource_deletion_reverse,
-                "resource_deletion_forms": {
-                    resource.get(self.id_field): self.resource_deletion_form_class(
-                        id_suffix=str(i),
-                        initial={"resource_id_to_delete": resource.get(self.id_field)},
-                    )
-                    for i, resource in enumerate(self.resource_list)
-                },
-                "multi_resource_deletion_reverse": self.multi_resource_deletion_reverse,
-                "multi_resource_deletion_form": self.multi_resource_deletion_form_class(
-                    resource_ids=[
-                        resource[self.id_field] for resource in self.resource_list
-                    ]
-                ),
-                "resources": {
-                    resource.get(self.id_field): resource
-                    for resource in self.resource_list
-                },
-            }
-        )
-        return context
-
-
-class BasicResourceListFormView(ResourceListFormView):
-    new_resource_form_class: type[forms.Form]
-    resource_update_form_class: type[OpenApiSpecificationBasedFormWithIdAttributeSuffix]
-
-    resource_update_reverse: str
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "new_resource_reverse": self.new_resource_reverse,
-                "resource_update_reverse": self.resource_update_reverse,
-                "new_resource_form": self.new_resource_form_class(
-                    self.api_client, self.column_metadata_api_client
-                ),
-                "resource_update_forms": {
-                    resource.get(self.id_field): self.resource_update_form_class(
-                        self.api_client,
-                        self.column_metadata_api_client,
-                        id_suffix=str(i),
-                        initial=resource,
-                    )
-                    for i, resource in enumerate(self.resource_list)
-                },
-            }
-        )
-        return context
