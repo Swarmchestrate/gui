@@ -3,10 +3,22 @@ from django import forms
 from editor.forms.base_forms import OpenApiSpecificationBasedForm
 
 
-class OpenApiSpecificationBasedFormWithSuffix(OpenApiSpecificationBasedForm):
+class FormWithIdAttributeSuffix(forms.Form):
     def __init__(self, *args, id_suffix: str = "", **kwargs):
         kwargs.update({"auto_id": f"id_%s_{id_suffix}"})
         super().__init__(*args, **kwargs)
+
+
+class OpenApiSpecificationBasedFormWithIdAttributeSuffix(
+    FormWithIdAttributeSuffix, OpenApiSpecificationBasedForm
+):
+    pass
+
+
+class ResourceDeletionForm(FormWithIdAttributeSuffix):
+    resource_id_to_delete = forms.IntegerField(
+        required=True, widget=forms.HiddenInput()
+    )
 
 
 class MultiResourceDeletionForm(forms.Form):

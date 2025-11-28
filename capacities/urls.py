@@ -34,6 +34,11 @@ urlpatterns = [
         name="cloud_capacity_editor",
     ),
     path(
+        "cloud-capacities/<resource_id>/delete/",
+        cloud_capacity_views.CloudCapacityDeletionFormView.as_view(),
+        name="delete_cloud_capacity",
+    ),
+    path(
         "edge-capacities/",
         edge_capacity_views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",
@@ -57,5 +62,10 @@ urlpatterns = [
         "edge-capacities/<resource_id>/edit/",
         edge_capacity_views.EdgeCapacityEditorRouterView.as_view(),
         name="edge_capacity_editor",
+    ),
+    path(
+        "edge-capacities/<resource_id>/delete/",
+        edge_capacity_views.EdgeCapacityDeletionFormView.as_view(),
+        name="delete_edge_capacity",
     ),
 ]

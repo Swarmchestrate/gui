@@ -29,6 +29,7 @@ from editor.views import (
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
+    ResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -63,7 +64,8 @@ class CloudCapacityViewMixin(
     column_metadata_api_client_class = CloudCapacityColumnMetadataApiClient
     editor_resource_list_url_reverse = "capacities:cloud_capacity_list"
     new_resource_reverse = "capacities:new_cloud_capacity"
-    resource_deletion_reverse = "capacities:delete_cloud_capacities"
+    resource_deletion_reverse = "capacities:delete_cloud_capacity"
+    multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"
     resource_type_name_singular = "cloud capacity"
     resource_type_name_plural = "cloud capacities"
 
@@ -144,9 +146,15 @@ class CloudCapacityEditorRouterView(CloudCapacityViewMixin, CapacityEditorRouter
         return super().route_to_view(request, *args, **kwargs)
 
 
+class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
+    template_name = "capacities/cloud_capacities.html"
+    success_url = reverse_lazy("capacities:delete_cloud_capacities")
+
+
 class MultiCloudCapacityDeletionFormView(
     CloudCapacityViewMixin, MultiResourceDeletionFormView
 ):
+    template_name = "capacities/cloud_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
 
 

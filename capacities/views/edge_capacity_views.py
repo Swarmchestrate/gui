@@ -26,6 +26,7 @@ from editor.views import (
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
+    ResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -59,7 +60,8 @@ class EdgeCapacityViewMixin(
     column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient
     editor_resource_list_url_reverse = "capacities:edge_capacity_list"
     new_resource_reverse = "capacities:new_edge_capacity"
-    resource_deletion_reverse = "capacities:delete_edge_capacities"
+    resource_deletion_reverse = "capacities:delete_edge_capacity"
+    multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
     resource_type_name_singular = "edge capacity"
     resource_type_name_plural = "edge capacities"
 
@@ -138,9 +140,15 @@ class EdgeCapacityEditorRouterView(EdgeCapacityViewMixin, CapacityEditorRouterVi
         return super().route_to_view(request, *args, **kwargs)
 
 
+class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
+    template_name = "capacities/edge_capacities.html"
+    success_url = reverse_lazy("capacities:delete_cloud_capacities")
+
+
 class MultiEdgeCapacityDeletionFormView(
     EdgeCapacityViewMixin, MultiResourceDeletionFormView
 ):
+    template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_edge_capacities")
 
 

@@ -13,6 +13,7 @@ from editor.views import (
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
+    ResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceListFormView,
 )
@@ -38,7 +39,8 @@ class ApplicationViewMixin(
     column_metadata_api_client_class = ApplicationColumnMetadataApiClient
     editor_resource_list_url_reverse = "applications:application_list"
     new_resource_reverse = "applications:new_application"
-    resource_deletion_reverse = "applications:delete_applications"
+    resource_deletion_reverse = "applications:delete_application"
+    multi_resource_deletion_reverse = "applications:delete_applications"
     resource_type_name_singular = "application"
     resource_type_name_plural = "applications"
 
@@ -55,9 +57,15 @@ class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormVi
     success_url = reverse_lazy("applications:new_application")
 
 
+class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
+    template_name = "applications/applications.html"
+    success_url = "applications:application_list"
+
+
 class MultiApplicationDeletionFormView(
     ApplicationViewMixin, MultiResourceDeletionFormView
 ):
+    template_name = "applications/applications.html"
     success_url = "applications:application_list"
 
 

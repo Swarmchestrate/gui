@@ -26,6 +26,11 @@ urlpatterns = [
         name="update_locality",
     ),
     path(
+        "localities/<resource_id>/delete/",
+        views.LocalityDeletionFormView.as_view(),
+        name="delete_locality",
+    ),
+    path(
         "api/localities/search/",
         views.CapacityLocalityOptionsSearchProcessFormView.as_view(),
         name="locality_options_search",

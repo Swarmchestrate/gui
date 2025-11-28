@@ -1,6 +1,6 @@
 import { setupDialog } from "/static/dialog.js";
 
-const form = document.getElementById("resource-deletion-form");
+const form = document.getElementById("multi-resource-deletion-form");
 const deleteCheckedButton = document.getElementById("delete-checked-btn");
 const numCheckedElement = document.getElementById("num-checked");
 

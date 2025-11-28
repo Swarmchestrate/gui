@@ -30,4 +30,9 @@ urlpatterns = [
         views.ApplicationEditorProcessFormView.as_view(),
         name="application_editor",
     ),
+    path(
+        "applications/<resource_id>/delete/",
+        views.ApplicationDeletionFormView.as_view(),
+        name="delete_application",
+    ),
 ]

@@ -11,11 +11,11 @@ from editor.base_views import (
     ColumnMetadataApiClientTemplateView,
     ResourceTypeNameContextMixin,
 )
-from resource_management.formsets import OpenApiDefinitionBasedFormSet
 from resource_management.views import (
     BasicResourceListFormView,
     MultiResourceDeletionFormView,
     NewResourceFormView,
+    ResourceDeletionFormView,
     ResourceListContextMixin,
     ResourceUpdateFormView,
 )
@@ -47,7 +47,8 @@ class LocalityViewMixin(
     editor_resource_list_url_reverse = "localities:locality_list"
     resource_update_reverse = "localities:update_locality"
     new_resource_reverse = "localities:new_locality"
-    resource_deletion_reverse = "localities:delete_localities"
+    resource_deletion_reverse = "localities:delete_locality"
+    multi_resource_deletion_reverse = "localities:delete_localities"
     resource_type_name_singular = "locality"
     resource_type_name_plural = "localities"
 
@@ -60,8 +61,12 @@ class LocalityEditorStartFormView(LocalityViewMixin, NewResourceFormView):
     form_class = LocalityRegistrationForm
 
 
+class LocalityDeletionFormView(LocalityViewMixin, ResourceDeletionFormView):
+    template_name = "localities/localities.html"
+
+
 class MultiLocalityDeletionFormView(LocalityViewMixin, MultiResourceDeletionFormView):
-    pass
+    template_name = "localities/localities.html"
 
 
 class LocalityListFormView(LocalityViewMixin, BasicResourceListFormView):

@@ -1,7 +1,7 @@
 from django import forms
 
 from editor.forms.base_forms import EditorForm, OpenApiSpecificationBasedForm
-from resource_management.forms import OpenApiSpecificationBasedFormWithSuffix
+from resource_management.forms import OpenApiSpecificationBasedFormWithIdAttributeSuffix
 
 
 class LocalityRegistrationForm(OpenApiSpecificationBasedForm):
@@ -11,7 +11,7 @@ class LocalityRegistrationForm(OpenApiSpecificationBasedForm):
         return "new-" + field_name
 
 
-class LocalityUpdateForm(OpenApiSpecificationBasedFormWithSuffix):
+class LocalityUpdateForm(OpenApiSpecificationBasedFormWithIdAttributeSuffix):
     definition_name = "locality"
 
 

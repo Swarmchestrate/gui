@@ -35,7 +35,7 @@
         </ul>
         <p class="text-body-secondary">No {{ resource_type_name_plural|title }} have been registered.</p>
         {% else %}
-        <form id="resource-deletion-form" method="POST" action="{% url resource_deletion_reverse %}">
+        <form id="multi-resource-deletion-form" method="POST" action="{% url multi_resource_deletion_reverse %}">
             {% csrf_token %}
             <div>
                 <ul class="d-inline-flex column-gap-3 list-unstyled">
@@ -73,7 +73,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for checkbox in delete_form.resource_ids_to_delete %}
+                    {% for checkbox in multi_resource_deletion_form.resource_ids_to_delete %}
                     {% with resource_id=checkbox.data.value %}
                     {% with resource=resources|get_key_value_or_blank_string:resource_id %}
                     {% if resource %}
@@ -112,6 +112,7 @@
                                 <li>
                                     <button
                                         class="btn btn-light delete-btn"
+                                        data-dialog-id="delete-{{ resource_id }}-dialog"
                                         type="button">
                                         <i class="bi bi-trash3-fill" title="Delete"></i>
                                     </button>
@@ -129,12 +130,20 @@
         {% endif %}
     </div>
 </div>
-{% with dialog_id='delete-dialog' %}
-{% include 'resource_management/dialogs/delete_dialog.html' %}
-{% endwith %}
+{% for resource_id, form in resource_deletion_forms.items %}
+<div id="delete-dialogs">
+    {% with resource_id_str=resource_id|stringformat:'s' %}
+    {% with dialog_id='delete-'|add:resource_id_str|add:'-dialog' %}
+    {% include 'resource_management/dialogs/delete_dialog.html' %}
+    {% endwith %}
+    {% endwith %}
+</div>
+{% endfor %}
 {% with dialog_id='delete-multiple-dialog' %}
 {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
 {% endwith %}
-{% block extra_dialogs %}
-{% endblock extra_dialogs %}
+<div id="extra-dialogs">
+    {% block extra_dialogs %}
+    {% endblock extra_dialogs %}
+</div>
 {% endblock content %}
