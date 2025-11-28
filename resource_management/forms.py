@@ -9,7 +9,7 @@ class OpenApiSpecificationBasedFormWithSuffix(OpenApiSpecificationBasedForm):
         super().__init__(*args, **kwargs)
 
 
-class ResourceDeletionForm(forms.Form):
+class MultiResourceDeletionForm(forms.Form):
     def __init__(self, resource_ids: list[int], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["resource_ids_to_delete"].choices = [

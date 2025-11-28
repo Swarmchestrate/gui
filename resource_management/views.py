@@ -6,7 +6,7 @@ from django.views.generic.base import ContextMixin
 
 from editor.api.base_api_clients import ApiClient, ColumnMetadataApiClient
 
-from .forms import OpenApiSpecificationBasedFormWithSuffix, ResourceDeletionForm
+from .forms import MultiResourceDeletionForm, OpenApiSpecificationBasedFormWithSuffix
 
 
 # Create your views here.
@@ -101,7 +101,7 @@ class ResourceUpdateFormView(FormView):
 
 
 class MultiResourceDeletionFormView(FormView):
-    form_class = ResourceDeletionForm
+    form_class = MultiResourceDeletionForm
 
     api_client: ApiClient
     id_field: str
@@ -148,7 +148,9 @@ class MultiResourceDeletionFormView(FormView):
 
 class ResourceListFormView(TemplateView):
     template_name = "resource_management/resource_list.html"
-    resource_deletion_form_class: type[ResourceDeletionForm] = ResourceDeletionForm
+    resource_deletion_form_class: type[MultiResourceDeletionForm] = (
+        MultiResourceDeletionForm
+    )
 
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
