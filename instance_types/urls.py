@@ -16,13 +16,28 @@ urlpatterns = [
         name="new_instance_type",
     ),
     path(
-        "instance-types/<resource_id>/overview/",
-        views.InstanceTypeEditorOverviewTemplateView.as_view(),
-        name="instance_type_overview",
+        "instance-types/deletes/",
+        views.MultiInstanceTypeDeletionFormView.as_view(),
+        name="delete_instance_types",
     ),
+    # path(
+    #     "instance-types/<resource_id>/overview/",
+    #     views.InstanceTypeEditorOverviewTemplateView.as_view(),
+    #     name="instance_type_overview",
+    # ),
+    # path(
+    #     "instance-types/<resource_id>/edit/",
+    #     views.InstanceTypeEditorProcessFormView.as_view(),
+    #     name="instance_type_editor",
+    # ),
     path(
         "instance-types/<resource_id>/edit/",
-        views.InstanceTypeEditorProcessFormView.as_view(),
-        name="instance_type_editor",
+        views.InstanceTypeUpdateFormView.as_view(),
+        name="update_instance_type",
+    ),
+    path(
+        "instance-types/<resource_id>/delete/",
+        views.InstanceTypeDeletionFormView.as_view(),
+        name="delete_instance_type",
     ),
 ]

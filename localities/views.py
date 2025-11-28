@@ -57,7 +57,7 @@ class LocalityUpdateFormView(LocalityViewMixin, ResourceUpdateFormView):
     form_class = LocalityUpdateForm
 
 
-class LocalityEditorStartFormView(LocalityViewMixin, NewResourceFormView):
+class NewLocalityFormView(LocalityViewMixin, NewResourceFormView):
     form_class = LocalityRegistrationForm
 
 

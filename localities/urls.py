@@ -12,7 +12,7 @@ urlpatterns = [
     ),
     path(
         "localities/new/",
-        views.LocalityEditorStartFormView.as_view(),
+        views.NewLocalityFormView.as_view(),
         name="new_locality",
     ),
     path(

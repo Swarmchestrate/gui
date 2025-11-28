@@ -11,7 +11,14 @@ from editor.views import (
     EditorProcessFormView,
     EditorStartFormView,
 )
-from resource_management.views import ResourceListContextMixin, ResourceListFormView
+from resource_management.views import (
+    BasicResourceListFormView,
+    MultiResourceDeletionFormView,
+    NewResourceFormView,
+    ResourceDeletionFormView,
+    ResourceListContextMixin,
+    ResourceUpdateFormView,
+)
 
 # from .api.api_clients import (
 #     InstanceTypeApiClient,
@@ -21,24 +28,52 @@ from .api.mocks.mock_api_clients import (
     InstanceTypeApiClient,
     InstanceTypeColumnMetadataApiClient,
 )
-from .forms import InstanceTypeEditorForm, InstanceTypeRegistrationForm
+from .forms import (
+    InstanceTypeEditorForm,
+    InstanceTypeRegistrationForm,
+    InstanceTypeUpdateForm,
+)
 
 
 class InstanceTypeViewMixin(
     ApiClientTemplateView,
     ColumnMetadataApiClientTemplateView,
-    EditorContextMixin,
     ResourceTypeNameContextMixin,
     ResourceListContextMixin,
 ):
     api_client_class = InstanceTypeApiClient
-    editor_url_reverse_base = "instance_types:instance_type_editor"
-    editor_start_url_reverse_base = "instance_types:new_instance_type"
-    editor_overview_url_reverse_base = "instance_types:instance_type_overview"
     column_metadata_api_client_class = InstanceTypeColumnMetadataApiClient
     editor_resource_list_url_reverse = "instance_types:instance_type_list"
+    resource_update_reverse = "instance_types:update_instance_type"
+    new_resource_reverse = "instance_types:new_instance_type"
+    resource_deletion_reverse = "instance_types:delete_instance_type"
+    multi_resource_deletion_reverse = "instance_types:delete_instance_types"
     resource_type_name_singular = "instance type"
     resource_type_name_plural = "instance types"
+
+
+class InstanceTypeUpdateFormView(InstanceTypeViewMixin, ResourceUpdateFormView):
+    form_class = InstanceTypeUpdateForm
+
+
+class NewInstanceTypeFormView(InstanceTypeViewMixin, NewResourceFormView):
+    form_class = InstanceTypeRegistrationForm
+
+
+class InstanceTypeDeletionFormView(InstanceTypeViewMixin, ResourceDeletionFormView):
+    template_name = "instance_types/instance_types.html"
+
+
+class MultiInstanceTypeDeletionFormView(
+    InstanceTypeViewMixin, MultiResourceDeletionFormView
+):
+    template_name = "instance_types/instance_types.html"
+
+
+class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView):
+    template_name = "instance_types/instance_types.html"
+    new_resource_form_class = InstanceTypeRegistrationForm
+    resource_update_form_class = InstanceTypeUpdateForm
 
 
 class InstanceTypeEditorStartFormView(InstanceTypeViewMixin, EditorStartFormView):
@@ -51,10 +86,6 @@ class InstanceTypeEditorProcessFormView(InstanceTypeViewMixin, EditorProcessForm
     template_name = "instance_types/instance_type_editor.html"
     main_form_class = InstanceTypeEditorForm
     success_url = reverse_lazy("instance_types:new_instance_type")
-
-
-class InstanceTypeListFormView(InstanceTypeViewMixin, ResourceListFormView):
-    new_resource_reverse = "instance_types:new_instance_type"
 
 
 class InstanceTypeEditorOverviewTemplateView(

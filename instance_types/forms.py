@@ -1,6 +1,7 @@
 from django import forms
 
 from editor.forms.base_forms import (
+    EditorForm,
     OpenApiSpecificationBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
 )
@@ -9,6 +10,7 @@ from editor.forms.widget_choices import (
     mem_size_choices,
     num_cpus_choices,
 )
+from resource_management.forms import OpenApiSpecificationBasedFormWithIdAttributeSuffix
 
 # from .api.api_clients import (
 #     InstanceTypeApiClient,
@@ -20,8 +22,15 @@ from .api.mocks.mock_api_clients import (
 )
 
 
-class InstanceTypeRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
-    definition_name = "instance_type"
+class InstanceTypeRegistrationForm(OpenApiSpecificationBasedForm):
+    definition_name = "locality"
+
+    def add_prefix(self, field_name):
+        return "new-" + field_name
+
+
+class InstanceTypeUpdateForm(OpenApiSpecificationBasedFormWithIdAttributeSuffix):
+    definition_name = "locality"
 
 
 class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
