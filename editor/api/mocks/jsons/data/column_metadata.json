@@ -660,7 +660,7 @@
         "column_name": "architecture",
         "title": "Architecture",
         "category": "",
-        "description": "Capacity of data transfer supported (Mbps).",
+        "description": "Supported architecture types (e.g., x86, ARM).",
         "order": null
     },
     {
