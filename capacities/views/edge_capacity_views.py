@@ -12,6 +12,10 @@ from capacities.forms.edge_capacity_forms import (
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
+from capacities.utils import (
+    edge_capacity_type_readable,
+    edge_capacity_type_readable_plural,
+)
 from editor.base_views import (
     ApiClientTemplateView,
     ColumnMetadataApiClientTemplateView,
@@ -62,8 +66,8 @@ class EdgeCapacityViewMixin(
     new_resource_reverse = "capacities:new_edge_capacity"
     resource_deletion_reverse = "capacities:delete_edge_capacity"
     multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
-    resource_type_readable = "edge capacity"
-    resource_type_readable_plural = "edge capacities"
+    resource_type_readable = edge_capacity_type_readable()
+    resource_type_readable_plural = edge_capacity_type_readable_plural()
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):

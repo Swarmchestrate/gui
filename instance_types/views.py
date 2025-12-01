@@ -33,6 +33,7 @@ from .forms import (
     InstanceTypeRegistrationForm,
     InstanceTypeUpdateForm,
 )
+from .utils import instance_type_type_readable, instance_type_type_readable_plural
 
 
 class InstanceTypeViewMixin(
@@ -48,8 +49,8 @@ class InstanceTypeViewMixin(
     new_resource_reverse = "instance_types:new_instance_type"
     resource_deletion_reverse = "instance_types:delete_instance_type"
     multi_resource_deletion_reverse = "instance_types:delete_instance_types"
-    resource_type_readable = "instance type"
-    resource_type_readable_plural = "instance types"
+    resource_type_readable = instance_type_type_readable()
+    resource_type_readable_plural = instance_type_type_readable_plural()
 
 
 class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView):

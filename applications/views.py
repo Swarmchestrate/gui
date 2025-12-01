@@ -23,6 +23,7 @@ from .api.api_clients import (
     ApplicationColumnMetadataApiClient,
 )
 from .forms import ApplicationEditorForm, ApplicationRegistrationForm
+from .utils import application_type_readable, application_type_readable_plural
 
 
 class ApplicationViewMixin(
@@ -41,8 +42,8 @@ class ApplicationViewMixin(
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"
     multi_resource_deletion_reverse = "applications:delete_applications"
-    resource_type_readable = "application"
-    resource_type_readable_plural = "applications"
+    resource_type_readable = application_type_readable()
+    resource_type_readable_plural = application_type_readable_plural()
 
 
 class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):

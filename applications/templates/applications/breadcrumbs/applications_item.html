@@ -1,3 +1,5 @@
-{% with page_title='Applications' url_name='applications:application_list' %}
+{% load application_helpers %}
+{% application_type_readable_plural as page_title %}
+{% with page_title=page_title.title url_name='applications:application_list' %}
 {% include 'breadcrumbs/item_base.html' %}
 {% endwith %}

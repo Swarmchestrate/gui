@@ -34,6 +34,7 @@ from .forms import (
     LocalityUpdateForm,
 )
 from .formsets import LocalityEditorFormSet
+from .utils import locality_type_readable, locality_type_readable_plural
 
 
 class LocalityViewMixin(
@@ -49,8 +50,8 @@ class LocalityViewMixin(
     new_resource_reverse = "localities:new_locality"
     resource_deletion_reverse = "localities:delete_locality"
     multi_resource_deletion_reverse = "localities:delete_localities"
-    resource_type_readable = "locality"
-    resource_type_readable_plural = "localities"
+    resource_type_readable = locality_type_readable()
+    resource_type_readable_plural = locality_type_readable_plural()
 
 
 class LocalityUpdateFormView(LocalityViewMixin, ResourceUpdateFormView):

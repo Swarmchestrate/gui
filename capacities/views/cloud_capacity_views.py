@@ -15,6 +15,10 @@ from capacities.forms.cloud_capacity_forms import (
     CloudCapacityEditorForm,
     CloudCapacityRegistrationForm,
 )
+from capacities.utils import (
+    cloud_capacity_type_readable,
+    cloud_capacity_type_readable_plural,
+)
 from editor.base_views import (
     ApiClientTemplateView,
     ColumnMetadataApiClientTemplateView,
@@ -66,8 +70,8 @@ class CloudCapacityViewMixin(
     new_resource_reverse = "capacities:new_cloud_capacity"
     resource_deletion_reverse = "capacities:delete_cloud_capacity"
     multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"
-    resource_type_readable = "cloud capacity"
-    resource_type_readable_plural = "cloud capacities"
+    resource_type_readable = cloud_capacity_type_readable()
+    resource_type_readable_plural = cloud_capacity_type_readable_plural()
 
 
 class CloudCapacityEditorStartFormView(

@@ -83,6 +83,10 @@ TEMPLATES = [
             "libraries": {
                 "breadcrumbs": "utils.templatetags.breadcrumbs",
                 "helpers": "utils.templatetags.helpers",
+                "application_helpers": "applications.templatetags.application_helpers",
+                "capacity_helpers": "capacities.templatetags.capacity_helpers",
+                "instance_type_helpers": "instance_types.templatetags.instance_type_helpers",
+                "locality_helpers": "localities.templatetags.locality_helpers",
             },
         },
     },

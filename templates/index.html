@@ -1,20 +1,28 @@
 {% extends 'base.html' %}
+{% load capacity_helpers %}
+{% load application_helpers %}
 {% block content %}
 <h1>Swarmchestrate Application Templates</h1>
+{% capacity_type_readable_plural as capacity_type_readable_plural %}
+{% application_type_readable_plural as application_type_readable_plural %}
 <p>
     A portal for registering and managing Swarmchestrate Application
-    Templates (SATs) for Capacities, Applications and Instance Types.
+    Templates (SATs) for {{ capacity_type_readable_plural.title }} and {{ application_type_readable_plural.title }}.
 </p>
 <section>
-    <h2 class="fs-6 text-body-secondary">Cloud Capacities</h2>
+    {% cloud_capacity_type_readable as cloud_capacity_type_readable %}
+    {% cloud_capacity_type_readable_plural as cloud_capacity_type_readable_plural %}
+    <h2 class="fs-6 text-body-secondary">{{ cloud_capacity_type_readable_plural.title }}</h2>
     <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
         <li class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'capacities:cloud_capacity_list' %}" class="fw-medium text-decoration-none stretched-link">Cloud Capacities</a>
+                        <a
+                            href="{% url 'capacities:cloud_capacity_list' %}"
+                            class="fw-medium text-decoration-none stretched-link">{{ cloud_capacity_type_readable_plural.title }}</a>
                     </div>
-                    <p class="card-text">View registered Swarmchestrate Cloud Capacities.</p>
+                    <p class="card-text">View registered Swarmchestrate {{ cloud_capacity_type_readable_plural.title }}.</p>
                 </div>
             </div>
         </li>
@@ -22,24 +30,30 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'capacities:new_cloud_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Cloud Capacity</a>
+                        <a
+                            href="{% url 'capacities:new_cloud_capacity' %}"
+                            class="fw-medium text-decoration-none stretched-link">Register a New {{ cloud_capacity_type_readable.title }}</a>
                     </div>
-                    <p class="card-text">Register a new Swarmchestrate Cloud Capacity.</p>
+                    <p class="card-text">Register a new Swarmchestrate {{ cloud_capacity_type_readable.title }}.</p>
                 </div>
             </div>
         </li>
     </ul>
 </section>
 <section>
-    <h2 class="fs-6 text-body-secondary">Edge Capacities</h2>
+    {% edge_capacity_type_readable as edge_capacity_type_readable %}
+    {% edge_capacity_type_readable_plural as edge_capacity_type_readable_plural %}
+    <h2 class="fs-6 text-body-secondary">{{ edge_capacity_type_readable_plural.title }}</h2>
     <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
         <li class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'capacities:edge_capacity_list' %}" class="fw-medium text-decoration-none stretched-link">Edge Capacities</a>
+                        <a
+                            href="{% url 'capacities:edge_capacity_list' %}"
+                            class="fw-medium text-decoration-none stretched-link">{{ edge_capacity_type_readable_plural.title }}</a>
                     </div>
-                    <p class="card-text">View registered Swarmchestrate Edge Capacities.</p>
+                    <p class="card-text">View registered Swarmchestrate {{ edge_capacity_type_readable_plural.title }}.</p>
                 </div>
             </div>
         </li>
@@ -47,24 +61,29 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'capacities:new_edge_capacity' %}" class="fw-medium text-decoration-none stretched-link">Register a New Edge Capacity</a>
+                        <a
+                            href="{% url 'capacities:new_edge_capacity' %}"
+                            class="fw-medium text-decoration-none stretched-link">Register a New {{ edge_capacity_type_readable.title }}</a>
                     </div>
-                    <p class="card-text">Register a new Swarmchestrate Edge Capacity.</p>
+                    <p class="card-text">Register a new Swarmchestrate {{ edge_capacity_type_readable.title }}.</p>
                 </div>
             </div>
         </li>
     </ul>
 </section>
 <section>
-    <h2 class="fs-6 text-body-secondary">Applications</h2>
+    {% application_type_readable as application_type_readable %}
+    <h2 class="fs-6 text-body-secondary">{{ application_type_readable_plural.title }}</h2>
     <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
         <li class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'applications:application_list' %}" class="fw-medium text-decoration-none stretched-link">Applications</a>
+                        <a
+                            href="{% url 'applications:application_list' %}"
+                            class="fw-medium text-decoration-none stretched-link">{{ application_type_readable_plural.title }}</a>
                     </div>
-                    <p class="card-text">View registered Swarmchestrate Applications.</p>
+                    <p class="card-text">View registered Swarmchestrate {{ application_type_readable_plural.title }}.</p>
                 </div>
             </div>
         </li>
@@ -72,9 +91,11 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
-                        <a href="{% url 'applications:new_application' %}" class="fw-medium text-decoration-none stretched-link">Register a New Application</a>
+                        <a
+                            href="{% url 'applications:new_application' %}"
+                            class="fw-medium text-decoration-none stretched-link">Register a New {{ application_type_readable.title }}</a>
                     </div>
-                    <p class="card-text">Register a new Swarmchestrate application.</p>
+                    <p class="card-text">Register a new Swarmchestrate {{ application_type_readable.title }}.</p>
                 </div>
             </div>
         </li>
