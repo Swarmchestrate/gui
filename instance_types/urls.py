@@ -12,7 +12,7 @@ urlpatterns = [
     ),
     path(
         "instance-types/new/",
-        views.InstanceTypeEditorStartFormView.as_view(),
+        views.NewInstanceTypeFormView.as_view(),
         name="new_instance_type",
     ),
     path(
@@ -20,16 +20,6 @@ urlpatterns = [
         views.MultiInstanceTypeDeletionFormView.as_view(),
         name="delete_instance_types",
     ),
-    # path(
-    #     "instance-types/<resource_id>/overview/",
-    #     views.InstanceTypeEditorOverviewTemplateView.as_view(),
-    #     name="instance_type_overview",
-    # ),
-    # path(
-    #     "instance-types/<resource_id>/edit/",
-    #     views.InstanceTypeEditorProcessFormView.as_view(),
-    #     name="instance_type_editor",
-    # ),
     path(
         "instance-types/<resource_id>/edit/",
         views.InstanceTypeUpdateFormView.as_view(),

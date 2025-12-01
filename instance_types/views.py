@@ -81,21 +81,3 @@ class MultiInstanceTypeDeletionFormView(
     InstanceTypeViewMixin, MultiResourceDeletionFormView
 ):
     pass
-
-
-class InstanceTypeEditorStartFormView(InstanceTypeViewMixin, EditorStartFormView):
-    template_name = "instance_types/new_instance_type_start.html"
-    form_class = InstanceTypeRegistrationForm
-    success_url = reverse_lazy("instance_types:new_instance_type")
-
-
-class InstanceTypeEditorProcessFormView(InstanceTypeViewMixin, EditorProcessFormView):
-    template_name = "instance_types/instance_type_editor.html"
-    main_form_class = InstanceTypeEditorForm
-    success_url = reverse_lazy("instance_types:new_instance_type")
-
-
-class InstanceTypeEditorOverviewTemplateView(
-    InstanceTypeViewMixin, EditorOverviewTemplateView
-):
-    pass
