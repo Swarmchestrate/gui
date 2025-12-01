@@ -105,13 +105,13 @@ class EditorStartFormView(
     api_client: ApiClient
     id_field: str
     editor_reverse_base: str
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"New {self.resource_type_name_singular.title()}",
+                "title": f"New {self.resource_type_readable.title()}",
             }
         )
         return context
@@ -162,7 +162,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
     api_client: ApiClient
     editor_reverse_base: str
     editor_overview_reverse_base: str
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     def get_prev_and_next_list_items(self):
         index_of_current_category = self.category_names.index(self.category)
@@ -259,7 +259,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
         try:
             self.api_client.update(self.resource_id, update_data)
         except Exception:
-            error_msg = f"An error occurred whilst updating {self.resource_type_name_singular} {self.resource_id}. The update may not have been applied."
+            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
             return self.forms_invalid(forms, error_msg=error_msg)
 
@@ -287,9 +287,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
                 "resource_id": self.resource_id,
             },
         )
-        self.title_base = (
-            f"{self.resource_type_name_singular.title()} {self.resource_id}"
-        )
+        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -305,7 +303,7 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
         context.update(
             {
                 "title": f"{self.title_base} | {category_formatted}",
-                "main_subheading": self.resource_type_name_singular.title(),
+                "main_subheading": self.resource_type_readable.title(),
                 "main_heading": category_formatted,
                 "current_category": self.category,
                 "prev_list_item": prev_list_item,
@@ -431,7 +429,7 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
     template_name = "editor/overview.html"
 
     api_client: ApiClient
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
@@ -468,9 +466,9 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"{self.resource_type_name_singular.title()} {self.resource_id} | Overview",
+                "title": f"{self.resource_type_readable.title()} {self.resource_id} | Overview",
                 "main_heading": "Overview",
-                "main_subheading": f"{self.resource_type_name_singular.title()}",
+                "main_subheading": f"{self.resource_type_readable.title()}",
                 "resource_data_by_category": self.format_resource_data_for_template(),
                 "resource": self.resource,
             }

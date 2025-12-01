@@ -38,7 +38,7 @@ class ResourceListFormView(TemplateView):
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
     id_field: str
-    resource_type_name_plural: str
+    resource_type_readable_plural: str
 
     resource_list_reverse: str
     new_resource_reverse: str
@@ -53,7 +53,7 @@ class ResourceListFormView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": self.resource_type_name_plural.title(),
+                "title": self.resource_type_readable_plural.title(),
                 "new_resource_reverse": self.new_resource_reverse,
                 "resource_deletion_reverse": self.resource_deletion_reverse,
                 "resource_deletion_forms": {
@@ -120,7 +120,7 @@ class NewResourceFormView(FormView, BasicResourceListFormView):
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
     id_field: str
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     resource_list_reverse: str
 
@@ -149,7 +149,7 @@ class NewResourceFormView(FormView, BasicResourceListFormView):
 
     def form_valid(self, form):
         new_resource = self.api_client.register(form.cleaned_data)
-        success_msg = f"Registered {self.resource_type_name_singular} {new_resource.get(self.id_field)}."
+        success_msg = f"Registered {self.resource_type_readable} {new_resource.get(self.id_field)}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
@@ -160,7 +160,7 @@ class ResourceUpdateFormView(FormView, BasicResourceListFormView):
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
     id_field: str
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     resource_list_reverse: str
 
@@ -190,7 +190,7 @@ class ResourceUpdateFormView(FormView, BasicResourceListFormView):
 
     def form_valid(self, form):
         self.api_client.update(self.resource_id, form.cleaned_data)
-        success_msg = f"Updated {self.resource_type_name_singular} {self.resource_id}."
+        success_msg = f"Updated {self.resource_type_readable} {self.resource_id}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
@@ -199,7 +199,7 @@ class ResourceDeletionFormView(FormView):
     form_class = ResourceDeletionForm
 
     api_client: ApiClient
-    resource_type_name_singular: str
+    resource_type_readable: str
 
     resource_list_reverse: str
 
@@ -211,16 +211,14 @@ class ResourceDeletionFormView(FormView):
     def form_invalid(self, form):
         messages.error(
             self.request,
-            f"The selected {self.resource_type_name_singular} may not have been deleted as an error occurred during deletion. Please try again later.",
+            f"The selected {self.resource_type_readable} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
         return redirect(self.resource_list_reverse)
 
     def form_valid(self, form):
         resource_id_to_delete = form.cleaned_data.get("resource_id_to_delete")
         self.api_client.delete(resource_id_to_delete)
-        success_msg = (
-            f"Deleted {self.resource_type_name_singular} {resource_id_to_delete}."
-        )
+        success_msg = f"Deleted {self.resource_type_readable} {resource_id_to_delete}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
@@ -230,8 +228,8 @@ class MultiResourceDeletionFormView(FormView):
 
     api_client: ApiClient
     id_field: str
-    resource_type_name_singular: str
-    resource_type_name_plural: str
+    resource_type_readable: str
+    resource_type_readable_plural: str
 
     resource_list_reverse: str
 
@@ -254,7 +252,7 @@ class MultiResourceDeletionFormView(FormView):
     def form_invalid(self, form):
         messages.error(
             self.request,
-            f"The selected {self.resource_type_name_plural} may not have been deleted as an error occurred during deletion. Please try again later.",
+            f"The selected {self.resource_type_readable_plural} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
         return redirect(self.resource_list_reverse)
 
@@ -264,8 +262,8 @@ class MultiResourceDeletionFormView(FormView):
             for resource_id in form.cleaned_data.get("resource_ids_to_delete", [])
         ]
         self.api_client.delete_many(resource_ids_to_delete)
-        success_msg = f"Deleted 1 {self.resource_type_name_singular}."
+        success_msg = f"Deleted 1 {self.resource_type_readable}."
         if len(resource_ids_to_delete) != 1:
-            success_msg = f"Deleted {len(resource_ids_to_delete)} {self.resource_type_name_plural}."
+            success_msg = f"Deleted {len(resource_ids_to_delete)} {self.resource_type_readable_plural}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)

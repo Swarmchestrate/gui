@@ -53,15 +53,15 @@ class ColumnMetadataApiClientTemplateView(TemplateView):
 
 
 class ResourceTypeNameContextMixin(ContextMixin):
-    resource_type_name_singular: str
-    resource_type_name_plural: str
+    resource_type_readable: str
+    resource_type_readable_plural: str
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "resource_type_name_singular": self.resource_type_name_singular,
-                "resource_type_name_plural": self.resource_type_name_plural,
+                "resource_type_readable": self.resource_type_readable,
+                "resource_type_readable_plural": self.resource_type_readable_plural,
             }
         )
         return context

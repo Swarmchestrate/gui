@@ -49,8 +49,8 @@ class LocalityViewMixin(
     new_resource_reverse = "localities:new_locality"
     resource_deletion_reverse = "localities:delete_locality"
     multi_resource_deletion_reverse = "localities:delete_localities"
-    resource_type_name_singular = "locality"
-    resource_type_name_plural = "localities"
+    resource_type_readable = "locality"
+    resource_type_readable_plural = "localities"
 
 
 class LocalityUpdateFormView(LocalityViewMixin, ResourceUpdateFormView):

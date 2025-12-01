@@ -1,5 +1,4 @@
 from dateutil import parser
-
 from django import template
 
 register = template.Library()
@@ -8,9 +7,9 @@ register = template.Library()
 @register.filter
 def get_key_value_or_blank_string(d: dict, key: str):
     try:
-        return d.get(key, '')
+        return d.get(key, "")
     except AttributeError:
-        return ''
+        return ""
 
 
 @register.filter

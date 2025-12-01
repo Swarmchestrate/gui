@@ -66,8 +66,8 @@ class CloudCapacityViewMixin(
     new_resource_reverse = "capacities:new_cloud_capacity"
     resource_deletion_reverse = "capacities:delete_cloud_capacity"
     multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"
-    resource_type_name_singular = "cloud capacity"
-    resource_type_name_plural = "cloud capacities"
+    resource_type_readable = "cloud capacity"
+    resource_type_readable_plural = "cloud capacities"
 
 
 class CloudCapacityEditorStartFormView(

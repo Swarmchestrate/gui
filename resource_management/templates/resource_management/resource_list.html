@@ -33,7 +33,7 @@
                 {% endblock new_button %}
             </li>
         </ul>
-        <p class="text-body-secondary">No {{ resource_type_name_plural|title }} have been registered.</p>
+        <p class="text-body-secondary">No {{ resource_type_readable_plural|title }} have been registered.</p>
         {% else %}
         <form id="multi-resource-deletion-form" method="POST" action="{% url multi_resource_deletion_reverse %}">
             {% csrf_token %}

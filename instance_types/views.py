@@ -48,8 +48,8 @@ class InstanceTypeViewMixin(
     new_resource_reverse = "instance_types:new_instance_type"
     resource_deletion_reverse = "instance_types:delete_instance_type"
     multi_resource_deletion_reverse = "instance_types:delete_instance_types"
-    resource_type_name_singular = "instance type"
-    resource_type_name_plural = "instance types"
+    resource_type_readable = "instance type"
+    resource_type_readable_plural = "instance types"
 
 
 class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView):
@@ -60,16 +60,16 @@ class InstanceTypeListFormView(InstanceTypeViewMixin, BasicResourceListFormView)
 
 class NewInstanceTypeFormView(InstanceTypeViewMixin, NewResourceFormView):
     template_name = "instance_types/instance_types.html"
-    form_class = InstanceTypeRegistrationForm
     new_resource_form_class = InstanceTypeRegistrationForm
     resource_update_form_class = InstanceTypeUpdateForm
+    form_class = InstanceTypeRegistrationForm
 
 
 class InstanceTypeUpdateFormView(InstanceTypeViewMixin, ResourceUpdateFormView):
     template_name = "instance_types/instance_types.html"
-    form_class = InstanceTypeUpdateForm
     new_resource_form_class = InstanceTypeRegistrationForm
     resource_update_form_class = InstanceTypeUpdateForm
+    form_class = InstanceTypeUpdateForm
 
 
 class InstanceTypeDeletionFormView(InstanceTypeViewMixin, ResourceDeletionFormView):

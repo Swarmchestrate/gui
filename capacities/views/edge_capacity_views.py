@@ -62,8 +62,8 @@ class EdgeCapacityViewMixin(
     new_resource_reverse = "capacities:new_edge_capacity"
     resource_deletion_reverse = "capacities:delete_edge_capacity"
     multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
-    resource_type_name_singular = "edge capacity"
-    resource_type_name_plural = "edge capacities"
+    resource_type_readable = "edge capacity"
+    resource_type_readable_plural = "edge capacities"
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
