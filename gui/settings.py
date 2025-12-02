@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "capacities.apps.CapacitiesConfig",
     "capacity_energy_consumptions.apps.CapacityEnergyConsumptionsConfig",
     "capacity_operating_systems.apps.CapacityOperatingSystemsConfig",
+    "capacity_prices.apps.CapacityPricesConfig",
     "capacity_resource_quotas.apps.CapacityResourceQuotasConfig",
     "editor.apps.EditorConfig",
     "instance_types.apps.InstanceTypesConfig",
