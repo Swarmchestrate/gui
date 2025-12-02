@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.index, name="index"),
     path("", include("applications.urls")),
+    path("", include("application_behaviours.urls")),
     path("", include("capacities.urls")),
     path("", include("capacity_energy_consumptions.urls")),
     path("", include("capacity_instance_types.urls")),
