@@ -73,12 +73,14 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 continue
         return is_valid
 
-    def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_client.get_resources()
-        field_data = (
-            self.api_client.endpoint_definition.get_all_user_specifiable_fields()
-        )
-        for cm in column_metadata:
+    def _add_extra_metadata_to_field_data(
+        self, field_data: dict, extra_metadata: list[dict] | None = None
+    ):
+        if not extra_metadata:
+            extra_metadata = self.column_metadata_api_client.get_resources()
+        for cm in extra_metadata:
+            cm.update({"help_text": cm.get("description")})
+            cm.pop("description", None)
             field_name = cm.get("column_name")
             try:
                 field_data[field_name].update(cm)
@@ -86,10 +88,17 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 pass
         return field_data
 
+    def get_data_for_form_fields(self):
+        field_data = (
+            self.api_client.endpoint_definition.get_all_user_specifiable_fields()
+        )
+        field_data = self._add_extra_metadata_to_field_data(field_data)
+        return field_data
+
     def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():
             is_required = field_key in self.required_field_names
-            field = self.get_field(field_metadata, is_required=is_required)
+            field = self.get_field(field_key, field_metadata, is_required=is_required)
             self.fields.update(
                 {
                     field_key: field,
@@ -153,11 +162,11 @@ class OpenApiSpecificationBasedForm(EditorForm):
                     "label": field_label,
                 }
             )
-        field_description = field_metadata.get("description")
-        if field_description:
+        help_text = field_metadata.get("help_text")
+        if help_text:
             kwargs.update(
                 {
-                    "help_text": field_description,
+                    "help_text": help_text,
                 }
             )
             kwargs["widget"].attrs.update(
@@ -203,11 +212,9 @@ class OpenApiSpecificationBasedForm(EditorForm):
         }
 
     def get_field(
-        self, field_metadata: dict, is_required: bool = False
+        self, field_name: str, field_metadata: dict, is_required: bool = False
     ) -> list[forms.Field]:
-        field_components = self._get_field_components_for_foreign_key_field(
-            field_metadata.get("column_name", "")
-        )
+        field_components = self._get_field_components_for_foreign_key_field(field_name)
         if not field_components:
             # Determine field, widget and/or widget CSS classes
             # from OpenAPI spec metadata.
@@ -239,21 +246,18 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         super().__init__(api_client, *args, **kwargs)
 
     def get_data_for_form_fields(self):
-        column_metadata = self.column_metadata_api_client.get_resources_by_category(
+        extra_metadata = self.column_metadata_api_client.get_resources_by_category(
             self.category
         )
-        field_names = [r.get("column_name") for r in column_metadata]
+        field_names = [r.get("column_name") for r in extra_metadata]
         field_data = (
             self.api_client.endpoint_definition.get_user_specifiable_fields_with_names(
                 field_names
             )
         )
-        for cm in column_metadata:
-            field_name = cm.get("column_name")
-            try:
-                field_data[field_name].update(cm)
-            except KeyError:
-                pass
+        field_data = self._add_extra_metadata_to_field_data(
+            field_data, extra_metadata=extra_metadata
+        )
         return field_data
 
 
@@ -263,14 +267,11 @@ class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
             "column_name": "in.(%s)"
             % (",".join([f'"{rfn}"' for rfn in self.required_field_names])),
         }
-        column_metadata = self.column_metadata_api_client.get_resources(params=params)
         field_data = (
             self.api_client.endpoint_definition.get_required_user_specifiable_fields()
         )
-        for cm in column_metadata:
-            field_name = cm.get("column_name")
-            try:
-                field_data[field_name].update(cm)
-            except KeyError:
-                pass
+        extra_metadata = self.column_metadata_api_client.get_resources(params=params)
+        field_data = self._add_extra_metadata_to_field_data(
+            field_data, extra_metadata=extra_metadata
+        )
         return field_data
