@@ -211,10 +211,32 @@ class OpenApiSpecificationBasedForm(EditorForm):
             },
         }
 
+    def _get_field_components_for_enum_field(self, field_metadata: dict):
+        format = field_metadata.get("format", "")
+        if not format.endswith("enum"):
+            return
+        field_class = forms.ChoiceField
+        field_enums = field_metadata.get("enum", [])
+        if not field_enums:
+            return
+        choices = (
+            (field_enum, field_enum.replace("_", " ")) for field_enum in field_enums
+        )
+        return {
+            "field_class": field_class,
+            "widget_class": field_class.widget,
+            "css_classes": ["form-select"],
+            "extra_field_kwargs": {
+                "choices": choices,
+            },
+        }
+
     def get_field(
         self, field_name: str, field_metadata: dict, is_required: bool = False
     ) -> list[forms.Field]:
         field_components = self._get_field_components_for_foreign_key_field(field_name)
+        if not field_components:
+            field_components = self._get_field_components_for_enum_field(field_metadata)
         if not field_components:
             # Determine field, widget and/or widget CSS classes
             # from OpenAPI spec metadata.
