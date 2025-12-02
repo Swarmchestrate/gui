@@ -76,7 +76,27 @@
                             {% instance_type_type_readable_plural as instance_type_type_readable_plural %}
                             <a class="dropdown-item" href="{% url 'instance_types:instance_type_list' %}">{{ instance_type_type_readable_plural.title }}</a>
                         </li>
-                        <!-- Capacities -->
+                        <li>
+                            {% load capacity_energy_consumption_helpers %}
+                            {% capacity_energy_consumption_type_readable_plural as capacity_energy_consumption_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'capacity_energy_consumptions:capacity_energy_consumption_list' %}">{{ capacity_energy_consumption_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load capacity_operating_system_helpers %}
+                            {% capacity_operating_system_type_readable_plural as capacity_operating_system_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'capacity_operating_systems:capacity_operating_system_list' %}">{{ capacity_operating_system_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load capacity_price_helpers %}
+                            {% capacity_price_type_readable_plural as capacity_price_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'capacity_prices:capacity_price_list' %}">{{ capacity_price_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load capacity_resource_quota_helpers %}
+                            {% capacity_resource_quota_type_readable_plural as capacity_resource_quota_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'capacity_resource_quotas:capacity_resource_quota_list' %}">{{ capacity_resource_quota_type_readable_plural.title }}</a>
+                        </li>
+                        <!-- Applications -->
                         <li>
                             <div class="dropdown-header">{{ application_type_readable_plural.title }}</div>
                         </li>
