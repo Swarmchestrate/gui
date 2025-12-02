@@ -1,0 +1,10 @@
+[
+    {
+        "behaviour_id": 1,
+        "kind": "CronJob",
+        "replicas": 5,
+        "restart_policy": "Always",
+        "cron_schedule": "2 * * * *",
+        "json_k8s_patch": { "key": "value" }
+    }
+]
