@@ -1,0 +1,20 @@
+{
+    "required": ["price_id"],
+    "properties": {
+        "price_id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "cpu_price_per_hr": { "format": "numeric", "type": "number" },
+        "gb_ram_price_per_hr": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "gb_storage_price_per_hr": {
+            "format": "numeric",
+            "type": "number"
+        }
+    },
+    "type": "object"
+}
