@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "sass_processor",
     "applications.apps.ApplicationsConfig",
     "capacities.apps.CapacitiesConfig",
+    "capacity_operating_systems.apps.CapacityOperatingSystemsConfig",
     "editor.apps.EditorConfig",
     "instance_types.apps.InstanceTypesConfig",
     "localities.apps.LocalitiesConfig",

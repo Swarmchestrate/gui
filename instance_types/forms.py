@@ -1,10 +1,6 @@
 from django import forms
 
-from editor.forms.base_forms import (
-    EditorForm,
-    OpenApiSpecificationBasedForm,
-    OpenApiSpecificationBasedRegistrationForm,
-)
+from editor.forms.base_forms import OpenApiSpecificationBasedForm
 from editor.forms.widget_choices import (
     disk_size_choices,
     mem_size_choices,

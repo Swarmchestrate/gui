@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "capacity_id": 1,
+        "os_name": "Linux",
+        "os_uuid": "123",
+        "architecture": "ARM"
+    }
+]
