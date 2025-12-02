@@ -3,10 +3,10 @@ import os
 from django.conf import settings
 
 from application_environment_vars.api.api_clients import (
-    BaseApplicationEnvironmentVarsApiClient,
+    BaseApplicationEnvironmentVarApiClient,
 )
 from application_environment_vars.api.mocks.mock_definitions import (
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition,
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition,
 )
 from editor.api.mocks.mock_base_api_clients import (
     MockApiClient,
@@ -16,11 +16,11 @@ from editor.api.mocks.mock_base_api_clients import (
 BASE_DIR = settings.BASE_DIR
 
 
-class ApplicationEnvironmentVarsApiClient(
-    BaseApplicationEnvironmentVarsApiClient, MockApiClient
+class ApplicationEnvironmentVarApiClient(
+    BaseApplicationEnvironmentVarApiClient, MockApiClient
 ):
     endpoint_definition_class = (
-        ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition
+        ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
     )
 
     path_to_data = os.path.join(
@@ -37,7 +37,7 @@ class ApplicationEnvironmentVarsApiClient(
     )
 
 
-class ApplicationEnvironmentVarsColumnMetadataApiClient(MockColumnMetadataApiClient):
+class ApplicationEnvironmentVarColumnMetadataApiClient(MockColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         resources = super().get_resources()
         return [

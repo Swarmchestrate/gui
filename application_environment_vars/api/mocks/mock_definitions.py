@@ -3,13 +3,13 @@ import os
 from django.conf import settings
 
 from application_environment_vars.api.definitions import (
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinitionMixin,
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
 )
 from editor.api.mocks.mock_base_definitions import MockUserSpecifiableOpenApiDefinition
 
 
-class ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition(
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinitionMixin,
+class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
     MockUserSpecifiableOpenApiDefinition,
 ):
     path_to_definition = os.path.join(

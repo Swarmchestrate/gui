@@ -1,5 +1,5 @@
 from application_environment_vars.api.definitions import (
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition,
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition,
 )
 from editor.api.base_api_clients import (
     ApiClient,
@@ -8,19 +8,19 @@ from editor.api.base_api_clients import (
 )
 
 
-class BaseApplicationEnvironmentVarsApiClient(BaseApiClient):
+class BaseApplicationEnvironmentVarApiClient(BaseApiClient):
     endpoint = "application_environment_var"
 
 
-class ApplicationEnvironmentVarsApiClient(
-    BaseApplicationEnvironmentVarsApiClient, ApiClient
+class ApplicationEnvironmentVarApiClient(
+    BaseApplicationEnvironmentVarApiClient, ApiClient
 ):
     endpoint_definition_class = (
-        ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition
+        ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
     )
 
 
-class ApplicationEnvironmentVarsColumnMetadataApiClient(ColumnMetadataApiClient):
+class ApplicationEnvironmentVarColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()

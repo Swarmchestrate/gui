@@ -4,14 +4,14 @@ from editor.api.base_definitions import (
 )
 
 
-class ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinitionMixin(
+class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin(
     UserSpecifiableOpenApiDefinitionMixin
 ):
     id_field = "id"
 
 
 class InstanceTypeUserSpecifiableOpenApiDefinition(
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinitionMixin,
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
     UserSpecifiableOpenApiDefinition,
 ):
     def __init__(self, openapi_spec: dict) -> None:
@@ -19,8 +19,8 @@ class InstanceTypeUserSpecifiableOpenApiDefinition(
         self.definition_name = "application_environment_var"
 
 
-class ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinition(
-    ApplicationEnvironmentVarsUserSpecifiableOpenApiDefinitionMixin,
+class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(
+    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
     UserSpecifiableOpenApiDefinition,
 ):
     def __init__(self, openapi_spec: dict) -> None:
