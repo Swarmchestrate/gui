@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "applications.apps.ApplicationsConfig",
     "capacities.apps.CapacitiesConfig",
     "capacity_operating_systems.apps.CapacityOperatingSystemsConfig",
+    "capacity_resource_quotas.apps.CapacityResourceQuotasConfig",
     "editor.apps.EditorConfig",
     "instance_types.apps.InstanceTypesConfig",
     "localities.apps.LocalitiesConfig",

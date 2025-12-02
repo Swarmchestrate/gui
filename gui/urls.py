@@ -26,6 +26,7 @@ urlpatterns = [
     path("", include("applications.urls")),
     path("", include("capacities.urls")),
     path("", include("capacity_operating_systems.urls")),
+    path("", include("capacity_resource_quotas.urls")),
     path("", include("instance_types.urls")),
     path("", include("localities.urls")),
 ]
