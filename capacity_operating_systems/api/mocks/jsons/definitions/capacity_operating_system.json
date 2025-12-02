@@ -6,7 +6,11 @@
             "format": "integer",
             "type": "integer"
         },
-        "capacity_id": { "format": "integer", "type": "integer" },
+        "capacity_id": {
+            "description": "Note:\nThis is a Foreign Key to `capacity.capacity_id`.<fk table='capacity' column='capacity_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
         "os_name": { "format": "text", "type": "string" },
         "os_uuid": { "format": "text", "type": "string" },
         "architecture": {
