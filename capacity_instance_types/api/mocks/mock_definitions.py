@@ -1,11 +1,11 @@
 import os
 
+from capacity_instance_types.api.definitions import (
+    CapacityInstanceTypeUserSpecifiableOpenApiDefinitionMixin,
+)
 from django.conf import settings
 
 from editor.api.mocks.mock_base_definitions import MockUserSpecifiableOpenApiDefinition
-from instance_types.api.definitions import (
-    CapacityInstanceTypeUserSpecifiableOpenApiDefinitionMixin,
-)
 
 
 class CapacityInstanceTypeUserSpecifiableOpenApiDefinition(
@@ -14,7 +14,7 @@ class CapacityInstanceTypeUserSpecifiableOpenApiDefinition(
 ):
     path_to_definition = os.path.join(
         settings.BASE_DIR,
-        "instance_types",
+        "capacity_instance_types",
         "api",
         "mocks",
         "jsons",

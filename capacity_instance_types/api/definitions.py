@@ -22,7 +22,7 @@ class InstanceTypeUserSpecifiableOpenApiDefinition(
 ):
     def __init__(self, openapi_spec: dict) -> None:
         super().__init__(openapi_spec)
-        self.definition_name = "instance_type"
+        self.definition_name = "capacity_instance_type"
 
 
 class CapacityInstanceTypeUserSpecifiableOpenApiDefinition(

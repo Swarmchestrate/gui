@@ -5,7 +5,7 @@
 {{ field }}
 {% include 'localities/locality_section.html' %}
 {% elif field.name == 'instance_types' %}
-{% include 'instance_types/instance_types_section.html' %}
+{% include 'capacity_instance_types/capacity_instance_types_section.html' %}
 {% elif field.name in formset_tables %}
 {% with section_field=field formset=formset_tables|get_key_value_or_empty_dict:field.name %}
 {% include 'editor/util_templates/formset_table_section_template.html' %}

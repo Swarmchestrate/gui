@@ -1,13 +1,15 @@
+from capacity_instance_types.api.definitions import (
+    CapacityInstanceTypeUserSpecifiableOpenApiDefinition,
+)
 from editor.api.base_api_clients import (
     ApiClient,
     BaseApiClient,
     ColumnMetadataApiClient,
 )
-from instance_types.api.definitions import InstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class BaseInstanceTypeApiClient(BaseApiClient):
-    endpoint = "instance_types"
+class BaseCapacityInstanceTypeApiClient(BaseApiClient):
+    endpoint = "capacity_instance_types"
 
     def _prepare_update_data(self, data: dict):
         data = super()._prepare_update_data(data)
@@ -16,17 +18,17 @@ class BaseInstanceTypeApiClient(BaseApiClient):
         return data
 
 
-class InstanceTypeApiClient(BaseInstanceTypeApiClient, ApiClient):
-    endpoint_definition_class = InstanceTypeUserSpecifiableOpenApiDefinition
+class CapacityInstanceTypeApiClient(BaseCapacityInstanceTypeApiClient, ApiClient):
+    endpoint_definition_class = CapacityInstanceTypeUserSpecifiableOpenApiDefinition
 
 
-class InstanceTypeColumnMetadataApiClient(ColumnMetadataApiClient):
+class CapacityInstanceTypeColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
         params.update(
             {
-                "table_name": "eq.instance_types",
+                "table_name": "eq.capacity_instance_types",
             }
         )
         return super().get_resources(params=params)

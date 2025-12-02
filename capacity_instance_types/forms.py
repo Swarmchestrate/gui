@@ -9,27 +9,29 @@ from editor.forms.widget_choices import (
 from resource_management.forms import OpenApiSpecificationBasedFormWithIdAttributeSuffix
 
 # from .api.api_clients import (
-#     InstanceTypeApiClient,
-#     InstanceTypeColumnMetadataApiClient,
+#     CapacityInstanceTypeApiClient,
+#     CapacityInstanceTypeColumnMetadataApiClient,
 # )
 from .api.mocks.mock_api_clients import (
-    InstanceTypeApiClient,
-    InstanceTypeColumnMetadataApiClient,
+    CapacityInstanceTypeApiClient,
+    CapacityInstanceTypeColumnMetadataApiClient,
 )
 
 
-class InstanceTypeRegistrationForm(OpenApiSpecificationBasedForm):
-    definition_name = "locality"
+class CapacityInstanceTypeRegistrationForm(OpenApiSpecificationBasedForm):
+    definition_name = "capacity_instance_type"
 
     def add_prefix(self, field_name):
         return "new-" + field_name
 
 
-class InstanceTypeUpdateForm(OpenApiSpecificationBasedFormWithIdAttributeSuffix):
-    definition_name = "locality"
+class CapacityInstanceTypeUpdateForm(
+    OpenApiSpecificationBasedFormWithIdAttributeSuffix
+):
+    definition_name = "capacity_instance_type"
 
 
-class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
+class CapacityInstanceTypeEditorForm(OpenApiSpecificationBasedForm):
     widget_enhancements = {
         "num_cpus": forms.Select(
             choices=num_cpus_choices(), attrs={"class": "form-select"}
@@ -43,14 +45,14 @@ class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
     }
 
     def __init__(self, *args, **kwargs):
-        instance_type_api_client = InstanceTypeApiClient()
+        capacity_instance_type_api_client = CapacityInstanceTypeApiClient()
         super().__init__(
-            instance_type_api_client,
-            InstanceTypeColumnMetadataApiClient(),
+            capacity_instance_type_api_client,
+            CapacityInstanceTypeColumnMetadataApiClient(),
             *args,
             **kwargs,
         )
-        self.fields[instance_type_api_client.endpoint_definition.id_field] = (
+        self.fields[capacity_instance_type_api_client.endpoint_definition.id_field] = (
             forms.IntegerField(required=False, widget=forms.HiddenInput())
         )
         # Add widget enhancements
@@ -59,7 +61,7 @@ class InstanceTypeEditorForm(OpenApiSpecificationBasedForm):
                 continue
             self.fields[field_name].widget = widget
 
-    definition_name = "instance_type"
+    definition_name = "capacity_instance_type"
 
     unsaved = forms.BooleanField(
         required=False,

@@ -3,7 +3,7 @@ from django.forms import CheckboxInput
 from editor.base_formsets import BaseEditorFormSet
 
 
-class InstanceTypeFormSet(BaseEditorFormSet):
+class CapacityInstanceTypeFormSet(BaseEditorFormSet):
     non_api_data_fields = [
         "DELETE",
         "unsaved",

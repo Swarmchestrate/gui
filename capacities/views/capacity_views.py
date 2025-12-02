@@ -10,15 +10,17 @@ from capacities.formsets.capacity_formsets import (
     CapacityPriceEditorFormSet,
     CapacitySecurityPortsEditorFormSet,
 )
+
+# from capacity_instance_types.api.api_clients import CapacityInstanceTypeApiClient
+from capacity_instance_types.api.mocks.mock_api_clients import (
+    CapacityInstanceTypeApiClient,
+)
+from capacity_instance_types.forms import CapacityInstanceTypeEditorForm
+from capacity_instance_types.formsets import CapacityInstanceTypeFormSet
 from editor.views import (
     EditorRouterView,
     MultipleEditorFormsetProcessFormView,
 )
-
-# from instance_types.api.api_clients import InstanceTypeApiClient
-from instance_types.api.mocks.mock_api_clients import InstanceTypeApiClient
-from instance_types.forms import InstanceTypeEditorForm
-from instance_types.formsets import InstanceTypeFormSet
 from localities.views import LocalityFormSetEditorViewMixin
 
 
@@ -142,8 +144,8 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
 
     def process_instance_types(
         self,
-        formset: InstanceTypeFormSet,
-        api_client_class: InstanceTypeApiClient,
+        formset: CapacityInstanceTypeFormSet,
+        api_client_class: CapacityInstanceTypeApiClient,
     ):
         instance_type_api_client = api_client_class()
         inst_type_id_field_name = instance_type_api_client.endpoint_definition.id_field
@@ -220,7 +222,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
             isinstance(instance_type_id, int) for instance_type_id in instance_type_ids
         ):
             return initial
-        instance_type_api_client = InstanceTypeApiClient()
+        instance_type_api_client = CapacityInstanceTypeApiClient()
         instance_types = instance_type_api_client.get_resources_by_ids(
             instance_type_ids
         )
@@ -254,10 +256,10 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
     def dispatch(self, request, *args, **kwargs):
         self.instance_types_property_name = "instance_types"
         self.add_instance_type_formset(
-            InstanceTypeEditorForm,
+            CapacityInstanceTypeEditorForm,
             self.instance_types_property_name,
-            InstanceTypeFormSet,
-            InstanceTypeApiClient,
+            CapacityInstanceTypeFormSet,
+            CapacityInstanceTypeApiClient,
             self.process_instance_types,
             extra_formset_factory_kwargs={
                 "extra": 0,
@@ -275,7 +277,7 @@ class CapacitySpecsEditorProcessFormView(MultipleEditorFormsetProcessFormView):
         context.update(
             {
                 "instance_type_list_item_template": render_to_string(
-                    "instance_types/instance_type_list_item.html",
+                    "capacity_instance_types/capacity_instance_type_list_item.html",
                     {
                         "form": (
                             context.get("formsets", {})

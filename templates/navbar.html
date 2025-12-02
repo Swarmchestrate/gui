@@ -72,9 +72,9 @@
                             <a class="dropdown-item" href="{% url 'localities:locality_list' %}">{{ locality_type_readable_plural.title }}</a>
                         </li>
                         <li>
-                            {% load instance_type_helpers %}
-                            {% instance_type_type_readable_plural as instance_type_type_readable_plural %}
-                            <a class="dropdown-item" href="{% url 'instance_types:instance_type_list' %}">{{ instance_type_type_readable_plural.title }}</a>
+                            {% load capacity_instance_type_helpers %}
+                            {% capacity_instance_type_type_readable_plural as capacity_instance_type_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'capacity_instance_types:capacity_instance_type_list' %}">{{ capacity_instance_type_type_readable_plural.title }}</a>
                         </li>
                         <li>
                             {% load capacity_energy_consumption_helpers %}

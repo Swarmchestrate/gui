@@ -3,7 +3,7 @@
     <div id="instance-types-list" class="list-group mb-4">
         {% for form in instance_types_formset %}
         {% with counter_str=forloop.counter0|stringformat:'s' %}
-        {% include 'instance_types/instance_type_list_item.html' with dialog_id='instance-type-'|add:counter_str|add:'-dialog' %}
+        {% include 'capacity_instance_types/capacity_instance_type_list_item.html' with dialog_id='instance-type-'|add:counter_str|add:'-dialog' %}
         {% endwith %}
         {% endfor %}
         <button
@@ -18,14 +18,14 @@
     {{ instance_types_formset.management_form }}
     {# New instance type dialog #}
     {% with dialog_id='instance-type-__prefix__-dialog' dialog_header_text='New Instance Type' form=instance_types_formset.empty_form %}
-    {% include 'instance_types/dialogs/instance_type_dialog.html' %}
+    {% include 'capacity_instance_types/dialogs/capacity_instance_type_dialog.html' %}
     {% endwith %}
 
     {# Instance type editor dialog #}
     {% for form in instance_types_formset %}
     {% with counter_str=forloop.counter0|stringformat:'s' %}
     {% with dialog_id='instance-type-'|add:counter_str|add:'-dialog' dialog_extra_classes='instance-type-formset-instance-dialog' %}
-    {% include 'instance_types/dialogs/instance_type_dialog.html' %}
+    {% include 'capacity_instance_types/dialogs/capacity_instance_type_dialog.html' %}
     {% endwith %}
     {% endwith %}
     {% endfor %}
