@@ -393,6 +393,14 @@
     },
     {
         "table_name": "capacity",
+        "column_name": "resource_quota_id",
+        "title": "Resource Quota",
+        "category": "Specs",
+        "description": "Available capacity as CPU/RAM/Memory quota. Either use resource_quota or instance_quota.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
         "column_name": "price",
         "title": "Price",
         "category": "Metadata",
