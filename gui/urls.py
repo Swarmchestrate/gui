@@ -25,6 +25,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("", include("applications.urls")),
     path("", include("application_behaviours.urls")),
+    path("", include("application_colocations.urls")),
     path("", include("application_environment_vars.urls")),
     path("", include("application_pref_resource_providers.urls")),
     path("", include("application_security_rules.urls")),
