@@ -12,7 +12,9 @@
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
+{% block title %}
 <h1>{{ title }}</h1>
+{% endblock title %}
 {% if description %}
 <p class="pb-4">{{ description }}</p>
 {% endif %}
