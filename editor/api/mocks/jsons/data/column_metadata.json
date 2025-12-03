@@ -560,6 +560,14 @@
         "order": null
     },
     {
+        "table_name": "capacity",
+        "column_name": "operating_system_id",
+        "title": "Operating System",
+        "category": "System Specific",
+        "description": "Supported operating systems with IDs (limited to Debian, Ubuntu, CentOS).",
+        "order": null
+    },
+    {
         "table_name": "instance_type",
         "column_name": "name",
         "title": "Name",
