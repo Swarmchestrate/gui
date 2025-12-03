@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "application_id": 1,
+        "volume_type": "Exists",
+        "volume_path": "/path/to/volume",
+        "mount_path": "/path/to/mount",
+        "target": "target",
+        "json_k8s_extra": { "key": "value" }
+    }
+]
