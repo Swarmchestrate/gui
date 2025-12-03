@@ -3,4 +3,4 @@ def application_pref_resource_provider_type_readable() -> str:
 
 
 def application_pref_resource_provider_type_readable_plural() -> str:
-    return "preferred resource provider"
+    return "preferred resource providers"
