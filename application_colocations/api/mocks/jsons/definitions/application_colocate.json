@@ -1,0 +1,14 @@
+{
+    "required": ["id"],
+    "properties": {
+        "id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "application_id": { "format": "integer", "type": "integer" },
+        "target": { "format": "text", "type": "string" },
+        "json_k8s_extra": { "format": "jsonb" }
+    },
+    "type": "object"
+}
