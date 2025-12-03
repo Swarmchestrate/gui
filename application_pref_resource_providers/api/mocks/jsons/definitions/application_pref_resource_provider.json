@@ -1,0 +1,14 @@
+{
+    "required": ["id", "provider_name"],
+    "properties": {
+        "id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "application_id": { "format": "integer", "type": "integer" },
+        "provider_name": { "format": "text", "type": "string" },
+        "weight": { "format": "numeric", "type": "number" }
+    },
+    "type": "object"
+}
