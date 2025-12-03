@@ -26,6 +26,7 @@ urlpatterns = [
     path("", include("applications.urls")),
     path("", include("application_behaviours.urls")),
     path("", include("application_environment_vars.urls")),
+    path("", include("application_security_rules.urls")),
     path("", include("application_volumes.urls")),
     path("", include("capacities.urls")),
     path("", include("capacity_energy_consumptions.urls")),
