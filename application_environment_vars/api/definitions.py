@@ -10,15 +10,6 @@ class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin(
     id_field = "id"
 
 
-class InstanceTypeUserSpecifiableOpenApiDefinition(
-    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
-    UserSpecifiableOpenApiDefinition,
-):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "application_environment_var"
-
-
 class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(
     ApplicationEnvironmentVarUserSpecifiableOpenApiDefinitionMixin,
     UserSpecifiableOpenApiDefinition,
