@@ -54,6 +54,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
             self.api_client.endpoint_definition.get_required_field_names()
         )
         field_data = self.get_data_for_form_fields()
+        field_data = self._add_foreign_key_referrer_field_data(field_data)
+        field_data = self.add_extra_metadata_to_field_data(field_data)
         self.populate_form_fields(field_data)
 
     def is_valid(self):
@@ -73,12 +75,15 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 continue
         return is_valid
 
-    def _add_extra_metadata_to_field_data(
-        self, field_data: dict, extra_metadata: list[dict] | None = None
-    ):
-        if not extra_metadata:
-            extra_metadata = self.column_metadata_api_client.get_resources()
-        for cm in extra_metadata:
+    def add_extra_metadata_to_field_data(self, field_data: dict):
+        column_metadata = self.column_metadata_api_client.get_resources()
+        column_metadata_by_column_name = dict(
+            (cm.get("column_name"), cm) for cm in column_metadata
+        )
+        for field_name, field_metadata in field_data.items():
+            cm = column_metadata_by_column_name.get(field_name)
+            if not cm:
+                continue
             cm.update({"help_text": cm.get("description")})
             cm.pop("description", None)
             field_name = cm.get("column_name")
@@ -88,22 +93,60 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 pass
         return field_data
 
+    def _add_foreign_key_referrer_field_data(self, field_metadata: dict) -> dict:
+        definitions = self.api_client.get_definitions()
+        for definition_key, definition in definitions.items():
+            properties = definition.get("properties", dict())
+            if not properties:
+                continue
+            properties_containing_endpoint_name = [
+                property
+                for property in properties.values()
+                if (
+                    self.api_client.endpoint in property.get("description", "")
+                    and lxml.html.fromstring(property.get("description", "")).xpath(
+                        "fk/@table"
+                    )
+                )
+            ]
+            if not properties_containing_endpoint_name:
+                continue
+            fk_referer_api_client = MockApiClient.get_client_instance_by_endpoint(
+                definition_key
+            )
+            if not fk_referer_api_client:
+                continue
+            resources = fk_referer_api_client.get_resources()
+            choices = [
+                (
+                    r.get(fk_referer_api_client.endpoint_definition.id_field),
+                    f"{fk_referer_api_client.endpoint.title()} {r.get(fk_referer_api_client.endpoint_definition.id_field)}",
+                )
+                for r in resources
+            ]
+            if definition_key in field_metadata:
+                continue
+            field_metadata.update(
+                {
+                    definition_key: {
+                        "type": "foreign_key_referrer",
+                        "choices": choices,
+                    }
+                }
+            )
+        return field_metadata
+
     def get_data_for_form_fields(self):
         field_data = (
             self.api_client.endpoint_definition.get_all_user_specifiable_fields()
         )
-        field_data = self._add_extra_metadata_to_field_data(field_data)
         return field_data
 
     def populate_form_fields(self, field_data: dict):
         for field_key, field_metadata in field_data.items():
             is_required = field_key in self.required_field_names
             field = self.get_field(field_key, field_metadata, is_required=is_required)
-            self.fields.update(
-                {
-                    field_key: field,
-                }
-            )
+            self.fields.update({field_key: field})
 
     def _get_initial_field_vars_from_field_format(self, field_format: str):
         field_class = forms.CharField
@@ -177,6 +220,22 @@ class OpenApiSpecificationBasedForm(EditorForm):
         kwargs.update(extra_field_kwargs)
         return kwargs
 
+    def _get_field_components_for_foreign_key_referrer_field(
+        self, field_metadata: dict
+    ) -> dict | None:
+        if not field_metadata.get("type") == "foreign_key_referrer":
+            return
+        choices = field_metadata.get("choices")
+        field_class = forms.MultipleChoiceField
+        return {
+            "field_class": field_class,
+            "widget_class": field_class.widget,
+            "css_classes": ["form-select"],
+            "extra_field_kwargs": {
+                "choices": choices,
+            },
+        }
+
     def _get_field_components_for_foreign_key_field(
         self, field_name: str
     ) -> dict | None:
@@ -234,7 +293,13 @@ class OpenApiSpecificationBasedForm(EditorForm):
     def get_field(
         self, field_name: str, field_metadata: dict, is_required: bool = False
     ) -> list[forms.Field]:
-        field_components = self._get_field_components_for_foreign_key_field(field_name)
+        field_components = self._get_field_components_for_foreign_key_referrer_field(
+            field_metadata
+        )
+        if not field_components:
+            field_components = self._get_field_components_for_foreign_key_field(
+                field_name
+            )
         if not field_components:
             field_components = self._get_field_components_for_enum_field(field_metadata)
         if not field_components:
@@ -277,23 +342,8 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
                 field_names
             )
         )
-        field_data = self._add_extra_metadata_to_field_data(
-            field_data, extra_metadata=extra_metadata
-        )
         return field_data
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
-    def get_data_for_form_fields(self):
-        params = {
-            "column_name": "in.(%s)"
-            % (",".join([f'"{rfn}"' for rfn in self.required_field_names])),
-        }
-        field_data = (
-            self.api_client.endpoint_definition.get_required_user_specifiable_fields()
-        )
-        extra_metadata = self.column_metadata_api_client.get_resources(params=params)
-        field_data = self._add_extra_metadata_to_field_data(
-            field_data, extra_metadata=extra_metadata
-        )
-        return field_data
+    pass
