@@ -15,10 +15,6 @@
                         {{ capacity_type_readable_plural.title }}
                     </a>
                     <ul class="dropdown-menu shadow">
-                        <!-- Manage -->
-                        <li>
-                            <div class="dropdown-header">Manage</div>
-                        </li>
                         <li>
                             {% cloud_capacity_type_readable_plural as cloud_capacity_type_readable_plural %}
                             <a class="dropdown-item" href="{% url 'capacities:cloud_capacity_list' %}">{{ cloud_capacity_type_readable_plural.title }}</a>
@@ -27,44 +23,9 @@
                             {% edge_capacity_type_readable_plural as edge_capacity_type_readable_plural %}
                             <a class="dropdown-item" href="{% url 'capacities:edge_capacity_list' %}">{{ edge_capacity_type_readable_plural.title }}</a>
                         </li>
-                        <!-- Register -->
+                        <!-- Related resources -->
                         <li>
-                            <div class="dropdown-header">Add</div>
-                        </li>
-                        <li>
-                            {% cloud_capacity_type_readable as cloud_capacity_type_readable %}
-                            <a class="dropdown-item" href="{% url 'capacities:new_cloud_capacity' %}">New {{ cloud_capacity_type_readable.title }}</a>
-                        </li>
-                        <li>
-                            {% edge_capacity_type_readable as edge_capacity_type_readable %}
-                            <a class="dropdown-item" href="{% url 'capacities:new_edge_capacity' %}">New {{ edge_capacity_type_readable.title }}</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    {% load application_helpers %}
-                    {% application_type_readable as application_type_readable %}
-                    {% application_type_readable_plural as application_type_readable_plural %}
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ application_type_readable_plural.title }}
-                    </a>
-                    <ul class="dropdown-menu shadow">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'applications:application_list' %}">{{ application_type_readable_plural.title }}</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'applications:new_application' %}">New {{ application_type_readable.title }}</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Other Resources
-                    </a>
-                    <ul class="dropdown-menu shadow">
-                        <!-- Capacities -->
-                        <li>
-                            <div class="dropdown-header">{{ capacity_type_readable_plural.title }}</div>
+                            <div class="dropdown-header">Related Resources</div>
                         </li>
                         <li>
                             {% load locality_helpers %}
@@ -96,9 +57,54 @@
                             {% capacity_resource_quota_type_readable_plural as capacity_resource_quota_type_readable_plural %}
                             <a class="dropdown-item" href="{% url 'capacity_resource_quotas:capacity_resource_quota_list' %}">{{ capacity_resource_quota_type_readable_plural.title }}</a>
                         </li>
-                        <!-- Applications -->
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    {% load application_helpers %}
+                    {% application_type_readable as application_type_readable %}
+                    {% application_type_readable_plural as application_type_readable_plural %}
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ application_type_readable_plural.title }}
+                    </a>
+                    <ul class="dropdown-menu shadow">
                         <li>
-                            <div class="dropdown-header">{{ application_type_readable_plural.title }}</div>
+                            <a class="dropdown-item" href="{% url 'applications:application_list' %}">{{ application_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            <div class="dropdown-header">Related Resources</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'localities:locality_list' %}">{{ locality_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_behaviour_helpers %}
+                            {% application_behaviour_type_readable_plural as application_behaviour_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_behaviours:application_behaviour_list' %}">{{ application_behaviour_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_colocation_helpers %}
+                            {% application_colocation_type_readable_plural as application_colocation_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_colocations:application_colocation_list' %}">{{ application_colocation_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_environment_var_helpers %}
+                            {% application_environment_var_type_readable_plural as application_environment_var_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_environment_vars:application_environment_var_list' %}">{{ application_environment_var_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_pref_resource_provider_helpers %}
+                            {% application_pref_resource_provider_type_readable_plural as application_pref_resource_provider_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_pref_resource_providers:application_pref_resource_provider_list' %}">{{ application_pref_resource_provider_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_security_rule_helpers %}
+                            {% application_security_rule_type_readable_plural as application_security_rule_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_security_rules:application_security_rule_list' %}">{{ application_security_rule_type_readable_plural.title }}</a>
+                        </li>
+                        <li>
+                            {% load application_volume_helpers %}
+                            {% application_volume_type_readable_plural as application_volume_type_readable_plural %}
+                            <a class="dropdown-item" href="{% url 'application_volumes:application_volume_list' %}">{{ application_volume_type_readable_plural.title }}</a>
                         </li>
                     </ul>
                 </li>
