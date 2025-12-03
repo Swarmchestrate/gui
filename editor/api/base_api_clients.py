@@ -23,8 +23,12 @@ class BaseApiClientMixin(ABC):
         pass
 
     @abstractmethod
-    def get_openapi_spec(self):
+    def get_openapi_spec(self) -> dict:
         pass
+
+    def get_definitions(self) -> dict:
+        openapi_spec = self.get_openapi_spec()
+        return openapi_spec.get("definitions", list())
 
 
 class ApiClientMixin(BaseApiClientMixin):
@@ -33,7 +37,7 @@ class ApiClientMixin(BaseApiClientMixin):
     def __init__(self):
         self.api_url = os.environ.get("API_URL", "")
 
-    def get_openapi_spec(self):
+    def get_openapi_spec(self) -> dict:
         response = requests.get(self.api_url)
         self.log_and_raise_response_status_if_error(response)
         return response.json()

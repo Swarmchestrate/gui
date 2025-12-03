@@ -21,11 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 class EditorTocTemplateView(TemplateView):
+    api_client: ApiClient
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
     column_metadata_api_client: ColumnMetadataApiClient
     categories: dict
     category_names: list[str]
     column_metadata: list[dict]
+    column_names: set[str]
 
     def setup(self, request, *args, **kwargs):
         self.setup_column_metadata()
@@ -34,6 +36,11 @@ class EditorTocTemplateView(TemplateView):
 
     def setup_column_metadata(self):
         self.column_metadata = self.column_metadata_api_client.get_resources()
+        self.column_names = set(
+            cm.get("column_name", "")
+            for cm in self.column_metadata
+            if cm.get("column_name", "")
+        )
 
     def setup_categories(self):
         self.category_names = list(
@@ -90,6 +97,20 @@ class EditorTocTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        property_names = set(
+            self.api_client.endpoint_definition.get_all_user_specifiable_fields().keys()
+        )
+        uncategorised_property_names = self.column_names - property_names
+        if uncategorised_property_names:
+            self.categories.update(
+                {
+                    "Uncategorised": {
+                        "title": "Uncategorised",
+                        "non_toc_title": "Uncategorised",
+                        "descendents": dict(),
+                    }
+                }
+            )
         context.update(
             {
                 "toc_list_items": self.categories,
@@ -433,26 +454,28 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
-        for category_name in self.category_names:
-            field_names_for_category = [
-                (cm.get("column_name"), cm.get("title"))
-                for cm in self.column_metadata
-                if cm.get("category") == category_name
-            ]
-            field_data_for_category = dict()
-            for field_name, field_title in field_names_for_category:
-                field_value = self.resource.get(field_name)
-                field_data_for_category.update(
-                    {
-                        field_name: {
-                            "title": field_title,
-                            "value": field_value,
-                        },
-                    }
-                )
-            formatted_resource_data.update(
+        column_metadata_by_column_name = dict(
+            (cm.get("column_name"), cm) for cm in self.column_metadata
+        )
+        user_specifiable_fields = (
+            self.api_client.endpoint_definition.get_all_user_specifiable_fields()
+        )
+        for field_name, field_metadata in user_specifiable_fields.items():
+            value = self.resource.get(field_name)
+            extra_metadata = column_metadata_by_column_name.get(field_name)
+            field_title = field_name.replace("_", " ").title()
+            field_category = "Uncategorised"
+            if extra_metadata:
+                field_title = extra_metadata.get("title")
+                field_category = extra_metadata.get("category")
+            if field_category not in formatted_resource_data:
+                formatted_resource_data.update({field_category: dict()})
+            formatted_resource_data[field_category].update(
                 {
-                    category_name: field_data_for_category,
+                    field_name: {
+                        "title": field_title,
+                        "value": value,
+                    }
                 }
             )
         return formatted_resource_data

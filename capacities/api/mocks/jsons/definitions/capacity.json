@@ -42,10 +42,6 @@
             "format": "public.energy_type_enum",
             "type": "string"
         },
-        "instance_types": {
-            "description": "Supported instance types and specifications (CPU, RAM, storage).",
-            "format": "jsonb"
-        },
         "powered_type": {
             "enum": ["Mains", "Battery"],
             "format": "public.power_type_enum",

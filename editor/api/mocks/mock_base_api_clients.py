@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class MockApiClientMixin(BaseApiClientMixin):
-    def get_openapi_spec(self):
+    def get_openapi_spec(self) -> dict:
         openapi_spec = None
         cwd = os.getcwd()
         base_dir = settings.BASE_DIR
@@ -33,7 +33,6 @@ class MockApiClientMixin(BaseApiClientMixin):
                     "api",
                     "mocks",
                     "jsons",
-                    "data",
                     "openapi_spec.json",
                 ),
                 "r",
