@@ -54,7 +54,6 @@ class OpenApiSpecificationBasedForm(EditorForm):
             self.api_client.endpoint_definition.get_required_field_names()
         )
         field_data = self.get_data_for_form_fields()
-        field_data = self._add_foreign_key_referrer_field_data(field_data)
         field_data = self.add_extra_metadata_to_field_data(field_data)
         self.populate_form_fields(field_data)
 
@@ -93,50 +92,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 pass
         return field_data
 
-    def _add_foreign_key_referrer_field_data(self, field_metadata: dict) -> dict:
-        definitions = self.api_client.get_definitions()
-        for definition_key, definition in definitions.items():
-            properties = definition.get("properties", dict())
-            if not properties:
-                continue
-            properties_containing_endpoint_name = [
-                property
-                for property in properties.values()
-                if (
-                    self.api_client.endpoint in property.get("description", "")
-                    and lxml.html.fromstring(property.get("description", "")).xpath(
-                        "fk/@table"
-                    )
-                )
-            ]
-            if not properties_containing_endpoint_name:
-                continue
-            fk_referer_api_client = MockApiClient.get_client_instance_by_endpoint(
-                definition_key
-            )
-            if not fk_referer_api_client:
-                continue
-            resources = fk_referer_api_client.get_resources()
-            choices = [
-                (
-                    r.get(fk_referer_api_client.endpoint_definition.id_field),
-                    f"{fk_referer_api_client.endpoint.title()} {r.get(fk_referer_api_client.endpoint_definition.id_field)}",
-                )
-                for r in resources
-            ]
-            if definition_key in field_metadata:
-                continue
-            field_metadata.update(
-                {
-                    definition_key: {
-                        "type": "foreign_key_referrer",
-                        "choices": choices,
-                    }
-                }
-            )
-        return field_metadata
-
-    def get_data_for_form_fields(self):
+    def get_data_for_form_fields(self) -> dict:
         field_data = (
             self.api_client.endpoint_definition.get_all_user_specifiable_fields()
         )
@@ -225,7 +181,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
     ) -> dict | None:
         if not field_metadata.get("type") == "foreign_key_referrer":
             return
-        choices = field_metadata.get("choices")
+        endpoint = field_metadata.get("endpoint", "")
+        fk_referrer_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
+        resources = fk_referrer_api_client.get_resources()
+        choices = [
+            (
+                r.get(fk_referrer_api_client.endpoint_definition.id_field),
+                f"{fk_referrer_api_client.endpoint.title()} {r.get(fk_referrer_api_client.endpoint_definition.id_field)}",
+            )
+            for r in resources
+        ]
         field_class = forms.MultipleChoiceField
         return {
             "field_class": field_class,
@@ -292,7 +257,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
     def get_field(
         self, field_name: str, field_metadata: dict, is_required: bool = False
-    ) -> list[forms.Field]:
+    ) -> forms.Field:
         field_components = self._get_field_components_for_foreign_key_referrer_field(
             field_metadata
         )
@@ -332,16 +297,17 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         self.category = category
         super().__init__(api_client, *args, **kwargs)
 
-    def get_data_for_form_fields(self):
+    def get_data_for_form_fields(self) -> dict:
+        field_data = super().get_data_for_form_fields()
         extra_metadata = self.column_metadata_api_client.get_resources_by_category(
             self.category
         )
-        field_names = [r.get("column_name") for r in extra_metadata]
-        field_data = (
-            self.api_client.endpoint_definition.get_user_specifiable_fields_with_names(
-                field_names
-            )
-        )
+        column_names = [em.get("column_name") for em in extra_metadata]
+        field_data = {
+            field_name: field_value
+            for field_name, field_value in field_data.items()
+            if field_name in column_names
+        }
         return field_data
 
 

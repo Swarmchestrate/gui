@@ -26,12 +26,22 @@ class MockOpenApiDefinition(BaseOpenApiDefinition):
 class MockUserSpecifiableOpenApiDefinition(
     MockOpenApiDefinition, UserSpecifiableOpenApiDefinitionMixin
 ):
-    pass
+    def _get_all_definitions(self) -> dict:
+        definitions = dict()
+        for definition_class in MockUserSpecifiableOpenApiDefinition.__subclasses__():
+            if definition_class.definition_name == self.definition_name:
+                continue
+            definition = definition_class()
+            definitions.update(
+                {definition.definition_name: definition._get_definition()}
+            )
+        return definitions
 
 
 class MockColumnMetadataUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition
 ):
+    definition_name = "column_metadata"
     path_to_definition = os.path.join(
         settings.BASE_DIR,
         "editor",

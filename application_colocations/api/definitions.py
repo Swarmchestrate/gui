@@ -8,12 +8,11 @@ class ApplicationColocateUserSpecifiableOpenApiDefinitionMixin(
     UserSpecifiableOpenApiDefinitionMixin
 ):
     id_field = "id"
+    definition_name = "application_colocate"
 
 
 class ApplicationColocateUserSpecifiableOpenApiDefinition(
     ApplicationColocateUserSpecifiableOpenApiDefinitionMixin,
     UserSpecifiableOpenApiDefinition,
 ):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "application_colocate"
+    pass
