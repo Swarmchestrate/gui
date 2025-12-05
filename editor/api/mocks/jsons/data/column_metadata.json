@@ -377,7 +377,7 @@
     },
     {
         "table_name": "capacity",
-        "column_name": "instance_types",
+        "column_name": "capacity_instance_type",
         "title": "Instance Types",
         "category": "Specs",
         "description": "Supported instance types and specifications (CPU, RAM, storage).",

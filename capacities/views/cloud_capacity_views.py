@@ -30,6 +30,7 @@ from editor.views import (
     EditorProcessFormView,
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
+    UncategorisedEditorTemplateView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -130,8 +131,16 @@ class CloudCapacitySpecsEditorProcessFormView(
     pass
 
 
+class CloudCapacityUncategorisedEditorProcessFormView(
+    CloudCapacityEditorProcessFormView,
+    UncategorisedEditorTemplateView,
+):
+    pass
+
+
 class CloudCapacityEditorRouterView(CloudCapacityViewMixin, CapacityEditorRouterView):
     editor_view_class = CloudCapacityEditorProcessFormView
+    uncategorised_editor_view_class = CloudCapacityUncategorisedEditorProcessFormView
     metadata_editor_view_class = CloudCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = (
         CloudCapacityCostAndLocalityEditorProcessFormView

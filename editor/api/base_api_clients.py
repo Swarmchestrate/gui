@@ -161,6 +161,13 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         return f"{self.api_url}/{self.endpoint}"
 
     # Resources
+    def _get_resources(self, params: dict | None = None) -> list[dict]:
+        if not params:
+            params = dict()
+        response = requests.get(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+        return response.json()
+
     def get(self, resource_id: int, params: dict | None = None) -> dict:
         if not params:
             params = dict()
@@ -190,11 +197,7 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         return response.json()
 
     def get_resources(self, params: dict | None = None) -> list[dict]:
-        if not params:
-            params = dict()
-        response = requests.get(self.endpoint_url, params=params)
-        self.log_and_raise_response_status_if_error(response)
-        return response.json()
+        return self._get_resources(params)
 
     def register(self, data: dict) -> dict:
         new_id = self._generate_random_id()
@@ -275,7 +278,7 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
         if not params:
             params = dict()
         if not self.disabled_categories:
-            return super().get_resources(params)
+            return self._get_resources(params)
         and_conditions = set(
             f"category.neq.{category}" for category in self.disabled_categories
         )
@@ -291,10 +294,14 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
                 "and": f"({','.join(and_conditions)})",
             }
         )
-        return super().get_resources(params)
+        return self._get_resources(params)
 
     def get_resources_by_category(self, category: str):
         return self.get_resources(params={"category": f"eq.{category}"})
 
     def get_by_table_name(self, table_name: str):
         return self.get_resources(params={"table_name": f"eq.{table_name}"})
+
+    def get_resources_for_disabled_categories(self):
+        resources = self._get_resources()
+        return [r for r in resources if r.get("category") in self.disabled_categories]
