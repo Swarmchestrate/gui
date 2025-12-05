@@ -125,6 +125,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 extra_field_kwargs.update({"min_value": 1, "step_size": 1})
             case OpenApiPropertyFormat.NUMERIC | OpenApiPropertyFormat.DOUBLE_PRECISION:
                 field_class = forms.FloatField
+                extra_field_kwargs.update({"min_value": 1, "step_size": "any"})
             case OpenApiPropertyFormat.TEXT_ARRAY | OpenApiPropertyFormat.JSONB:
                 widget_class = forms.Textarea
         if not widget_class:
@@ -183,14 +184,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
             return
         endpoint = field_metadata.get("endpoint", "")
         fk_referrer_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
-        resources = fk_referrer_api_client.get_resources()
-        choices = [
-            (
-                r.get(fk_referrer_api_client.endpoint_definition.id_field),
-                f"{fk_referrer_api_client.endpoint.title()} {r.get(fk_referrer_api_client.endpoint_definition.id_field)}",
-            )
-            for r in resources
-        ]
+        choices = []
+        if fk_referrer_api_client:
+            resources = fk_referrer_api_client.get_resources()
+            choices = [
+                (
+                    r.get(fk_referrer_api_client.endpoint_definition.id_field),
+                    f"{fk_referrer_api_client.endpoint.title()} {r.get(fk_referrer_api_client.endpoint_definition.id_field)}",
+                )
+                for r in resources
+            ]
         field_class = forms.MultipleChoiceField
         return {
             "field_class": field_class,
@@ -299,6 +302,25 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
 
     def get_data_for_form_fields(self) -> dict:
         field_data = super().get_data_for_form_fields()
+        if self.category.lower() == "uncategorised":
+            column_metadata = self.column_metadata_api_client.get_resources()
+            disabled_column_metadata = (
+                self.column_metadata_api_client.get_resources_for_disabled_categories()
+            )
+            column_metadata.extend(disabled_column_metadata)
+            column_names = set(
+                cm.get("column_name", "")
+                for cm in column_metadata
+                if cm.get("category")
+            )
+            field_names = set(field_name for field_name in field_data.keys())
+            uncategorised_field_names = field_names - column_names
+            field_data = {
+                field_name: field_value
+                for field_name, field_value in field_data.items()
+                if field_name in uncategorised_field_names
+            }
+            return field_data
         extra_metadata = self.column_metadata_api_client.get_resources_by_category(
             self.category
         )
@@ -312,4 +334,14 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
 
 
 class OpenApiSpecificationBasedRegistrationForm(OpenApiSpecificationBasedForm):
-    pass
+    def get_data_for_form_fields(self) -> dict:
+        field_data = super().get_data_for_form_fields()
+        required_field_names = (
+            self.api_client.endpoint_definition._get_required_field_names()
+        )
+        field_data = {
+            field_name: field_value
+            for field_name, field_value in field_data.items()
+            if field_name in required_field_names
+        }
+        return field_data

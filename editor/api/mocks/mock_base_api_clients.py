@@ -77,6 +77,10 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         with open(self.path_to_temp_data, "w") as f:
             f.write(json.dumps(update_data, indent=4))
 
+    def _get_resources(self, params: dict | None = None) -> list[dict]:
+        resources = self._get_temp_data_and_create_if_not_exists()
+        return resources
+
     # Resources
     def get(self, resource_id: int, params: dict | None = None) -> dict:
         resources = self._get_temp_data_and_create_if_not_exists()
@@ -103,8 +107,7 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         return resources
 
     def get_resources(self, params: dict | None = None) -> list[dict]:
-        resources = self._get_temp_data_and_create_if_not_exists()
-        return resources
+        return self._get_resources(params)
 
     def register(self, data: dict) -> dict:
         resources = self._get_temp_data_and_create_if_not_exists()
@@ -216,3 +219,7 @@ class MockColumnMetadataApiClient(MockApiClient, BaseColumnMetadataApiClient):
                 and r.get("table_name") == table_name
             )
         ]
+
+    def get_resources_for_disabled_categories(self):
+        resources = self._get_resources()
+        return [r for r in resources if r.get("category") in self.disabled_categories]

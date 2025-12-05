@@ -20,6 +20,10 @@ from .base_formsets import BaseEditorFormSet
 logger = logging.getLogger(__name__)
 
 
+class UncategorisedEditorTemplateView(TemplateView):
+    api_client: ApiClient
+
+
 class EditorTocTemplateView(TemplateView):
     api_client: ApiClient
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
@@ -92,16 +96,12 @@ class EditorTocTemplateView(TemplateView):
         for category in self.category_names:
             add_category_descendents(category, self.categories)
 
-    def _get_first_category(self):
-        return next(iter(self.category_names))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         property_names = set(
             self.api_client.endpoint_definition.get_all_user_specifiable_fields().keys()
         )
         uncategorised_property_names = self.column_names - property_names
         if uncategorised_property_names:
+            self.category_names.append("Uncategorised")
             self.categories.update(
                 {
                     "Uncategorised": {
@@ -111,6 +111,12 @@ class EditorTocTemplateView(TemplateView):
                     }
                 }
             )
+
+    def _get_first_category(self):
+        return next(iter(self.category_names))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context.update(
             {
                 "toc_list_items": self.categories,
@@ -162,8 +168,13 @@ class EditorStartFormView(
 
 class EditorRouterView(EditorTocTemplateView, ProcessFormView):
     editor_view_class: TemplateView
+    uncategorised_editor_view_class: TemplateView
 
     def route_to_view(self, request, *args, **kwargs):
+        if self.category.lower() == "uncategorised":
+            return self.uncategorised_editor_view_class.as_view()(
+                request, *args, **kwargs
+            )
         return self.editor_view_class.as_view()(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
