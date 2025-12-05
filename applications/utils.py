@@ -1,6 +1,6 @@
 def application_type_readable() -> str:
-    return "microservice"
+    return "application"
 
 
 def application_type_readable_plural() -> str:
-    return "microservices"
+    return "applications"
