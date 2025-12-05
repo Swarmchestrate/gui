@@ -9,7 +9,9 @@ from editor.base_views import (
 from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
+    EditorRouterView,
     EditorStartFormView,
+    UncategorisedEditorTemplateView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -56,6 +58,18 @@ class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormVi
     template_name = "applications/application_editor.html"
     main_form_class = ApplicationEditorForm
     success_url = reverse_lazy("applications:new_application")
+
+
+class ApplicationUncategorisedEditorProcessFormView(
+    ApplicationEditorProcessFormView,
+    UncategorisedEditorTemplateView,
+):
+    pass
+
+
+class ApplicationEditorRouterView(ApplicationViewMixin, EditorRouterView):
+    editor_view_class = ApplicationEditorProcessFormView
+    uncategorised_editor_view_class = ApplicationUncategorisedEditorProcessFormView
 
 
 class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):

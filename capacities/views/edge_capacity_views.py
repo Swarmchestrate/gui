@@ -27,6 +27,7 @@ from editor.views import (
     EditorProcessFormView,
     EditorStartFormView,
     MultipleEditorFormsetProcessFormView,
+    UncategorisedEditorTemplateView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -124,8 +125,16 @@ class EdgeCapacitySpecsEditorProcessFormView(
     pass
 
 
+class EdgeCapacityUncategorisedEditorProcessFormView(
+    EdgeCapacityEditorProcessFormView,
+    UncategorisedEditorTemplateView,
+):
+    pass
+
+
 class EdgeCapacityEditorRouterView(EdgeCapacityViewMixin, CapacityEditorRouterView):
     editor_view_class = EdgeCapacityEditorProcessFormView
+    uncategorised_editor_view_class = EdgeCapacityUncategorisedEditorProcessFormView
     metadata_editor_view_class = EdgeCapacityMetadataEditorProcessFormView
     cost_and_locality_editor_view_class = (
         EdgeCapacityCostAndLocalityEditorProcessFormView

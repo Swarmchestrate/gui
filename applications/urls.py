@@ -27,7 +27,7 @@ urlpatterns = [
     ),
     path(
         "applications/<resource_id>/edit/",
-        views.ApplicationEditorProcessFormView.as_view(),
+        views.ApplicationEditorRouterView.as_view(),
         name="application_editor",
     ),
     path(
