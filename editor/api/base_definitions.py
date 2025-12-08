@@ -32,6 +32,34 @@ class BaseOpenApiDefinition:
         properties = self._get_definition().get("properties", {})
         return properties
 
+    def _get_foreign_key_fields(self) -> dict:
+        properties = self._get_definition().get("properties", {})
+        foreign_key_properties = dict()
+        for property_name, property_metadata in properties.items():
+            description = property_metadata.get("description", "")
+            if not description:
+                continue
+            fk_table_names = lxml.html.fromstring(description).xpath("fk/@table")
+            if not fk_table_names:
+                continue
+            property_metadata.update(
+                {
+                    "table_name": next(iter(fk_table_names)),
+                }
+            )
+            foreign_key_properties.update({property_name: property_metadata})
+        return foreign_key_properties
+
+    def _get_one_to_one_fields(self) -> dict:
+        foreign_key_fields = self._get_foreign_key_fields()
+        one_to_one_properties = dict()
+        for property_name, property_metadata in foreign_key_fields.items():
+            is_unique = property_metadata.get("unique", False)
+            if not is_unique:
+                continue
+            one_to_one_properties.update({property_name: property_metadata})
+        return one_to_one_properties
+
 
 class OpenApiDefinition(BaseOpenApiDefinition):
     openapi_spec: dict
@@ -68,9 +96,12 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
             )
         )
 
-    def _get_all_user_specifiable_fields(self):
+    def _get_all_user_specifiable_fields(self, include_one_to_many_fields: bool = True):
         all_fields = self._get_all_fields()
-        all_fields = self._add_properties_for_foreign_key_referrer_fields(all_fields)
+        if include_one_to_many_fields:
+            all_fields = self._add_properties_for_foreign_key_referrer_fields(
+                all_fields
+            )
         return {
             key: value
             for key, value in all_fields.items()
@@ -114,9 +145,30 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
             )
         return base_properties
 
+    def _get_one_to_many_fields(self) -> dict:
+        foreign_key_fields = self._get_foreign_key_fields()
+        one_to_many_properties = dict()
+        for property_name, property_metadata in foreign_key_fields.items():
+            is_unique = property_metadata.get("unique", False)
+            if is_unique:
+                continue
+            one_to_many_properties.update({property_name: property_metadata})
+        return one_to_many_properties
+
     # Public methods
-    def get_all_user_specifiable_fields(self):
-        return self._get_all_user_specifiable_fields()
+    def get_all_user_specifiable_fields(self, include_one_to_many_fields: bool = True):
+        return self._get_all_user_specifiable_fields(
+            include_one_to_many_fields=include_one_to_many_fields
+        )
+
+    def get_user_specifiable_foreign_key_fields(self):
+        return self._get_foreign_key_fields()
+
+    def get_user_specifiable_one_to_one_fields(self):
+        return self._get_one_to_one_fields()
+
+    def get_user_specifiable_one_to_many_fields(self):
+        return self._get_one_to_many_fields()
 
     def get_required_field_names(self):
         return self._get_required_field_names()

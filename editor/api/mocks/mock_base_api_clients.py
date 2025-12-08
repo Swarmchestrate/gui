@@ -109,10 +109,9 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         return self._get_resources(params)
 
-    def register(self, data: dict) -> dict:
+    def _register(self, new_id: int, data: dict) -> dict:
         resources = self._get_temp_data_and_create_if_not_exists()
         cleaned_data = self.clean_data(data)
-        new_id = self._generate_random_id()
         cleaned_data.update(
             {
                 self.endpoint_definition.id_field: new_id,
@@ -126,6 +125,13 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         resources.append(cleaned_data)
         self._update_temp_data(resources)
         return cleaned_data
+
+    def register(self, data: dict) -> dict:
+        new_id = self._generate_random_id()
+        return self._register(new_id, data)
+
+    def register_with_id(self, new_id: int, data: dict) -> dict:
+        return self._register(new_id, data)
 
     def bulk_register(self, data_list: list[dict]) -> list[int]:
         resources = self._get_temp_data_and_create_if_not_exists()

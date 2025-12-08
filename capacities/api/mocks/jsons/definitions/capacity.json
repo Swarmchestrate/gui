@@ -76,22 +76,26 @@
         "locality_id": {
             "description": "Note:\nThis is a Foreign Key to `locality.locality_id`.<fk table='locality' column='locality_id'/>",
             "format": "integer",
-            "type": "integer"
+            "type": "integer",
+            "unique": true
         },
         "resource_quota_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_resource_quota.resource_quota_id`.<fk table='capacity_resource_quota' column='resource_quota_id'/>",
             "format": "integer",
-            "type": "integer"
+            "type": "integer",
+            "unique": true
         },
         "energy_consumption_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_energy_consumption.energy_consumption_id`.<fk table='capacity_energy_consumption' column='energy_consumption_id'/>",
             "format": "integer",
-            "type": "integer"
+            "type": "integer",
+            "unique": true
         },
         "price_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_price.price_id`.<fk table='capacity_price' column='price_id'/>",
             "format": "integer",
-            "type": "integer"
+            "type": "integer",
+            "unique": true
         }
     },
     "type": "object"

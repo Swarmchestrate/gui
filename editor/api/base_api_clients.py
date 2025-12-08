@@ -94,6 +94,10 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         pass
 
     @abstractmethod
+    def register_with_id(self, new_id: int, data: dict) -> dict:
+        pass
+
+    @abstractmethod
     def bulk_register(self, data_list: list[dict]) -> list[int]:
         pass
 
@@ -209,9 +213,8 @@ class ApiClient(ApiClientMixin, BaseApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         return self._get_resources(params)
 
-    def register(self, data: dict) -> dict:
+    def _register(self, new_id: int, data: dict) -> dict:
         cleaned_data = self.clean_data(data)
-        new_id = self._generate_random_id()
         cleaned_data.update(
             {
                 self.endpoint_definition.id_field: new_id,
@@ -221,6 +224,13 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         self.log_and_raise_response_status_if_error(response)
         new_resource = self.get(new_id)
         return new_resource
+
+    def register(self, data: dict) -> dict:
+        new_id = self._generate_random_id()
+        return self._register(new_id, data)
+
+    def register_with_id(self, new_id: int, data: dict) -> dict:
+        return self._register(new_id, data)
 
     def bulk_register(self, data_list: list[dict]) -> list[int]:
         new_ids = self._generate_random_ids(amount=len(data_list))

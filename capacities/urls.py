@@ -39,6 +39,11 @@ urlpatterns = [
         name="delete_cloud_capacity",
     ),
     path(
+        "cloud-capacities/<resource_id>/fk/<fk_table_name>/new/",
+        cloud_capacity_views.CloudCapacityOneToOneFieldFormView.as_view(),
+        name="new_cloud_capacity_fk",
+    ),
+    path(
         "edge-capacities/",
         edge_capacity_views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",

@@ -10,10 +10,11 @@ from django.views.generic import (
     FormView,
     TemplateView,
 )
-from django.views.generic.edit import ProcessFormView
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
+from .api.mocks.mock_base_api_clients import MockApiClient, MockColumnMetadataApiClient
 from .base_formsets import BaseEditorFormSet
+from .forms.base_forms import SimpleOpenApiSpecificationBasedForm
 
 logger = logging.getLogger(__name__)
 
@@ -164,29 +165,46 @@ class EditorStartFormView(
         return super().form_valid(form)
 
 
-class EditorRouterView(EditorTocTemplateView, ProcessFormView):
-    editor_view_class: TemplateView
-    uncategorised_editor_view_class: TemplateView
+class EditorForeignKeyFormsView(TemplateView):
+    resource_id: int
+    api_client: ApiClient
+    column_metadata_api_client: ColumnMetadataApiClient
+    editor_reverse_base: str
 
-    def route_to_view(self, request, *args, **kwargs):
-        if self.category.lower() == "uncategorised":
-            return self.uncategorised_editor_view_class.as_view()(
-                request, *args, **kwargs
+    def get_one_to_one_forms(self) -> dict:
+        one_to_one_forms = dict()
+        one_to_one_fields = (
+            self.api_client.endpoint_definition.get_user_specifiable_one_to_one_fields()
+        )
+        for field_name, field_metadata in one_to_one_fields.items():
+            fk_table_name = field_metadata.get("table_name", "")
+            fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+            if not fk_api_client:
+                continue
+            initial = dict()
+            existing_resource = fk_api_client.get(self.resource_id)
+            if existing_resource:
+                initial = existing_resource
+            field_form = SimpleOpenApiSpecificationBasedForm(
+                fk_api_client, MockColumnMetadataApiClient(), initial=initial
             )
-        return self.editor_view_class.as_view()(request, *args, **kwargs)
+            one_to_one_forms.update(
+                {
+                    field_name: {
+                        "form": field_form,
+                        "table_name": fk_table_name,
+                    }
+                }
+            )
+        return one_to_one_forms
 
-    def get(self, request, *args, **kwargs):
-        return self.route_to_view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.route_to_view(request, *args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.category = self.request.GET.get("category", self._get_first_category())
-        return super().dispatch(request, *args, **kwargs)
+    def get_one_to_many_forms(self) -> dict:
+        pass
 
 
-class EditorProcessFormView(EditorTocTemplateView, FormView, TemplateView):
+class EditorProcessFormView(
+    EditorTocTemplateView, EditorForeignKeyFormsView, FormView, TemplateView
+):
     template_name = "editor/editor_base_new.html"
     form_class: forms.Form
 
@@ -212,6 +230,7 @@ class EditorProcessFormView(EditorTocTemplateView, FormView, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        one_to_one_forms = self.get_one_to_one_forms()
         context = super().get_context_data(**kwargs)
         context.update(
             {
@@ -221,6 +240,7 @@ class EditorProcessFormView(EditorTocTemplateView, FormView, TemplateView):
                 "current_category": self.category,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
+                "one_to_one_forms": one_to_one_forms,
             }
         )
         return context
@@ -266,6 +286,53 @@ class EditorProcessFormView(EditorTocTemplateView, FormView, TemplateView):
                 "initial": self.resource,
                 "api_client": self.api_client,
                 "column_metadata_api_client": self.column_metadata_api_client,
+            }
+        )
+        return kwargs
+
+
+class OneToOneFieldFormView(FormView):
+    form_class = SimpleOpenApiSpecificationBasedForm
+    api_client: ApiClient
+    column_metadata_api_client: ColumnMetadataApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.fk_table_name = self.kwargs["fk_table_name"]
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        api_client = MockApiClient.get_client_instance_by_endpoint(self.fk_table_name)
+        new_resource = api_client.register_with_id(self.resource_id, form.cleaned_data)
+        message = (
+            f"New {self.api_client.endpoint_definition.definition_name} registered.",
+        )
+        messages.success(
+            self.request,
+            message,
+        )
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "new_resource": new_resource,
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(
+            {
+                "api_client": MockApiClient.get_client_instance_by_endpoint(
+                    self.fk_table_name
+                ),
+                "column_metadata_api_client": MockColumnMetadataApiClient(),
             }
         )
         return kwargs

@@ -29,6 +29,7 @@ from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
+    OneToOneFieldFormView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -93,3 +94,12 @@ class CloudCapacityEditorOverviewTemplateView(
     CloudCapacityViewMixin, EditorOverviewTemplateView
 ):
     template_name = "capacities/cloud_capacity_overview.html"
+
+
+class CloudCapacityOneToOneFieldFormView(CloudCapacityViewMixin, OneToOneFieldFormView):
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)

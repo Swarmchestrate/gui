@@ -288,6 +288,16 @@ class OpenApiSpecificationBasedForm(EditorForm):
         return field
 
 
+class SimpleOpenApiSpecificationBasedForm(OpenApiSpecificationBasedForm):
+    def get_data_for_form_fields(self) -> dict:
+        field_data = (
+            self.api_client.endpoint_definition.get_all_user_specifiable_fields(
+                include_one_to_many_fields=False
+            )
+        )
+        return field_data
+
+
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
     def __init__(self, api_client: ApiClient, category: str, *args, **kwargs):
         self.category = category

@@ -3,6 +3,7 @@
 {% load helpers %}
 {% block scripts %}
 <script type="module" src="{% static 'editor/editor.js' %}"></script>
+<script type="module" src="{% static 'editor/one_to_one_fields.js' %}"></script>
 {% block extra_scripts %}
 {% endblock extra_scripts %}
 {% endblock scripts %}
@@ -54,7 +55,11 @@
                         </div>
                         <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
                         {% for field in field_group.list %}
-                        {% if field.field.widget.input_type == 'checkbox' %}
+                        {% if field.name in one_to_one_forms %}
+                        {% with field_metadata=one_to_one_forms|get_key_value_or_empty_dict:field.name %}
+                        {% include 'editor/foreign_key_fields/one_to_one_field.html' %}
+                        {% endwith %}
+                        {% elif field.field.widget.input_type == 'checkbox' %}
                         {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
                         {% else %}
                         {% include 'editor/field_templates/field_template.html' %}
@@ -83,5 +88,13 @@
             {% endblock editor_main_content %}
         </div>
     </div>
+</div>
+<div id="dialogs">
+    {% for field_name, field_metadata in one_to_one_forms.items %}
+    {% url 'capacities:new_cloud_capacity_fk' resource_id field_metadata.table_name as new_resource_url %}
+    {% with form=field_metadata.form dialog_id='new-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' new_resource_reverse='capacities:new_cloud_capacity' resource_type_readable=field_name %}
+    {% include 'editor/dialogs/new_dialog.html' %}
+    {% endwith %}
+    {% endfor %}
 </div>
 {% endblock content %}
