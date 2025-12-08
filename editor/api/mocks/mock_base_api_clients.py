@@ -111,8 +111,9 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
 
     def register(self, data: dict) -> dict:
         resources = self._get_temp_data_and_create_if_not_exists()
+        cleaned_data = self.clean_data(data)
         new_id = self._generate_random_id()
-        data.update(
+        cleaned_data.update(
             {
                 self.endpoint_definition.id_field: new_id,
             }
@@ -122,16 +123,17 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
             for r in resources
         ):
             return {}
-        resources.append(data)
+        resources.append(cleaned_data)
         self._update_temp_data(resources)
-        return data
+        return cleaned_data
 
     def bulk_register(self, data_list: list[dict]) -> list[int]:
         resources = self._get_temp_data_and_create_if_not_exists()
         new_ids = self._generate_random_ids(amount=len(data_list))
         try:
             for i, data in enumerate(data_list):
-                data.update({self.endpoint_definition.id_field: new_ids[i]})
+                cleaned_data = self.clean_data(data)
+                cleaned_data.update({self.endpoint_definition.id_field: new_ids[i]})
         except IndexError:
             raise Error("An error occurred whilst assigning IDs for bulk registration.")
         updated_resources = resources + data_list
@@ -168,7 +170,8 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
 
     def update(self, resource_id: int, data: dict):
         resource_to_update = self.get(resource_id)
-        prepared_update_data = self._prepare_update_data(data)
+        cleaned_data = self.clean_data(data)
+        prepared_update_data = self._prepare_update_data(cleaned_data)
         resource_to_update.update(prepared_update_data)
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = [

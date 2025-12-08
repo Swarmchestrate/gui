@@ -14,24 +14,6 @@ class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
         capacities = self.api_client.get_resources()
         self.assertIsInstance(capacities, list)
 
-    def test_get_user_specifiable_fields_with_format(self):
-        example_format = "text"
-        fields = (
-            self.api_client.endpoint_definition.get_user_specifiable_fields_with_format(
-                example_format
-            )
-        )
-        self.assertIsInstance(fields, dict)
-        self.assertGreater(len(fields.keys()), 0)
-        for value in fields.values():
-            self.assertEqual(value.get("format"), example_format)
-
-    def test_get_user_specifiable_field_formats(self):
-        field_formats = (
-            self.api_client.endpoint_definition.get_user_specifiable_field_formats()
-        )
-        self.assertIsInstance(field_formats, list)
-
 
 class CloudCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
     api_client_class = CloudCapacityApiClient

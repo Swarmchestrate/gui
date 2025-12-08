@@ -25,15 +25,20 @@ class OpenApiPropertyFormat(Enum):
 class EditorForm(forms.Form):
     error_css_class = "is-invalid"
 
-    def is_valid(self):
-        result = super().is_valid()
+    def clean(self):
+        cleaned_data = super().clean()
         fields_with_errors = self.errors
         if "__all__" in self.errors:
             fields_with_errors = self.fields
         for field_name in fields_with_errors:
-            attrs = self.fields[field_name].widget.attrs
-            attrs.update({"class": attrs.get("class", "") + " is-invalid"})
-        return result
+            try:
+                field = self.fields[field_name]
+                f_classes = field.widget.attrs.get("class", "").split(" ")
+                f_classes.append(self.error_css_class)
+                field.widget.attrs.update({"class": " ".join(f_classes)})
+            except KeyError:
+                continue
+        return cleaned_data
 
 
 class OpenApiSpecificationBasedForm(EditorForm):
@@ -56,23 +61,6 @@ class OpenApiSpecificationBasedForm(EditorForm):
         field_data = self.get_data_for_form_fields()
         field_data = self.add_extra_metadata_to_field_data(field_data)
         self.populate_form_fields(field_data)
-
-    def is_valid(self):
-        is_valid = super().is_valid()
-        errors = self.errors.as_data()
-        for field_name in errors:
-            try:
-                field = self.fields[field_name]
-                f_classes = field.widget.attrs.get("class", "").split(" ")
-                f_classes.append(self.error_css_class)
-                field.widget.attrs.update(
-                    {
-                        "class": " ".join(f_classes),
-                    }
-                )
-            except KeyError:
-                continue
-        return is_valid
 
     def add_extra_metadata_to_field_data(self, field_data: dict):
         column_metadata = self.column_metadata_api_client.get_resources()
@@ -129,7 +117,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 extra_field_kwargs.update({"min_value": 1, "step_size": 1})
             case OpenApiPropertyFormat.NUMERIC | OpenApiPropertyFormat.DOUBLE_PRECISION:
                 field_class = forms.FloatField
-                extra_field_kwargs.update({"min_value": 1, "step_size": "any"})
+                extra_field_kwargs.update({"min_value": 1})
             case OpenApiPropertyFormat.TEXT_ARRAY | OpenApiPropertyFormat.JSONB:
                 widget_class = forms.Textarea
         if not widget_class:

@@ -109,6 +109,16 @@ class BaseApiClient(BaseApiClientMixin, ABC):
     def delete_many(self, resource_ids: list[int]):
         pass
 
+    # Helper methods
+    def clean_data(self, uncleaned_data: dict) -> dict:
+        uncleaned_data_copy = dict(uncleaned_data)
+        definition_fields = self.endpoint_definition._get_all_fields().keys()
+        for key in uncleaned_data.keys():
+            if key in definition_fields:
+                continue
+            uncleaned_data_copy.pop(key)
+        return uncleaned_data_copy
+
     def _get_existing_resource_ids(self):
         params = {"select": f"{self.endpoint_definition.id_field}"}
         return [
@@ -200,13 +210,14 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         return self._get_resources(params)
 
     def register(self, data: dict) -> dict:
+        cleaned_data = self.clean_data(data)
         new_id = self._generate_random_id()
-        data.update(
+        cleaned_data.update(
             {
                 self.endpoint_definition.id_field: new_id,
             }
         )
-        response = requests.post(self.endpoint_url, json=data)
+        response = requests.post(self.endpoint_url, json=cleaned_data)
         self.log_and_raise_response_status_if_error(response)
         new_resource = self.get(new_id)
         return new_resource
@@ -215,7 +226,8 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         new_ids = self._generate_random_ids(amount=len(data_list))
         try:
             for i, data in enumerate(data_list):
-                data.update({self.endpoint_definition.id_field: new_ids[i]})
+                cleaned_data = self.clean_data(data)
+                cleaned_data.update({self.endpoint_definition.id_field: new_ids[i]})
         except IndexError:
             raise Error("An error occurred whilst assigning IDs for bulk registration.")
         response = requests.post(self.endpoint_url, json=data_list)
