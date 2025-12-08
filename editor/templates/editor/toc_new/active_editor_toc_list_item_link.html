@@ -1,0 +1,14 @@
+{% load helpers %}
+{% with category_id_base=list_item.lower.split|join:'-'|split_by_colon|join:'-' %}
+<button
+    class="nav-link w-100 text-start {% if current_category == list_item %}active{% endif %}"
+    id="{{ category_id_base }}-tab"
+    data-bs-toggle="tab"
+    data-bs-target="#{{ category_id_base }}-tab-pane"
+    type="button"
+    role="tab"
+    aria-controls="{{ category_id_base }}-tab-pane"
+    aria-selected="{% if current_category == list_item %}true{% else %}false{% endif %}">
+        {{ list_item_data.title }}
+</button>
+{% endwith %}

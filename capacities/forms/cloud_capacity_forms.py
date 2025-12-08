@@ -2,8 +2,8 @@ from django import forms
 
 from editor.forms.base_forms import (
     EditorForm,
+    OpenApiSpecificationBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
-    OpenApiSpecificationCategoryBasedForm,
 )
 
 
@@ -12,7 +12,7 @@ class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = "capacity"
 
 
-class CloudCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
+class CloudCapacityEditorForm(OpenApiSpecificationBasedForm):
     definition_name = "capacity"
     disabled_categories = ["Edge Specific", "Networking"]
 

@@ -5,6 +5,11 @@ register = template.Library()
 
 
 @register.filter
+def split_by_colon(value: str):
+    return value.split(":")
+
+
+@register.filter
 def get_key_value_or_blank_string(d: dict, key: str):
     try:
         return d.get(key, "")

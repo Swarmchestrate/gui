@@ -1,12 +1,10 @@
 import logging
-import urllib.parse
 from http import HTTPStatus
 
 from django import forms
 from django.contrib import messages
 from django.forms import Form, formset_factory
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
@@ -188,123 +186,14 @@ class EditorRouterView(EditorTocTemplateView, ProcessFormView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView):
-    main_form_class: forms.Form
+class EditorProcessFormView(EditorTocTemplateView, FormView, TemplateView):
+    template_name = "editor/editor_base_new.html"
+    form_class: forms.Form
 
     api_client: ApiClient
     editor_reverse_base: str
     editor_overview_reverse_base: str
     resource_type_readable: str
-
-    def get_prev_and_next_list_items(self):
-        index_of_current_category = self.category_names.index(self.category)
-        prev_list_item = ""
-        try:
-            if index_of_current_category == 0:
-                raise IndexError
-            prev_list_item = self.category_names[index_of_current_category - 1]
-        except IndexError:
-            pass
-
-        next_list_item = ""
-        try:
-            next_list_item = self.category_names[index_of_current_category + 1]
-        except IndexError:
-            pass
-
-        return (prev_list_item, next_list_item)
-
-    def get_form_kwargs(self):
-        kwargs = {
-            "initial": dict(),
-            "prefix": None,
-        }
-        kwargs.update(
-            {
-                "initial": self.resource,
-                "api_client": self.api_client,
-                "column_metadata_api_client": self.column_metadata_api_client,
-                "category": self.category,
-            }
-        )
-        return kwargs
-
-    def get_forms_from_request_data(self, request):
-        kwargs = self.get_form_kwargs()
-        form = self.main_form_class(data=request.POST, **kwargs)
-        return {
-            "": form,
-        }
-
-    def get_context_data_forms_invalid(self, forms: dict):
-        form = forms.get("")
-        context = self.get_context_data()
-        context.update(
-            {
-                "form": form,
-            }
-        )
-        return context
-
-    def get_json_response_feedback_forms_invalid(self, forms: dict) -> dict:
-        feedback = dict()
-        for form in forms.values():
-            feedback.update(form.errors.as_json())
-        return feedback
-
-    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
-        return cleaned_data
-
-    def forms_invalid(self, forms: dict, error_msg: str | None = None):
-        if not error_msg:
-            error_msg = "Some fields were invalid. Please see feedback below."
-        if self.request.accepts("text/html"):
-            messages.error(self.request, error_msg)
-            return render(
-                self.request,
-                self.template_name,
-                self.get_context_data_forms_invalid(forms),
-            )
-        return JsonResponse(
-            {
-                "feedback": self.get_json_response_feedback_forms_invalid(forms),
-                "url": self.request.get_full_path(),
-            },
-            status=HTTPStatus.BAD_REQUEST,
-        )
-
-    def forms_valid(self, forms: dict):
-        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
-        if next_list_item:
-            self.success_url = "%s?category=%s" % (
-                reverse_lazy(
-                    self.editor_reverse_base,
-                    kwargs={
-                        "resource_id": self.resource_id,
-                    },
-                ),
-                urllib.parse.quote_plus(next_list_item),
-            )
-        form = forms.get("")
-        update_data = form.cleaned_data
-        update_data = self.add_formset_data_to_main_form(update_data, forms)
-        try:
-            self.api_client.update(self.resource_id, update_data)
-        except Exception:
-            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
-            logger.exception(error_msg)
-            return self.forms_invalid(forms, error_msg=error_msg)
-
-        message = f"Updated {self.category}"
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return redirect(self.success_url)
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -322,32 +211,64 @@ class EditorProcessFormView(EditorTocTemplateView, ProcessFormView, TemplateView
         self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        forms = self.get_forms_from_request_data(request)
-        if all([form.is_valid() for form in forms.values()]):
-            return self.forms_valid(forms)
-        return self.forms_invalid(forms)
-
     def get_context_data(self, **kwargs):
-        prev_list_item, next_list_item = self.get_prev_and_next_list_items()
         context = super().get_context_data(**kwargs)
-        category_formatted = self.category.replace(":", ": ")
         context.update(
             {
-                "title": f"{self.title_base} | {category_formatted}",
+                "title": self.title_base,
                 "main_subheading": self.resource_type_readable.title(),
-                "main_heading": category_formatted,
+                "main_heading": self.title_base,
                 "current_category": self.category,
-                "prev_list_item": prev_list_item,
-                "prev_list_item_title": prev_list_item.replace(":", ": "),
-                "next_list_item": next_list_item,
-                "next_list_item_title": next_list_item.replace(":", ": "),
                 "resource": self.resource,
                 "resource_id": self.resource_id,
-                "form": self.main_form_class(**self.get_form_kwargs()),
             }
         )
         return context
+
+    # Form view
+    def form_valid(self, form):
+        update_data = form.cleaned_data
+        try:
+            self.api_client.update(self.resource_id, update_data)
+        except Exception:
+            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
+            logger.exception(error_msg)
+            return self.form_invalid(form)
+
+        message = f"Updated {self.category}"
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+    def form_invalid(self, form):
+        error_msg = "Some fields were invalid. Please see feedback below."
+        if self.request.accepts("text/html"):
+            messages.error(self.request, error_msg)
+            return super().form_invalid(form)
+        return JsonResponse(
+            {
+                "feedback": error_msg,
+                "url": self.request.get_full_path(),
+            },
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(
+            {
+                "initial": self.resource,
+                "api_client": self.api_client,
+                "column_metadata_api_client": self.column_metadata_api_client,
+            }
+        )
+        return kwargs
 
 
 class MultipleEditorFormsetProcessFormView(EditorProcessFormView):

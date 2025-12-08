@@ -1,0 +1,9 @@
+{% extends 'editor/toc_new/active_editor_toc_list_item.html' %}
+
+{% block list_item_link %}
+{% include 'editor/toc_new/inactive_editor_toc_list_item_link.html' %}
+{% endblock %}
+
+{% block descendent_list_item %}
+{% include 'editor/toc_new/inactive_editor_toc_list_item.html' %}
+{% endblock %}

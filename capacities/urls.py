@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/<resource_id>/edit/",
-        cloud_capacity_views.CloudCapacityEditorRouterView.as_view(),
+        cloud_capacity_views.CloudCapacityEditorProcessFormView.as_view(),
         name="cloud_capacity_editor",
     ),
     path(
@@ -60,7 +60,7 @@ urlpatterns = [
     ),
     path(
         "edge-capacities/<resource_id>/edit/",
-        edge_capacity_views.EdgeCapacityEditorRouterView.as_view(),
+        edge_capacity_views.EdgeCapacityEditorProcessFormView.as_view(),
         name="edge_capacity_editor",
     ),
     path(

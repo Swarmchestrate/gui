@@ -2,8 +2,8 @@ from django import forms
 
 from editor.forms.base_forms import (
     EditorForm,
+    OpenApiSpecificationBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
-    OpenApiSpecificationCategoryBasedForm,
 )
 
 
@@ -12,7 +12,7 @@ class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
     definition_name = "capacity"
 
 
-class EdgeCapacityEditorForm(OpenApiSpecificationCategoryBasedForm):
+class EdgeCapacityEditorForm(OpenApiSpecificationBasedForm):
     definition_name = "capacity"
 
 

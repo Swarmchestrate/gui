@@ -76,6 +76,10 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
     def add_extra_metadata_to_field_data(self, field_data: dict):
         column_metadata = self.column_metadata_api_client.get_resources()
+        disabled_column_metadata = (
+            self.column_metadata_api_client.get_resources_for_disabled_categories()
+        )
+        column_metadata.extend(disabled_column_metadata)
         column_metadata_by_column_name = dict(
             (cm.get("column_name"), cm) for cm in column_metadata
         )
@@ -149,11 +153,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             extra_field_kwargs = dict()
         kwargs = {
             "required": is_required,
-            "widget": widget_class(
-                attrs={
-                    "class": " ".join(css_classes),
-                }
-            ),
+            "widget": widget_class(attrs={"class": " ".join(css_classes)}),
         }
         field_label = field_metadata.get("title")
         if field_label:
@@ -292,7 +292,12 @@ class OpenApiSpecificationBasedForm(EditorForm):
             extra_field_kwargs=extra_field_kwargs,
         )
 
-        return field_class(**kwargs)
+        field = field_class(**kwargs)
+        category = field_metadata.get("category")
+        if not category:
+            category = "Uncategorised"
+        field.category = category
+        return field
 
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
