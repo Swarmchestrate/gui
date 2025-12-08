@@ -1,19 +1,25 @@
 <section class="py-4">
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
     <div class="d-flex flex-column align-items-start row-gap-3">
-        <button
-            class="btn btn-outline-dark new-dialog-btn one-to-one-btn"
-            type="button"
-            data-dialog-id="new-{{ field.name }}-dialog">
-            Add {{ field.label }}
-        </button>
         <div class="w-100 rounded border p-3">
-            <dl class="mb-0">
-                {% for field in field_metadata.form %}
-                <dt>{{ field.label }}</dt>
-                <dd {% if forloop.last %}class="pb-0"{% endif %}>{{ field.value }}</dd>
-                {% endfor %}
-            </dl>
+            <div class="d-flex align-items-start justify-content-between column-gap-4">
+                <dl class="mb-0">
+                    {% for field in field_metadata.update_form %}
+                    <dt>{{ field.label }}</dt>
+                    <dd {% if forloop.last %}class="pb-0"{% endif %}>{{ field.value|default:'None' }}</dd>
+                    {% endfor %}
+                </dl>
+                <div class="d-flex column-gap-2">
+                    <button
+                        class="btn btn-light new-dialog-btn one-to-one-btn {% if field.value %}d-none{% endif %}"
+                        type="button"
+                        data-dialog-id="new-{{ field.name }}-dialog">
+                        Add {{ field.label }}
+                    </button>
+                    <button class="btn btn-light update-dialog-btn {% if not field.value %}d-none{% endif %}" data-dialog-id="update-{{ field.name }}-dialog" type="button">Edit</button>
+                    <button class="btn btn-outline-danger delete-dialog-btn {% if not field.value %}d-none{% endif %}" data-dialog-id="delete-{{ field.name }}-dialog" type="button">Delete</button>
+                </div>
+            </div>
         </div>
     </div>
 </section>

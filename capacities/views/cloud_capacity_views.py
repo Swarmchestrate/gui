@@ -26,10 +26,12 @@ from editor.base_views import (
     ResourceTypeNameContextMixin,
 )
 from editor.views import (
+    DeleteOneToOneRelationFormView,
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
-    OneToOneFieldFormView,
+    NewOneToOneRelationFormView,
+    UpdateOneToOneRelationFormView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -96,7 +98,37 @@ class CloudCapacityEditorOverviewTemplateView(
     template_name = "capacities/cloud_capacity_overview.html"
 
 
-class CloudCapacityOneToOneFieldFormView(CloudCapacityViewMixin, OneToOneFieldFormView):
+class CloudCapacityNewOneToOneRelationFormView(
+    CloudCapacityViewMixin, NewOneToOneRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CloudCapacityUpdateOneToOneRelationFormView(
+    CloudCapacityViewMixin, UpdateOneToOneRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CloudCapacityDeleteOneToOneRelationFormView(
+    CloudCapacityViewMixin, DeleteOneToOneRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
             "capacities:cloud_capacity_editor",

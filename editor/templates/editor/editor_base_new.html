@@ -91,9 +91,20 @@
 </div>
 <div id="dialogs">
     {% for field_name, field_metadata in one_to_one_forms.items %}
-    {% url 'capacities:new_cloud_capacity_fk' resource_id field_metadata.table_name as new_resource_url %}
-    {% with form=field_metadata.form dialog_id='new-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' new_resource_reverse='capacities:new_cloud_capacity' resource_type_readable=field_name %}
+    {# New dialogs #}
+    {% url 'capacities:new_cloud_capacity_fk' resource_id field_name as new_resource_url %}
+    {% with form=field_metadata.new_form dialog_id='new-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_name %}
     {% include 'editor/dialogs/new_dialog.html' %}
+    {% endwith %}
+    {# Update dialogs #}
+    {% url 'capacities:update_cloud_capacity_fk' resource_id field_name as update_resource_url %}
+    {% with form=field_metadata.update_form dialog_id='update-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_name %}
+    {% include 'editor/dialogs/update_dialog.html' %}
+    {% endwith %}
+    {# Delete dialogs #}
+    {% url 'capacities:delete_cloud_capacity_fk' resource_id field_name as delete_resource_url %}
+    {% with form=field_metadata.delete_form dialog_id='delete-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_name %}
+    {% include 'editor/dialogs/delete_dialog.html' %}
     {% endwith %}
     {% endfor %}
 </div>

@@ -1,0 +1,22 @@
+{% extends 'dialog_base.html' %}
+
+{% block dialog_header_content %}
+<div>
+    Delete {{ resource_type_readable|title }} <span class="dialog-id-to-delete">{{ resource_id }}</span>
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+<form method="POST" action="{{ delete_resource_url }}">
+    <p>Are you sure you want to delete this {{ resource_type_readable }}?</p>
+    {% csrf_token %}
+    {{ form }}
+    <div class="d-flex flex-sm-row flex-column align-items-sm-start align-items-stretch justify-content-sm-stretch justify-content-stretch column-gap-2 row-gap-3">
+        <button class="btn btn-light flex-grow-1" type="button" value="cancel">Cancel</button>
+        <div class="d-flex flex-column row-gap-2">
+            <button class="btn btn-danger confirm-btn">Delete</button>
+            <div class="form-text text-danger text-sm-end text-center">This action cannot be undone.</div>
+        </div>
+    </div>
+</form>
+{% endblock dialog_body_content %}

@@ -3,18 +3,22 @@ from http import HTTPStatus
 
 from django import forms
 from django.contrib import messages
-from django.forms import Form, formset_factory
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
     TemplateView,
+    View,
 )
+
+from resource_management.forms import ResourceDeletionForm
 
 from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
 from .api.mocks.mock_base_api_clients import MockApiClient, MockColumnMetadataApiClient
-from .base_formsets import BaseEditorFormSet
-from .forms.base_forms import SimpleOpenApiSpecificationBasedForm
+from .forms.base_forms import (
+    SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
+    SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -166,6 +170,7 @@ class EditorStartFormView(
 
 
 class EditorForeignKeyFormsView(TemplateView):
+    resource: dict
     resource_id: int
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
@@ -181,19 +186,31 @@ class EditorForeignKeyFormsView(TemplateView):
             fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
             if not fk_api_client:
                 continue
-            initial = dict()
-            existing_resource = fk_api_client.get(self.resource_id)
-            if existing_resource:
-                initial = existing_resource
-            field_form = SimpleOpenApiSpecificationBasedForm(
-                fk_api_client, MockColumnMetadataApiClient(), initial=initial
+            new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
+                fk_api_client,
+                MockColumnMetadataApiClient(),
+                id_prefix="new",
             )
+            initial = dict()
+            fk_resource_id = self.resource.get(field_name)
+            if fk_resource_id:
+                existing_resource = fk_api_client.get(fk_resource_id)
+                initial = existing_resource
             one_to_one_forms.update(
                 {
                     field_name: {
-                        "form": field_form,
+                        "new_form": new_form,
+                        "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
+                            fk_api_client,
+                            MockColumnMetadataApiClient(),
+                            id_suffix=f"{fk_table_name}_{self.resource_id}",
+                            initial=initial,
+                        ),
+                        "delete_form": ResourceDeletionForm(
+                            initial={"resource_id_to_delete": fk_resource_id}
+                        ),
                         "table_name": fk_table_name,
-                    }
+                    },
                 }
             )
         return one_to_one_forms
@@ -291,26 +308,58 @@ class EditorProcessFormView(
         return kwargs
 
 
-class OneToOneFieldFormView(FormView):
-    form_class = SimpleOpenApiSpecificationBasedForm
+class OneToOneRelationView(View):
+    form_class = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        self.fk_table_name = self.kwargs["fk_table_name"]
+        self.resource = self.api_client.get(self.resource_id)
+        self.fk_column_name = self.kwargs["fk_column_name"]
+        fk_column_name_metadata = (
+            self.api_client.endpoint_definition._get_one_to_one_fields()
+        )
+        self.fk_table_name = fk_column_name_metadata.get(self.fk_column_name, {}).get(
+            "table_name"
+        )
+        self.fk_api_client = MockApiClient.get_client_instance_by_endpoint(
+            self.fk_table_name
+        )
         return super().dispatch(request, *args, **kwargs)
 
+
+class OneToOneRelationBasedFormView(OneToOneRelationView, FormView):
+    def form_invalid(self, form):
+        messages.error(self.request, "The form submitted was not valid.")
+        return super().form_invalid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(
+            {
+                "api_client": MockApiClient.get_client_instance_by_endpoint(
+                    self.fk_table_name
+                ),
+                "column_metadata_api_client": MockColumnMetadataApiClient(),
+                "id_prefix": "new",
+            }
+        )
+        return kwargs
+
+
+class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
     def form_valid(self, form):
-        api_client = MockApiClient.get_client_instance_by_endpoint(self.fk_table_name)
-        new_resource = api_client.register_with_id(self.resource_id, form.cleaned_data)
-        message = (
-            f"New {self.api_client.endpoint_definition.definition_name} registered.",
+        new_resource = self.fk_api_client.register(form.cleaned_data)
+        self.api_client.update(
+            self.resource_id,
+            {
+                self.fk_column_name: new_resource.get(
+                    self.fk_api_client.endpoint_definition.id_field
+                )
+            },
         )
-        messages.success(
-            self.request,
-            message,
-        )
+        message = f"Added new {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -322,127 +371,40 @@ class OneToOneFieldFormView(FormView):
             }
         )
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
+class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
+    def form_valid(self, form):
+        fk_resource_id = self.resource.get(self.fk_column_name)
+        self.fk_api_client.update(fk_resource_id, form.cleaned_data)
+        message = f"Updated {self.fk_table_name} registration."
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
             {
-                "api_client": MockApiClient.get_client_instance_by_endpoint(
-                    self.fk_table_name
-                ),
-                "column_metadata_api_client": MockColumnMetadataApiClient(),
+                "message": message,
+                "redirect": self.success_url,
             }
         )
-        return kwargs
 
 
-class MultipleEditorFormsetProcessFormView(EditorProcessFormView):
-    formset_classes: dict
-    initial_data_for_formsets: dict[str, list[dict]]
-    manually_processed_formset_prefixes: set[str]
-    formsets_not_using_table_templates: set[str]
+class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
+    form_class = ResourceDeletionForm
 
-    # Class-specific methods
-    def add_formset_class(
-        self,
-        form_class: Form,
-        formset_prefix: str,
-        base_formset_class: BaseEditorFormSet = None,
-        can_delete: bool | None = None,
-        extra_formset_factory_kwargs: dict | None = None,
-        add_to_main_form: bool = True,
-    ):
-        if not base_formset_class:
-            base_formset_class = BaseEditorFormSet
-        if can_delete is None:
-            can_delete = True
-        if not extra_formset_factory_kwargs:
-            extra_formset_factory_kwargs = dict()
-        formset_class = formset_factory(
-            form_class,
-            formset=base_formset_class,
-            can_delete=can_delete,
-            **extra_formset_factory_kwargs,
+    def form_valid(self, form):
+        fk_resource_id = self.resource.get(self.fk_column_name)
+        self.fk_api_client.delete(fk_resource_id)
+        self.api_client.update(self.resource_id, {self.fk_column_name: None})
+        message = f"Deleted {self.fk_table_name} registration."
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "message": message,
+                "redirect": self.success_url,
+            }
         )
-        self.formset_classes.update({formset_prefix: formset_class})
-        if add_to_main_form:
-            return
-        self.manually_processed_formset_prefixes.add(formset_prefix)
-
-    def add_initial_data_for_formset(self, data: list[dict], formset_prefix: str):
-        self.initial_data_for_formsets.update({formset_prefix: data})
-
-    def get_initial_data_for_formset(self, formset_prefix: str):
-        return self.initial_data_for_formsets.get(formset_prefix, list())
-
-    def exclude_formset_from_table_templates(self, formset_prefix: str):
-        return self.formsets_not_using_table_templates.add(formset_prefix)
-
-    # EditorProcessFormView method overrides
-    def get_forms_from_request_data(self, request):
-        forms = super().get_forms_from_request_data(request)
-        for formset_prefix, formset_class in self.formset_classes.items():
-            initial = self.get_initial_data_for_formset(formset_prefix)
-            loaded_formset = formset_class(
-                data=request.POST, initial=initial, prefix=formset_prefix
-            )
-            forms.update({formset_prefix: loaded_formset})
-        return forms
-
-    def get_context_data_forms_invalid(self, forms):
-        context = super().get_context_data_forms_invalid(forms)
-        for form_prefix, formset in forms.items():
-            context.update(
-                {
-                    f"{form_prefix}_formset": formset,
-                }
-            )
-        return context
-
-    def add_formset_data_to_main_form(self, cleaned_data: dict, forms: dict):
-        cleaned_data = super().add_formset_data_to_main_form(cleaned_data, forms)
-        for formset_prefix, formset in forms.items():
-            if not formset_prefix:
-                continue
-            if formset_prefix in self.manually_processed_formset_prefixes:
-                # The property will be updated when the
-                # formset is processed after the main form.
-                cleaned_data.pop(formset_prefix, None)
-                continue
-            formset_data = formset.to_api_ready_format()
-            cleaned_data.update(
-                {
-                    formset_prefix: formset_data,
-                }
-            )
-        return cleaned_data
-
-    # ProcessFormView method overrides
-    def setup(self, request, *args, **kwargs):
-        self.initial_data_for_formsets = dict()
-        self.formset_classes = dict()
-        self.manually_processed_formset_prefixes = set()
-        self.formsets_not_using_table_templates = set()
-        return super().setup(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        for formset_prefix, formset_class in self.formset_classes.items():
-            initial = self.get_initial_data_for_formset(formset_prefix)
-            initial_formset = formset_class(initial=initial, prefix=formset_prefix)
-            if "formsets" not in context:
-                context.update({"formsets": dict()})
-            context.update({f"{formset_prefix}_formset": initial_formset})
-            context["formsets"].update({formset_prefix: initial_formset})
-            if formset_prefix in self.formsets_not_using_table_templates:
-                continue
-            if "formset_tables" not in context:
-                context.update({"formset_tables": dict()})
-            context.update({f"{formset_prefix}_formset": initial_formset})
-            context["formset_tables"].update({formset_prefix: initial_formset})
-        return context
 
 
 class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):

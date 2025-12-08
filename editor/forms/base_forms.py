@@ -41,6 +41,18 @@ class EditorForm(forms.Form):
         return cleaned_data
 
 
+class FormWithIdAttributePrefix(forms.Form):
+    def __init__(self, *args, id_prefix: str = "", **kwargs):
+        kwargs.update({"auto_id": f"{id_prefix}-id_%s"})
+        super().__init__(*args, **kwargs)
+
+
+class FormWithIdAttributeSuffix(forms.Form):
+    def __init__(self, *args, id_suffix: str = "", **kwargs):
+        kwargs.update({"auto_id": f"id_%s-{id_suffix}"})
+        super().__init__(*args, **kwargs)
+
+
 class OpenApiSpecificationBasedForm(EditorForm):
     error_css_class = "is-invalid"
     definition_name = ""
@@ -296,6 +308,18 @@ class SimpleOpenApiSpecificationBasedForm(OpenApiSpecificationBasedForm):
             )
         )
         return field_data
+
+
+class SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
+    FormWithIdAttributePrefix, SimpleOpenApiSpecificationBasedForm
+):
+    pass
+
+
+class SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
+    FormWithIdAttributeSuffix, SimpleOpenApiSpecificationBasedForm
+):
+    pass
 
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
