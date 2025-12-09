@@ -86,6 +86,12 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         pass
 
     @abstractmethod
+    def get_resources_referencing_resource_id(
+        self, column_name: str, resource_id: int, params: dict | None = None
+    ) -> list[dict]:
+        pass
+
+    @abstractmethod
     def get_resources(self, params: dict | None = None) -> list[dict]:
         pass
 
@@ -194,7 +200,7 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         self.log_and_raise_response_status_if_error(response)
         # Responses are returned as lists, so need
         # to get the first list element.
-        resource = next(iter(response.json()))
+        resource = next(iter(response.json()), None)
         return resource
 
     def get_resources_by_ids(self, resource_ids: list[int], params: dict | None = None):
@@ -206,6 +212,16 @@ class ApiClient(ApiClientMixin, BaseApiClient):
                 % ",".join([str(resource_id) for resource_id in resource_ids])
             }
         )
+        response = requests.get(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+        return response.json()
+
+    def get_resources_referencing_resource_id(
+        self, column_name: str, resource_id: int, params: dict | None = None
+    ) -> list[dict]:
+        if not params:
+            params = dict()
+        params.update({column_name: int(resource_id)})
         response = requests.get(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
         return response.json()

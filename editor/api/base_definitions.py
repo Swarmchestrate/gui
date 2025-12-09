@@ -44,7 +44,7 @@ class BaseOpenApiDefinition:
                 continue
             property_metadata.update(
                 {
-                    "table_name": next(iter(fk_table_names)),
+                    "fk_table_name": next(iter(fk_table_names), None),
                 }
             )
             foreign_key_properties.update({property_name: property_metadata})
@@ -59,6 +59,48 @@ class BaseOpenApiDefinition:
                 continue
             one_to_one_properties.update({property_name: property_metadata})
         return one_to_one_properties
+
+    def _get_many_to_one_fields(self) -> dict:
+        foreign_key_fields = self._get_foreign_key_fields()
+        many_to_one_properties = dict()
+        for property_name, property_metadata in foreign_key_fields.items():
+            is_unique = property_metadata.get("unique", False)
+            if is_unique:
+                continue
+            many_to_one_properties.update({property_name: property_metadata})
+        return many_to_one_properties
+
+    def _get_one_to_many_fields(self) -> dict:
+        one_to_many_properties = dict()
+        definitions = self._get_all_definitions()
+        for definition_key, definition in definitions.items():
+            properties = definition.get("properties", dict())
+            if not properties:
+                continue
+            for property in properties.values():
+                description = property.get("description", "")
+                if not description:
+                    continue
+                if self.definition_name not in description:
+                    continue
+                fk_table_name = next(
+                    iter(lxml.html.fromstring(description).xpath("fk/@table")), None
+                )
+                fk_column_name = next(
+                    iter(lxml.html.fromstring(description).xpath("fk/@column")), None
+                )
+                if not fk_table_name or not fk_column_name:
+                    continue
+                one_to_many_properties.update(
+                    {
+                        definition_key: {
+                            "type": "one_to_many",
+                            "fk_table_name": definition_key,
+                            "fk_table_column_name": fk_column_name,
+                        }
+                    }
+                )
+        return one_to_many_properties
 
 
 class OpenApiDefinition(BaseOpenApiDefinition):
@@ -112,44 +154,9 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
         return list(required_field_names - auto_generated_field_names)
 
     def _add_one_to_many_properties(self, base_properties: dict) -> dict:
-        definitions = self._get_all_definitions()
-        for definition_key, definition in definitions.items():
-            properties = definition.get("properties", dict())
-            if not properties:
-                continue
-            properties_containing_endpoint_name = [
-                property
-                for property in properties.values()
-                if (
-                    self.definition_name in property.get("description", "")
-                    and lxml.html.fromstring(property.get("description", "")).xpath(
-                        "fk/@table"
-                    )
-                )
-            ]
-            if not properties_containing_endpoint_name:
-                continue
-            if definition_key in base_properties:
-                continue
-            base_properties.update(
-                {
-                    definition_key: {
-                        "type": "one_to_many",
-                        "endpoint": definition_key,
-                    }
-                }
-            )
+        one_to_many_properties = self._get_one_to_many_fields()
+        base_properties.update(one_to_many_properties)
         return base_properties
-
-    def _get_one_to_many_fields(self) -> dict:
-        foreign_key_fields = self._get_foreign_key_fields()
-        one_to_many_properties = dict()
-        for property_name, property_metadata in foreign_key_fields.items():
-            is_unique = property_metadata.get("unique", False)
-            if is_unique:
-                continue
-            one_to_many_properties.update({property_name: property_metadata})
-        return one_to_many_properties
 
     # Public methods
     def get_all_user_specifiable_fields(self, include_one_to_many_fields: bool = True):
@@ -165,6 +172,9 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
 
     def get_user_specifiable_one_to_many_fields(self):
         return self._get_one_to_many_fields()
+
+    def get_user_specifiable_many_to_one_fields(self):
+        return self._get_many_to_one_fields()
 
     def get_required_field_names(self):
         return self._get_required_field_names()

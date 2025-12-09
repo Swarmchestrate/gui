@@ -112,7 +112,7 @@ class EditorTocTemplateView(TemplateView):
             )
 
     def _get_first_category(self):
-        return next(iter(self.category_names))
+        return next(iter(self.category_names), None)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -178,7 +178,7 @@ class EditorForeignKeyFormsView(TemplateView):
             self.api_client.endpoint_definition.get_user_specifiable_one_to_one_fields()
         )
         for field_name, field_metadata in one_to_one_fields.items():
-            fk_table_name = field_metadata.get("table_name", "")
+            fk_table_name = field_metadata.get("fk_table_name", "")
             fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
             if not fk_api_client:
                 continue
@@ -205,14 +205,55 @@ class EditorForeignKeyFormsView(TemplateView):
                         "delete_form": ResourceDeletionForm(
                             initial={"resource_id_to_delete": fk_resource_id}
                         ),
-                        "table_name": fk_table_name,
                     },
                 }
             )
         return one_to_one_forms
 
     def get_one_to_many_forms(self) -> dict:
-        pass
+        one_to_many_forms = dict()
+        one_to_many_fields = self.api_client.endpoint_definition.get_user_specifiable_one_to_many_fields()
+        for field_name, field_metadata in one_to_many_fields.items():
+            fk_table_name = field_metadata.get("fk_table_name", "")
+            fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+            if not fk_api_client:
+                continue
+            new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
+                fk_api_client,
+                MockColumnMetadataApiClient(),
+                id_prefix="new",
+            )
+            existing_resources = fk_api_client.get_resources_referencing_resource_id(
+                field_metadata.get("fk_table_column_name"), self.resource_id
+            )
+            one_to_many_forms.update(
+                {
+                    field_name: {
+                        "new_form": new_form,
+                        "existing_resources": {
+                            existing_resource.get(
+                                fk_api_client.endpoint_definition.id_field
+                            ): {
+                                "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
+                                    fk_api_client,
+                                    MockColumnMetadataApiClient(),
+                                    id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.id_field}",
+                                    initial=existing_resource,
+                                ),
+                                "delete_form": ResourceDeletionForm(
+                                    initial={
+                                        "resource_id_to_delete": existing_resource.get(
+                                            fk_api_client.endpoint_definition.id_field
+                                        )
+                                    }
+                                ),
+                            }
+                            for existing_resource in existing_resources
+                        },
+                    },
+                }
+            )
+        return one_to_many_forms
 
 
 class EditorProcessFormView(
@@ -244,6 +285,7 @@ class EditorProcessFormView(
 
     def get_context_data(self, **kwargs):
         one_to_one_forms = self.get_one_to_one_forms()
+        one_to_many_forms = self.get_one_to_many_forms()
         context = super().get_context_data(**kwargs)
         context.update(
             {
@@ -254,6 +296,7 @@ class EditorProcessFormView(
                 "resource": self.resource,
                 "resource_id": self.resource_id,
                 "one_to_one_forms": one_to_one_forms,
+                "one_to_many_forms": one_to_many_forms,
             }
         )
         return context
@@ -313,11 +356,9 @@ class OneToOneRelationView(View):
         self.resource_id = self.kwargs["resource_id"]
         self.resource = self.api_client.get(self.resource_id)
         self.fk_column_name = self.kwargs["fk_column_name"]
-        fk_column_name_metadata = (
-            self.api_client.endpoint_definition._get_one_to_one_fields()
-        )
-        self.fk_table_name = fk_column_name_metadata.get(self.fk_column_name, {}).get(
-            "table_name"
+        one_to_one_fields = self.api_client.endpoint_definition._get_one_to_one_fields()
+        self.fk_table_name = one_to_one_fields.get(self.fk_column_name, {}).get(
+            "fk_table_name"
         )
         self.fk_api_client = MockApiClient.get_client_instance_by_endpoint(
             self.fk_table_name
@@ -391,6 +432,100 @@ class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
         fk_resource_id = self.resource.get(self.fk_column_name)
         self.fk_api_client.delete(fk_resource_id)
         self.api_client.update(self.resource_id, {self.fk_column_name: None})
+        message = f"Deleted {self.fk_table_name} registration."
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+
+class OneToManyRelationView(View):
+    form_class = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix
+    api_client: ApiClient
+    column_metadata_api_client: ColumnMetadataApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
+        self.fk_column_name = self.kwargs["fk_column_name"]
+        self.fk_resource_id = self.kwargs["fk_resource_id"]
+        one_to_many_fields = (
+            self.api_client.endpoint_definition._get_one_to_many_fields()
+        )
+        self.fk_table_name = one_to_many_fields.get(self.fk_column_name, {}).get(
+            "fk_table_name"
+        )
+        self.fk_table_column_name = one_to_many_fields.get(self.fk_column_name, {}).get(
+            "fk_table_column_name"
+        )
+        self.fk_api_client = MockApiClient.get_client_instance_by_endpoint(
+            self.fk_table_name
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class OneToManyRelationBasedFormView(OneToManyRelationView, FormView):
+    def form_invalid(self, form):
+        messages.error(self.request, "The form submitted was not valid.")
+        return super().form_invalid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(
+            {
+                "api_client": MockApiClient.get_client_instance_by_endpoint(
+                    self.fk_table_name
+                ),
+                "column_metadata_api_client": MockColumnMetadataApiClient(),
+                "id_prefix": "new",
+            }
+        )
+        return kwargs
+
+
+class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
+    def form_valid(self, form):
+        cleaned_data = form.cleaned_data
+        cleaned_data.update({self.fk_table_column_name: self.resource_id})
+        new_resource = self.fk_api_client.register(cleaned_data)
+        message = f"Added new {self.fk_table_name} registration."
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "new_resource": new_resource,
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+
+class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
+    def form_valid(self, form):
+        self.fk_api_client.update(self.fk_resource_id, form.cleaned_data)
+        message = f"Updated {self.fk_table_name} registration."
+        if self.request.accepts("text/html"):
+            messages.success(self.request, message)
+            return super().form_valid(form)
+        return JsonResponse(
+            {
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+
+class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
+    form_class = ResourceDeletionForm
+
+    def form_valid(self, form):
+        self.fk_api_client.delete(self.fk_resource_id)
         message = f"Deleted {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)

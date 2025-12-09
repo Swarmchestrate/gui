@@ -4,7 +4,7 @@ from editor.base_formsets import BaseEditorFormSet
 class LocalityEditorFormSet(BaseEditorFormSet):
     def to_api_ready_format(self) -> dict | list:
         formatted_data = dict()
-        form = next(iter(self))
+        form = next(iter(self), None)
         data = self.get_cleaned_data_from_form(form)
         # Continent
         continent = data.get("continent")

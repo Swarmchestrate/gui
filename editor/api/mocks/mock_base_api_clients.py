@@ -106,6 +106,13 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         ]
         return resources
 
+    def get_resources_referencing_resource_id(
+        self, column_name: str, resource_id: int, params: dict | None = None
+    ) -> list[dict]:
+        all_resources = self._get_temp_data_and_create_if_not_exists()
+        resources = [r for r in all_resources if r.get(column_name) == int(resource_id)]
+        return resources
+
     def get_resources(self, params: dict | None = None) -> list[dict]:
         return self._get_resources(params)
 

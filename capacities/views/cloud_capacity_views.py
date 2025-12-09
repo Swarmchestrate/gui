@@ -26,11 +26,14 @@ from editor.base_views import (
     ResourceTypeNameContextMixin,
 )
 from editor.views import (
+    DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
+    NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
+    UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
 from resource_management.views import (
@@ -126,6 +129,45 @@ class CloudCapacityUpdateOneToOneRelationFormView(
 
 class CloudCapacityDeleteOneToOneRelationFormView(
     CloudCapacityViewMixin, DeleteOneToOneRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CloudCapacityNewOneToManyRelationFormView(
+    CloudCapacityViewMixin, NewOneToManyRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CloudCapacityUpdateOneToManyRelationFormView(
+    CloudCapacityViewMixin, UpdateOneToManyRelationFormView
+):
+    api_client = CloudCapacityApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "capacities:cloud_capacity_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CloudCapacityDeleteOneToManyRelationFormView(
+    CloudCapacityViewMixin, DeleteOneToManyRelationFormView
 ):
     api_client = CloudCapacityApiClient
 

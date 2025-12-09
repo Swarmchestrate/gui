@@ -113,6 +113,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         widget_class = None
         css_classes: list = ["form-control"]
         format_enum = None
+        extra_widget_attrs = dict()
         extra_field_kwargs = dict()
         try:
             format_enum = OpenApiPropertyFormat(field_format)
@@ -129,7 +130,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 extra_field_kwargs.update({"min_value": 1, "step_size": 1})
             case OpenApiPropertyFormat.NUMERIC | OpenApiPropertyFormat.DOUBLE_PRECISION:
                 field_class = forms.FloatField
-                extra_field_kwargs.update({"min_value": 1})
+                extra_widget_attrs.update({"step": "any"})
             case OpenApiPropertyFormat.TEXT_ARRAY | OpenApiPropertyFormat.JSONB:
                 widget_class = forms.Textarea
         if not widget_class:
@@ -139,6 +140,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "widget_class": widget_class,
             "css_classes": css_classes,
             "extra_field_kwargs": extra_field_kwargs,
+            "extra_widget_attrs": extra_widget_attrs,
         }
 
     def _configure_field_kwargs(
@@ -148,12 +150,17 @@ class OpenApiSpecificationBasedForm(EditorForm):
         css_classes: list[str],
         is_required: bool,
         extra_field_kwargs: dict | None = None,
+        extra_widget_attrs: dict | None = None,
     ):
         if not extra_field_kwargs:
             extra_field_kwargs = dict()
+        if not extra_widget_attrs:
+            extra_widget_attrs = dict()
         kwargs = {
             "required": is_required,
-            "widget": widget_class(attrs={"class": " ".join(css_classes)}),
+            "widget": widget_class(
+                attrs={"class": " ".join(css_classes), **extra_widget_attrs}
+            ),
         }
         field_label = field_metadata.get("title")
         if field_label:
@@ -182,7 +189,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
     ) -> dict | None:
         if not field_metadata.get("type") == "one_to_many":
             return
-        endpoint = field_metadata.get("endpoint", "")
+        endpoint = field_metadata.get("fk_table_name", "")
         fk_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
         choices = []
         if fk_api_client:
@@ -202,6 +209,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "extra_field_kwargs": {
                 "choices": choices,
             },
+            "extra_widget_attrs": dict(),
         }
 
     def _get_field_components_for_foreign_key_field(
@@ -236,6 +244,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "extra_field_kwargs": {
                 "choices": choices,
             },
+            "extra_widget_attrs": dict(),
         }
 
     def _get_field_components_for_enum_field(self, field_metadata: dict):
@@ -256,6 +265,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             "extra_field_kwargs": {
                 "choices": choices,
             },
+            "extra_widget_attrs": dict(),
         }
 
     def get_field(
@@ -281,6 +291,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             widget_class,
             css_classes,
             extra_field_kwargs,
+            extra_widget_attrs,
         ) = field_components.values()
 
         # Build field kwargs
@@ -290,6 +301,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
             css_classes,
             is_required,
             extra_field_kwargs=extra_field_kwargs,
+            extra_widget_attrs=extra_widget_attrs,
         )
 
         field = field_class(**kwargs)
@@ -307,6 +319,9 @@ class SimpleOpenApiSpecificationBasedForm(OpenApiSpecificationBasedForm):
                 include_one_to_many_fields=False
             )
         )
+        foreign_key_fields = self.api_client.endpoint_definition.get_user_specifiable_foreign_key_fields()
+        for field_name, field_metadata in foreign_key_fields.items():
+            field_data.pop(field_name, None)
         return field_data
 
 
