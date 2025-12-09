@@ -177,20 +177,20 @@ class OpenApiSpecificationBasedForm(EditorForm):
         kwargs.update(extra_field_kwargs)
         return kwargs
 
-    def _get_field_components_for_foreign_key_referrer_field(
+    def _get_field_components_for_one_to_many_field(
         self, field_metadata: dict
     ) -> dict | None:
-        if not field_metadata.get("type") == "foreign_key_referrer":
+        if not field_metadata.get("type") == "one_to_many":
             return
         endpoint = field_metadata.get("endpoint", "")
-        fk_referrer_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
+        fk_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
         choices = []
-        if fk_referrer_api_client:
-            resources = fk_referrer_api_client.get_resources()
+        if fk_api_client:
+            resources = fk_api_client.get_resources()
             choices = [
                 (
-                    r.get(fk_referrer_api_client.endpoint_definition.id_field),
-                    f"{fk_referrer_api_client.endpoint.title()} {r.get(fk_referrer_api_client.endpoint_definition.id_field)}",
+                    r.get(fk_api_client.endpoint_definition.id_field),
+                    f"{fk_api_client.endpoint.title()} {r.get(fk_api_client.endpoint_definition.id_field)}",
                 )
                 for r in resources
             ]
@@ -261,7 +261,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
     def get_field(
         self, field_name: str, field_metadata: dict, is_required: bool = False
     ) -> forms.Field:
-        field_components = self._get_field_components_for_foreign_key_referrer_field(
+        field_components = self._get_field_components_for_one_to_many_field(
             field_metadata
         )
         if not field_components:

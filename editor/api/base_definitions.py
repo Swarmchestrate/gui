@@ -99,9 +99,7 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
     def _get_all_user_specifiable_fields(self, include_one_to_many_fields: bool = True):
         all_fields = self._get_all_fields()
         if include_one_to_many_fields:
-            all_fields = self._add_properties_for_foreign_key_referrer_fields(
-                all_fields
-            )
+            all_fields = self._add_one_to_many_properties(all_fields)
         return {
             key: value
             for key, value in all_fields.items()
@@ -113,9 +111,7 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
         auto_generated_field_names = set(self._get_non_user_specifiable_field_names())
         return list(required_field_names - auto_generated_field_names)
 
-    def _add_properties_for_foreign_key_referrer_fields(
-        self, base_properties: dict
-    ) -> dict:
+    def _add_one_to_many_properties(self, base_properties: dict) -> dict:
         definitions = self._get_all_definitions()
         for definition_key, definition in definitions.items():
             properties = definition.get("properties", dict())
@@ -138,7 +134,7 @@ class UserSpecifiableOpenApiDefinitionMixin(BaseOpenApiDefinition):
             base_properties.update(
                 {
                     definition_key: {
-                        "type": "foreign_key_referrer",
+                        "type": "one_to_many",
                         "endpoint": definition_key,
                     }
                 }
