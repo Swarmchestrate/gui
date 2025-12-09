@@ -568,6 +568,22 @@
         "order": null
     },
     {
+        "table_name": "capacity",
+        "column_name": "price_id",
+        "title": "Price",
+        "category": "Price",
+        "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "energy_consumption_id",
+        "title": "Energy Consumption",
+        "category": "Energy Consumption",
+        "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+        "order": null
+    },
+    {
         "table_name": "instance_type",
         "column_name": "name",
         "title": "Name",
@@ -733,6 +749,54 @@
         "title": "GPS Location",
         "category": "",
         "description": "GPS location of the edge device. e.g. 51.509865, -0.118092.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_price",
+        "column_name": "cpu_price_per_hr",
+        "title": "Per CPU (price per hour)",
+        "category": "",
+        "description": "If no instances, cost per CPU.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_price",
+        "column_name": "gb_ram_price_per_hr",
+        "title": "Per GB RAM (price per hr)",
+        "category": "",
+        "description": "If no instances, cost per GB RAM.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_price",
+        "column_name": "gb_storage_price_per_hr",
+        "title": "Per GB storage (price per hr)",
+        "category": "",
+        "description": "If no instances, cost per GB storage.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_energy_consumption",
+        "column_name": "kwh_per_cpu",
+        "title": "Per CPU (kWh)",
+        "category": "",
+        "description": "If no instances, kWh per CPU.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_energy_consumption",
+        "column_name": "kwh_per_gb_ram",
+        "title": "Per GB of RAM (kWh)",
+        "category": "",
+        "description": "If no instances, kWh per GB RAM.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_energy_consumption",
+        "column_name": "kwh_per_gb_storage",
+        "title": "Per GB of Storage (kWh)",
+        "category": "",
+        "description": "If no instances, kWh per GB storage.",
         "order": null
     }
 ]
