@@ -9,7 +9,7 @@ from editor.api.base_api_clients import (
 
 
 class BaseCapacityInstanceTypeApiClient(BaseApiClient):
-    endpoint = "capacity_instance_types"
+    endpoint = "capacity_instance_type"
 
     def _prepare_update_data(self, data: dict):
         data = super()._prepare_update_data(data)
