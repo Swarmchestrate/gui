@@ -379,23 +379,15 @@
         "table_name": "capacity",
         "column_name": "capacity_instance_type",
         "title": "Instance Types",
-        "category": "Specs",
+        "category": "Capacity",
         "description": "Supported instance types and specifications (CPU, RAM, storage).",
-        "order": null
-    },
-    {
-        "table_name": "capacity",
-        "column_name": "resource_quota",
-        "title": "Resource Quota",
-        "category": "Specs",
-        "description": "Available capacity as CPU/RAM/Memory quota. Either use resource_quota or instance_quota.",
         "order": null
     },
     {
         "table_name": "capacity",
         "column_name": "resource_quota_id",
         "title": "Resource Quota",
-        "category": "Specs",
+        "category": "Capacity",
         "description": "Available capacity as CPU/RAM/Memory quota. Either use resource_quota or instance_quota.",
         "order": null
     },
@@ -571,7 +563,7 @@
         "table_name": "capacity",
         "column_name": "price_id",
         "title": "Price",
-        "category": "Price",
+        "category": "Pricing",
         "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
         "order": null
     },
@@ -579,8 +571,16 @@
         "table_name": "capacity",
         "column_name": "energy_consumption_id",
         "title": "Energy Consumption",
-        "category": "Energy Consumption",
+        "category": "Capacity",
         "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
+        "column_name": "resource_provider_type",
+        "title": "Resource Provider Type",
+        "category": "Metadata",
+        "description": "Deployment model type (i.e public or private).",
         "order": null
     },
     {
