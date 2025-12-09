@@ -23,10 +23,6 @@ from .forms.base_forms import (
 logger = logging.getLogger(__name__)
 
 
-class UncategorisedEditorTemplateView(TemplateView):
-    api_client: ApiClient
-
-
 class EditorTocTemplateView(TemplateView):
     api_client: ApiClient
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
