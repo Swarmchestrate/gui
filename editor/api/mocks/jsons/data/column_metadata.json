@@ -798,5 +798,29 @@
         "category": "",
         "description": "If no instances, kWh per GB storage.",
         "order": null
+    },
+    {
+        "table_name": "capacity_operating_system",
+        "column_name": "os_name",
+        "title": "OS Name",
+        "category": "",
+        "description": "Name of the operating system.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_operating_system",
+        "column_name": "os_uuid",
+        "title": "OS UUID",
+        "category": "",
+        "description": "UUID of the operating system.",
+        "order": null
+    },
+    {
+        "table_name": "capacity_operating_system",
+        "column_name": "architecture",
+        "title": "Architecture",
+        "category": "",
+        "description": "Supported architecture types (e.g., x86, ARM).",
+        "order": null
     }
 ]
