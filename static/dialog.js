@@ -1,3 +1,76 @@
+export class Dialog {
+    constructor(dialog, closeButtons, showButtons, options) {
+        this.dialog = dialog;
+        this.mainCloseButton = closeButtons[0];
+        this.closeButtons = closeButtons;
+        this.showButtons = showButtons;
+        if (typeof options !== "object") {
+            options = {};
+        }
+        if (!("lightDismiss" in options)) {
+            options.lightDismiss = true;
+        }
+        this.options = options;
+        this.setup();
+    }
+
+    setup() {
+        // Light dismiss - allows dialog to be closed
+        // by clicking on the backdrop.
+        if (this.options.lightDismiss) {
+            this.dialog.addEventListener("click", () => {
+                this.dialog.close();
+            });
+            this.dialog
+                .querySelector(".dialog-header")
+                .addEventListener("click", (event) => {
+                    event.stopPropagation();
+                });
+            this.dialog
+                .querySelector(".dialog-content")
+                .addEventListener("click", (event) => {
+                    event.stopPropagation();
+                });
+            this.dialog
+                .querySelector(".dialog-footer")
+                .addEventListener("click", (event) => {
+                    event.stopPropagation();
+                });
+        }
+        this.closeButtons.forEach((closeButton) => {
+            closeButton.addEventListener("click", () => {
+                this.close();
+            });
+        });
+
+        this.dialog.addEventListener("close", () => {
+            // When the dialog is closed, set the
+            // inert attribute to true so that it's
+            // not focusable by keyboard/assistive
+            // technologies.
+            this.dialog.setAttribute("inert", "");
+        });
+        this.showButtons.forEach((showButton) => {
+            this.addShowButton(showButton);
+        });
+    }
+
+    close() {
+        this.dialog.close("");
+    }
+
+    addShowButton(showButton) {
+        showButton.addEventListener("click", () => {
+            this.dialog.removeAttribute("inert");
+            this.dialog.showModal();
+            // Close button should autofocus with
+            // dialog, but doesn't in Safari for
+            // some reason.
+            this.mainCloseButton.focus();
+        });
+    }
+}
+
 export function addShowButtonToDialog(showButton, dialog, closeButtons) {
     showButton.addEventListener("click", () => {
         dialog.removeAttribute("inert");
@@ -17,10 +90,11 @@ export function addShowButtonToDialog(showButton, dialog, closeButtons) {
 }
 
 export function setupDialog(dialog, closeButtons, showButtons, options) {
-    if (typeof options === "undefined") {
-        options = {
-            lightDismiss: true,
-        };
+    if (typeof options !== "object") {
+        options = {};
+    }
+    if (!("lightDismiss" in options)) {
+        options.lightDismiss = true;
     }
     // Light dismiss - allows dialog to be closed
     // by clicking on the backdrop.
@@ -28,25 +102,22 @@ export function setupDialog(dialog, closeButtons, showButtons, options) {
         dialog.addEventListener("click", () => {
             dialog.close();
         });
+        dialog
+            .querySelector(".dialog-header")
+            .addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
+        dialog
+            .querySelector(".dialog-content")
+            .addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
+        dialog
+            .querySelector(".dialog-footer")
+            .addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
     }
-
-    dialog
-        .querySelector(".dialog-header")
-        .addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
-
-    dialog
-        .querySelector(".dialog-content")
-        .addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
-
-    dialog
-        .querySelector(".dialog-footer")
-        .addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
 
     closeButtons.forEach((closeButton) => {
         closeButton.addEventListener("click", () => {

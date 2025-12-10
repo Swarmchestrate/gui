@@ -1,6 +1,6 @@
 <section class="py-4">
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
-    <div class="d-flex flex-column align-items-start row-gap-3">
+    <div class="d-flex flex-column one-to-one-field align-items-start row-gap-3">
         <div class="w-100 rounded border p-3">
             <div class="d-flex flex-md-row flex-column flex-wrap align-items-start justify-content-between column-gap-4">
                 <dl class="d-flex flex-md-row flex-column column-gap-4 form-text mb-0">
@@ -9,13 +9,13 @@
                         <dt>
                             {{ field.label }}
                         </dt>
-                        <dd {% if forloop.last %}class="pb-0"{% endif %}>{{ field.value|default:'None' }}</dd>
+                        <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>{{ field.value|default:'None' }}</dd>
                     </div>
                     {% endfor %}
                 </dl>
                 <div class="d-flex column-gap-2">
                     <button
-                        class="btn btn-light new-dialog-btn one-to-one-btn {% if field.value %}d-none{% endif %}"
+                        class="btn btn-light new-dialog-btn {% if field.value %}d-none{% endif %}"
                         type="button"
                         data-dialog-id="new-{{ field.name }}-dialog">
                         Add {{ field.label }}

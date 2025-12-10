@@ -9,6 +9,7 @@
 {% block dialog_body_content %}
 <form method="POST" action="{{ update_resource_url }}">
     {% csrf_token %}
+    {% include 'editor/util_templates/form_errors_list.html' %}
     {% for field in form %}
     {% if field.field.widget.input_type == 'checkbox' %}
     {% include 'editor/field_templates/checkbox_field_wrapper.html' %}

@@ -400,13 +400,7 @@ class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "new_resource": new_resource,
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({"resource": new_resource})
 
 
 class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
@@ -414,15 +408,11 @@ class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
         fk_resource_id = self.resource.get(self.fk_column_name)
         self.fk_api_client.update(fk_resource_id, form.cleaned_data)
         message = f"Updated {self.fk_table_name} registration."
+        resource = self.fk_api_client.get(fk_resource_id)
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({"resource": resource})
 
 
 class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
@@ -436,12 +426,7 @@ class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({})
 
 
 class OneToManyRelationView(View):
@@ -497,28 +482,18 @@ class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "new_resource": new_resource,
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({"resource": new_resource})
 
 
 class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
     def form_valid(self, form):
         self.fk_api_client.update(self.fk_resource_id, form.cleaned_data)
         message = f"Updated {self.fk_table_name} registration."
+        resource = self.fk_api_client.get(self.fk_resource_id)
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({"resource": resource})
 
 
 class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
@@ -530,12 +505,7 @@ class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
+        return JsonResponse({})
 
 
 class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
