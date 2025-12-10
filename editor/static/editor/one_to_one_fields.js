@@ -53,13 +53,19 @@ class OneToOneField {
                     this.updateDialogButton.classList.remove("d-none");
                     this.deleteDialogButton.classList.remove("d-none");
                     for (const property in responseData.resource) {
+                        const propertyValue = responseData.resource[property];
                         const elementForProperty =
                             this.oneToOneField.querySelector(
                                 `[data-field="${property}"]`,
                             );
                         if (!elementForProperty) continue;
-                        elementForProperty.textContent =
-                            responseData.resource[property];
+                        elementForProperty.textContent = propertyValue;
+                        const fieldForProperty =
+                            this.updateDialogForm.querySelector(
+                                `[name="${property}"]`,
+                            );
+                        fieldForProperty.defaultValue = propertyValue;
+                        this.updateDialogForm.reset();
                     }
                 },
             },
@@ -110,6 +116,11 @@ class OneToOneField {
                             "input, textarea, select",
                         ),
                     ).forEach((field) => {
+                        if (
+                            field.getAttribute("name") == "csrfmiddlewaretoken"
+                        ) {
+                            return;
+                        }
                         try {
                             field.defaultValue = "";
                         } catch (error) {}
