@@ -104,6 +104,7 @@ class CloudCapacityEditorOverviewTemplateView(
 class CloudCapacityNewOneToOneRelationFormView(
     CloudCapacityViewMixin, NewOneToOneRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):
@@ -117,6 +118,7 @@ class CloudCapacityNewOneToOneRelationFormView(
 class CloudCapacityUpdateOneToOneRelationFormView(
     CloudCapacityViewMixin, UpdateOneToOneRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):
@@ -130,6 +132,7 @@ class CloudCapacityUpdateOneToOneRelationFormView(
 class CloudCapacityDeleteOneToOneRelationFormView(
     CloudCapacityViewMixin, DeleteOneToOneRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):
@@ -143,6 +146,7 @@ class CloudCapacityDeleteOneToOneRelationFormView(
 class CloudCapacityNewOneToManyRelationFormView(
     CloudCapacityViewMixin, NewOneToManyRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):
@@ -156,6 +160,7 @@ class CloudCapacityNewOneToManyRelationFormView(
 class CloudCapacityUpdateOneToManyRelationFormView(
     CloudCapacityViewMixin, UpdateOneToManyRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):
@@ -169,6 +174,7 @@ class CloudCapacityUpdateOneToManyRelationFormView(
 class CloudCapacityDeleteOneToManyRelationFormView(
     CloudCapacityViewMixin, DeleteOneToManyRelationFormView
 ):
+    template_name = "capacities/cloud_capacity_editor.html"
     api_client = CloudCapacityApiClient
 
     def dispatch(self, request, *args, **kwargs):

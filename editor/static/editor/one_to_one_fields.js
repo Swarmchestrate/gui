@@ -65,8 +65,20 @@ class OneToOneField {
                                 `[name="${property}"]`,
                             );
                         fieldForProperty.defaultValue = propertyValue;
+                        if (fieldForProperty.options) {
+                            for (const option of fieldForProperty.options) {
+                                if (option.value !== propertyValue) {
+                                    option.removeAttribute("selected");
+                                    continue;
+                                }
+                                option.setAttribute("selected", "selected");
+                            }
+                        }
                         this.updateDialogForm.reset();
                     }
+                    this.deleteDialogForm.querySelector(
+                        "[name='resource_id_to_delete']",
+                    ).value = responseData.resource.pk;
                 },
             },
             this.newDialogForm,
@@ -93,6 +105,15 @@ class OneToOneField {
                                 `[name="${property}"]`,
                             );
                         fieldForProperty.defaultValue = propertyValue;
+                        if (fieldForProperty.options) {
+                            for (const option of fieldForProperty.options) {
+                                if (option.value !== propertyValue) {
+                                    option.removeAttribute("selected");
+                                    continue;
+                                }
+                                option.setAttribute("selected", "selected");
+                            }
+                        }
                         this.updateDialogForm.reset();
                     }
                 },

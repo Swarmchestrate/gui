@@ -353,7 +353,7 @@ class OneToOneRelationView(View):
     column_metadata_api_client: ColumnMetadataApiClient
 
     def dispatch(self, request, *args, **kwargs):
-        self.resource_id = self.kwargs["resource_id"]
+        self.resource_id = int(self.kwargs["resource_id"])
         self.resource = self.api_client.get(self.resource_id)
         self.fk_column_name = self.kwargs["fk_column_name"]
         one_to_one_fields = self.api_client.endpoint_definition._get_one_to_one_fields()
@@ -368,8 +368,11 @@ class OneToOneRelationView(View):
 
 class OneToOneRelationBasedFormView(OneToOneRelationView, FormView):
     def form_invalid(self, form):
-        messages.error(self.request, "The form submitted was not valid.")
-        return super().form_invalid(form)
+        logger.exception("form.errors", form.errors)
+        if self.request.accepts("text/html"):
+            messages.error(self.request, "The form submitted was not valid.")
+            return super().form_invalid(form)
+        return JsonResponse({"feedback": form.errors})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -388,6 +391,9 @@ class OneToOneRelationBasedFormView(OneToOneRelationView, FormView):
 class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
     def form_valid(self, form):
         new_resource = self.fk_api_client.register(form.cleaned_data)
+        new_resource.update(
+            {"pk": new_resource.get(self.fk_api_client.endpoint_definition.id_field)}
+        )
         self.api_client.update(
             self.resource_id,
             {
@@ -405,10 +411,13 @@ class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
 
 class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
     def form_valid(self, form):
-        fk_resource_id = self.resource.get(self.fk_column_name)
+        fk_resource_id = int(self.resource.get(self.fk_column_name))
         self.fk_api_client.update(fk_resource_id, form.cleaned_data)
         message = f"Updated {self.fk_table_name} registration."
         resource = self.fk_api_client.get(fk_resource_id)
+        resource.update(
+            {"pk": resource.get(self.fk_api_client.endpoint_definition.id_field)}
+        )
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -418,15 +427,22 @@ class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
 class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
     form_class = ResourceDeletionForm
 
+    def form_invalid(self, form):
+        logger.exception("form.errors", form.errors)
+        if self.request.accepts("text/html"):
+            messages.error(self.request, "The form submitted was not valid.")
+            return super().form_invalid(form)
+        return JsonResponse({"feedback": form.errors})
+
     def form_valid(self, form):
-        fk_resource_id = self.resource.get(self.fk_column_name)
+        fk_resource_id = int(self.resource.get(self.fk_column_name))
         self.fk_api_client.delete(fk_resource_id)
         self.api_client.update(self.resource_id, {self.fk_column_name: None})
         message = f"Deleted {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({})
+        return JsonResponse({"result": "success"})
 
 
 class OneToManyRelationView(View):
@@ -435,10 +451,10 @@ class OneToManyRelationView(View):
     column_metadata_api_client: ColumnMetadataApiClient
 
     def dispatch(self, request, *args, **kwargs):
-        self.resource_id = self.kwargs["resource_id"]
+        self.resource_id = int(self.kwargs["resource_id"])
         self.resource = self.api_client.get(self.resource_id)
         self.fk_column_name = self.kwargs["fk_column_name"]
-        self.fk_resource_id = self.kwargs["fk_resource_id"]
+        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
         one_to_many_fields = (
             self.api_client.endpoint_definition._get_one_to_many_fields()
         )
@@ -456,7 +472,10 @@ class OneToManyRelationView(View):
 
 class OneToManyRelationBasedFormView(OneToManyRelationView, FormView):
     def form_invalid(self, form):
-        messages.error(self.request, "The form submitted was not valid.")
+        logger.exception("form.errors", form.errors)
+        if self.request.accepts("text/html"):
+            messages.error(self.request, "The form submitted was not valid.")
+            return super().form_invalid(form)
         return super().form_invalid(form)
 
     def get_form_kwargs(self):
@@ -499,13 +518,20 @@ class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
 class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
     form_class = ResourceDeletionForm
 
+    def form_invalid(self, form):
+        logger.exception("form.errors", form.errors)
+        if self.request.accepts("text/html"):
+            messages.error(self.request, "The form submitted was not valid.")
+            return super().form_invalid(form)
+        return JsonResponse({"feedback": form.errors})
+
     def form_valid(self, form):
         self.fk_api_client.delete(self.fk_resource_id)
         message = f"Deleted {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({})
+        return JsonResponse({"result": "success"})
 
 
 class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):

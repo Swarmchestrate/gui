@@ -64,11 +64,13 @@ export class AsyncFormHandler {
 
         let responseData;
         try {
-            responseData = await response.json();
+            const responseText = await response.text();
+            responseData = JSON.parse(responseText);
         } catch (error) {
+            console.error(error);
             this.statusButton.showDefaultState();
             this.validator.displayFormErrors([
-                "Encountered checking server validation results. Please try again.",
+                "Encountered a problem whilst checking server validation results. Please try again.",
             ]);
             return false;
         }
