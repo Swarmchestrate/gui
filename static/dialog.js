@@ -31,7 +31,19 @@ export function setupDialog(dialog, closeButtons, showButtons, options) {
     }
 
     dialog
+        .querySelector(".dialog-header")
+        .addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+
+    dialog
         .querySelector(".dialog-content")
+        .addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+
+    dialog
+        .querySelector(".dialog-footer")
         .addEventListener("click", (event) => {
             event.stopPropagation();
         });
