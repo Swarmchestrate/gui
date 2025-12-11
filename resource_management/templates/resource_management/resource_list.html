@@ -53,8 +53,9 @@
                         <button
                             id="delete-checked-btn"
                             class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
-                            type="button">
-                            <i class="bi bi-trash3-fill" title="Delete"></i>
+                            type="button"
+                            aria-label="Delete">
+                            <i class="bi bi-trash3-fill"></i>
                             <span>Delete selected (<span id="num-checked"></span>)</span>
                         </button>
                     </li>
@@ -106,8 +107,9 @@
                                     {% block edit_button %}
                                     <a
                                         href="{% url editor_reverse_base resource_id %}"
-                                        class="btn btn-light edit-btn">
-                                        <i class="bi bi-pencil-fill" title="Edit"></i>
+                                        class="btn btn-light edit-btn"
+                                        aria-label="Edit">
+                                        <i class="bi bi-pencil-fill"></i>
                                     </a>
                                     {% endblock edit_button %}
                                 </li>
@@ -115,8 +117,9 @@
                                     <button
                                         class="btn btn-light delete-btn"
                                         data-dialog-id="delete-{{ resource_id }}-dialog"
-                                        type="button">
-                                        <i class="bi bi-trash3-fill" title="Delete"></i>
+                                        type="button"
+                                        aria-label="Delete">
+                                        <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </li>
                             </ul>
