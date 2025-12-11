@@ -7,10 +7,11 @@ const oneToOneFields = Array.from(
 class OneToOneField {
     constructor(oneToOneField) {
         this.oneToOneField = oneToOneField;
-        this.setup();
+        this.setupClassFields();
+        this.setupDialogs();
     }
 
-    setup() {
+    setupClassFields() {
         // New dialog button
         this.newDialogButton = this.oneToOneField.querySelector(
             "button.new-dialog-btn[data-dialog-id]",
@@ -35,6 +36,9 @@ class OneToOneField {
             `#${this.deleteDialogButton.dataset.dialogId}`,
         );
         this.deleteDialogForm = this.deleteDialogElement.querySelector("form");
+    }
+
+    setupDialogs() {
         // Setup dialogs
         this.setupNewDialog();
         this.setupUpdateDialog();

@@ -1,6 +1,6 @@
-<section class="py-4">
+<section class="one-to-one-field py-4">
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
-    <div class="d-flex flex-column one-to-one-field align-items-start row-gap-3">
+    <div class="d-flex flex-column align-items-start row-gap-3">
         <div class="w-100 rounded border p-3">
             <div class="d-flex flex-md-row flex-column flex-wrap align-items-md-center align-items-start justify-content-between row-gap-3 column-gap-4">
                 <dl class="d-flex flex-md-row flex-column column-gap-4 form-text mb-0">
@@ -9,7 +9,13 @@
                         <dt>
                             {{ field.label }}
                         </dt>
-                        <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>{{ field.value|default:'None' }}</dd>
+                        <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>
+                            {% if field.get_choices_display %}
+                            {{ field.get_choices_display|default:'None' }}
+                            {% else %}
+                            {{ field.value|default:'None' }}
+                            {% endif %}
+                        </dd>
                     </div>
                     {% endfor %}
                 </dl>

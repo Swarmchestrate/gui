@@ -77,6 +77,24 @@ class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFo
     template_name = "capacities/cloud_capacity_editor.html"
     form_class = CloudCapacityEditorForm
     success_url = reverse_lazy("capacities:new_cloud_capacity")
+    new_one_to_one_relation_reverse_base = (
+        "capacities:new_cloud_capacity_one_to_one_relation"
+    )
+    update_one_to_one_relation_reverse_base = (
+        "capacities:update_cloud_capacity_one_to_one_relation"
+    )
+    delete_one_to_one_relation_reverse_base = (
+        "capacities:delete_cloud_capacity_one_to_one_relation"
+    )
+    new_one_to_many_relation_reverse_base = (
+        "capacities:new_cloud_capacity_one_to_many_relation"
+    )
+    update_one_to_many_relation_reverse_base = (
+        "capacities:update_cloud_capacity_one_to_many_relation"
+    )
+    delete_one_to_many_relation_reverse_base = (
+        "capacities:delete_cloud_capacity_one_to_many_relation"
+    )
 
 
 class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):

@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
@@ -165,15 +166,22 @@ class EditorStartFormView(
         return super().form_valid(form)
 
 
-class EditorForeignKeyFormsView(TemplateView):
+class EditorForeignKeyFieldsTemplateView(TemplateView):
     resource: dict
     resource_id: int
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
     editor_reverse_base: str
 
-    def get_one_to_one_forms(self) -> dict:
-        one_to_one_forms = dict()
+    new_one_to_one_relation_reverse_base: str
+    update_one_to_one_relation_reverse_base: str
+    delete_one_to_one_relation_reverse_base: str
+    new_one_to_many_relation_reverse_base: str
+    update_one_to_many_relation_reverse_base: str
+    delete_one_to_many_relation_reverse_base: str
+
+    def get_one_to_one_field_metadata(self) -> dict:
+        one_to_one_field_metadata = dict()
         one_to_one_fields = (
             self.api_client.endpoint_definition.get_user_specifiable_one_to_one_fields()
         )
@@ -192,7 +200,7 @@ class EditorForeignKeyFormsView(TemplateView):
             if fk_resource_id:
                 existing_resource = fk_api_client.get(fk_resource_id)
                 initial = existing_resource
-            one_to_one_forms.update(
+            one_to_one_field_metadata.update(
                 {
                     field_name: {
                         "new_form": new_form,
@@ -208,10 +216,10 @@ class EditorForeignKeyFormsView(TemplateView):
                     },
                 }
             )
-        return one_to_one_forms
+        return one_to_one_field_metadata
 
-    def get_one_to_many_forms(self) -> dict:
-        one_to_many_forms = dict()
+    def get_one_to_many_field_metadata(self) -> dict:
+        one_to_many_field_metadata = dict()
         one_to_many_fields = self.api_client.endpoint_definition.get_user_specifiable_one_to_many_fields()
         for field_name, field_metadata in one_to_many_fields.items():
             fk_table_name = field_metadata.get("fk_table_name", "")
@@ -226,11 +234,11 @@ class EditorForeignKeyFormsView(TemplateView):
             existing_resources = fk_api_client.get_resources_referencing_resource_id(
                 field_metadata.get("fk_table_column_name"), self.resource_id
             )
-            one_to_many_forms.update(
+            one_to_many_field_metadata.update(
                 {
                     field_name: {
                         "new_form": new_form,
-                        "existing_resources": {
+                        "resource_forms": {
                             existing_resource.get(
                                 fk_api_client.endpoint_definition.id_field
                             ): {
@@ -250,14 +258,73 @@ class EditorForeignKeyFormsView(TemplateView):
                             }
                             for existing_resource in existing_resources
                         },
+                        "templates": {
+                            "update_dialog": render_to_string(
+                                "editor/dialogs/update_dialog.html",
+                                {
+                                    "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
+                                        fk_api_client,
+                                        MockColumnMetadataApiClient(),
+                                        id_suffix="__resource_id__",
+                                    ),
+                                    "resource_id": "__resource_id__",
+                                    "update_resource_url": reverse_lazy(
+                                        self.update_one_to_many_relation_reverse_base,
+                                        kwargs={
+                                            "resource_id": self.resource_id,
+                                            "fk_column_name": field_name,
+                                            "fk_resource_id": "__resource_id__",
+                                        },
+                                    ),
+                                    "dialog_id": f"update-{field_name}-__resource_id__-dialog",
+                                    "dialog_extra_classes": "col-lg-10",
+                                    "resource_type_readable": fk_api_client.endpoint,
+                                },
+                            ),
+                            "delete_dialog": render_to_string(
+                                "editor/dialogs/delete_dialog.html",
+                                {
+                                    "form": ResourceDeletionForm(
+                                        initial={
+                                            "resource_id_to_delete": "__resource_id__"
+                                        }
+                                    ),
+                                    "resource_id": "__resource_id__",
+                                    "delete_resource_url": reverse_lazy(
+                                        self.delete_one_to_many_relation_reverse_base,
+                                        kwargs={
+                                            "resource_id": self.resource_id,
+                                            "fk_column_name": field_name,
+                                            "fk_resource_id": "__resource_id__",
+                                        },
+                                    ),
+                                    "dialog_id": f"delete-{field_name}-__resource_id__-dialog",
+                                    "dialog_extra_classes": "col-lg-10",
+                                    "resource_type_readable": fk_api_client.endpoint,
+                                },
+                            ),
+                            "list_item": render_to_string(
+                                "editor/foreign_key_fields/one_to_many_field_list_item.html",
+                                {
+                                    "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
+                                        fk_api_client,
+                                        MockColumnMetadataApiClient(),
+                                        id_suffix="__resource_id__",
+                                    ),
+                                    "resource_id": "__resource_id__",
+                                    "resource_type_readable": fk_api_client.endpoint,
+                                    "field": {"name": field_name},
+                                },
+                            ),
+                        },
                     },
                 }
             )
-        return one_to_many_forms
+        return one_to_many_field_metadata
 
 
 class EditorProcessFormView(
-    EditorTocTemplateView, EditorForeignKeyFormsView, FormView, TemplateView
+    EditorTocTemplateView, EditorForeignKeyFieldsTemplateView, FormView, TemplateView
 ):
     template_name = "editor/editor_base_new.html"
     form_class: forms.Form
@@ -284,8 +351,8 @@ class EditorProcessFormView(
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        one_to_one_forms = self.get_one_to_one_forms()
-        one_to_many_forms = self.get_one_to_many_forms()
+        one_to_one_field_metadata = self.get_one_to_one_field_metadata()
+        one_to_many_field_metadata = self.get_one_to_many_field_metadata()
         context = super().get_context_data(**kwargs)
         context.update(
             {
@@ -295,8 +362,14 @@ class EditorProcessFormView(
                 "current_category": self.category,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
-                "one_to_one_forms": one_to_one_forms,
-                "one_to_many_forms": one_to_many_forms,
+                "one_to_one_field_metadata": one_to_one_field_metadata,
+                "one_to_many_field_metadata": one_to_many_field_metadata,
+                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
+                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
+                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
+                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
+                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
+                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
             }
         )
         return context
@@ -454,7 +527,6 @@ class OneToManyRelationView(View):
         self.resource_id = int(self.kwargs["resource_id"])
         self.resource = self.api_client.get(self.resource_id)
         self.fk_column_name = self.kwargs["fk_column_name"]
-        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
         one_to_many_fields = (
             self.api_client.endpoint_definition._get_one_to_many_fields()
         )
@@ -497,6 +569,9 @@ class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
         cleaned_data = form.cleaned_data
         cleaned_data.update({self.fk_table_column_name: self.resource_id})
         new_resource = self.fk_api_client.register(cleaned_data)
+        new_resource.update(
+            {"pk": new_resource.get(self.fk_api_client.endpoint_definition.id_field)}
+        )
         message = f"Added new {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
@@ -505,10 +580,17 @@ class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
 
 
 class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
+    def dispatch(self, request, *args, **kwargs):
+        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         self.fk_api_client.update(self.fk_resource_id, form.cleaned_data)
         message = f"Updated {self.fk_table_name} registration."
         resource = self.fk_api_client.get(self.fk_resource_id)
+        resource.update(
+            {"pk": resource.get(self.fk_api_client.endpoint_definition.id_field)}
+        )
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -517,6 +599,10 @@ class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
 
 class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
     form_class = ResourceDeletionForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
+        return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
         logger.exception("form.errors", form.errors)

@@ -1,0 +1,32 @@
+<li class="list-group-item">
+    <div class="row align-items-center gx-4 gy-3">
+        <div class="col-xl-10">
+            {{ resource_type_readable }} {{ resource_id }}
+            <div class="form-text text-truncate">
+                {% for field in form %}
+                <span class="{% if not forloop.last %}me-2{% endif %}">
+                    <strong>{{ field.label }}</strong><i class="bi bi-dot"></i><span data-field="{{ field.name }}">{% if field.get_choices_display %}{{ field.get_choices_display }}{% else %}{{ field.value|default:'None' }}{% endif %}</span>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-xl-2 d-flex column-gap-2">
+            <button
+                class="btn btn-light update-dialog-btn ms-xl-auto"
+                data-dialog-id="update-{{ field.name }}-{{ resource_id }}-dialog"
+                type="button"
+                aria-label="Edit"
+                title="Edit">
+                <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button
+                class="btn btn-outline-danger delete-dialog-btn"
+                data-dialog-id="delete-{{ field.name }}-{{ resource_id }}-dialog"
+                type="button"
+                aria-label="Delete"
+                title="Delete">
+                <i class="bi bi-trash3-fill"></i>
+            </button>
+        </div>
+    </div>
+</li>
