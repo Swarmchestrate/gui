@@ -54,7 +54,8 @@
                             id="delete-checked-btn"
                             class="d-inline-flex align-items-center column-gap-2 invisible btn btn-outline-danger"
                             type="button"
-                            aria-label="Delete">
+                            aria-label="Delete"
+                            title="Delete">
                             <i class="bi bi-trash3-fill"></i>
                             <span>Delete selected (<span id="num-checked"></span>)</span>
                         </button>
@@ -108,7 +109,8 @@
                                     <a
                                         href="{% url editor_reverse_base resource_id %}"
                                         class="btn btn-light edit-btn"
-                                        aria-label="Edit">
+                                        aria-label="Edit"
+                                        title="Edit">
                                         <i class="bi bi-pencil-fill"></i>
                                     </a>
                                     {% endblock edit_button %}
@@ -118,7 +120,8 @@
                                         class="btn btn-light delete-btn"
                                         data-dialog-id="delete-{{ resource_id }}-dialog"
                                         type="button"
-                                        aria-label="Delete">
+                                        aria-label="Delete"
+                                        title="Delete">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </li>
