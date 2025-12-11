@@ -2,7 +2,7 @@
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
     <div class="d-flex flex-column one-to-one-field align-items-start row-gap-3">
         <div class="w-100 rounded border p-3">
-            <div class="d-flex flex-md-row flex-column flex-wrap align-items-start justify-content-between column-gap-4">
+            <div class="d-flex flex-md-row flex-column flex-wrap align-items-md-center align-items-start justify-content-between row-gap-3 column-gap-4">
                 <dl class="d-flex flex-md-row flex-column column-gap-4 form-text mb-0">
                     {% for field in field_metadata.update_form %}
                     <div>
@@ -20,8 +20,20 @@
                         data-dialog-id="new-{{ field.name }}-dialog">
                         Add {{ field.label }}
                     </button>
-                    <button class="btn btn-light update-dialog-btn {% if not field.value %}d-none{% endif %}" data-dialog-id="update-{{ field.name }}-dialog" type="button">Edit</button>
-                    <button class="btn btn-outline-danger delete-dialog-btn {% if not field.value %}d-none{% endif %}" data-dialog-id="delete-{{ field.name }}-dialog" type="button">Delete</button>
+                    <button
+                        class="btn btn-light update-dialog-btn {% if not field.value %}d-none{% endif %}"
+                        data-dialog-id="update-{{ field.name }}-dialog"
+                        type="button"
+                        aria-label="Edit">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                        class="btn btn-outline-danger delete-dialog-btn {% if not field.value %}d-none{% endif %}"
+                        data-dialog-id="delete-{{ field.name }}-dialog"
+                        type="button"
+                        aria-label="Delete">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
                 </div>
             </div>
         </div>

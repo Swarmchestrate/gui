@@ -9,8 +9,8 @@
     <ul class="list-group">
         {% for existing_resource_id, existing_resource_metadata in field_metadata.existing_resources.items %}
         <li class="list-group-item">
-            <div class="row align-items-center gx-4">
-                <div class="col-lg-10">
+            <div class="row align-items-center gx-4 gy-3">
+                <div class="col-xl-10">
                     {{ field.label }} {{ existing_resource_id }}
                     <div class="form-text text-truncate">
                         {% for field in existing_resource_metadata.update_form %}
@@ -21,9 +21,21 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="col-lg-2 d-flex column-gap-2">
-                    <button class="btn btn-light btn-sm update-dialog-btn" data-dialog-id="update-{{ field.name }}-{{ existing_resource_id }}-dialog" type="button">Edit</button>
-                    <button class="btn btn-outline-danger btn-sm delete-dialog-btn" data-dialog-id="delete-{{ field.name }}-{{ existing_resource_id }}-dialog" type="button">Delete</button>
+                <div class="col-xl-2 d-flex column-gap-2">
+                    <button
+                        class="btn btn-light update-dialog-btn ms-xl-auto"
+                        data-dialog-id="update-{{ field.name }}-{{ existing_resource_id }}-dialog"
+                        type="button"
+                        aria-label="Edit">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                        class="btn btn-outline-danger delete-dialog-btn"
+                        data-dialog-id="delete-{{ field.name }}-{{ existing_resource_id }}-dialog"
+                        type="button"
+                        aria-label="Delete">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
                 </div>
             </div>
         </li>
