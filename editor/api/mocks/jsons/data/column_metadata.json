@@ -40,7 +40,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "container_image",
         "title": "Container Image",
         "category": "Specs:Component",
@@ -48,7 +48,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "commands",
         "title": "Commands",
         "category": "Specs:Component",
@@ -56,7 +56,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "arguments",
         "title": "Arguments",
         "category": "Specs:Component",
@@ -64,7 +64,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "environment_vars",
         "title": "Environment Variables",
         "category": "Specs:Component",
@@ -72,7 +72,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "min_cpu",
         "title": "Minimum CPU",
         "category": "Specs:Component",
@@ -80,7 +80,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "min_memory_gb",
         "title": "Minimum Memory (GB)",
         "category": "Specs:Component",
@@ -88,7 +88,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "max_cpu",
         "title": "Maximum CPU",
         "category": "Specs:Component",
@@ -96,7 +96,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "max_memory_gb",
         "title": "Maximum Memory (GB)",
         "category": "Specs:Component",
@@ -104,7 +104,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "relationships",
         "title": "Relationships",
         "category": "Specs",
@@ -112,7 +112,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "behaviour",
         "title": "Behaviour",
         "category": "Specs",
@@ -120,7 +120,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "security_config",
         "title": "Security Config",
         "category": "Specs",
@@ -128,7 +128,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "instance_type",
         "title": "Instance Type",
         "category": "Resource Requirements",
@@ -136,7 +136,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "num_cpu",
         "title": "Number of CPUs",
         "category": "Resource Requirements",
@@ -144,7 +144,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "mem_ram",
         "title": "Memory RAM",
         "category": "Resource Requirements",
@@ -152,7 +152,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "num_gpu",
         "title": "Number of GPUs",
         "category": "Resource Requirements",
@@ -160,7 +160,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "disk_size",
         "title": "Disk Size",
         "category": "Resource Requirements",
@@ -168,7 +168,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "network_bandwidth",
         "title": "Network Bandwidth",
         "category": "Resource Requirements",
@@ -176,7 +176,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "num_instances",
         "title": "Number of Instances",
         "category": "Resource Requirements",
@@ -184,7 +184,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "energy_type",
         "title": "Energy Type",
         "category": "Resource Requirements",
@@ -192,7 +192,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "security_rules",
         "title": "Security Rules",
         "category": "Resource Requirements",
@@ -200,7 +200,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "max_price",
         "title": "Maximum Price",
         "category": "Resource Requirements",
@@ -208,7 +208,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "location",
         "title": "Location",
         "category": "QoS Goals",
@@ -216,7 +216,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "pref_capacity_provider",
         "title": "Preferred Capacity Provider",
         "category": "QoS Goals",
@@ -224,7 +224,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "pref_resource_type",
         "title": "Preferred Resource Type",
         "category": "QoS Goals",
@@ -232,7 +232,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "pref_provider_type",
         "title": "Preferred Provider Type",
         "category": "QoS Goals",
@@ -240,7 +240,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "pref_resource_provider",
         "title": "Preferred Resource Provider",
         "category": "QoS Goals",
@@ -248,7 +248,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "minimise_power_usage",
         "title": "Minimise Power Usage",
         "category": "QoS Goals:Energy",
@@ -256,7 +256,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "energy_budget",
         "title": "Energy Budget",
         "category": "QoS Goals:Energy",
@@ -264,7 +264,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "minimise_cost",
         "title": "Minimise Cost",
         "category": "QoS Goals:Cost",
@@ -272,7 +272,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "cost_budget",
         "title": "Cost Budget",
         "category": "QoS Goals:Cost",
@@ -280,7 +280,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "trust_level",
         "title": "Trust Level",
         "category": "QoS Goals",
@@ -288,7 +288,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "response_time_ms",
         "title": "Response Time (ms)",
         "category": "QoS Goals:Performance",
@@ -296,7 +296,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "requests_per_sec",
         "title": "Requests per Second",
         "category": "QoS Goals:Performance",
@@ -304,7 +304,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "iops",
         "title": "IOPS",
         "category": "QoS Goals:Performance",
@@ -312,7 +312,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "io_throughput_bps",
         "title": "IO Throughput (bps)",
         "category": "QoS Goals:Performance",
@@ -320,7 +320,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "net_throughput_bps",
         "title": "Net Throughput (bps)",
         "category": "QoS Goals:Performance",
@@ -328,7 +328,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "database_writes",
         "title": "Database Writes",
         "category": "QoS Goals:Performance",
@@ -336,7 +336,7 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "custom_attributes",
         "title": "Custom Attributes",
         "category": "QoS Goals:Performance",
@@ -344,11 +344,19 @@
         "order": null
     },
     {
-        "table_name": "application",
+        "table_name": "application_microservice",
         "column_name": "custom_scaling_rules",
         "title": "Custom Scaling Rules",
         "category": "QoS Goals:Performance",
         "description": "Custom scaling rules with higher priority over AI decision making in case of conflict.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "application_microservice",
+        "title": "Microservices",
+        "category": "Microservices",
+        "description": "",
         "order": null
     },
     {
