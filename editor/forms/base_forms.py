@@ -3,10 +3,8 @@ from enum import Enum
 import lxml.html
 from django import forms
 
-from editor.api.base_api_clients import (
-    ApiClient,
-    ColumnMetadataApiClient,
-)
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
 from postgrest.mocks.base.mock_base_api_clients import MockApiClient
 
 from .widgets import SelectWithDisabledFirstOption

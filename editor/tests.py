@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from editor.api.base_api_clients import ApiClientMixin
+from postgrest.base.base_api_clients import ApiClientMixin
 
 
 class ApiClientTestCase(SimpleTestCase):

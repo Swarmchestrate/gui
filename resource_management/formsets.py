@@ -1,6 +1,7 @@
 from django.forms.formsets import BaseFormSet
 
-from editor.api.base_api_clients import ApiClient, ColumnMetadataApiClient
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
 
 
 class OpenApiDefinitionBasedFormSet(BaseFormSet):

@@ -7,7 +7,8 @@ from django.urls.base import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.views.generic.base import ContextMixin
 
-from editor.api.base_api_clients import ApiClient, ColumnMetadataApiClient
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
 
 from .forms import (
     MultiResourceDeletionForm,
