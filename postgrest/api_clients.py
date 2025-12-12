@@ -1,7 +1,6 @@
 from ast import literal_eval as make_tuple
 
 from .base.base_api_clients import ApiClient, BaseColumnMetadataApiClient
-from .base.base_definitions import ColumnMetadataUserSpecifiableOpenApiDefinition,
 from .definitions import (
     ApplicationBehaviourUserSpecifiableOpenApiDefinition,
     ApplicationColocateUserSpecifiableOpenApiDefinition,

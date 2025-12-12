@@ -10,7 +10,7 @@ class BaseOpenApiDefinition:
     # Properties
     @property
     def pk_field_name(self) -> str | None:
-        if self._pk_field_name:
+        if hasattr(self, "_pk_field_name"):
             return self._pk_field_name
         for field_name, field_metadata in self._get_all_fields().items():
             is_pk = lxml.html.fromstring(field_metadata.get("description", "")).xpath(
@@ -198,9 +198,3 @@ class UserSpecifiableOpenApiDefinition(
     OpenApiDefinition, UserSpecifiableOpenApiDefinitionMixin
 ):
     pass
-
-
-class ColumnMetadataUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "column_metadata"

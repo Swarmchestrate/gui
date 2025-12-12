@@ -23,7 +23,7 @@ class ApplicationBehaviourUserSpecifiableOpenApiDefinition(
 class ApplicationColocateUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
-    definition_name = "application_colocation"
+    definition_name = "application_colocate"
 
 
 class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(

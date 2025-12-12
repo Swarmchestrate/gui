@@ -3,8 +3,8 @@ from django import template
 from postgrest.readable_text_utils import (
     application_behaviour_type_readable,
     application_behaviour_type_readable_plural,
-    application_colocation_type_readable,
-    application_colocation_type_readable_plural,
+    application_colocate_type_readable,
+    application_colocate_type_readable_plural,
     application_environment_var_type_readable,
     application_environment_var_type_readable_plural,
     application_pref_resource_provider_type_readable,
@@ -40,8 +40,8 @@ register = template.Library()
 
 register.simple_tag(application_behaviour_type_readable)
 register.simple_tag(application_behaviour_type_readable_plural)
-register.simple_tag(application_colocation_type_readable)
-register.simple_tag(application_colocation_type_readable_plural)
+register.simple_tag(application_colocate_type_readable)
+register.simple_tag(application_colocate_type_readable_plural)
 register.simple_tag(application_environment_var_type_readable)
 register.simple_tag(application_environment_var_type_readable_plural)
 register.simple_tag(application_pref_resource_provider_type_readable)

@@ -7,11 +7,11 @@ def application_behaviour_type_readable_plural() -> str:
     return "behaviours"
 
 
-def application_colocation_type_readable() -> str:
+def application_colocate_type_readable() -> str:
     return "colocation"
 
 
-def application_colocation_type_readable_plural() -> str:
+def application_colocate_type_readable_plural() -> str:
     return "colocations"
 
 

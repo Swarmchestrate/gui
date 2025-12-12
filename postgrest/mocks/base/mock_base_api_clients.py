@@ -43,8 +43,8 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
     instantiated directly.
     """
 
-    path_to_mock_data_dir = os.path.join(
-        settings.BASE_DIR, "postgrest", "mocks", "jsons", "definitions"
+    path_to_data_dir = os.path.join(
+        settings.BASE_DIR, "postgrest", "mocks", "jsons", "data"
     )
     path_to_temp_data_dir = os.path.join(
         settings.BASE_DIR, "postgrest", "mocks", "jsons", "data", "temp"
@@ -53,12 +53,14 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
     def __init__(self) -> None:
         super().__init__()
         self.endpoint_definition = self.endpoint_definition_class()
-        self.path_to_data = os.path.join(
-            self.path_to_mock_data_dir, f"{self.endpoint}.json"
-        )
-        self.path_to_temp_data = os.path.join(
-            self.path_to_temp_data_dir, f"{self.endpoint}.json"
-        )
+
+    @property
+    def path_to_data(self):
+        return os.path.join(self.path_to_data_dir, f"{self.endpoint}.json")
+
+    @property
+    def path_to_temp_data(self):
+        return os.path.join(self.path_to_temp_data_dir, f"{self.endpoint}.json")
 
     # Helpers
     def _create_temp_data_if_not_exists(self):
