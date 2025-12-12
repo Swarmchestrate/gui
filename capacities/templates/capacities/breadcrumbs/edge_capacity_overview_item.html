@@ -1,5 +1,5 @@
 {% load helpers %}
-{% load capacity_helpers %}
+{% load readable_text_helpers %}
 {% edge_capacity_type_readable as resource_name_base %}
 {% with resource_name_base=resource_name_base.title|add:' ' url_name='capacities:edge_capacity_overview' resource_id_in_url=resource_id %}
 {% include 'editor/breadcrumbs/overview_item_base.html' with resource_name=resource_name_base|add:resource_id %}

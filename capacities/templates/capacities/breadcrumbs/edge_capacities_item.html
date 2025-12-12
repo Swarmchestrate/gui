@@ -1,4 +1,4 @@
-{% load capacity_helpers %}
+{% load readable_text_helpers %}
 {% edge_capacity_type_readable_plural as page_title %}
 {% with page_title=page_title.title url_name='capacities:edge_capacity_list' %}
 {% include 'breadcrumbs/item_base.html' %}

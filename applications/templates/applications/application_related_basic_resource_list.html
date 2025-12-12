@@ -1,6 +1,6 @@
 {% extends 'resource_management/basic_resource_list.html' %}
 {% block title %}
-{% load application_helpers %}
+{% load readable_text_helpers %}
 {% application_type_readable_plural as application_type_readable_plural %}
 <hgroup class="d-flex flex-column row-gap-2">
     <p class="text-body-secondary fs-5 mb-0">{{ application_type_readable_plural.title }}</p>

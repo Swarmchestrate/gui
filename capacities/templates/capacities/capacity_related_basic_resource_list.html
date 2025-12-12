@@ -1,6 +1,6 @@
 {% extends 'resource_management/basic_resource_list.html' %}
 {% block title %}
-{% load capacity_helpers %}
+{% load readable_text_helpers %}
 {% capacity_type_readable_plural as capacity_type_readable_plural %}
 <hgroup class="d-flex flex-column row-gap-2">
     <p class="text-body-secondary fs-5 mb-0">{{ capacity_type_readable_plural.title }}</p>
