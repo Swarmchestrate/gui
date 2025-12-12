@@ -7,9 +7,15 @@ from editor.base_views import (
     ResourceTypeNameContextMixin,
 )
 from editor.views import (
+    DeleteOneToManyRelationFormView,
+    DeleteOneToOneRelationFormView,
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
+    NewOneToManyRelationFormView,
+    NewOneToOneRelationFormView,
+    UpdateOneToManyRelationFormView,
+    UpdateOneToOneRelationFormView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -56,6 +62,24 @@ class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormVi
     template_name = "applications/application_editor.html"
     form_class = ApplicationEditorForm
     success_url = reverse_lazy("applications:new_application")
+    new_one_to_one_relation_reverse_base = (
+        "applications:new_application_one_to_one_relation"
+    )
+    update_one_to_one_relation_reverse_base = (
+        "applications:update_application_one_to_one_relation"
+    )
+    delete_one_to_one_relation_reverse_base = (
+        "applications:delete_application_one_to_one_relation"
+    )
+    new_one_to_many_relation_reverse_base = (
+        "applications:new_application_one_to_many_relation"
+    )
+    update_one_to_many_relation_reverse_base = (
+        "applications:update_application_one_to_many_relation"
+    )
+    delete_one_to_many_relation_reverse_base = (
+        "applications:delete_application_one_to_many_relation"
+    )
 
 
 class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
@@ -78,3 +102,87 @@ class ApplicationEditorOverviewTemplateView(
     ApplicationViewMixin, EditorOverviewTemplateView
 ):
     template_name = "applications/application_overview.html"
+
+
+class ApplicationNewOneToOneRelationFormView(
+    ApplicationViewMixin, NewOneToOneRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationUpdateOneToOneRelationFormView(
+    ApplicationViewMixin, UpdateOneToOneRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationDeleteOneToOneRelationFormView(
+    ApplicationViewMixin, DeleteOneToOneRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationNewOneToManyRelationFormView(
+    ApplicationViewMixin, NewOneToManyRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationUpdateOneToManyRelationFormView(
+    ApplicationViewMixin, UpdateOneToManyRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationDeleteOneToManyRelationFormView(
+    ApplicationViewMixin, DeleteOneToManyRelationFormView
+):
+    template_name = "applications/application_editor.html"
+    api_client = ApplicationApiClient
+
+    def dispatch(self, request, *args, **kwargs):
+        self.success_url = reverse_lazy(
+            "applications:application_editor",
+            kwargs={"resource_id": kwargs["resource_id"]},
+        )
+        return super().dispatch(request, *args, **kwargs)
