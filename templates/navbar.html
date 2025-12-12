@@ -31,6 +31,11 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         {{ application_type_readable_plural.title }}
                     </a>
+                    <ul class="dropdown-menu shadow">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'applications:application_list' %}">{{ application_type_readable_plural.title }}</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
