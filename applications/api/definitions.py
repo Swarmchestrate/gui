@@ -1,8 +1,24 @@
 from editor.api.base_definitions import UserSpecifiableOpenApiDefinition
 
 
-class ApplicationUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
-    def __init__(self, openapi_spec: dict) -> None:
-        super().__init__(openapi_spec)
-        self.definition_name = "application"
-        self.id_field = "application_id"
+class ApplicationUserSpecifiableOpenApiDefinitionMixin:
+    id_field = "application_id"
+    definition_name = "application"
+
+
+class ApplicationMicroserviceUserSpecifiableOpenApiDefinitionMixin:
+    id_field = "id"
+    definition_name = "application_microservice"
+
+
+class ApplicationUserSpecifiableOpenApiDefinition(
+    ApplicationUserSpecifiableOpenApiDefinitionMixin, UserSpecifiableOpenApiDefinition
+):
+    pass
+
+
+class ApplicationMicroserviceUserSpecifiableOpenApiDefinition(
+    ApplicationMicroserviceUserSpecifiableOpenApiDefinitionMixin,
+    UserSpecifiableOpenApiDefinition,
+):
+    pass

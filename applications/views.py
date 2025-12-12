@@ -24,7 +24,11 @@ from resource_management.views import (
     ResourceListFormView,
 )
 
-from .api.api_clients import (
+# from .api.api_clients import (
+#     ApplicationApiClient,
+#     ApplicationColumnMetadataApiClient,
+# )
+from .api.mocks.mock_api_clients import (
     ApplicationApiClient,
     ApplicationColumnMetadataApiClient,
 )

@@ -1,0 +1,18 @@
+[
+    {
+        "application_id": 1,
+        "name": "Weather Analytics App",
+        "author": "test",
+        "creation_date": "2025-08-28T10:00:00",
+        "version": "1.0",
+        "classification": "Data Processing"
+    },
+    {
+        "application_id": 159014,
+        "name": "Weather Analytics App 3",
+        "author": "John Doe",
+        "creation_date": null,
+        "version": "",
+        "classification": ""
+    }
+]
