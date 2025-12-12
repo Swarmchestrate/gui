@@ -41,7 +41,7 @@
                     {% for field_group in field_groups %}
                     {% with category_id_base=field_group.grouper.lower.split|join:'-'|split_by_colon|join:'-' %}
                     <div
-                        class="tab-pane fade {% if field_group.grouper == current_category %}show active{% endif %}"
+                        class="tab-pane {% if field_group.grouper == current_category %}show active{% endif %}"
                         id="{{ category_id_base }}-tab-pane"
                         role="tabpanel"
                         aria-labelledby="{{ category_id_base }}-tab"
