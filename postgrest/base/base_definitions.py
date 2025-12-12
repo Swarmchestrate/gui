@@ -13,9 +13,10 @@ class BaseOpenApiDefinition:
         if hasattr(self, "_pk_field_name"):
             return self._pk_field_name
         for field_name, field_metadata in self._get_all_fields().items():
-            is_pk = lxml.html.fromstring(field_metadata.get("description", "")).xpath(
-                "pk"
-            )
+            description = field_metadata.get("description")
+            if not description:
+                continue
+            is_pk = lxml.html.fromstring(description).xpath("pk")
             if not is_pk:
                 continue
             self._pk_field_name = field_name
