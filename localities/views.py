@@ -11,12 +11,12 @@ from editor.base_views import (
     ColumnMetadataApiClientTemplateView,
     ResourceTypeNameContextMixin,
 )
-
-# from .api.api_clients import LocalityApiClient, LocalityColumnMetadataApiClient
 from postgrest.mocks.mock_api_clients import (
-    LocalityApiClient,
-    MockColumnMetadataApiClient,
+    MockColumnMetadataApiClient as ColumnMetadataApiClient,
 )
+
+# from postgrest.api_clients import LocalityApiClient, ColumnMetadataApiClient
+from postgrest.mocks.mock_api_clients import MockLocalityApiClient as LocalityApiClient
 from resource_management.views import (
     BasicResourceListFormView,
     MultiResourceDeletionFormView,
@@ -45,7 +45,7 @@ class LocalityViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = LocalityApiClient
-    column_metadata_api_client_class = MockColumnMetadataApiClient
+    column_metadata_api_client_class = ColumnMetadataApiClient
     resource_list_reverse = "localities:locality_list"
     resource_update_reverse = "localities:update_locality"
     new_resource_reverse = "localities:new_locality"

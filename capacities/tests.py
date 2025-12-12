@@ -2,8 +2,10 @@ from django.test import SimpleTestCase
 
 from editor.test_mixins import ApiClientTestCaseHelperMixin
 from postgrest.mocks.mock_api_clients import (
-    CloudCapacityApiClient,
-    EdgeCapacityApiClient,
+    MockCloudCapacityApiClient as CloudCapacityApiClient,
+)
+from postgrest.mocks.mock_api_clients import (
+    MockEdgeCapacityApiClient as EdgeCapacityApiClient,
 )
 
 

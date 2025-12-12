@@ -34,8 +34,10 @@ from editor.views import (
 #     ColumnMetadataApiClient,
 # )
 from postgrest.mocks.mock_api_clients import (
-    CloudCapacityApiClient,
-    CloudCapacityColumnMetadataApiClient,
+    MockCloudCapacityApiClient as CloudCapacityApiClient,
+)
+from postgrest.mocks.mock_api_clients import (
+    MockCloudCapacityColumnMetadataApiClient as CloudCapacityColumnMetadataApiClient,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,

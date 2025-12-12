@@ -18,7 +18,7 @@ from editor.views import (
     UpdateOneToOneRelationFormView,
 )
 from postgrest.mocks.mock_api_clients import (
-    ApplicationApiClient,
+    MockApplicationApiClient as ApplicationApiClient,
 )
 from postgrest.mocks.mock_api_clients import (
     MockApplicationColumnMetadataApiClient as ApplicationColumnMetadataApiClient,

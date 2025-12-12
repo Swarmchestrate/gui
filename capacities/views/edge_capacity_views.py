@@ -25,8 +25,10 @@ from editor.views import (
 #     EdgeCapacityColumnMetadataApiClient,
 # )
 from postgrest.mocks.mock_api_clients import (
-    EdgeCapacityApiClient,
-    EdgeCapacityColumnMetadataApiClient,
+    MockEdgeCapacityApiClient as EdgeCapacityApiClient,
+)
+from postgrest.mocks.mock_api_clients import (
+    MockEdgeCapacityColumnMetadataApiClient as EdgeCapacityColumnMetadataApiClient,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
