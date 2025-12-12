@@ -4,8 +4,9 @@ import lxml.html
 from django import forms
 
 from postgrest.api_clients import ColumnMetadataApiClient
-from postgrest.base.base_api_clients import ApiClient
-from postgrest.mocks.base.mock_base_api_clients import MockApiClient
+
+# from postgrest.base.base_api_clients import ApiClient
+from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
 
 from .widgets import SelectWithDisabledFirstOption
 
@@ -190,7 +191,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         if not field_metadata.get("type") == "one_to_many":
             return
         endpoint = field_metadata.get("fk_table_name", "")
-        fk_api_client = MockApiClient.get_client_instance_by_endpoint(endpoint)
+        fk_api_client = ApiClient.get_client_instance_by_endpoint(endpoint)
         choices = []
         if fk_api_client:
             resources = fk_api_client.get_resources()
@@ -223,7 +224,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         fk_table_name = next(iter(field_description.xpath("fk/@table")), None)
 
         # Get endpoint for the foreign key
-        api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+        api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
         if not api_client:
             return
         # Get resources at endpoint

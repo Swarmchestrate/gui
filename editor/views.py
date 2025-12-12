@@ -12,10 +12,12 @@ from django.views.generic import (
     View,
 )
 
-from postgrest.api_clients import ColumnMetadataApiClient
-from postgrest.base.base_api_clients import ApiClient
-from postgrest.mocks.base.mock_base_api_clients import MockApiClient
-from postgrest.mocks.mock_api_clients import MockColumnMetadataApiClient
+# from postgrest.api_clients import ColumnMetadataApiClient
+# from postgrest.base.base_api_clients import ApiClient
+from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
+from postgrest.mocks.mock_api_clients import (
+    MockColumnMetadataApiClient as ColumnMetadataApiClient,
+)
 from resource_management.forms import ResourceDeletionForm
 
 from .forms.base_forms import (
@@ -189,12 +191,12 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
         )
         for field_name, field_metadata in one_to_one_fields.items():
             fk_table_name = field_metadata.get("fk_table_name", "")
-            fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+            fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
             if not fk_api_client:
                 continue
             new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
                 fk_api_client,
-                MockColumnMetadataApiClient(),
+                ColumnMetadataApiClient(),
                 id_prefix="new",
             )
             initial = dict()
@@ -208,7 +210,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                         "new_form": new_form,
                         "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
                             fk_api_client,
-                            MockColumnMetadataApiClient(),
+                            ColumnMetadataApiClient(),
                             id_suffix=f"{fk_table_name}_{self.resource_id}",
                             initial=initial,
                         ),
@@ -225,12 +227,12 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
         one_to_many_fields = self.api_client.endpoint_definition.get_user_specifiable_one_to_many_fields()
         for field_name, field_metadata in one_to_many_fields.items():
             fk_table_name = field_metadata.get("fk_table_name", "")
-            fk_api_client = MockApiClient.get_client_instance_by_endpoint(fk_table_name)
+            fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
             if not fk_api_client:
                 continue
             new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
                 fk_api_client,
-                MockColumnMetadataApiClient(),
+                ColumnMetadataApiClient(),
                 id_prefix="new",
             )
             existing_resources = fk_api_client.get_resources_referencing_resource_id(
@@ -246,7 +248,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                             ): {
                                 "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
                                     fk_api_client,
-                                    MockColumnMetadataApiClient(),
+                                    ColumnMetadataApiClient(),
                                     id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.pk_field_name}",
                                     initial=existing_resource,
                                 ),
@@ -266,7 +268,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                                 {
                                     "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
                                         fk_api_client,
-                                        MockColumnMetadataApiClient(),
+                                        ColumnMetadataApiClient(),
                                         id_suffix="__resource_id__",
                                     ),
                                     "resource_id": "__resource_id__",
@@ -310,7 +312,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                                 {
                                     "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
                                         fk_api_client,
-                                        MockColumnMetadataApiClient(),
+                                        ColumnMetadataApiClient(),
                                         id_suffix="__resource_id__",
                                     ),
                                     "resource_id": "__resource_id__",
@@ -435,7 +437,7 @@ class OneToOneRelationView(View):
         self.fk_table_name = one_to_one_fields.get(self.fk_column_name, {}).get(
             "fk_table_name"
         )
-        self.fk_api_client = MockApiClient.get_client_instance_by_endpoint(
+        self.fk_api_client = ApiClient.get_client_instance_by_endpoint(
             self.fk_table_name
         )
         return super().dispatch(request, *args, **kwargs)
@@ -453,10 +455,10 @@ class OneToOneRelationBasedFormView(OneToOneRelationView, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "api_client": MockApiClient.get_client_instance_by_endpoint(
+                "api_client": ApiClient.get_client_instance_by_endpoint(
                     self.fk_table_name
                 ),
-                "column_metadata_api_client": MockColumnMetadataApiClient(),
+                "column_metadata_api_client": ColumnMetadataApiClient(),
                 "id_prefix": "new",
             }
         )
@@ -542,7 +544,7 @@ class OneToManyRelationView(View):
         self.fk_table_column_name = one_to_many_fields.get(self.fk_column_name, {}).get(
             "fk_table_column_name"
         )
-        self.fk_api_client = MockApiClient.get_client_instance_by_endpoint(
+        self.fk_api_client = ApiClient.get_client_instance_by_endpoint(
             self.fk_table_name
         )
         return super().dispatch(request, *args, **kwargs)
@@ -560,10 +562,10 @@ class OneToManyRelationBasedFormView(OneToManyRelationView, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "api_client": MockApiClient.get_client_instance_by_endpoint(
+                "api_client": ApiClient.get_client_instance_by_endpoint(
                     self.fk_table_name
                 ),
-                "column_metadata_api_client": MockColumnMetadataApiClient(),
+                "column_metadata_api_client": ColumnMetadataApiClient(),
                 "id_prefix": "new",
             }
         )
