@@ -1,0 +1,20 @@
+{
+    "required": ["table_name", "column_name", "title"],
+    "properties": {
+        "table_name": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "text",
+            "type": "string"
+        },
+        "column_name": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "text",
+            "type": "string"
+        },
+        "title": { "format": "text", "type": "string" },
+        "category": { "format": "text", "type": "string" },
+        "description": { "format": "text", "type": "string" },
+        "order": { "format": "integer", "type": "integer" }
+    },
+    "type": "object"
+}
