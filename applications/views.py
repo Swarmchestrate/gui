@@ -17,6 +17,15 @@ from editor.views import (
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
+from postgrest.mocks.mock_api_clients import (
+    ApplicationApiClient,
+    MockColumnMetadataApiClient,
+)
+
+# from postgrest.api_clients import (
+#     ApplicationApiClient,
+#     ColumnMetadataApiClient,
+# )
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -24,14 +33,6 @@ from resource_management.views import (
     ResourceListFormView,
 )
 
-# from .api.api_clients import (
-#     ApplicationApiClient,
-#     ApplicationColumnMetadataApiClient,
-# )
-from .api.mocks.mock_api_clients import (
-    ApplicationApiClient,
-    ApplicationColumnMetadataApiClient,
-)
 from .forms import ApplicationEditorForm, ApplicationRegistrationForm
 from .utils import application_type_readable, application_type_readable_plural
 
@@ -47,7 +48,7 @@ class ApplicationViewMixin(
     editor_reverse_base = "applications:application_editor"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
-    column_metadata_api_client_class = ApplicationColumnMetadataApiClient
+    column_metadata_api_client_class = MockColumnMetadataApiClient
     resource_list_reverse = "applications:application_list"
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"

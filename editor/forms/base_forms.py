@@ -7,7 +7,7 @@ from editor.api.base_api_clients import (
     ApiClient,
     ColumnMetadataApiClient,
 )
-from editor.api.mocks.mock_base_api_clients import MockApiClient
+from postgrest.mocks.base.mock_base_api_clients import MockApiClient
 
 from .widgets import SelectWithDisabledFirstOption
 
@@ -198,8 +198,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
             resources = fk_api_client.get_resources()
             choices = [
                 (
-                    r.get(fk_api_client.endpoint_definition.id_field),
-                    f"{fk_api_client.endpoint.title()} {r.get(fk_api_client.endpoint_definition.id_field)}",
+                    r.get(fk_api_client.endpoint_definition.pk_field_name),
+                    f"{fk_api_client.endpoint.title()} {r.get(fk_api_client.endpoint_definition.pk_field_name)}",
                 )
                 for r in resources
             ]
@@ -233,8 +233,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
         # Return field components in a dict
         choices = (
             (
-                r.get(api_client.endpoint_definition.id_field),
-                f"{api_client.endpoint.title()} {r.get(api_client.endpoint_definition.id_field)}",
+                r.get(api_client.endpoint_definition.pk_field_name),
+                f"{api_client.endpoint.title()} {r.get(api_client.endpoint_definition.pk_field_name)}",
             )
             for r in resources
         )

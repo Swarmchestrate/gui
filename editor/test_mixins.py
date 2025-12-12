@@ -1,4 +1,4 @@
-from editor.api.base_api_clients import ApiClient
+from postgrest.base.base_api_clients import ApiClient
 
 
 class ApiClientTestCaseHelperMixin:
@@ -29,8 +29,8 @@ class ApiClientTestCaseHelperMixin:
         if not data:
             data = dict()
         new_resource = self.api_client.register(data)
-        id_field = self.api_client.endpoint_definition.id_field
-        self.add_resource_id(new_resource.get(id_field))
+        pk_field_name = self.api_client.endpoint_definition.pk_field_name
+        self.add_resource_id(new_resource.get(pk_field_name))
         return new_resource
 
 

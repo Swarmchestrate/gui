@@ -3,14 +3,6 @@ from dataclasses import dataclass
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-# from capacities.api.cloud_capacity_api_clients import (
-#     CloudCapacityApiClient,
-#     CloudCapacityColumnMetadataApiClient,
-# )
-from capacities.api.mocks.mock_cloud_capacity_clients import (
-    CloudCapacityApiClient,
-    CloudCapacityColumnMetadataApiClient,
-)
 from capacities.forms.cloud_capacity_forms import (
     CloudCapacityEditorForm,
     CloudCapacityRegistrationForm,
@@ -35,6 +27,15 @@ from editor.views import (
     NewOneToOneRelationFormView,
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
+)
+
+# from postgrest.api_clients import (
+#     CloudCapacityApiClient,
+#     ColumnMetadataApiClient,
+# )
+from postgrest.mocks.mock_api_clients import (
+    CloudCapacityApiClient,
+    CloudCapacityColumnMetadataApiClient,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,

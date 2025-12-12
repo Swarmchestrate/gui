@@ -37,7 +37,7 @@ class ResourceListFormView(TemplateView):
 
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
-    id_field: str
+    pk_field_name: str
     resource_type_readable_plural: str
 
     resource_list_reverse: str
@@ -57,20 +57,22 @@ class ResourceListFormView(TemplateView):
                 "new_resource_reverse": self.new_resource_reverse,
                 "resource_deletion_reverse": self.resource_deletion_reverse,
                 "resource_deletion_forms": {
-                    resource.get(self.id_field): self.resource_deletion_form_class(
+                    resource.get(self.pk_field_name): self.resource_deletion_form_class(
                         id_suffix=str(i),
-                        initial={"resource_id_to_delete": resource.get(self.id_field)},
+                        initial={
+                            "resource_id_to_delete": resource.get(self.pk_field_name)
+                        },
                     )
                     for i, resource in enumerate(self.resource_list)
                 },
                 "multi_resource_deletion_reverse": self.multi_resource_deletion_reverse,
                 "multi_resource_deletion_form": self.multi_resource_deletion_form_class(
                     resource_ids=[
-                        resource[self.id_field] for resource in self.resource_list
+                        resource[self.pk_field_name] for resource in self.resource_list
                     ]
                 ),
                 "resources": {
-                    resource.get(self.id_field): resource
+                    resource.get(self.pk_field_name): resource
                     for resource in self.resource_list
                 },
             }
@@ -93,10 +95,10 @@ class BasicResourceListFormView(ResourceListFormView):
             )
         invalid_update_form = context.get("invalid_update_form", dict())
         resource_update_forms = {
-            str(resource.get(self.id_field)): self.resource_update_form_class(
+            str(resource.get(self.pk_field_name)): self.resource_update_form_class(
                 self.api_client,
                 self.column_metadata_api_client,
-                id_suffix=str(resource.get(self.id_field)),
+                id_suffix=str(resource.get(self.pk_field_name)),
                 initial=resource,
             )
             for resource in self.resource_list
@@ -119,7 +121,7 @@ class NewResourceFormView(FormView, BasicResourceListFormView):
 
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
-    id_field: str
+    pk_field_name: str
     resource_type_readable: str
 
     resource_list_reverse: str
@@ -149,7 +151,7 @@ class NewResourceFormView(FormView, BasicResourceListFormView):
 
     def form_valid(self, form):
         new_resource = self.api_client.register(form.cleaned_data)
-        success_msg = f"Registered {self.resource_type_readable} {new_resource.get(self.id_field)}."
+        success_msg = f"Registered {self.resource_type_readable} {new_resource.get(self.pk_field_name)}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
 
@@ -159,7 +161,7 @@ class ResourceUpdateFormView(FormView, BasicResourceListFormView):
 
     api_client: ApiClient
     column_metadata_api_client: ColumnMetadataApiClient
-    id_field: str
+    pk_field_name: str
     resource_type_readable: str
 
     resource_list_reverse: str
@@ -227,7 +229,7 @@ class MultiResourceDeletionFormView(FormView):
     form_class = MultiResourceDeletionForm
 
     api_client: ApiClient
-    id_field: str
+    pk_field_name: str
     resource_type_readable: str
     resource_type_readable_plural: str
 
@@ -243,7 +245,7 @@ class MultiResourceDeletionFormView(FormView):
         kwargs.update(
             {
                 "resource_ids": [
-                    resource.get(self.id_field) for resource in self.resource_list
+                    resource.get(self.pk_field_name) for resource in self.resource_list
                 ]
             }
         )

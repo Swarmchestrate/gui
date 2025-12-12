@@ -3,7 +3,8 @@ import logging
 from django.views.generic import TemplateView
 from django.views.generic.base import ContextMixin
 
-from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
 
 logger = logging.getLogger(__name__)
 
@@ -13,14 +14,14 @@ class ApiClientTemplateView(TemplateView):
 
     def setup(self, request, *args, **kwargs):
         self.api_client = self.api_client_class()
-        self.id_field = self.api_client.endpoint_definition.id_field
+        self.pk_field_name = self.api_client.endpoint_definition.pk_field_name
         return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "id_field": self.id_field,
+                "pk_field_name": self.pk_field_name,
                 "description": self.api_client.endpoint_definition.description,
             }
         )

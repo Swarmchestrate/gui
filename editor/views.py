@@ -12,10 +12,12 @@ from django.views.generic import (
     View,
 )
 
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
+from postgrest.mocks.base.mock_base_api_clients import MockApiClient
+from postgrest.mocks.mock_api_clients import MockColumnMetadataApiClient
 from resource_management.forms import ResourceDeletionForm
 
-from .api.base_api_clients import ApiClient, ColumnMetadataApiClient
-from .api.mocks.mock_base_api_clients import MockApiClient, MockColumnMetadataApiClient
 from .forms.base_forms import (
     SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
     SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
@@ -130,7 +132,7 @@ class EditorStartFormView(
     FormView,
 ):
     api_client: ApiClient
-    id_field: str
+    pk_field_name: str
     editor_reverse_base: str
     resource_type_readable: str
 
@@ -161,7 +163,7 @@ class EditorStartFormView(
         )
         self.success_url = reverse_lazy(
             self.editor_reverse_base,
-            kwargs={"resource_id": new_resource.get(self.id_field)},
+            kwargs={"resource_id": new_resource.get(self.pk_field_name)},
         )
         return super().form_valid(form)
 
@@ -240,18 +242,18 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                         "new_form": new_form,
                         "resource_forms": {
                             existing_resource.get(
-                                fk_api_client.endpoint_definition.id_field
+                                fk_api_client.endpoint_definition.pk_field_name
                             ): {
                                 "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
                                     fk_api_client,
                                     MockColumnMetadataApiClient(),
-                                    id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.id_field}",
+                                    id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.pk_field_name}",
                                     initial=existing_resource,
                                 ),
                                 "delete_form": ResourceDeletionForm(
                                     initial={
                                         "resource_id_to_delete": existing_resource.get(
-                                            fk_api_client.endpoint_definition.id_field
+                                            fk_api_client.endpoint_definition.pk_field_name
                                         )
                                     }
                                 ),
@@ -465,13 +467,17 @@ class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
     def form_valid(self, form):
         new_resource = self.fk_api_client.register(form.cleaned_data)
         new_resource.update(
-            {"pk": new_resource.get(self.fk_api_client.endpoint_definition.id_field)}
+            {
+                "pk": new_resource.get(
+                    self.fk_api_client.endpoint_definition.pk_field_name
+                )
+            }
         )
         self.api_client.update(
             self.resource_id,
             {
                 self.fk_column_name: new_resource.get(
-                    self.fk_api_client.endpoint_definition.id_field
+                    self.fk_api_client.endpoint_definition.pk_field_name
                 )
             },
         )
@@ -489,7 +495,7 @@ class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
         message = f"Updated {self.fk_table_name} registration."
         resource = self.fk_api_client.get(fk_resource_id)
         resource.update(
-            {"pk": resource.get(self.fk_api_client.endpoint_definition.id_field)}
+            {"pk": resource.get(self.fk_api_client.endpoint_definition.pk_field_name)}
         )
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
@@ -570,7 +576,11 @@ class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
         cleaned_data.update({self.fk_table_column_name: self.resource_id})
         new_resource = self.fk_api_client.register(cleaned_data)
         new_resource.update(
-            {"pk": new_resource.get(self.fk_api_client.endpoint_definition.id_field)}
+            {
+                "pk": new_resource.get(
+                    self.fk_api_client.endpoint_definition.pk_field_name
+                )
+            }
         )
         message = f"Added new {self.fk_table_name} registration."
         if self.request.accepts("text/html"):
@@ -589,7 +599,7 @@ class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
         message = f"Updated {self.fk_table_name} registration."
         resource = self.fk_api_client.get(self.fk_resource_id)
         resource.update(
-            {"pk": resource.get(self.fk_api_client.endpoint_definition.id_field)}
+            {"pk": resource.get(self.fk_api_client.endpoint_definition.pk_field_name)}
         )
         if self.request.accepts("text/html"):
             messages.success(self.request, message)

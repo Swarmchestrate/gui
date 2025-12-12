@@ -1,14 +1,14 @@
 from django.test import SimpleTestCase
 
 from editor.test_mixins import ApiClientTestCaseHelperMixin
-
-from .api.capacity_api_clients import CapacityApiClient
-from .api.cloud_capacity_api_clients import CloudCapacityApiClient
-from .api.edge_capacity_api_clients import EdgeCapacityApiClient
+from postgrest.mocks.mock_api_clients import (
+    CloudCapacityApiClient,
+    EdgeCapacityApiClient,
+)
 
 
 class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
-    api_client_class = CapacityApiClient
+    api_client_class = CloudCapacityApiClient
 
     def test_get_resources(self):
         capacities = self.api_client.get_resources()
@@ -38,9 +38,9 @@ class CloudCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCas
         update_data = {
             "mobility": True,
         }
-        id_field = self.api_client.endpoint_definition.id_field
-        self.api_client.update(new_resource.get(id_field), update_data)
-        updated_resource = self.api_client.get(new_resource.get(id_field))
+        pk_field_name = self.api_client.endpoint_definition.pk_field_name
+        self.api_client.update(new_resource.get(pk_field_name), update_data)
+        updated_resource = self.api_client.get(new_resource.get(pk_field_name))
         self.assertEqual(updated_resource.get("mobility"), True)
 
 

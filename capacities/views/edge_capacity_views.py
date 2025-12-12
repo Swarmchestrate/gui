@@ -1,13 +1,5 @@
 from django.urls import reverse_lazy
 
-# from capacities.api.edge_capacity_api_clients import (
-#     EdgeCapacityApiClient,
-#     EdgeCapacityColumnMetadataApiClient,
-# )
-from capacities.api.mocks.mock_edge_capacity_clients import (
-    EdgeCapacityApiClient,
-    EdgeCapacityColumnMetadataApiClient,
-)
 from capacities.forms.edge_capacity_forms import (
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
@@ -26,6 +18,15 @@ from editor.views import (
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
+)
+
+# from postgrest.api_clients import (
+#     EdgeCapacityApiClient,
+#     EdgeCapacityColumnMetadataApiClient,
+# )
+from postgrest.mocks.mock_api_clients import (
+    EdgeCapacityApiClient,
+    EdgeCapacityColumnMetadataApiClient,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
