@@ -19,7 +19,7 @@ export class Dialog {
         // by clicking on the backdrop.
         if (this.options.lightDismiss) {
             this.dialog.addEventListener("click", () => {
-                this.dialog.close();
+                this.closeWithoutSaving();
             });
             this.dialog
                 .querySelector(".dialog-header")
@@ -39,7 +39,7 @@ export class Dialog {
         }
         this.closeButtons.forEach((closeButton) => {
             closeButton.addEventListener("click", () => {
-                this.close();
+                this.closeWithoutSaving();
             });
         });
 
@@ -55,7 +55,7 @@ export class Dialog {
         });
     }
 
-    close() {
+    closeWithoutSaving() {
         this.dialog.close("");
     }
 

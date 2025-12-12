@@ -9,6 +9,8 @@ from editor.api.base_api_clients import (
 )
 from editor.api.mocks.mock_base_api_clients import MockApiClient
 
+from .widgets import SelectWithDisabledFirstOption
+
 
 class OpenApiPropertyFormat(Enum):
     BOOLEAN = "boolean"
@@ -255,12 +257,13 @@ class OpenApiSpecificationBasedForm(EditorForm):
         field_enums = field_metadata.get("enum", [])
         if not field_enums:
             return
-        choices = (
+        choices = [
             (field_enum, field_enum.replace("_", " ")) for field_enum in field_enums
-        )
+        ]
+        choices.insert(0, ("", "None"))
         return {
             "field_class": field_class,
-            "widget_class": field_class.widget,
+            "widget_class": SelectWithDisabledFirstOption,
             "css_classes": ["form-select"],
             "extra_field_kwargs": {
                 "choices": choices,

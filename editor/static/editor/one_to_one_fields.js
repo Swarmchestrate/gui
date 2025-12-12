@@ -64,10 +64,16 @@ class OneToOneField {
                             );
                         if (!elementForProperty) continue;
                         elementForProperty.textContent = propertyValue;
+                        if (!propertyValue) {
+                            elementForProperty.textContent = "None";
+                        }
                         const fieldForProperty =
                             this.updateDialogForm.querySelector(
                                 `[name="${property}"]`,
                             );
+                        if (propertyValue === null) {
+                            propertyValue = "";
+                        }
                         fieldForProperty.defaultValue = propertyValue;
                         if (fieldForProperty.options) {
                             for (const option of fieldForProperty.options) {
@@ -97,17 +103,23 @@ class OneToOneField {
             {
                 onFormSuccess: (responseData) => {
                     for (const property in responseData.resource) {
-                        const propertyValue = responseData.resource[property];
+                        let propertyValue = responseData.resource[property];
                         const elementForProperty =
                             this.oneToOneField.querySelector(
                                 `[data-field="${property}"]`,
                             );
                         if (!elementForProperty) continue;
                         elementForProperty.textContent = propertyValue;
+                        if (!propertyValue) {
+                            elementForProperty.textContent = "None";
+                        }
                         const fieldForProperty =
                             this.updateDialogForm.querySelector(
                                 `[name="${property}"]`,
                             );
+                        if (propertyValue === null) {
+                            propertyValue = "";
+                        }
                         fieldForProperty.defaultValue = propertyValue;
                         if (fieldForProperty.options) {
                             for (const option of fieldForProperty.options) {
