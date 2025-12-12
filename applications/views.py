@@ -19,7 +19,9 @@ from editor.views import (
 )
 from postgrest.mocks.mock_api_clients import (
     ApplicationApiClient,
-    MockColumnMetadataApiClient,
+)
+from postgrest.mocks.mock_api_clients import (
+    MockApplicationColumnMetadataApiClient as ApplicationColumnMetadataApiClient,
 )
 
 # from postgrest.api_clients import (
@@ -48,7 +50,7 @@ class ApplicationViewMixin(
     editor_reverse_base = "applications:application_editor"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
-    column_metadata_api_client_class = MockColumnMetadataApiClient
+    column_metadata_api_client_class = ApplicationColumnMetadataApiClient
     resource_list_reverse = "applications:application_list"
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"

@@ -194,3 +194,17 @@ class EdgeCapacityColumnMetadataApiClient(MockColumnMetadataApiClient):
                 and r.get("category") not in self.disabled_categories
             )
         ]
+
+
+class MockApplicationColumnMetadataApiClient(MockColumnMetadataApiClient):
+    def get_resources(self, params: dict | None = None) -> list[dict]:
+        resources = super().get_resources()
+        return [r for r in resources if (r.get("table_name") == "application")]
+
+
+class MockApplicationMicroserviceColumnMetadataApiClient(MockColumnMetadataApiClient):
+    def get_resources(self, params: dict | None = None) -> list[dict]:
+        resources = super().get_resources()
+        return [
+            r for r in resources if (r.get("table_name") == "application_microservice")
+        ]

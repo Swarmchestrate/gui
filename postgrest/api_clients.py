@@ -183,21 +183,30 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
         return [r for r in resources if r.get("category") in self.disabled_categories]
 
 
+class ApplicationColumnMetadataApiClient(ColumnMetadataApiClient):
+    def get_resources(self, params: dict | None = None) -> list[dict]:
+        if not params:
+            params = dict()
+        params.update({"table_name": "eq.application"})
+        return super().get_resources(params)
+
+
+class ApplicationMicroserviceColumnMetadataApiClient(ColumnMetadataApiClient):
+    def get_resources(self, params: dict | None = None) -> list[dict]:
+        if not params:
+            params = dict()
+        params.update({"table_name": "eq.application_microservice"})
+        return super().get_resources(params)
+
+
 class CloudCapacityColumnMetadataApiClient(ColumnMetadataApiClient):
     disabled_categories = ["Edge Specific", "Networking"]
 
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
-        params.update(
-            {
-                "table_name": "eq.capacity",
-            }
-        )
+        params.update({"table_name": "eq.capacity"})
         return super().get_resources(params)
-
-    def get_resources_by_category(self, category: str):
-        return self.get_resources(params={"category": f'eq."{category}"'})
 
 
 class EdgeCapacityColumnMetadataApiClient(ColumnMetadataApiClient):
@@ -206,12 +215,5 @@ class EdgeCapacityColumnMetadataApiClient(ColumnMetadataApiClient):
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
-        params.update(
-            {
-                "table_name": "eq.capacity",
-            }
-        )
+        params.update({"table_name": "eq.capacity"})
         return super().get_resources(params)
-
-    def get_resources_by_category(self, category: str):
-        return self.get_resources(params={"category": f'eq."{category}"'})
