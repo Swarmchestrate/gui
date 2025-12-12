@@ -9,21 +9,21 @@ from postgrest.mocks.mock_definitions import (
 )
 
 from .mock_definitions import (
-    ApplicationBehaviourUserSpecifiableOpenApiDefinition,
-    ApplicationColocateUserSpecifiableOpenApiDefinition,
-    ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition,
-    ApplicationMicroserviceUserSpecifiableOpenApiDefinition,
-    ApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition,
-    ApplicationSecurityRuleUserSpecifiableOpenApiDefinition,
-    ApplicationUserSpecifiableOpenApiDefinition,
-    ApplicationVolumeUserSpecifiableOpenApiDefinition,
-    CapacityEnergyConsumptionUserSpecifiableOpenApiDefinition,
-    CapacityInstanceTypeUserSpecifiableOpenApiDefinition,
-    CapacityOperatingSystemUserSpecifiableOpenApiDefinition,
-    CapacityPriceUserSpecifiableOpenApiDefinition,
-    CapacityResourceQuotaUserSpecifiableOpenApiDefinition,
-    CapacityUserSpecifiableOpenApiDefinition,
-    LocalityUserSpecifiableOpenApiDefinition,
+    MockApplicationBehaviourUserSpecifiableOpenApiDefinition,
+    MockApplicationColocateUserSpecifiableOpenApiDefinition,
+    MockApplicationEnvironmentVarUserSpecifiableOpenApiDefinition,
+    MockApplicationMicroserviceUserSpecifiableOpenApiDefinition,
+    MockApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition,
+    MockApplicationSecurityRuleUserSpecifiableOpenApiDefinition,
+    MockApplicationUserSpecifiableOpenApiDefinition,
+    MockApplicationVolumeUserSpecifiableOpenApiDefinition,
+    MockCapacityEnergyConsumptionUserSpecifiableOpenApiDefinition,
+    MockCapacityInstanceTypeUserSpecifiableOpenApiDefinition,
+    MockCapacityOperatingSystemUserSpecifiableOpenApiDefinition,
+    MockCapacityPriceUserSpecifiableOpenApiDefinition,
+    MockCapacityResourceQuotaUserSpecifiableOpenApiDefinition,
+    MockCapacityUserSpecifiableOpenApiDefinition,
+    MockLocalityUserSpecifiableOpenApiDefinition,
 )
 
 BASE_DIR = settings.BASE_DIR
@@ -32,52 +32,56 @@ BASE_DIR = settings.BASE_DIR
 # Applications
 class MockApplicationApiClient(MockApiClient):
     endpoint = "application"
-    endpoint_definition_class = ApplicationUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockApplicationUserSpecifiableOpenApiDefinition
 
 
 class MockApplicationMicroserviceApiClient(MockApiClient):
     endpoint = "application_microservice"
-    endpoint_definition_class = ApplicationMicroserviceUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = (
+        MockApplicationMicroserviceUserSpecifiableOpenApiDefinition
+    )
 
 
 class MockApplicationBehaviourApiClient(MockApiClient):
     endpoint = "application_behaviour"
-    endpoint_definition_class = ApplicationBehaviourUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockApplicationBehaviourUserSpecifiableOpenApiDefinition
 
 
 class MockApplicationColocateApiClient(MockApiClient):
     endpoint = "application_colocate"
-    endpoint_definition_class = ApplicationColocateUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockApplicationColocateUserSpecifiableOpenApiDefinition
 
 
 class MockApplicationEnvironmentVarApiClient(MockApiClient):
     endpoint = "application_environment_var"
     endpoint_definition_class = (
-        ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
+        MockApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
     )
 
 
 class MockApplicationPrefResourceProviderApiClient(MockApiClient):
     endpoint = "application_pref_resource_provider"
     endpoint_definition_class = (
-        ApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition
+        MockApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition
     )
 
 
 class MockApplicationSecurityRuleApiClient(MockApiClient):
     endpoint = "application_security_rule"
-    endpoint_definition_class = ApplicationSecurityRuleUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = (
+        MockApplicationSecurityRuleUserSpecifiableOpenApiDefinition
+    )
 
 
 class MockApplicationVolumeApiClient(MockApiClient):
     endpoint = "application_volume"
-    endpoint_definition_class = ApplicationVolumeUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockApplicationVolumeUserSpecifiableOpenApiDefinition
 
 
 # Capacities
 class MockCloudCapacityApiClient(MockApiClient):
     endpoint = "capacity"
-    endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockCapacityUserSpecifiableOpenApiDefinition
 
     @property
     def path_to_data(self):
@@ -90,7 +94,7 @@ class MockCloudCapacityApiClient(MockApiClient):
 
 class MockEdgeCapacityApiClient(MockApiClient):
     endpoint = "capacity"
-    endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockCapacityUserSpecifiableOpenApiDefinition
 
     @property
     def path_to_data(self):
@@ -104,34 +108,38 @@ class MockEdgeCapacityApiClient(MockApiClient):
 class MockCapacityEnergyConsumptionApiClient(MockApiClient):
     endpoint = "capacity_energy_consumption"
     endpoint_definition_class = (
-        CapacityEnergyConsumptionUserSpecifiableOpenApiDefinition
+        MockCapacityEnergyConsumptionUserSpecifiableOpenApiDefinition
     )
 
 
 class MockCapacityInstanceTypeApiClient(MockApiClient):
     endpoint = "capacity_instance_type"
-    endpoint_definition_class = CapacityInstanceTypeUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockCapacityInstanceTypeUserSpecifiableOpenApiDefinition
 
 
 class MockCapacityOperatingSystemApiClient(MockApiClient):
     endpoint = "capacity_operating_system"
-    endpoint_definition_class = CapacityOperatingSystemUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = (
+        MockCapacityOperatingSystemUserSpecifiableOpenApiDefinition
+    )
 
 
 class MockCapacityPriceApiClient(MockApiClient):
     endpoint = "capacity_price"
-    endpoint_definition_class = CapacityPriceUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockCapacityPriceUserSpecifiableOpenApiDefinition
 
 
 class MockCapacityResourceQuotaApiClient(MockApiClient):
     endpoint = "capacity_resource_quota"
-    endpoint_definition_class = CapacityResourceQuotaUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = (
+        MockCapacityResourceQuotaUserSpecifiableOpenApiDefinition
+    )
 
 
 # Localities
 class MockLocalityApiClient(MockApiClient):
     endpoint = "locality"
-    endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
+    endpoint_definition_class = MockLocalityUserSpecifiableOpenApiDefinition
 
 
 # Column Metadata

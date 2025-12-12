@@ -2,91 +2,95 @@ from .base.mock_base_definitions import MockUserSpecifiableOpenApiDefinition
 
 
 # Applications
-class ApplicationUserSpecifiableOpenApiDefinition(
+class MockApplicationUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application"
 
 
-class ApplicationMicroserviceUserSpecifiableOpenApiDefinition(
+class MockApplicationMicroserviceUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_microservice"
 
 
-class ApplicationBehaviourUserSpecifiableOpenApiDefinition(
+class MockApplicationBehaviourUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_behaviour"
 
 
-class ApplicationColocateUserSpecifiableOpenApiDefinition(
+class MockApplicationColocateUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_colocate"
 
 
-class ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(
+class MockApplicationEnvironmentVarUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_environment_var"
 
 
-class ApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition(
+class MockApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_pref_resource_provider"
 
 
-class ApplicationSecurityRuleUserSpecifiableOpenApiDefinition(
+class MockApplicationSecurityRuleUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_security_rule"
 
 
-class ApplicationVolumeUserSpecifiableOpenApiDefinition(
+class MockApplicationVolumeUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "application_volume"
 
 
 # Capacities
-class CapacityUserSpecifiableOpenApiDefinition(MockUserSpecifiableOpenApiDefinition):
+class MockCapacityUserSpecifiableOpenApiDefinition(
+    MockUserSpecifiableOpenApiDefinition
+):
     definition_name = "capacity"
 
 
-class CapacityEnergyConsumptionUserSpecifiableOpenApiDefinition(
+class MockCapacityEnergyConsumptionUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "capacity_energy_consumption"
 
 
-class CapacityInstanceTypeUserSpecifiableOpenApiDefinition(
+class MockCapacityInstanceTypeUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "capacity_instance_type"
 
 
-class CapacityOperatingSystemUserSpecifiableOpenApiDefinition(
+class MockCapacityOperatingSystemUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "capacity_operating_system"
 
 
-class CapacityPriceUserSpecifiableOpenApiDefinition(
+class MockCapacityPriceUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "capacity_price"
 
 
-class CapacityResourceQuotaUserSpecifiableOpenApiDefinition(
+class MockCapacityResourceQuotaUserSpecifiableOpenApiDefinition(
     MockUserSpecifiableOpenApiDefinition,
 ):
     definition_name = "capacity_resource_quota"
 
 
 # Localities
-class LocalityUserSpecifiableOpenApiDefinition(MockUserSpecifiableOpenApiDefinition):
+class MockLocalityUserSpecifiableOpenApiDefinition(
+    MockUserSpecifiableOpenApiDefinition
+):
     definition_name = "locality"
 
 
