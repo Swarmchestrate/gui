@@ -1,0 +1,41 @@
+{
+    "description": "Application description table storing all metadata, specs, relationships, behaviours, resource requirements, and QoS goals.",
+    "required": ["application_id", "name"],
+    "properties": {
+        "application_id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Name of the application.",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "author": {
+            "description": "Author of the application.",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "creation_date": {
+            "description": "Date the application was created.",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "version": {
+            "description": "Version of the application.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "classification": {
+            "description": "Classification/type of the application.",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

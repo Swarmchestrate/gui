@@ -1,0 +1,8 @@
+[
+    {
+        "energy_consumption_id": 1,
+        "kwh_per_cpu": 1,
+        "kwh_per_gb_ram": 1,
+        "kwh_per_gb_storage": 1
+    }
+]

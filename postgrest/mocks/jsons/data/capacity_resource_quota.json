@@ -1,0 +1,8 @@
+[
+    {
+        "resource_quota_id": 1,
+        "cpu": 8,
+        "ram_gb": 32,
+        "storage_gb": 2000
+    }
+]

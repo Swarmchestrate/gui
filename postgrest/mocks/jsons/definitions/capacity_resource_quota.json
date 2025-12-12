@@ -1,0 +1,14 @@
+{
+    "required": ["resource_quota_id"],
+    "properties": {
+        "resource_quota_id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "cpu": { "format": "integer", "type": "integer" },
+        "ram_gb": { "format": "integer", "type": "integer" },
+        "storage_gb": { "format": "integer", "type": "integer" }
+    },
+    "type": "object"
+}

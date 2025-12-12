@@ -1,0 +1,9 @@
+[
+    {
+        "locality_id": 1,
+        "continent": "Europe",
+        "country": "United Kingdom",
+        "city": "London",
+        "gps_location": "51.509865, -0.118092"
+    }
+]

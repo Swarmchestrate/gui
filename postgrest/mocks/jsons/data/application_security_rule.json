@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "application_id": 1,
+        "name": "Security rule 1",
+        "protocol": "TCP",
+        "port": "8000",
+        "targetport": "8000",
+        "port_type": "NodePort",
+        "cluster_ip": "127.0.0.1"
+    }
+]

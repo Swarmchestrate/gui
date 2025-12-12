@@ -1,0 +1,189 @@
+{
+    "description": "Application description table storing all metadata, specs, relationships, behaviours, resource requirements, and QoS goals.",
+    "required": ["id", "container_image"],
+    "properties": {
+        "application_id": {
+            "description": "Note:\nThis is a Foreign Key to `application.application_id`.<fk table='application' column='application_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "container_image": {
+            "description": "OCI-compliant container image (mandatory parameter).",
+            "format": "character varying",
+            "maxLength": 500,
+            "type": "string"
+        },
+        "commands": {
+            "description": "List of startup commands.",
+            "format": "text[]",
+            "items": { "type": "string" },
+            "type": "array"
+        },
+        "arguments": {
+            "description": "Arguments passed to the application container.",
+            "format": "text[]",
+            "items": { "type": "string" },
+            "type": "array"
+        },
+        "environment_vars": {
+            "description": "Environment variables in key-value format.",
+            "format": "jsonb"
+        },
+        "min_cpu": {
+            "description": "Minimum required CPU.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "min_memory_gb": {
+            "description": "Minimum required memory in GB.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "max_cpu": {
+            "description": "Maximum allowed CPU.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "max_memory_gb": {
+            "description": "Maximum allowed memory in GB.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "relationships": {
+            "description": "Relationships such as volumes, other containers, and node selectors.",
+            "format": "jsonb"
+        },
+        "behaviour": {
+            "description": "Deployment strategy and orchestration behaviour (type, replicas, restart policy, cron, etc.).",
+            "format": "jsonb"
+        },
+        "security_config": {
+            "description": "Secrets, credentials, keys, and firewall rules.",
+            "format": "jsonb"
+        },
+        "instance_type": {
+            "description": "Type of instance: General or Optimised (CPU/RAM/Storage/GPU).",
+            "format": "character varying",
+            "maxLength": 100,
+            "type": "string"
+        },
+        "num_cpu": {
+            "description": "Number of CPUs required (exact or range).",
+            "format": "integer",
+            "type": "integer"
+        },
+        "mem_ram": {
+            "description": "Memory requirement (exact or range).",
+            "format": "text",
+            "type": "string"
+        },
+        "num_gpu": {
+            "description": "Number of GPUs required.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "disk_size": {
+            "description": "Disk size requirement (exact or range).",
+            "format": "text",
+            "type": "string"
+        },
+        "network_bandwidth": {
+            "description": "Network bandwidth requirement (exact or range).",
+            "format": "text",
+            "type": "string"
+        },
+        "num_instances": {
+            "description": "Number of instances required.",
+            "format": "integer",
+            "type": "integer"
+        },
+        "energy_type": {
+            "description": "Energy type preference (Green, Brown, Mix).",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "security_rules": {
+            "description": "Firewall/security rules including whitelists and ports.",
+            "format": "jsonb"
+        },
+        "max_price": {
+            "description": "Maximum price user is willing to pay for resource unit.",
+            "format": "numeric",
+            "type": "number"
+        },
+        "location": {
+            "description": "Preferred location of resource (continent, country, city, GPS).",
+            "format": "jsonb"
+        },
+        "pref_capacity_provider": {
+            "description": "Preferred capacity provider (e.g., ACME Corp).",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "pref_resource_type": {
+            "description": "Preferred type of resource (Cloud/Edge).",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "pref_provider_type": {
+            "description": "Preferred provider type (Public/Private).",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "pref_resource_provider": {
+            "description": "Preferred specific providers with weights (e.g., Amazon 70%, Azure 50%).",
+            "format": "jsonb"
+        },
+        "minimise_power_usage": {
+            "description": "Indicates if power usage should be minimised.",
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "energy_budget": {
+            "description": "Energy budget in kWh per hour.",
+            "format": "numeric",
+            "type": "number"
+        },
+        "minimise_cost": {
+            "description": "Indicates if cost should be minimised.",
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "cost_budget": {
+            "description": "Maximum cost budget (£/hour).",
+            "format": "numeric",
+            "type": "number"
+        },
+        "trust_level": {
+            "description": "Overall trust level score (percentage).",
+            "format": "double precision",
+            "type": "number"
+        },
+        "created_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "updated_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "response_time_ms": { "format": "numeric", "type": "number" },
+        "requests_per_sec": { "format": "numeric", "type": "number" },
+        "iops": { "format": "numeric", "type": "number" },
+        "io_throughput_bps": { "format": "numeric", "type": "number" },
+        "net_throughput_bps": { "format": "numeric", "type": "number" },
+        "database_writes": { "format": "numeric", "type": "number" },
+        "custom_attributes": { "format": "jsonb" },
+        "custom_scaling_rules": {
+            "description": "Custom scaling rules (overrides AI decision making in case of conflict).",
+            "format": "jsonb"
+        }
+    },
+    "type": "object"
+}
