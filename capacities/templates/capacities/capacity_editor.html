@@ -5,7 +5,6 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 <script type="module" src="{% static 'localities/locality_options_search.js' %}"></script>
 <script type="module" src="{% static 'localities/locality_gps_search.js' %}"></script>
-<script type="module" src="{% static 'capacity_instance_types/capacity_instance_types.js' %}"></script>
 {{ instance_type_list_item_template|json_script:'instance-type-list-item-template' }}
 {% endblock extra_scripts %}
 
