@@ -1,5 +1,5 @@
 {% load helpers %}
-{% with category_id_base=list_item.lower.split|join:'-'|split_by_colon|join:'-' %}
+{% with category_id_base=list_item.lower|kebab_case %}
 <button
     class="nav-link w-100 text-start {% if current_category == list_item %}active{% endif %}"
     id="{{ category_id_base }}-tab"

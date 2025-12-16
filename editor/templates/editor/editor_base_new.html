@@ -39,7 +39,7 @@
                 <div class="tab-content" id="editor-tab-content">
                     {% regroup form|dictsort:'field.category' by field.category as field_groups %}
                     {% for field_group in field_groups %}
-                    {% with category_id_base=field_group.grouper.lower.split|join:'-'|split_by_colon|join:'-' %}
+                    {% with category_id_base=field_group.grouper.lower|kebab_case %}
                     <div
                         class="tab-pane {% if field_group.grouper == current_category %}show active{% endif %}"
                         id="{{ category_id_base }}-tab-pane"

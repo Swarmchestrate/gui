@@ -1,3 +1,4 @@
+import casefy
 from dateutil import parser
 from django import template
 
@@ -7,6 +8,11 @@ register = template.Library()
 @register.filter
 def split_by_colon(value: str):
     return value.split(":")
+
+
+@register.filter
+def kebab_case(value: str):
+    return casefy.kebabcase(value)
 
 
 @register.filter
