@@ -185,69 +185,6 @@ class OpenApiSpecificationBasedForm(EditorForm):
         kwargs.update(extra_field_kwargs)
         return kwargs
 
-    def _get_field_components_for_one_to_many_field(
-        self, field_metadata: dict
-    ) -> dict | None:
-        if not field_metadata.get("type") == "one_to_many":
-            return
-        endpoint = field_metadata.get("fk_table_name", "")
-        fk_api_client = ApiClient.get_client_instance_by_endpoint(endpoint)
-        choices = []
-        if fk_api_client:
-            resources = fk_api_client.get_resources()
-            choices = [
-                (
-                    r.get(fk_api_client.endpoint_definition.pk_field_name),
-                    f"{fk_api_client.endpoint.title()} {r.get(fk_api_client.endpoint_definition.pk_field_name)}",
-                )
-                for r in resources
-            ]
-        field_class = forms.MultipleChoiceField
-        return {
-            "field_class": field_class,
-            "widget_class": field_class.widget,
-            "css_classes": ["form-select"],
-            "extra_field_kwargs": {
-                "choices": choices,
-            },
-            "extra_widget_attrs": dict(),
-        }
-
-    def _get_field_components_for_foreign_key_field(
-        self, field_name: str
-    ) -> dict | None:
-        definition = self.api_client.endpoint_definition
-        field_metadata = definition.get_field(field_name)
-        if not field_metadata.get("description"):
-            return
-        field_description = lxml.html.fromstring(field_metadata.get("description"))
-        fk_table_name = next(iter(field_description.xpath("fk/@table")), None)
-
-        # Get endpoint for the foreign key
-        api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
-        if not api_client:
-            return
-        # Get resources at endpoint
-        resources = api_client.get_resources()
-        # Return field components in a dict
-        choices = (
-            (
-                r.get(api_client.endpoint_definition.pk_field_name),
-                f"{api_client.endpoint.title()} {r.get(api_client.endpoint_definition.pk_field_name)}",
-            )
-            for r in resources
-        )
-        field_class = forms.ChoiceField
-        return {
-            "field_class": field_class,
-            "widget_class": field_class.widget,
-            "css_classes": ["form-select"],
-            "extra_field_kwargs": {
-                "choices": choices,
-            },
-            "extra_widget_attrs": dict(),
-        }
-
     def _get_field_components_for_enum_field(self, field_metadata: dict):
         format = field_metadata.get("format", "")
         if not format.endswith("enum"):
@@ -273,15 +210,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
     def get_field(
         self, field_name: str, field_metadata: dict, is_required: bool = False
     ) -> forms.Field:
-        field_components = self._get_field_components_for_one_to_many_field(
-            field_metadata
-        )
-        if not field_components:
-            field_components = self._get_field_components_for_foreign_key_field(
-                field_name
-            )
-        if not field_components:
-            field_components = self._get_field_components_for_enum_field(field_metadata)
+        field_components = self._get_field_components_for_enum_field(field_metadata)
         if not field_components:
             # Determine field, widget and/or widget CSS classes
             # from OpenAPI spec metadata.
