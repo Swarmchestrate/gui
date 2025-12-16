@@ -200,7 +200,11 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                 id_prefix="new",
             )
             initial = dict()
-            fk_resource_id = self.resource.get(field_name)
+            fk_resource_id = None
+            try:
+                fk_resource_id = self.resource.get(field_name)
+            except AttributeError:
+                pass
             if fk_resource_id:
                 existing_resource = fk_api_client.get(fk_resource_id)
                 initial = existing_resource
