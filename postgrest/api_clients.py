@@ -18,22 +18,62 @@ from .definitions import (
     ColumnMetadataUserSpecifiableOpenApiDefinition,
     LocalityUserSpecifiableOpenApiDefinition,
 )
+from .readable_text_utils import (
+    application_behaviour_type_readable,
+    application_behaviour_type_readable_plural,
+    application_colocate_type_readable,
+    application_colocate_type_readable_plural,
+    application_environment_var_type_readable,
+    application_environment_var_type_readable_plural,
+    application_pref_resource_provider_type_readable,
+    application_pref_resource_provider_type_readable_plural,
+    application_security_rule_type_readable,
+    application_security_rule_type_readable_plural,
+    application_type_readable,
+    application_type_readable_plural,
+    application_volume_type_readable,
+    application_volume_type_readable_plural,
+    capacity_energy_consumption_type_readable,
+    capacity_energy_consumption_type_readable_plural,
+    capacity_instance_type_type_readable,
+    capacity_instance_type_type_readable_plural,
+    capacity_operating_system_type_readable,
+    capacity_operating_system_type_readable_plural,
+    capacity_price_type_readable,
+    capacity_price_type_readable_plural,
+    capacity_resource_quota_type_readable,
+    capacity_resource_quota_type_readable_plural,
+    capacity_type_readable,
+    capacity_type_readable_plural,
+    cloud_capacity_type_readable,
+    cloud_capacity_type_readable_plural,
+    edge_capacity_type_readable,
+    edge_capacity_type_readable_plural,
+    locality_type_readable,
+    locality_type_readable_plural,
+)
 
 
 # Applications
 class ApplicationApiClient(ApiClient):
     endpoint = "application"
     endpoint_definition_class = ApplicationUserSpecifiableOpenApiDefinition
+    type_readable = application_type_readable()
+    type_readable_plural = application_type_readable_plural()
 
 
 class ApplicationBehaviourApiClient(ApiClient):
     endpoint = "application_behaviour"
     endpoint_definition_class = ApplicationBehaviourUserSpecifiableOpenApiDefinition
+    type_readable = application_behaviour_type_readable()
+    type_readable_plural = application_behaviour_type_readable_plural()
 
 
 class ApplicationColocateApiClient(ApiClient):
     endpoint = "application_colocate"
     endpoint_definition_class = ApplicationColocateUserSpecifiableOpenApiDefinition
+    type_readable = application_colocate_type_readable()
+    type_readable_plural = application_colocate_type_readable_plural()
 
 
 class ApplicationEnvironmentVarApiClient(ApiClient):
@@ -41,6 +81,8 @@ class ApplicationEnvironmentVarApiClient(ApiClient):
     endpoint_definition_class = (
         ApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_environment_var_type_readable()
+    type_readable_plural = application_environment_var_type_readable_plural()
 
 
 class ApplicationPrefResourceProviderApiClient(ApiClient):
@@ -48,25 +90,36 @@ class ApplicationPrefResourceProviderApiClient(ApiClient):
     endpoint_definition_class = (
         ApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_pref_resource_provider_type_readable()
+    type_readable_plural = application_pref_resource_provider_type_readable_plural()
 
 
 class ApplicationSecurityRuleApiClient(ApiClient):
     endpoint = "application_security_rule"
     endpoint_definition_class = ApplicationSecurityRuleUserSpecifiableOpenApiDefinition
+    type_readable = application_security_rule_type_readable()
+    type_readable_plural = application_security_rule_type_readable_plural()
 
 
 class ApplicationVolumeApiClient(ApiClient):
     endpoint = "application_volume"
     endpoint_definition_class = ApplicationVolumeUserSpecifiableOpenApiDefinition
+    type_readable = application_volume_type_readable()
+    type_readable_plural = application_volume_type_readable_plural()
 
 
 # Capacities
 class CapacityApiClient(ApiClient):
     endpoint = "capacity"
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
+    type_readable = capacity_type_readable()
+    type_readable_plural = capacity_type_readable_plural()
 
 
 class CloudCapacityApiClient(CapacityApiClient):
+    type_readable = cloud_capacity_type_readable()
+    type_readable_plural = cloud_capacity_type_readable_plural()
+
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -85,6 +138,9 @@ class CloudCapacityApiClient(CapacityApiClient):
 
 
 class EdgeCapacityApiClient(CapacityApiClient):
+    type_readable = edge_capacity_type_readable()
+    type_readable_plural = edge_capacity_type_readable_plural()
+
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:
             params = dict()
@@ -107,10 +163,14 @@ class CapacityEnergyConsumptionApiClient(ApiClient):
     endpoint_definition_class = (
         CapacityEnergyConsumptionUserSpecifiableOpenApiDefinition
     )
+    type_readable = capacity_energy_consumption_type_readable()
+    type_readable_plural = capacity_energy_consumption_type_readable_plural()
 
 
 class CapacityInstanceTypeApiClient(ApiClient):
     endpoint = "capacity_instance_type"
+    type_readable = capacity_instance_type_type_readable()
+    type_readable_plural = capacity_instance_type_type_readable_plural()
 
     def _prepare_update_data(self, data: dict):
         data = super()._prepare_update_data(data)
@@ -124,22 +184,30 @@ class CapacityInstanceTypeApiClient(ApiClient):
 class CapacityOperatingSystemApiClient(ApiClient):
     endpoint = "capacity_operating_system"
     endpoint_definition_class = CapacityOperatingSystemUserSpecifiableOpenApiDefinition
+    type_readable = capacity_operating_system_type_readable()
+    type_readable_plural = capacity_operating_system_type_readable_plural()
 
 
 class CapacityPriceApiClient(ApiClient):
     endpoint = "capacity_price"
     endpoint_definition_class = CapacityPriceUserSpecifiableOpenApiDefinition
+    type_readable = capacity_price_type_readable()
+    type_readable_plural = capacity_price_type_readable_plural()
 
 
 class CapacityResourceQuotaApiClient(ApiClient):
     endpoint = "capacity_resource_quota"
     endpoint_definition_class = CapacityResourceQuotaUserSpecifiableOpenApiDefinition
+    type_readable = capacity_resource_quota_type_readable()
+    type_readable_plural = capacity_resource_quota_type_readable_plural()
 
 
 # Localities
 class LocalityApiClient(ApiClient):
     endpoint = "locality"
     endpoint_definition_class = LocalityUserSpecifiableOpenApiDefinition
+    type_readable = locality_type_readable()
+    type_readable_plural = locality_type_readable_plural()
 
 
 # Column Metadata
@@ -149,6 +217,8 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
     """
 
     endpoint_definition_class = ColumnMetadataUserSpecifiableOpenApiDefinition
+    type_readable = "column metadata"
+    type_readable_plural = "column metadata"
 
     def get_resources(self, params: dict | None = None) -> list[dict]:
         if not params:

@@ -58,6 +58,9 @@ class BaseApiClient(BaseApiClientMixin, ABC):
     random_id_min_value: int = 0
     random_id_max_value: int = 999999
 
+    type_readable: str
+    type_readable_plural: str
+
     @classmethod
     def get_client_instance_by_endpoint(cls, endpoint_name: str) -> "BaseApiClient":
         client_instance = None
@@ -217,7 +220,7 @@ class ApiClient(ApiClientMixin, BaseApiClient):
     ) -> list[dict]:
         if not params:
             params = dict()
-        params.update({column_name: int(resource_id)})
+        params.update({column_name: f"eq.{int(resource_id)}"})
         response = requests.get(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
         return response.json()

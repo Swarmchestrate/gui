@@ -23,6 +23,14 @@ def application_environment_var_type_readable_plural() -> str:
     return "environment variables"
 
 
+def application_microservice_type_readable() -> str:
+    return "microservice"
+
+
+def application_microservice_type_readable_plural() -> str:
+    return "microservices"
+
+
 def application_pref_resource_provider_type_readable() -> str:
     return "preferred resource provider"
 

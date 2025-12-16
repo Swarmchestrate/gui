@@ -7,6 +7,40 @@ from postgrest.mocks.base.mock_base_api_clients import MockApiClient
 from postgrest.mocks.mock_definitions import (
     MockColumnMetadataUserSpecifiableOpenApiDefinition,
 )
+from postgrest.readable_text_utils import (
+    application_behaviour_type_readable,
+    application_behaviour_type_readable_plural,
+    application_colocate_type_readable,
+    application_colocate_type_readable_plural,
+    application_environment_var_type_readable,
+    application_environment_var_type_readable_plural,
+    application_microservice_type_readable,
+    application_microservice_type_readable_plural,
+    application_pref_resource_provider_type_readable,
+    application_pref_resource_provider_type_readable_plural,
+    application_security_rule_type_readable,
+    application_security_rule_type_readable_plural,
+    application_type_readable,
+    application_type_readable_plural,
+    application_volume_type_readable,
+    application_volume_type_readable_plural,
+    capacity_energy_consumption_type_readable,
+    capacity_energy_consumption_type_readable_plural,
+    capacity_instance_type_type_readable,
+    capacity_instance_type_type_readable_plural,
+    capacity_operating_system_type_readable,
+    capacity_operating_system_type_readable_plural,
+    capacity_price_type_readable,
+    capacity_price_type_readable_plural,
+    capacity_resource_quota_type_readable,
+    capacity_resource_quota_type_readable_plural,
+    cloud_capacity_type_readable,
+    cloud_capacity_type_readable_plural,
+    edge_capacity_type_readable,
+    edge_capacity_type_readable_plural,
+    locality_type_readable,
+    locality_type_readable_plural,
+)
 
 from .mock_definitions import (
     MockApplicationBehaviourUserSpecifiableOpenApiDefinition,
@@ -33,6 +67,8 @@ BASE_DIR = settings.BASE_DIR
 class MockApplicationApiClient(MockApiClient):
     endpoint = "application"
     endpoint_definition_class = MockApplicationUserSpecifiableOpenApiDefinition
+    type_readable = application_type_readable()
+    type_readable_plural = application_type_readable_plural()
 
 
 class MockApplicationMicroserviceApiClient(MockApiClient):
@@ -40,16 +76,22 @@ class MockApplicationMicroserviceApiClient(MockApiClient):
     endpoint_definition_class = (
         MockApplicationMicroserviceUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_microservice_type_readable()
+    type_readable = application_microservice_type_readable_plural()
 
 
 class MockApplicationBehaviourApiClient(MockApiClient):
     endpoint = "application_behaviour"
     endpoint_definition_class = MockApplicationBehaviourUserSpecifiableOpenApiDefinition
+    type_readable = application_behaviour_type_readable()
+    type_readable_plural = application_behaviour_type_readable_plural()
 
 
 class MockApplicationColocateApiClient(MockApiClient):
     endpoint = "application_colocate"
     endpoint_definition_class = MockApplicationColocateUserSpecifiableOpenApiDefinition
+    type_readable = application_colocate_type_readable()
+    type_readable_plural = application_colocate_type_readable_plural()
 
 
 class MockApplicationEnvironmentVarApiClient(MockApiClient):
@@ -57,6 +99,8 @@ class MockApplicationEnvironmentVarApiClient(MockApiClient):
     endpoint_definition_class = (
         MockApplicationEnvironmentVarUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_environment_var_type_readable()
+    type_readable_plural = application_environment_var_type_readable_plural()
 
 
 class MockApplicationPrefResourceProviderApiClient(MockApiClient):
@@ -64,6 +108,8 @@ class MockApplicationPrefResourceProviderApiClient(MockApiClient):
     endpoint_definition_class = (
         MockApplicationPrefResourceProviderUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_pref_resource_provider_type_readable()
+    type_readable_plural = application_pref_resource_provider_type_readable_plural()
 
 
 class MockApplicationSecurityRuleApiClient(MockApiClient):
@@ -71,17 +117,23 @@ class MockApplicationSecurityRuleApiClient(MockApiClient):
     endpoint_definition_class = (
         MockApplicationSecurityRuleUserSpecifiableOpenApiDefinition
     )
+    type_readable = application_security_rule_type_readable()
+    type_readable_plural = application_security_rule_type_readable_plural()
 
 
 class MockApplicationVolumeApiClient(MockApiClient):
     endpoint = "application_volume"
     endpoint_definition_class = MockApplicationVolumeUserSpecifiableOpenApiDefinition
+    type_readable = application_volume_type_readable()
+    type_readable_plural = application_volume_type_readable_plural()
 
 
 # Capacities
 class MockCloudCapacityApiClient(MockApiClient):
     endpoint = "capacity"
     endpoint_definition_class = MockCapacityUserSpecifiableOpenApiDefinition
+    type_readable = cloud_capacity_type_readable()
+    type_readable_plural = cloud_capacity_type_readable_plural()
 
     @property
     def path_to_data(self):
@@ -95,6 +147,8 @@ class MockCloudCapacityApiClient(MockApiClient):
 class MockEdgeCapacityApiClient(MockApiClient):
     endpoint = "capacity"
     endpoint_definition_class = MockCapacityUserSpecifiableOpenApiDefinition
+    type_readable = edge_capacity_type_readable()
+    type_readable_plural = edge_capacity_type_readable_plural()
 
     @property
     def path_to_data(self):
@@ -110,11 +164,15 @@ class MockCapacityEnergyConsumptionApiClient(MockApiClient):
     endpoint_definition_class = (
         MockCapacityEnergyConsumptionUserSpecifiableOpenApiDefinition
     )
+    type_readable = capacity_energy_consumption_type_readable()
+    type_readable_plural = capacity_energy_consumption_type_readable_plural()
 
 
 class MockCapacityInstanceTypeApiClient(MockApiClient):
     endpoint = "capacity_instance_type"
     endpoint_definition_class = MockCapacityInstanceTypeUserSpecifiableOpenApiDefinition
+    type_readable = capacity_instance_type_type_readable()
+    type_readable_plural = capacity_instance_type_type_readable_plural()
 
 
 class MockCapacityOperatingSystemApiClient(MockApiClient):
@@ -122,11 +180,15 @@ class MockCapacityOperatingSystemApiClient(MockApiClient):
     endpoint_definition_class = (
         MockCapacityOperatingSystemUserSpecifiableOpenApiDefinition
     )
+    type_readable = capacity_operating_system_type_readable()
+    type_readable_plural = capacity_operating_system_type_readable_plural()
 
 
 class MockCapacityPriceApiClient(MockApiClient):
     endpoint = "capacity_price"
     endpoint_definition_class = MockCapacityPriceUserSpecifiableOpenApiDefinition
+    type_readable = capacity_price_type_readable()
+    type_readable_plural = capacity_price_type_readable_plural()
 
 
 class MockCapacityResourceQuotaApiClient(MockApiClient):
@@ -134,18 +196,24 @@ class MockCapacityResourceQuotaApiClient(MockApiClient):
     endpoint_definition_class = (
         MockCapacityResourceQuotaUserSpecifiableOpenApiDefinition
     )
+    type_readable = capacity_resource_quota_type_readable()
+    type_readable_plural = capacity_resource_quota_type_readable_plural()
 
 
 # Localities
 class MockLocalityApiClient(MockApiClient):
     endpoint = "locality"
     endpoint_definition_class = MockLocalityUserSpecifiableOpenApiDefinition
+    type_readable = locality_type_readable()
+    type_readable_plural = locality_type_readable_plural()
 
 
 # Column Metadata
 class MockColumnMetadataApiClient(MockApiClient, BaseColumnMetadataApiClient):
     endpoint = "column_metadata"
     endpoint_definition_class = MockColumnMetadataUserSpecifiableOpenApiDefinition
+    type_readable = "column metadata"
+    type_readable_plural = "column metadata"
 
     def get_resources_by_category(self, category: str):
         resources = self.get_resources()

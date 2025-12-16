@@ -4,11 +4,11 @@
         class="btn btn-light new-dialog-btn mb-3 {% if field.value %}d-none{% endif %}"
         type="button"
         data-dialog-id="new-{{ field.name }}-dialog">
-        Add {{ field.label }}
+        Add {{ field_metadata.type_readable.title }}
     </button>
     <ul class="list-group">
         {% for resource_id, forms in field_metadata.resource_forms.items %}
-        {% with form=forms.update_form resource_type_readable=field.name %}
+        {% with form=forms.update_form resource_type_readable=field_metadata.type_readable.title %}
         {% include 'editor/foreign_key_fields/one_to_many_field_list_item.html' %}
         {% endwith %}
         {% endfor %}

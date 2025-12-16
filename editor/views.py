@@ -217,6 +217,8 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                         "delete_form": ResourceDeletionForm(
                             initial={"resource_id_to_delete": fk_resource_id}
                         ),
+                        "type_readable": fk_api_client.type_readable,
+                        "type_readable_plural": fk_api_client.type_readable_plural,
                     },
                 }
             )
@@ -262,6 +264,8 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                             }
                             for existing_resource in existing_resources
                         },
+                        "type_readable": fk_api_client.type_readable,
+                        "type_readable_plural": fk_api_client.type_readable_plural,
                         "templates": {
                             "update_dialog": render_to_string(
                                 "editor/dialogs/update_dialog.html",
