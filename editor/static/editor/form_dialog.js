@@ -36,9 +36,9 @@ export class FormDialog extends Dialog {
     }
 
     confirmClose() {
-        if (this.isAnyFieldChanged()) {
-            return confirm("You have unsaved changes.");
-        }
+        // if (this.isAnyFieldChanged()) {
+        //     return confirm("You have unsaved changes.");
+        // }
         return true;
     }
 
