@@ -71,7 +71,7 @@ class BaseApiClient(BaseApiClientMixin, ABC):
         return client_instance
 
     @abstractmethod
-    def _prepare_update_data(self, data: dict) -> dict:
+    def _set_updated_at_to_now(self, data: dict) -> dict:
         pass
 
     @abstractmethod
@@ -279,7 +279,7 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         response = requests.delete(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)
 
-    def _prepare_update_data(self, data: dict):
+    def _set_updated_at_to_now(self, data: dict) -> dict:
         current_time = datetime.now(timezone.utc).isoformat()
         current_time_no_tz = str(current_time).replace("+00:00", "")
         data.update(
@@ -290,13 +290,10 @@ class ApiClient(ApiClientMixin, BaseApiClient):
         return data
 
     def update(self, resource_id: int, data: dict):
-        prepared_update_data = self._prepare_update_data(data)
         params = {
             self.endpoint_definition.pk_field_name: f"eq.{resource_id}",
         }
-        response = requests.patch(
-            self.endpoint_url, params=params, json=prepared_update_data
-        )
+        response = requests.patch(self.endpoint_url, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
 

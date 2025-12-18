@@ -61,6 +61,10 @@ class ApplicationApiClient(ApiClient):
     type_readable = application_type_readable()
     type_readable_plural = application_type_readable_plural()
 
+    def update(self, resource_id: int, data: dict):
+        data = self._set_updated_at_to_now(data)
+        return super().update(resource_id, data)
+
 
 class ApplicationBehaviourApiClient(ApiClient):
     endpoint = "application_behaviour"
@@ -114,6 +118,10 @@ class CapacityApiClient(ApiClient):
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     type_readable = capacity_type_readable()
     type_readable_plural = capacity_type_readable_plural()
+
+    def update(self, resource_id: int, data: dict):
+        data = self._set_updated_at_to_now(data)
+        return super().update(resource_id, data)
 
 
 class CloudCapacityApiClient(CapacityApiClient):
@@ -171,12 +179,6 @@ class CapacityInstanceTypeApiClient(ApiClient):
     endpoint = "capacity_instance_type"
     type_readable = capacity_instance_type_type_readable()
     type_readable_plural = capacity_instance_type_type_readable_plural()
-
-    def _prepare_update_data(self, data: dict):
-        data = super()._prepare_update_data(data)
-        data.pop("updated_at", None)
-        data.pop(self.endpoint_definition.pk_field_name, None)
-        return data
 
     endpoint_definition_class = CapacityInstanceTypeUserSpecifiableOpenApiDefinition
 

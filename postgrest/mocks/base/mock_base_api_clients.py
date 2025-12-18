@@ -179,7 +179,7 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
         ]
         return self._update_temp_data(updated_resources)
 
-    def _prepare_update_data(self, data: dict) -> dict:
+    def _set_updated_at_to_now(self, data: dict) -> dict:
         current_time = datetime.now(timezone.utc).isoformat()
         current_time_no_tz = str(current_time).replace("+00:00", "")
         data.update(
@@ -192,8 +192,7 @@ class MockApiClient(MockApiClientMixin, BaseApiClient):
     def update(self, resource_id: int, data: dict):
         resource_to_update = self.get(resource_id)
         cleaned_data = self.clean_data(data)
-        prepared_update_data = self._prepare_update_data(cleaned_data)
-        resource_to_update.update(prepared_update_data)
+        resource_to_update.update(cleaned_data)
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = [
             r

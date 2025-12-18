@@ -70,6 +70,10 @@ class MockApplicationApiClient(MockApiClient):
     type_readable = application_type_readable()
     type_readable_plural = application_type_readable_plural()
 
+    def update(self, resource_id: int, data: dict):
+        data = self._set_updated_at_to_now(data)
+        return super().update(resource_id, data)
+
 
 class MockApplicationMicroserviceApiClient(MockApiClient):
     endpoint = "application_microservice"
@@ -143,6 +147,10 @@ class MockCloudCapacityApiClient(MockApiClient):
     def path_to_temp_data(self):
         return os.path.join(self.path_to_temp_data_dir, "cloud_capacity.json")
 
+    def update(self, resource_id: int, data: dict):
+        data = self._set_updated_at_to_now(data)
+        return super().update(resource_id, data)
+
 
 class MockEdgeCapacityApiClient(MockApiClient):
     endpoint = "capacity"
@@ -157,6 +165,10 @@ class MockEdgeCapacityApiClient(MockApiClient):
     @property
     def path_to_temp_data(self):
         return os.path.join(self.path_to_temp_data_dir, "edge_capacity.json")
+
+    def update(self, resource_id: int, data: dict):
+        data = self._set_updated_at_to_now(data)
+        return super().update(resource_id, data)
 
 
 class MockCapacityEnergyConsumptionApiClient(MockApiClient):
