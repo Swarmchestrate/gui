@@ -24,7 +24,7 @@
                         class="btn btn-light new-dialog-btn {% if field.value %}d-none{% endif %}"
                         type="button"
                         data-dialog-id="new-{{ field.name }}-dialog">
-                        Add {{ field.label }}
+                        Add {{ field_metadata.type_readable.title }}
                     </button>
                     <button
                         class="btn btn-light update-dialog-btn {% if not field.value %}d-none{% endif %}"
