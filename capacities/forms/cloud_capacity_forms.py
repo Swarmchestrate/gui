@@ -9,11 +9,11 @@ from editor.forms.base_forms import (
 
 # Cloud Capacity forms
 class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
-    definition_name = "capacity"
+    definition_name = "capacity_new"
 
 
 class CloudCapacityEditorForm(OpenApiSpecificationBasedForm):
-    definition_name = "capacity"
+    definition_name = "capacity_new"
     disabled_categories = ["Edge Specific", "Networking"]
 
 

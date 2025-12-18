@@ -9,11 +9,11 @@ from editor.forms.base_forms import (
 
 # Edge Capacity forms
 class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
-    definition_name = "capacity"
+    definition_name = "capacity_new"
 
 
 class EdgeCapacityEditorForm(OpenApiSpecificationBasedForm):
-    definition_name = "capacity"
+    definition_name = "capacity_new"
 
 
 # Forms to be used in formsets to help with the input

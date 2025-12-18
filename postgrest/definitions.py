@@ -44,7 +44,7 @@ class ApplicationVolumeUserSpecifiableOpenApiDefinition(
 
 # Capacities
 class CapacityUserSpecifiableOpenApiDefinition(UserSpecifiableOpenApiDefinition):
-    definition_name = "capacity"
+    definition_name = "capacity_new"
 
     def _get_auto_generated_field_names(self) -> list:
         names = super()._get_auto_generated_field_names()

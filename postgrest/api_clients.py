@@ -114,7 +114,7 @@ class ApplicationVolumeApiClient(ApiClient):
 
 # Capacities
 class CapacityApiClient(ApiClient):
-    endpoint = "capacity"
+    endpoint = "capacity_new"
     endpoint_definition_class = CapacityUserSpecifiableOpenApiDefinition
     type_readable = capacity_type_readable()
     type_readable_plural = capacity_type_readable_plural()

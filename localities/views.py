@@ -11,12 +11,13 @@ from editor.base_views import (
     ColumnMetadataApiClientTemplateView,
     ResourceTypeNameContextMixin,
 )
-from postgrest.mocks.mock_api_clients import (
-    MockColumnMetadataApiClient as ColumnMetadataApiClient,
-)
 
-# from postgrest.api_clients import LocalityApiClient, ColumnMetadataApiClient
-from postgrest.mocks.mock_api_clients import MockLocalityApiClient as LocalityApiClient
+# from postgrest.mocks.mock_api_clients import (
+#     MockColumnMetadataApiClient as ColumnMetadataApiClient,
+# )
+from postgrest.api_clients import ColumnMetadataApiClient, LocalityApiClient
+
+# from postgrest.mocks.mock_api_clients import MockLocalityApiClient as LocalityApiClient
 from resource_management.views import (
     BasicResourceListFormView,
     MultiResourceDeletionFormView,

@@ -12,12 +12,13 @@ from django.views.generic import (
     View,
 )
 
-# from postgrest.api_clients import ColumnMetadataApiClient
-# from postgrest.base.base_api_clients import ApiClient
-from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
-from postgrest.mocks.mock_api_clients import (
-    MockColumnMetadataApiClient as ColumnMetadataApiClient,
-)
+from postgrest.api_clients import ColumnMetadataApiClient
+from postgrest.base.base_api_clients import ApiClient
+
+# from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
+# from postgrest.mocks.mock_api_clients import (
+#     MockColumnMetadataApiClient as ColumnMetadataApiClient,
+# )
 from resource_management.forms import ResourceDeletionForm
 
 from .forms.base_forms import (
