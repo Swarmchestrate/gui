@@ -31,7 +31,7 @@ from editor.views import (
 
 # from postgrest.api_clients import (
 #     CloudCapacityApiClient,
-#     ColumnMetadataApiClient,
+#     CloudCapacityColumnMetadataApiClient,
 # )
 from postgrest.mocks.mock_api_clients import (
     MockCloudCapacityApiClient as CloudCapacityApiClient,
