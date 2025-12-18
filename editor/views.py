@@ -441,10 +441,8 @@ class OneToOneRelationView(View):
         self.resource_id = int(self.kwargs["resource_id"])
         self.resource = self.api_client.get(self.resource_id)
         self.fk_column_name = self.kwargs["fk_column_name"]
-        one_to_one_fields = self.api_client.endpoint_definition._get_one_to_one_fields()
-        self.fk_table_name = one_to_one_fields.get(self.fk_column_name, {}).get(
-            "fk_table_name"
-        )
+        fk_fields = self.api_client.endpoint_definition.get_user_specifiable_foreign_key_fields()
+        self.fk_table_name = fk_fields.get(self.fk_column_name, {}).get("fk_table_name")
         self.fk_api_client = ApiClient.get_client_instance_by_endpoint(
             self.fk_table_name
         )

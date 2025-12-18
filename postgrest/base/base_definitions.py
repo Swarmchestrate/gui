@@ -66,24 +66,10 @@ class BaseOpenApiDefinition:
         return foreign_key_properties
 
     def _get_one_to_one_fields(self) -> dict:
-        foreign_key_fields = self._get_foreign_key_fields()
-        one_to_one_properties = dict()
-        for property_name, property_metadata in foreign_key_fields.items():
-            # is_unique = property_metadata.get("unique", False)
-            # if not is_unique:
-            #     continue
-            one_to_one_properties.update({property_name: property_metadata})
-        return one_to_one_properties
+        return self._get_foreign_key_fields()
 
     def _get_many_to_one_fields(self) -> dict:
-        foreign_key_fields = self._get_foreign_key_fields()
-        many_to_one_properties = dict()
-        for property_name, property_metadata in foreign_key_fields.items():
-            is_unique = property_metadata.get("unique", False)
-            if is_unique:
-                continue
-            many_to_one_properties.update({property_name: property_metadata})
-        return many_to_one_properties
+        return self._get_foreign_key_fields()
 
     def _get_one_to_many_fields(self) -> dict:
         one_to_many_properties = dict()
