@@ -15,54 +15,6 @@ class LocalityUpdateForm(OpenApiSpecificationBasedFormWithIdAttributeSuffix):
     definition_name = "locality"
 
 
-class LocalityEditorForm(EditorForm):
-    form_prefix = forms.CharField(widget=forms.HiddenInput(), required=False)
-
-    continent = forms.CharField(
-        label="Continent",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-            }
-        ),
-        help_text="e.g. Europe",
-        required=False,
-    )
-
-    country = forms.CharField(
-        label="Country",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-            }
-        ),
-        help_text="e.g. United Kingdom",
-        required=False,
-    )
-
-    city = forms.CharField(
-        label="City",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-            }
-        ),
-        help_text="e.g. London",
-        required=False,
-    )
-
-    gps = forms.CharField(
-        label="GPS Location",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-            }
-        ),
-        help_text="e.g. 51.5072, -0.1276",
-        required=False,
-    )
-
-
 class LocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
         label="Enter a Continent/Country/City Name",

@@ -3,7 +3,6 @@ from http import HTTPStatus
 import geonamescache
 import reverse_geocode
 from django.http import JsonResponse
-from django.urls import reverse_lazy
 from django.views.generic.edit import ProcessFormView
 
 from editor.base_views import (
@@ -16,6 +15,10 @@ from editor.base_views import (
 #     MockColumnMetadataApiClient as ColumnMetadataApiClient,
 # )
 from postgrest.api_clients import ColumnMetadataApiClient, LocalityApiClient
+from postgrest.readable_text_utils import (
+    locality_type_readable,
+    locality_type_readable_plural,
+)
 
 # from postgrest.mocks.mock_api_clients import MockLocalityApiClient as LocalityApiClient
 from resource_management.views import (
@@ -30,13 +33,10 @@ from resource_management.views import (
 from .forms import (
     GetLocalityByGpsForm,
     GetLocalityByNameForm,
-    LocalityEditorForm,
     LocalityOptionsSearchForm,
     LocalityRegistrationForm,
     LocalityUpdateForm,
 )
-from .formsets import LocalityEditorFormSet
-from .utils import locality_type_readable, locality_type_readable_plural
 
 
 class LocalityViewMixin(
@@ -76,58 +76,6 @@ class LocalityListFormView(LocalityViewMixin, BasicResourceListFormView):
     template_name = "localities/localities.html"
     new_resource_form_class = LocalityRegistrationForm
     resource_update_form_class = LocalityUpdateForm
-
-
-class LocalityFormSetEditorViewMixin:
-    def add_locality_formset_metadata(self):
-        self.locality_property_name = "locality_id"
-        self.add_formset_class(
-            LocalityEditorForm,
-            self.locality_property_name,
-            base_formset_class=LocalityEditorFormSet,
-            can_delete=False,
-            extra_formset_factory_kwargs={
-                "extra": 0,
-                "max_num": 1,
-            },
-        )
-
-        # Configure initial formset data
-        initial_locality = list()
-        locality_data = self.resource.get(self.locality_property_name)
-        if not locality_data or not isinstance(locality_data, dict):
-            locality_data = {
-                "form_prefix": self.locality_property_name,
-                "continent": "",
-                "country": "",
-                "city": "",
-                "gps": "",
-            }
-        initial_locality.append(locality_data)
-        self.add_initial_data_for_formset(initial_locality, self.locality_property_name)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "locality_options_search_form": LocalityOptionsSearchForm(
-                    prefix=self.locality_property_name
-                ),
-                "get_locality_by_gps_form": GetLocalityByGpsForm(
-                    prefix=self.locality_property_name
-                ),
-                "locality_options_search_form_url_reverse": reverse_lazy(
-                    "localities:locality_options_search"
-                ),
-                "get_locality_by_name_url_reverse": reverse_lazy(
-                    "localities:get_locality_by_name"
-                ),
-                "get_locality_by_gps_url_reverse": reverse_lazy(
-                    "localities:get_locality_by_gps"
-                ),
-            }
-        )
-        return context
 
 
 class CapacityLocalityOptionsSearchProcessFormView(ProcessFormView):

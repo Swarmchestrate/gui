@@ -1,7 +1,6 @@
 from django import forms
 
 from editor.forms.base_forms import EditorForm
-from localities.forms import LocalityEditorForm
 
 
 # Cloud & Edge Capacity forms
@@ -62,7 +61,3 @@ class CapacitySecurityPortsEditorForm(EditorForm):
         ),
         required=True,
     )
-
-
-class CapacityLocalityEditorForm(LocalityEditorForm):
-    pass
