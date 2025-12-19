@@ -17,17 +17,17 @@ from editor.views import (
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
-
-# from postgrest.mocks.mock_api_clients import (
-#     MockApplicationApiClient as ApplicationApiClient,
-# )
-# from postgrest.mocks.mock_api_clients import (
-#     MockApplicationColumnMetadataApiClient as ApplicationColumnMetadataApiClient,
-# )
-from postgrest.api_clients import (
-    ApplicationApiClient,
-    ApplicationColumnMetadataApiClient,
+from postgrest.mocks.mock_api_clients import (
+    MockApplicationApiClient as ApplicationApiClient,
 )
+from postgrest.mocks.mock_api_clients import (
+    MockApplicationColumnMetadataApiClient as ApplicationColumnMetadataApiClient,
+)
+
+# from postgrest.api_clients import (
+#     ApplicationApiClient,
+#     ApplicationColumnMetadataApiClient,
+# )
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,

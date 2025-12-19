@@ -28,17 +28,17 @@ from editor.views import (
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
-from postgrest.api_clients import (
-    CloudCapacityApiClient,
-    CloudCapacityColumnMetadataApiClient,
-)
 
-# from postgrest.mocks.mock_api_clients import (
-#     MockCloudCapacityApiClient as CloudCapacityApiClient,
+# from postgrest.api_clients import (
+#     CloudCapacityApiClient,
+#     CloudCapacityColumnMetadataApiClient,
 # )
-# from postgrest.mocks.mock_api_clients import (
-#     MockCloudCapacityColumnMetadataApiClient as CloudCapacityColumnMetadataApiClient,
-# )
+from postgrest.mocks.mock_api_clients import (
+    MockCloudCapacityApiClient as CloudCapacityApiClient,
+)
+from postgrest.mocks.mock_api_clients import (
+    MockCloudCapacityColumnMetadataApiClient as CloudCapacityColumnMetadataApiClient,
+)
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
