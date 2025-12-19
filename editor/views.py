@@ -25,6 +25,7 @@ from .forms.base_forms import (
     SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
     SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
 )
+from .utils import UNCATEGORISED_CATEGORY
 
 logger = logging.getLogger(__name__)
 
@@ -106,12 +107,12 @@ class EditorTocTemplateView(TemplateView):
         )
         uncategorised_property_names = self.column_names - property_names
         if uncategorised_property_names:
-            self.category_names.append("Uncategorised")
+            self.category_names.append(UNCATEGORISED_CATEGORY)
             self.categories.update(
                 {
-                    "Uncategorised": {
-                        "title": "Uncategorised",
-                        "non_toc_title": "Uncategorised",
+                    UNCATEGORISED_CATEGORY: {
+                        "title": UNCATEGORISED_CATEGORY,
+                        "non_toc_title": UNCATEGORISED_CATEGORY,
                         "descendents": dict(),
                     }
                 }
@@ -657,7 +658,7 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
             value = self.resource.get(field_name)
             extra_metadata = column_metadata_by_column_name.get(field_name)
             field_title = field_name.replace("_", " ").title()
-            field_category = "Uncategorised"
+            field_category = UNCATEGORISED_CATEGORY
             if extra_metadata:
                 field_title = extra_metadata.get("title")
                 field_category = extra_metadata.get("category")

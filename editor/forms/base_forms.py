@@ -1,8 +1,8 @@
 from enum import Enum
 
-import lxml.html
 from django import forms
 
+from editor.utils import UNCATEGORISED_CATEGORY
 from postgrest.api_clients import ColumnMetadataApiClient
 
 # from postgrest.base.base_api_clients import ApiClient
@@ -238,7 +238,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         field = field_class(**kwargs)
         category = field_metadata.get("category")
         if not category:
-            category = "Uncategorised"
+            category = UNCATEGORISED_CATEGORY
         field.category = category
         return field
 
