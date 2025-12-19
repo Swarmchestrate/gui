@@ -275,7 +275,7 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
 
     def get_data_for_form_fields(self) -> dict:
         field_data = super().get_data_for_form_fields()
-        if self.category.lower() == "uncategorised":
+        if self.category.lower() == UNCATEGORISED_CATEGORY.lower():
             column_metadata = self.column_metadata_api_client.get_resources()
             disabled_column_metadata = (
                 self.column_metadata_api_client.get_resources_for_disabled_categories()
