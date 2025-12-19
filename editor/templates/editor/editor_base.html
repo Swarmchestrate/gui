@@ -72,7 +72,9 @@
                         {% if next_list_item %}
                         <div class="form-text text-center">{{ next_list_item_title }}</div>
                         {% endif %}
-                        {% include 'editor/util_templates/form_errors_list.html' %}
+                        <div class="text-center">
+                            {% include 'editor/util_templates/form_errors_list.html' %}
+                        </div>
                     </div>
                 </div>
             </form>

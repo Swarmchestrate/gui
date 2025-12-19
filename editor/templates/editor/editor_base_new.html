@@ -78,18 +78,36 @@
                         {% endif %}
                         {% endfor %}
                         <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
+                            {% if not forloop.first %}
                             <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
                                 <button class="btn btn-light" type="button">
                                     Previous Step
                                 </button>
-                                <div class="form-text text-center">Previous Step</div>
+                                <div class="form-text text-center">
+                                    {% with previous_element=field_groups|previous:forloop.counter0 %}
+                                    {{ next_element.grouper.title|split_by_colon|join:': ' }}
+                                    {% endwith %}
+                                </div>
                             </div>
+                            {% endif %}
                             <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
                                 <button id="editor-submit-button" type="submit" class="btn btn-primary">
-                                    {% include 'editor/util_templates/submit_button_content.html' %}
+                                    {% if forloop.last %}
+                                    Finish & Review
+                                    {% else %}
+                                    Next Step
+                                    {% endif %}
                                 </button>
-                                <div class="form-text text-center">Next Step</div>
-                                {% include 'editor/util_templates/form_errors_list.html' %}
+                                {% if not forloop.last %}
+                                <div class="form-text text-center">
+                                    {% with next_element=field_groups|next:forloop.counter0 %}
+                                    {{ next_element.grouper.title|split_by_colon|join:': ' }}
+                                    {% endwith %}
+                                </div>
+                                {% endif %}
+                                <div class="text-center">
+                                    {% include 'editor/util_templates/form_errors_list.html' %}
+                                </div>
                             </div>
                         </div>
                     </div>
