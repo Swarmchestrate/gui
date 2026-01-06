@@ -222,36 +222,20 @@ class ColumnMetadataApiClient(ApiClient, BaseColumnMetadataApiClient):
     type_readable = "column metadata"
     type_readable_plural = "column metadata"
 
-    def get_resources(self, params: dict | None = None) -> list[dict]:
-        if not params:
-            params = dict()
-        if not self.disabled_categories:
-            return self._get_resources(params)
-        and_conditions = set(
-            f"category.neq.{category}" for category in self.disabled_categories
-        )
-        if "and" in params:
-            existing_and_conditions = make_tuple(params.get("and", "()"))
-            for condition in existing_and_conditions:
-                and_conditions.add(condition)
-        if "category" in params:
-            and_conditions.add(f"category.{params.get('category')}")
-            params.pop("category", None)
-        params.update(
-            {
-                "and": f"({','.join(and_conditions)})",
-            }
-        )
-        return self._get_resources(params)
-
     def get_resources_by_category(self, category: str):
         return self.get_resources(params={"category": f"eq.{category}"})
 
     def get_by_table_name(self, table_name: str):
         return self.get_resources(params={"table_name": f"eq.{table_name}"})
 
+    def get_resources_for_enabled_categories(self):
+        resources = self.get_resources()
+        return [
+            r for r in resources if r.get("category") not in self.disabled_categories
+        ]
+
     def get_resources_for_disabled_categories(self):
-        resources = self._get_resources()
+        resources = self.get_resources()
         return [r for r in resources if r.get("category") in self.disabled_categories]
 
 

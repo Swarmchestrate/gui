@@ -32,11 +32,15 @@ class ApiClientMixin(BaseApiClientMixin):
 
     def __init__(self):
         self.api_url = os.environ.get("API_URL", "")
+        self.openapi_spec = self.get_latest_openapi_spec()
 
-    def get_openapi_spec(self) -> dict:
+    def get_latest_openapi_spec(self) -> dict:
         response = requests.get(self.api_url)
         self.log_and_raise_response_status_if_error(response)
         return response.json()
+
+    def get_openapi_spec(self) -> dict:
+        return self.openapi_spec
 
     # Error handling
     def log_and_raise_response_status_if_error(self, response: requests.Response):

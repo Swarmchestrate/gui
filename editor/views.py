@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from http import HTTPStatus
 
@@ -25,6 +26,7 @@ from .forms.base_forms import (
     SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
     SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
 )
+from .services import get_categories_for_editor
 from .utils import UNCATEGORISED_CATEGORY
 
 logger = logging.getLogger(__name__)
@@ -45,7 +47,9 @@ class EditorTocTemplateView(TemplateView):
         return super().setup(request, *args, **kwargs)
 
     def setup_column_metadata(self):
-        self.column_metadata = self.column_metadata_api_client.get_resources()
+        self.column_metadata = (
+            self.column_metadata_api_client.get_resources_for_enabled_categories()
+        )
         self.column_names = set(
             cm.get("column_name", "")
             for cm in self.column_metadata
@@ -56,67 +60,9 @@ class EditorTocTemplateView(TemplateView):
         self.category_names = list(
             set(r.get("category", "") for r in self.column_metadata)
         )
-        self.category_names.sort()
-        processed_categories = set()
-
-        def add_category_descendents(
-            category: str, category_data: dict, parent_category: str = ""
-        ):
-            if category in processed_categories:
-                return
-            processed_categories.add(category)
-            if category not in category_data:
-                category_data.update(
-                    {
-                        category: {
-                            "title": category,
-                            "non_toc_title": category.replace(":", ": "),
-                            "descendents": dict(),
-                        },
-                    }
-                )
-                if parent_category:
-                    category_data[category].update(
-                        {
-                            "title": category.replace(f"{parent_category}:", ""),
-                        }
-                    )
-
-            category_with_colon = f"{category}:"
-            descendent_names = [
-                possible_descendent_name
-                for possible_descendent_name in self.category_names
-                if (
-                    category in possible_descendent_name
-                    and category != possible_descendent_name
-                    and ":"
-                    not in possible_descendent_name.replace(category_with_colon, "")
-                )
-            ]
-            for dn in descendent_names:
-                add_category_descendents(
-                    dn, category_data[category]["descendents"], parent_category=category
-                )
-
-        self.categories = dict()
-        for category in self.category_names:
-            add_category_descendents(category, self.categories)
-
-        property_names = set(
-            self.api_client.endpoint_definition.get_all_user_specifiable_fields().keys()
+        self.categories = get_categories_for_editor(
+            self.api_client, self.column_metadata
         )
-        uncategorised_property_names = self.column_names - property_names
-        if uncategorised_property_names:
-            self.category_names.append(UNCATEGORISED_CATEGORY)
-            self.categories.update(
-                {
-                    UNCATEGORISED_CATEGORY: {
-                        "title": UNCATEGORISED_CATEGORY,
-                        "non_toc_title": UNCATEGORISED_CATEGORY,
-                        "descendents": dict(),
-                    }
-                }
-            )
 
     def _get_first_category(self):
         return next(iter(self.category_names), None)
@@ -186,11 +132,12 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
     update_one_to_many_relation_reverse_base: str
     delete_one_to_many_relation_reverse_base: str
 
-    def get_one_to_one_field_metadata(self) -> dict:
+    async def get_one_to_one_field_metadata(self) -> dict:
         one_to_one_field_metadata = dict()
         one_to_one_fields = (
             self.api_client.endpoint_definition.get_user_specifiable_one_to_one_fields()
         )
+
         for field_name, field_metadata in one_to_one_fields.items():
             fk_table_name = field_metadata.get("fk_table_name", "")
             fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
@@ -230,7 +177,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
             )
         return one_to_one_field_metadata
 
-    def get_one_to_many_field_metadata(self) -> dict:
+    async def get_one_to_many_field_metadata(self) -> dict:
         one_to_many_field_metadata = dict()
         one_to_many_fields = self.api_client.endpoint_definition.get_user_specifiable_one_to_many_fields()
         for field_name, field_metadata in one_to_many_fields.items():
@@ -342,6 +289,7 @@ class EditorProcessFormView(
 ):
     template_name = "editor/editor_base_new.html"
     form_class: forms.Form
+    view_is_async = True
 
     api_client: ApiClient
     editor_reverse_base: str
@@ -364,9 +312,15 @@ class EditorProcessFormView(
         self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
+    async def get(self, request, *args, **kwargs):
+        field_metadata = await asyncio.gather(
+            self.get_one_to_one_field_metadata(), self.get_one_to_many_field_metadata()
+        )
+        self.one_to_one_field_metadata = field_metadata[0]
+        self.one_to_many_field_metadata = field_metadata[1]
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
-        one_to_one_field_metadata = self.get_one_to_one_field_metadata()
-        one_to_many_field_metadata = self.get_one_to_many_field_metadata()
         context = super().get_context_data(**kwargs)
         context.update(
             {
@@ -376,8 +330,8 @@ class EditorProcessFormView(
                 "current_category": self.category,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
-                "one_to_one_field_metadata": one_to_one_field_metadata,
-                "one_to_many_field_metadata": one_to_many_field_metadata,
+                "one_to_one_field_metadata": self.one_to_one_field_metadata,
+                "one_to_many_field_metadata": self.one_to_many_field_metadata,
                 "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
                 "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
                 "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,

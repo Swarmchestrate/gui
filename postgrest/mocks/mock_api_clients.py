@@ -229,14 +229,7 @@ class MockColumnMetadataApiClient(MockApiClient, BaseColumnMetadataApiClient):
 
     def get_resources_by_category(self, category: str):
         resources = self.get_resources()
-        return [
-            r
-            for r in resources
-            if (
-                r.get("category") not in self.disabled_categories
-                and r.get("category") == category
-            )
-        ]
+        return [r for r in resources if r.get("category") == category]
 
     def get_by_table_name(self, table_name: str):
         resources = self.get_resources()
@@ -247,6 +240,12 @@ class MockColumnMetadataApiClient(MockApiClient, BaseColumnMetadataApiClient):
                 r.get("category") not in self.disabled_categories
                 and r.get("table_name") == table_name
             )
+        ]
+
+    def get_resources_for_enabled_categories(self):
+        resources = self._get_resources()
+        return [
+            r for r in resources if r.get("category") not in self.disabled_categories
         ]
 
     def get_resources_for_disabled_categories(self):

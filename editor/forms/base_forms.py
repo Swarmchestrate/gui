@@ -77,10 +77,6 @@ class OpenApiSpecificationBasedForm(EditorForm):
 
     def add_extra_metadata_to_field_data(self, field_data: dict):
         column_metadata = self.column_metadata_api_client.get_resources()
-        disabled_column_metadata = (
-            self.column_metadata_api_client.get_resources_for_disabled_categories()
-        )
-        column_metadata.extend(disabled_column_metadata)
         column_metadata_by_column_name = dict(
             (cm.get("column_name"), cm) for cm in column_metadata
         )
@@ -277,10 +273,6 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
         field_data = super().get_data_for_form_fields()
         if self.category.lower() == UNCATEGORISED_CATEGORY.lower():
             column_metadata = self.column_metadata_api_client.get_resources()
-            disabled_column_metadata = (
-                self.column_metadata_api_client.get_resources_for_disabled_categories()
-            )
-            column_metadata.extend(disabled_column_metadata)
             column_names = set(
                 cm.get("column_name", "")
                 for cm in column_metadata
