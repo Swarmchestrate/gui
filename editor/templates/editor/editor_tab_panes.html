@@ -4,11 +4,9 @@
     {% csrf_token %}
     <div class="tab-content" id="editor-tab-content">
         {% regroup form|dictsort:'field.category' by field.category as field_groups %}
-        {% for category in category_names %}
-        {% with category_data=toc_list_items|get_key_value_or_empty_dict:category %}
+        {% for category, category_data in toc_list_items.items %}
         {% with category_id_base=category.lower|kebab_case %}
         {% include 'editor/editor_tab_pane_router.html' %}
-        {% endwith %}
         {% endwith %}
         {% endfor %}
     </div>

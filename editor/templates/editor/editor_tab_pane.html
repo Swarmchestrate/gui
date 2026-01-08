@@ -1,6 +1,6 @@
 {% load helpers %}
 <div
-    class="tab-pane {% if category == current_category %}show active{% endif %}"
+    class="tab-pane {% if category == current_category %}show active{% elif not current_category and not category_data.previous %}show active{% endif %}"
     id="{{ category_id_base }}-tab-pane"
     role="tabpanel"
     aria-labelledby="{{ category_id_base }}-tab"
