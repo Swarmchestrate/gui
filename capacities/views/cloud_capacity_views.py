@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView
 
 from capacities.forms.cloud_capacity_forms import (
+    CloudCapacityCategoryBasedEditorForm,
     CloudCapacityEditorForm,
     CloudCapacityRegistrationForm,
 )
@@ -20,6 +21,7 @@ from editor.base_views import (
 from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
+    EditorCategoryBasedFormView,
     EditorEnabledTabListTemplateView,
     EditorFormView,
     EditorOverviewTemplateView,
@@ -89,11 +91,17 @@ class CloudCapacityEditorFormView(CloudCapacityViewMixin, EditorFormView):
     form_class = CloudCapacityEditorForm
 
 
+class CloudCapacityEditorCategoryBasedFormView(
+    CloudCapacityViewMixin, EditorCategoryBasedFormView
+):
+    form_class = CloudCapacityCategoryBasedEditorForm
+
+
 class CloudCapacityEditorTabbedFormTemplateView(
     CloudCapacityViewMixin, EditorTabbedFormTemplateView
 ):
     form_class = CloudCapacityEditorForm
-    editor_form_reverse = "capacities:cloud_capacity_editor_form"
+    editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = (
         "capacities:new_cloud_capacity_one_to_one_relation"
     )

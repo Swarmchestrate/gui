@@ -4,6 +4,7 @@ from editor.forms.base_forms import (
     EditorForm,
     OpenApiSpecificationBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
+    OpenApiSpecificationCategoryBasedForm,
 )
 
 
@@ -13,6 +14,11 @@ class CloudCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
 
 
 class CloudCapacityEditorForm(OpenApiSpecificationBasedForm):
+    definition_name = "capacity_new"
+    disabled_categories = ["Edge Specific", "Networking"]
+
+
+class CloudCapacityCategoryBasedEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = "capacity_new"
     disabled_categories = ["Edge Specific", "Networking"]
 

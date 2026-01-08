@@ -265,9 +265,16 @@ class SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
 
 
 class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
-    def __init__(self, api_client: ApiClient, category: str, *args, **kwargs):
+    def __init__(
+        self,
+        api_client: ApiClient,
+        column_metadata_api_client: ColumnMetadataApiClient,
+        category: str,
+        *args,
+        **kwargs,
+    ):
         self.category = category
-        super().__init__(api_client, *args, **kwargs)
+        super().__init__(api_client, column_metadata_api_client, *args, **kwargs)
 
     def get_data_for_form_fields(self) -> dict:
         field_data = super().get_data_for_form_fields()

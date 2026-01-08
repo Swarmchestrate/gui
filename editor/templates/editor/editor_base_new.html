@@ -4,6 +4,7 @@
 {% block scripts %}
 {{ toc_url|json_script:'toc_url' }}
 {{ tabbed_form_url|json_script:'tabbed_form_url' }}
+{{ initial_category|json_script:'initial_category' }}
 <script type="module" src="{% static 'editor/editor_toc.js' %}"></script>
 <script type="module" src="{% static 'editor/editor_tabbed_form.js' %}"></script>
 <script type="module" src="{% static 'editor/editor.js' %}"></script>

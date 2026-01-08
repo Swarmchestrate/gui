@@ -34,9 +34,9 @@ urlpatterns = [
         name="cloud_capacity_editor_tabbed_form",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/form/",
-        cloud_capacity_views.CloudCapacityEditorFormView.as_view(),
-        name="cloud_capacity_editor_form",
+        "cloud-capacities/api/<resource_id>/edit/",
+        cloud_capacity_views.CloudCapacityEditorCategoryBasedFormView.as_view(),
+        name="update_cloud_capacity_by_category",
     ),
     path(
         "cloud-capacities/<resource_id>/overview/",

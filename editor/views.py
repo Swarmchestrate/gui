@@ -43,6 +43,7 @@ class EditorCategoriesTemplateView(TemplateView):
     column_names: set[str]
 
     def setup(self, request, *args, **kwargs):
+        self.category = request.GET.get("category")
         self.setup_column_metadata()
         self.setup_categories()
         return super().setup(request, *args, **kwargs)
@@ -75,6 +76,7 @@ class EditorCategoriesTemplateView(TemplateView):
             {
                 "toc_list_items": self.categories,
                 "category_names": self.category_names,
+                "initial_category": self.category,
             }
         )
         return context
@@ -112,8 +114,9 @@ class EditorTocTemplateView(TemplateView):
         self.category_names = list(
             set(r.get("category", "") for r in self.column_metadata)
         )
+        self.category_names.sort()
         self.categories = get_categories_for_editor(
-            self.api_client, self.column_metadata
+            self.api_client, self.column_metadata, self.category_names
         )
 
     def _get_first_category(self):
@@ -408,6 +411,73 @@ class EditorFormView(FormView):
         return kwargs
 
 
+class EditorCategoryBasedFormView(EditorFormView):
+    template_name = "editor/"
+    form_class: forms.Form
+
+    api_client: ApiClient
+    column_metadata_api_client: ColumnMetadataApiClient
+    editor_overview_reverse_base: str
+    resource_type_readable: str
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.category = self.request.GET.get("category")
+        if not self.category:
+            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        self.success_url = reverse_lazy(
+            self.editor_overview_reverse_base,
+            kwargs={
+                "resource_id": self.resource_id,
+            },
+        )
+        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        update_data = form.cleaned_data
+        try:
+            self.api_client.update(self.resource_id, update_data)
+        except Exception:
+            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
+            logger.exception(error_msg)
+            return self.form_invalid(form)
+
+        message = f"Saved changes to {self.category}."
+        return JsonResponse(
+            {
+                "message": message,
+                "redirect": self.success_url,
+            }
+        )
+
+    def form_invalid(self, form):
+        error_msg = "Some fields were invalid. Please see feedback below."
+        return JsonResponse(
+            {
+                "feedback": error_msg,
+                "url": self.request.get_full_path(),
+            },
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(
+            {
+                "initial": self.resource,
+                "api_client": self.api_client,
+                "column_metadata_api_client": self.column_metadata_api_client,
+                "category": self.category,
+            }
+        )
+        return kwargs
+
+
 class EditorTabbedFormTemplateView(
     EditorFormView,
     EditorForeignKeyFieldsTemplateView,
@@ -421,6 +491,7 @@ class EditorTabbedFormTemplateView(
     editor_form_url: str
 
     def dispatch(self, request, *args, **kwargs):
+        self.category = request.GET.get("category")
         self.editor_form_url = reverse_lazy(
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
@@ -440,6 +511,7 @@ class EditorTabbedFormTemplateView(
             {
                 "resource": self.resource,
                 "resource_id": self.resource_id,
+                "initial_category": self.category,
                 "editor_form_url": self.editor_form_url,
                 "one_to_one_field_metadata": self.one_to_one_field_metadata,
                 "one_to_many_field_metadata": self.one_to_many_field_metadata,
@@ -468,9 +540,9 @@ class EditorProcessFormView(TemplateView):
         super().setup(request, *args, **kwargs)
         self.resource_id = self.kwargs["resource_id"]
         self.resource = self.api_client.get(self.resource_id)
+        self.category = request.GET.get("category", "")
 
     def dispatch(self, request, *args, **kwargs):
-        self.category = self.request.GET.get("category")
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -490,11 +562,11 @@ class EditorProcessFormView(TemplateView):
                 "title": self.title_base,
                 "main_subheading": self.resource_type_readable.title(),
                 "main_heading": self.title_base,
-                "current_category": self.category,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
                 "toc_url": self.toc_url,
                 "tabbed_form_url": self.tabbed_form_url,
+                "initial_category": self.category,
             }
         )
         return context
