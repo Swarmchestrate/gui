@@ -1,0 +1,73 @@
+{% load helpers %}
+<div
+    class="tab-pane {% if category == current_category %}show active{% endif %}"
+    id="{{ category_id_base }}-tab-pane"
+    role="tabpanel"
+    aria-labelledby="{{ category_id_base }}-tab"
+    tabindex="0">
+    {# Editor header #}
+    <div class="editor-layout__header">
+        {% block top_section %}
+        <div class="d-flex flex-column align-items-baseline row-gap-1">
+            <h2 class="fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
+            {% url editor_overview_reverse_base resource_id as overview_url %}
+            <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
+                {{ resource_type_readable.title }} {{ resource_id }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                </svg>
+            </a>
+        </div>
+        {% endblock top_section %}
+    </div>
+    <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
+    {% for field_group in field_groups %}
+    {% if field_group.grouper != category %}
+    {% else %}
+    {% for field in field_group.list %}
+    {% if field.name in one_to_one_field_metadata %}
+    {% with field_metadata=one_to_one_field_metadata|get_key_value_or_empty_dict:field.name %}
+    {% include 'editor/foreign_key_fields/one_to_one_field.html' %}
+    {% endwith %}
+    {% elif field.name in one_to_many_field_metadata %}
+    {% with field_metadata=one_to_many_field_metadata|get_key_value_or_empty_dict:field.name %}
+    {% include 'editor/foreign_key_fields/one_to_many_field.html' %}
+    {% endwith %}
+    {% elif field.field.widget.input_type == 'checkbox' %}
+    {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+    {% else %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+    <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
+        {% if category_data.previous %}
+        <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+            <button class="btn btn-light" type="button">
+                Previous Step
+            </button>
+            <div class="form-text text-center">
+                {{ category_data.previous.title|split_by_colon|join:': ' }}
+            </div>
+        </div>
+        {% endif %}
+        <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
+            <button id="editor-submit-button" type="submit" class="btn btn-primary">
+                {% if not category_data.next %}
+                Finish & Review
+                {% else %}
+                Next Step
+                {% endif %}
+            </button>
+            {% if category_data.next %}
+            <div class="form-text text-center">
+                {{ category_data.next.title|split_by_colon|join:': ' }}
+            </div>
+            {% endif %}
+            <div class="text-center">
+                {% include 'editor/util_templates/form_errors_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>

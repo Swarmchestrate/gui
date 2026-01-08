@@ -1,0 +1,12 @@
+{% load helpers %}
+{% include 'editor/editor_tab_pane.html' %}
+
+{% if category_data.descendents %}
+{% for descendent_category, descendent_category_data in category_data.descendents.items %}
+{% with category=descendent_category category_data=descendent_category_data %}
+{% with category_id_base=category.lower|kebab_case %}
+{% include 'editor/editor_tab_pane_router.html' %}
+{% endwith %}
+{% endwith %}
+{% endfor %}
+{% endif %}

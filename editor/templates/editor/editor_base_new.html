@@ -2,6 +2,10 @@
 {% load static %}
 {% load helpers %}
 {% block scripts %}
+{{ toc_url|json_script:'toc_url' }}
+{{ tabbed_form_url|json_script:'tabbed_form_url' }}
+<script type="module" src="{% static 'editor/editor_toc.js' %}"></script>
+<script type="module" src="{% static 'editor/editor_tabbed_form.js' %}"></script>
 <script type="module" src="{% static 'editor/editor.js' %}"></script>
 <script type="module" src="{% static 'editor/one_to_one_fields.js' %}"></script>
 {% for field_name, field_metadata in one_to_many_field_metadata.items %}
@@ -23,98 +27,12 @@
     <div class="editor-layout__content">
         {# TOC #}
         <div class="editor-layout__toc">
-            <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top" id="editor-tab" role="tablist">
-                {% for list_item, list_item_data in toc_list_items.items %}
-                {% block list_item %}
-                {% include 'editor/toc_new/active_editor_toc_list_item.html' %}
-                {% endblock list_item %}
-                {% endfor %}
-            </ul>
+            {% include 'editor/placeholders/toc_placeholder.html' %}
         </div>
         {# Editor main content #}
         <div class="editor-layout__body">
             {% block editor_main_content %}
-            <form id="editor-form" action="{{ request.get_full_path }}" method="POST">
-                {% csrf_token %}
-                <div class="tab-content" id="editor-tab-content">
-                    {% regroup form|dictsort:'field.category' by field.category as field_groups %}
-                    {% for field_group in field_groups %}
-                    {% with category_id_base=field_group.grouper.lower|kebab_case %}
-                    <div
-                        class="tab-pane {% if field_group.grouper == current_category %}show active{% endif %}"
-                        id="{{ category_id_base }}-tab-pane"
-                        role="tabpanel"
-                        aria-labelledby="{{ category_id_base }}-tab"
-                        tabindex="0">
-                        {# Editor header #}
-                        <div class="editor-layout__header">
-                            {% block top_section %}
-                            <div class="d-flex flex-column align-items-baseline row-gap-1">
-                                <h2 class="fs-1 mb-0">{{ field_group.grouper.title|split_by_colon|join:': ' }}</h2>
-                                {% url editor_overview_reverse_base resource_id as overview_url %}
-                                <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
-                                    {{ resource_type_readable.title }} {{ resource_id }}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-                                    </svg>
-                                </a>
-                            </div>
-                            {% endblock top_section %}
-                        </div>
-                        <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-                        {% for field in field_group.list %}
-                        {% if field.name in one_to_one_field_metadata %}
-                        {% with field_metadata=one_to_one_field_metadata|get_key_value_or_empty_dict:field.name %}
-                        {% include 'editor/foreign_key_fields/one_to_one_field.html' %}
-                        {% endwith %}
-                        {% elif field.name in one_to_many_field_metadata %}
-                        {% with field_metadata=one_to_many_field_metadata|get_key_value_or_empty_dict:field.name %}
-                        {% include 'editor/foreign_key_fields/one_to_many_field.html' %}
-                        {% endwith %}
-                        {% elif field.field.widget.input_type == 'checkbox' %}
-                        {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
-                        {% else %}
-                        {% include 'editor/field_templates/field_template.html' %}
-                        {% endif %}
-                        {% endfor %}
-                        <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
-                            {% if not forloop.first %}
-                            <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
-                                <button class="btn btn-light" type="button">
-                                    Previous Step
-                                </button>
-                                <div class="form-text text-center">
-                                    {% with previous_element=field_groups|previous:forloop.counter0 %}
-                                    {{ next_element.grouper.title|split_by_colon|join:': ' }}
-                                    {% endwith %}
-                                </div>
-                            </div>
-                            {% endif %}
-                            <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
-                                <button id="editor-submit-button" type="submit" class="btn btn-primary">
-                                    {% if forloop.last %}
-                                    Finish & Review
-                                    {% else %}
-                                    Next Step
-                                    {% endif %}
-                                </button>
-                                {% if not forloop.last %}
-                                <div class="form-text text-center">
-                                    {% with next_element=field_groups|next:forloop.counter0 %}
-                                    {{ next_element.grouper.title|split_by_colon|join:': ' }}
-                                    {% endwith %}
-                                </div>
-                                {% endif %}
-                                <div class="text-center">
-                                    {% include 'editor/util_templates/form_errors_list.html' %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endwith %}
-                    {% endfor %}
-                </div>
-            </form>
+            {% include 'editor/placeholders/fields_placeholder.html' %}
             {% endblock editor_main_content %}
         </div>
     </div>

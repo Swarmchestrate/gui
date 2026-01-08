@@ -24,6 +24,21 @@ urlpatterns = [
         name="delete_cloud_capacities",
     ),
     path(
+        "cloud-capacities/api/editor-toc/",
+        cloud_capacity_views.CloudCapacityEditorEnabledTabListTemplateView.as_view(),
+        name="cloud_capacity_editor_toc",
+    ),
+    path(
+        "cloud-capacities/api/<resource_id>/editor/",
+        cloud_capacity_views.CloudCapacityEditorTabbedFormTemplateView.as_view(),
+        name="cloud_capacity_editor_tabbed_form",
+    ),
+    path(
+        "cloud-capacities/api/<resource_id>/form/",
+        cloud_capacity_views.CloudCapacityEditorFormView.as_view(),
+        name="cloud_capacity_editor_form",
+    ),
+    path(
         "cloud-capacities/<resource_id>/overview/",
         cloud_capacity_views.CloudCapacityEditorOverviewTemplateView.as_view(),
         name="cloud_capacity_overview",

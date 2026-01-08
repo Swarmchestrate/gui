@@ -1,0 +1,7 @@
+<ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top" id="editor-tab" role="tablist">
+    {% for list_item, list_item_data in toc_list_items.items %}
+    {% block list_item %}
+    {% include 'editor/toc_new/active_editor_toc_list_item.html' %}
+    {% endblock list_item %}
+    {% endfor %}
+</ul>

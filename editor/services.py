@@ -8,20 +8,31 @@ from .utils import UNCATEGORISED_CATEGORY
 def _add_category_descendents(
     category: str,
     category_data: dict,
+    processed_categories: set,
     category_names: list[str],
     parent_category: str = "",
 ):
-    processed_categories = set()
     if category in processed_categories:
         return
     processed_categories.add(category)
     if category not in category_data:
+        # Previous & next categories
+        current_category_index = category_names.index(category)
+        prev_category = None
+        if not current_category_index == 0:
+            prev_category = category_names[current_category_index - 1]
+        next_category = None
+        if not (current_category_index == (len(category_names) - 1)):
+            next_category = category_names[current_category_index + 1]
+        # Category metadata
         category_data.update(
             {
                 category: {
                     "title": category,
                     "non_toc_title": category.replace(":", ": "),
                     "descendents": dict(),
+                    "previous": prev_category,
+                    "next": next_category,
                 },
             }
         )
@@ -39,27 +50,28 @@ def _add_category_descendents(
         if (
             category in possible_descendent_name
             and category != possible_descendent_name
-            and ":" not in possible_descendent_name.replace(category_with_colon, "")
+            and ":" not in possible_descendent_name.replace(category_with_colon, "") # Checks if "direct" descendent.
         )
     ]
     for dn in descendent_names:
         _add_category_descendents(
             dn,
             category_data[category]["descendents"],
+            processed_categories,
             category_names,
             parent_category=category,
         )
 
 
 def get_categories_for_editor(
-    api_client: ApiClient, column_metadata: list[dict]
+    api_client: ApiClient, column_metadata: list[dict], category_names: list[str]
 ) -> dict:
-    category_names = list(set(r.get("category", "") for r in column_metadata))
-    category_names.sort()
-
     categories = dict()
+    processed_categories = set()
     for category in category_names:
-        _add_category_descendents(category, categories, category_names)
+        _add_category_descendents(
+            category, categories, processed_categories, category_names
+        )
 
     categorised_field_names = set(
         cm.get("column_name", "") for cm in column_metadata if cm.get("column_name", "")
@@ -71,14 +83,18 @@ def get_categories_for_editor(
         user_specifiable_field_names - categorised_field_names
     )
     if uncategorised_property_names:
-        category_names.append(UNCATEGORISED_CATEGORY)
+        last_category = category_names[-1]
+        categories[last_category].update({"next": UNCATEGORISED_CATEGORY})
         categories.update(
             {
                 UNCATEGORISED_CATEGORY: {
                     "title": UNCATEGORISED_CATEGORY,
                     "non_toc_title": UNCATEGORISED_CATEGORY,
                     "descendents": dict(),
+                    "previous": last_category,
+                    "next": None,
                 }
             }
         )
+        category_names.append(UNCATEGORISED_CATEGORY)
     return categories

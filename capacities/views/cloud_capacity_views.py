@@ -20,9 +20,12 @@ from editor.base_views import (
 from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
+    EditorEnabledTabListTemplateView,
+    EditorFormView,
     EditorOverviewTemplateView,
     EditorProcessFormView,
     EditorStartFormView,
+    EditorTabbedFormTemplateView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
     UpdateOneToManyRelationFormView,
@@ -76,10 +79,21 @@ class CloudCapacityEditorStartFormView(
     form_class = CloudCapacityRegistrationForm
 
 
-class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFormView):
-    template_name = "capacities/cloud_capacity_editor.html"
+class CloudCapacityEditorEnabledTabListTemplateView(
+    CloudCapacityViewMixin, EditorEnabledTabListTemplateView
+):
+    pass
+
+
+class CloudCapacityEditorFormView(CloudCapacityViewMixin, EditorFormView):
     form_class = CloudCapacityEditorForm
-    success_url = reverse_lazy("capacities:new_cloud_capacity")
+
+
+class CloudCapacityEditorTabbedFormTemplateView(
+    CloudCapacityViewMixin, EditorTabbedFormTemplateView
+):
+    form_class = CloudCapacityEditorForm
+    editor_form_reverse = "capacities:cloud_capacity_editor_form"
     new_one_to_one_relation_reverse_base = (
         "capacities:new_cloud_capacity_one_to_one_relation"
     )
@@ -98,6 +112,13 @@ class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFo
     delete_one_to_many_relation_reverse_base = (
         "capacities:delete_cloud_capacity_one_to_many_relation"
     )
+
+
+class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFormView):
+    template_name = "capacities/cloud_capacity_editor.html"
+    success_url = reverse_lazy("capacities:new_cloud_capacity")
+    toc_url = reverse_lazy("capacities:cloud_capacity_editor_toc")
+    tabbed_form_reverse = "capacities:cloud_capacity_editor_tabbed_form"
 
 
 class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):

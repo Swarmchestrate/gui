@@ -5,6 +5,7 @@ from http import HTTPStatus
 from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -30,6 +31,57 @@ from .services import get_categories_for_editor
 from .utils import UNCATEGORISED_CATEGORY
 
 logger = logging.getLogger(__name__)
+
+
+class EditorCategoriesTemplateView(TemplateView):
+    api_client: ApiClient
+    column_metadata_api_client_class: type[ColumnMetadataApiClient]
+    column_metadata_api_client: ColumnMetadataApiClient
+    categories: dict
+    category_names: list[str]
+    column_metadata: list[dict]
+    column_names: set[str]
+
+    def setup(self, request, *args, **kwargs):
+        self.setup_column_metadata()
+        self.setup_categories()
+        return super().setup(request, *args, **kwargs)
+
+    def setup_column_metadata(self):
+        self.column_metadata = (
+            self.column_metadata_api_client.get_resources_for_enabled_categories()
+        )
+        self.column_names = set(
+            cm.get("column_name", "")
+            for cm in self.column_metadata
+            if cm.get("column_name", "")
+        )
+
+    def setup_categories(self):
+        self.category_names = list(
+            set(r.get("category", "") for r in self.column_metadata)
+        )
+        self.category_names.sort()
+        self.categories = get_categories_for_editor(
+            self.api_client, self.column_metadata, self.category_names
+        )
+
+    def _get_first_category(self):
+        return next(iter(self.category_names), None)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "toc_list_items": self.categories,
+                "category_names": self.category_names,
+            }
+        )
+        return context
+
+
+class EditorEnabledTabListTemplateView(EditorCategoriesTemplateView):
+    template_name = "editor/toc_new/toc_base.html"
 
 
 class EditorTocTemplateView(TemplateView):
@@ -284,15 +336,12 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
         return one_to_many_field_metadata
 
 
-class EditorProcessFormView(
-    EditorTocTemplateView, EditorForeignKeyFieldsTemplateView, FormView, TemplateView
-):
-    template_name = "editor/editor_base_new.html"
+class EditorFormView(FormView):
+    template_name = "editor/"
     form_class: forms.Form
-    view_is_async = True
 
     api_client: ApiClient
-    editor_reverse_base: str
+    column_metadata_api_client: ColumnMetadataApiClient
     editor_overview_reverse_base: str
     resource_type_readable: str
 
@@ -302,7 +351,7 @@ class EditorProcessFormView(
         self.resource = self.api_client.get(self.resource_id)
 
     def dispatch(self, request, *args, **kwargs):
-        self.category = self.request.GET.get("category", self._get_first_category())
+        self.category = self.request.GET.get("category")
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -312,37 +361,6 @@ class EditorProcessFormView(
         self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
-    async def get(self, request, *args, **kwargs):
-        field_metadata = await asyncio.gather(
-            self.get_one_to_one_field_metadata(), self.get_one_to_many_field_metadata()
-        )
-        self.one_to_one_field_metadata = field_metadata[0]
-        self.one_to_many_field_metadata = field_metadata[1]
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": self.title_base,
-                "main_subheading": self.resource_type_readable.title(),
-                "main_heading": self.title_base,
-                "current_category": self.category,
-                "resource": self.resource,
-                "resource_id": self.resource_id,
-                "one_to_one_field_metadata": self.one_to_one_field_metadata,
-                "one_to_many_field_metadata": self.one_to_many_field_metadata,
-                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
-                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
-                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
-                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
-                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
-                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
-            }
-        )
-        return context
-
-    # Form view
     def form_valid(self, form):
         update_data = form.cleaned_data
         try:
@@ -352,10 +370,11 @@ class EditorProcessFormView(
             logger.exception(error_msg)
             return self.form_invalid(form)
 
-        message = f"Updated {self.category}"
+        message = "Successfully applied changes."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
-            return super().form_valid(form)
+            return redirect(self.success_url)
+            # return super().form_valid(form)
         return JsonResponse(
             {
                 "message": message,
@@ -367,7 +386,8 @@ class EditorProcessFormView(
         error_msg = "Some fields were invalid. Please see feedback below."
         if self.request.accepts("text/html"):
             messages.error(self.request, error_msg)
-            return super().form_invalid(form)
+            return redirect(self.success_url)
+            # return super().form_invalid(form)
         return JsonResponse(
             {
                 "feedback": error_msg,
@@ -386,6 +406,98 @@ class EditorProcessFormView(
             }
         )
         return kwargs
+
+
+class EditorTabbedFormTemplateView(
+    EditorFormView,
+    EditorForeignKeyFieldsTemplateView,
+    EditorCategoriesTemplateView,
+    TemplateView,
+):
+    template_name = "editor/editor_tab_panes.html"
+    view_is_async = True
+
+    editor_form_reverse: str
+    editor_form_url: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.editor_form_url = reverse_lazy(
+            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    async def get(self, request, *args, **kwargs):
+        field_metadata = await asyncio.gather(
+            self.get_one_to_one_field_metadata(), self.get_one_to_many_field_metadata()
+        )
+        self.one_to_one_field_metadata = field_metadata[0]
+        self.one_to_many_field_metadata = field_metadata[1]
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "resource": self.resource,
+                "resource_id": self.resource_id,
+                "editor_form_url": self.editor_form_url,
+                "one_to_one_field_metadata": self.one_to_one_field_metadata,
+                "one_to_many_field_metadata": self.one_to_many_field_metadata,
+                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
+                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
+                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
+                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
+                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
+                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
+            }
+        )
+        return context
+
+
+class EditorProcessFormView(TemplateView):
+    template_name = "editor/editor_base_new.html"
+
+    api_client: ApiClient
+    editor_overview_reverse_base: str
+    toc_url: str
+    tabbed_form_url: str
+    tabbed_form_reverse: str
+    resource_type_readable: str
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = self.api_client.get(self.resource_id)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.category = self.request.GET.get("category")
+        self.success_url = reverse_lazy(
+            self.editor_overview_reverse_base,
+            kwargs={
+                "resource_id": self.resource_id,
+            },
+        )
+        self.tabbed_form_url = reverse_lazy(
+            self.tabbed_form_reverse, kwargs={"resource_id": self.resource_id}
+        )
+        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "title": self.title_base,
+                "main_subheading": self.resource_type_readable.title(),
+                "main_heading": self.title_base,
+                "current_category": self.category,
+                "resource": self.resource,
+                "resource_id": self.resource_id,
+                "toc_url": self.toc_url,
+                "tabbed_form_url": self.tabbed_form_url,
+            }
+        )
+        return context
 
 
 class OneToOneRelationView(View):

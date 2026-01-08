@@ -42,6 +42,7 @@ def next(list_, current_index):
     """Returns the next element of the list using the current index
     if it exists. Otherwise returns an empty string.
     """
+    list_ = list(list_)
     try:
         return list_[int(current_index) + 1]  # access the next element
     except Exception:
@@ -53,6 +54,9 @@ def previous(list_, current_index):
     """Returns the previous element of the list using the current index
     if it exists. Otherwise returns an empty string.
     """
+    if current_index == 0:
+        return ""
+    list_ = list(list_)
     try:
         return list_[int(current_index) - 1]  # access the next element
     except Exception:
