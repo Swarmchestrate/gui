@@ -25,11 +25,35 @@ function linkEditorTabSwitchingToCurrentPageCategory() {
 
 window.addEventListener("DOMContentLoaded", async () => {
     await Promise.all([loadEditorTabbedForm(), loadEditorToc()]);
+    const bsEditorTab = new bootstrap.Tab("#editor-tab");
     const editorTabForms = Array.from(
         document.querySelectorAll("#editor-tab-content form"),
     );
     editorTabForms.forEach((form) => {
-        new AsyncFormHandler(form);
+        const prevTabButton = form.querySelector("button[data-prev-tab-id]");
+        if (prevTabButton) {
+            const prevTabId = prevTabButton.dataset.prevTabId;
+            const prevTab = document.querySelector(`#${prevTabId}`);
+            const prevTabInstance = bootstrap.Tab.getOrCreateInstance(prevTab);
+            prevTabButton.addEventListener("click", () => {
+                prevTabInstance.show();
+            });
+        }
+        const nextTabButton = form.querySelector("button[data-next-tab-id]");
+        let nextTabInstance;
+        if (nextTabButton) {
+            const nextTabId = nextTabButton.dataset.nextTabId;
+            const nextTab = document.querySelector(`#${nextTabId}`);
+            nextTabInstance = bootstrap.Tab.getOrCreateInstance(nextTab);
+        }
+        new AsyncFormHandler(form, {
+            onSuccess: (responseData) => {
+                if (nextTabInstance) {
+                    console.log("success!");
+                    nextTabInstance.show();
+                }
+            },
+        });
     });
     linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();
