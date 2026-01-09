@@ -3,6 +3,24 @@ import { setupFormsetTables } from "/static/editor/formset_tables.js";
 import { loadEditorTabbedForm } from "/static/editor/editor_tabbed_form.js";
 import { loadEditorToc } from "/static/editor/editor_toc.js";
 
+function linkEditorTabSwitchingToCurrentPageCategory() {
+    const tabPaneButtons = Array.from(
+        document.querySelectorAll(".editor-toc button[data-bs-toggle='tab']"),
+    );
+    tabPaneButtons.forEach((tabPaneButton) => {
+        tabPaneButton.addEventListener("shown.bs.tab", (event) => {
+            const selectedTabPaneButton = event.target;
+            const updatedCurrentCategory =
+                selectedTabPaneButton.dataset.category;
+            if ("URLSearchParams" in window) {
+                const url = new URL(window.location);
+                url.searchParams.set("category", updatedCurrentCategory);
+                history.pushState(null, "", url);
+            }
+        });
+    });
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
     await Promise.all([loadEditorTabbedForm(), loadEditorToc()]);
     const editorTabForms = Array.from(
@@ -11,5 +29,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     editorTabForms.forEach((form) => {
         new AsyncFormHandler(form);
     });
+    linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();
 });
