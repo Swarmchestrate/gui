@@ -4,6 +4,10 @@ import { loadEditorTabbedForm } from "/static/editor/editor_tabbed_form.js";
 import { loadEditorToc } from "/static/editor/editor_toc.js";
 import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
 import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
+import {
+    displayToast,
+    displayToastWithoutAutoHide,
+} from "/static/editor/toasts.js";
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
     const tabPaneButtons = Array.from(
@@ -49,7 +53,9 @@ window.addEventListener("DOMContentLoaded", async () => {
         new AsyncFormHandler(form, {
             onSuccess: (responseData) => {
                 if (nextTabInstance) {
-                    console.log("success!");
+                    const responseMessage =
+                        responseData.message || "Applied changes.";
+                    displayToast("Wizard", responseMessage);
                     nextTabInstance.show();
                 }
             },

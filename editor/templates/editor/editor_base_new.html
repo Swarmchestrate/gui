@@ -5,6 +5,7 @@
 {{ toc_url|json_script:'toc_url' }}
 {{ tabbed_form_url|json_script:'tabbed_form_url' }}
 {{ initial_category|json_script:'initial_category' }}
+{{ toast_template|json_script:'toast-template' }}
 <script type="module" src="{% static 'editor/editor.js' %}"></script>
 {% block extra_scripts %}
 {% endblock extra_scripts %}
@@ -27,5 +28,8 @@
             {% endblock editor_main_content %}
         </div>
     </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3">
+
 </div>
 {% endblock content %}

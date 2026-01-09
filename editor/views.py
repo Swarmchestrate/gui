@@ -577,6 +577,7 @@ class EditorProcessFormView(TemplateView):
                 "toc_url": self.toc_url,
                 "tabbed_form_url": self.tabbed_form_url,
                 "initial_category": self.category,
+                "toast_template": render_to_string("editor/toast_template.html", {}),
             }
         )
         return context
