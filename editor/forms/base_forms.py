@@ -8,6 +8,7 @@ from postgrest.api_clients import ColumnMetadataApiClient
 # from postgrest.base.base_api_clients import ApiClient
 from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
 
+from .custom_fields import EnumField
 from .widgets import SelectWithDisabledFirstOption
 
 
@@ -185,7 +186,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         format = field_metadata.get("format", "")
         if not format.endswith("enum"):
             return
-        field_class = forms.ChoiceField
+        field_class = EnumField
         field_enums = field_metadata.get("enum", [])
         if not field_enums:
             return
