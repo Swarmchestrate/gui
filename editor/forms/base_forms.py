@@ -160,13 +160,12 @@ class OpenApiSpecificationBasedForm(EditorForm):
                 attrs={"class": " ".join(css_classes), **extra_widget_attrs}
             ),
         }
-        field_label = field_metadata.get("title")
-        if field_label:
-            kwargs.update(
-                {
-                    "label": field_label,
-                }
-            )
+        field_title = field_metadata.get("title")
+        kwargs.update(
+            {
+                "label": field_title,
+            }
+        )
         help_text = field_metadata.get("help_text")
         if help_text:
             kwargs.update(
@@ -221,6 +220,8 @@ class OpenApiSpecificationBasedForm(EditorForm):
             extra_field_kwargs,
             extra_widget_attrs,
         ) = field_components.values()
+        if "title" not in field_metadata:
+            field_metadata.update({"title": " ".join(field_name.split("_")).title()})
 
         # Build field kwargs
         kwargs = self._configure_field_kwargs(
