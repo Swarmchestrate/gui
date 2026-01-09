@@ -6,7 +6,7 @@ const initialCategory = JSON.parse(
     document.querySelector("#initial_category").textContent,
 );
 
-window.addEventListener("DOMContentLoaded", async () => {
+export async function loadEditorTabbedForm() {
     const response = await fetch(
         `${editorTabbedFormUrl}?${new URLSearchParams({ category: initialCategory }).toString()}`,
         { method: "GET" },
@@ -27,4 +27,4 @@ window.addEventListener("DOMContentLoaded", async () => {
         );
     }
     editorTabbedFormWrapper.innerHTML = responseContent;
-});
+}

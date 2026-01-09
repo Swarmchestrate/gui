@@ -5,8 +5,6 @@
 {{ toc_url|json_script:'toc_url' }}
 {{ tabbed_form_url|json_script:'tabbed_form_url' }}
 {{ initial_category|json_script:'initial_category' }}
-<script type="module" src="{% static 'editor/editor_toc.js' %}"></script>
-<script type="module" src="{% static 'editor/editor_tabbed_form.js' %}"></script>
 <script type="module" src="{% static 'editor/editor.js' %}"></script>
 <script type="module" src="{% static 'editor/one_to_one_fields.js' %}"></script>
 {% for field_name, field_metadata in one_to_many_field_metadata.items %}
@@ -20,6 +18,7 @@
 {% block extra_scripts %}
 {% endblock extra_scripts %}
 {% endblock scripts %}
+
 {% block content %}
 <div class="editor-layout">
     <h1 class="visually-hidden">
@@ -37,50 +36,5 @@
             {% endblock editor_main_content %}
         </div>
     </div>
-</div>
-<div id="dialogs">
-    {# One-to-one dialogs #}
-    {% for field_name, field_metadata in one_to_one_field_metadata.items %}
-    {# New dialogs #}
-    {% url new_one_to_one_relation_reverse_base resource_id field_name as new_resource_url %}
-    {% with form=field_metadata.new_form dialog_id='new-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/new_dialog.html' %}
-    {% endwith %}
-    {# Update dialogs #}
-    {% url update_one_to_one_relation_reverse_base resource_id field_name as update_resource_url %}
-    {% with form=field_metadata.update_form dialog_id='update-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/update_dialog.html' %}
-    {% endwith %}
-    {# Delete dialogs #}
-    {% url delete_one_to_one_relation_reverse_base resource_id field_name as delete_resource_url %}
-    {% with form=field_metadata.delete_form dialog_id='delete-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/delete_dialog.html' %}
-    {% endwith %}
-    {% endfor %}
-
-    {# One-to-many dialogs #}
-    {% for field_name, field_metadata in one_to_many_field_metadata.items %}
-    {# New dialogs #}
-    {% url new_one_to_many_relation_reverse_base resource_id field_name as new_resource_url %}
-    {% with form=field_metadata.new_form dialog_id='new-'|add:field_name|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/new_dialog.html' %}
-    {% endwith %}
-    {% for resource_id, forms in field_metadata.resource_forms.items %}
-    {# Update dialogs #}
-    {% url update_one_to_many_relation_reverse_base resource_id field_name resource_id as update_resource_url %}
-    {% with resource_id_str=resource_id|stringformat:'s' %}
-    {% with form=forms.update_form dialog_id='update-'|add:field_name|add:'-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/update_dialog.html' %}
-    {% endwith %}
-    {% endwith %}
-    {# Delete dialogs #}
-    {% url delete_one_to_many_relation_reverse_base resource_id field_name resource_id as delete_resource_url %}
-    {% with resource_id_str=resource_id|stringformat:'s' resource_id=resource_id %}
-    {% with form=forms.delete_form dialog_id='delete-'|add:field_name|add:'-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='col-lg-10' resource_type_readable=field_metadata.type_readable %}
-    {% include 'editor/dialogs/delete_dialog.html' %}
-    {% endwith %}
-    {% endwith %}
-    {% endfor %}
-    {% endfor %}
 </div>
 {% endblock content %}

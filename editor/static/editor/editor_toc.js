@@ -4,7 +4,7 @@ const initialCategory = JSON.parse(
     document.querySelector("#initial_category").textContent,
 );
 
-window.addEventListener("DOMContentLoaded", async () => {
+export async function loadEditorToc() {
     const response = await fetch(
         `${editorTocUrl}?${new URLSearchParams({ category: initialCategory }).toString()}`,
         { method: "GET" },
@@ -25,4 +25,4 @@ window.addEventListener("DOMContentLoaded", async () => {
         );
     }
     editorTocWrapper.innerHTML = responseContent;
-});
+}

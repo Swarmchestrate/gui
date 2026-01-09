@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from http import HTTPStatus
 
@@ -445,13 +446,12 @@ class EditorCategoryBasedFormView(EditorFormView):
         except Exception:
             error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
-            return self.form_invalid(form)
+            return self.api_invalid()
 
         message = f"Saved changes to {self.category}."
         return JsonResponse(
             {
                 "message": message,
-                "redirect": self.success_url,
             }
         )
 
@@ -459,8 +459,16 @@ class EditorCategoryBasedFormView(EditorFormView):
         error_msg = "Some fields were invalid. Please see feedback below."
         return JsonResponse(
             {
-                "feedback": error_msg,
-                "url": self.request.get_full_path(),
+                "message": error_msg,
+                "feedback": json.loads(form.errors.as_json()),
+            },
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def api_invalid(self):
+        return JsonResponse(
+            {
+                "message": f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied.",
             },
             status=HTTPStatus.BAD_REQUEST,
         )
@@ -484,7 +492,7 @@ class EditorTabbedFormTemplateView(
     EditorCategoriesTemplateView,
     TemplateView,
 ):
-    template_name = "editor/editor_tab_panes.html"
+    template_name = "editor/editor_tab.html"
     view_is_async = True
 
     editor_form_reverse: str

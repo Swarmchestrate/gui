@@ -62,12 +62,24 @@ export class AsyncFormHandler {
             body: body,
         });
 
+        let responseText;
         let responseData;
         try {
-            const responseText = await response.text();
+            responseText = await response.text();
+        } catch (error) {
+            console.error(error);
+            this.statusButton.showDefaultState();
+            this.validator.displayFormErrors([
+                "Encountered a problem whilst checking server validation results. Please try again.",
+            ]);
+            return false;
+        }
+
+        try {
             responseData = JSON.parse(responseText);
         } catch (error) {
             console.error(error);
+            console.error(responseText);
             this.statusButton.showDefaultState();
             this.validator.displayFormErrors([
                 "Encountered a problem whilst checking server validation results. Please try again.",
@@ -79,12 +91,6 @@ export class AsyncFormHandler {
             this.statusButton.showDefaultState();
             this.onSuccess(responseData);
             return responseData;
-        }
-
-        try {
-            console.error(await response.text());
-        } catch (error) {
-            console.error(error);
         }
 
         this.statusButton.showDefaultState();

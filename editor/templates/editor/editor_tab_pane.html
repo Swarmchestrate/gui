@@ -21,7 +21,7 @@
         {% endblock top_section %}
     </div>
     <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-    <form id="editor-form" action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST">
+    <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST">
         {% csrf_token %}
         {% for field_group in field_groups %}
         {% if field_group.grouper != category %}
