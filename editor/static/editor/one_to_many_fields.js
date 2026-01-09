@@ -1,9 +1,6 @@
 import { FormDialog } from "/static/editor/form_dialog.js";
 
-const oneToManyFields = Array.from(
-    document.querySelectorAll(".one-to-many-field"),
-);
-const dialogsContainer = document.querySelector("#dialogs");
+let dialogsContainer;
 
 class OneToManyField {
     constructor(oneToManyField) {
@@ -253,8 +250,12 @@ class OneToManyFieldListItem {
     }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+export function initialiseOneToManyFields() {
+    const oneToManyFields = Array.from(
+        document.querySelectorAll(".one-to-many-field"),
+    );
+    dialogsContainer = document.querySelector("#dialogs");
     oneToManyFields.forEach((oneToManyField) => {
         new OneToManyField(oneToManyField);
     });
-});
+}

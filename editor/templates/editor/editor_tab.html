@@ -9,6 +9,14 @@
     {% endfor %}
 </div>
 <div id="dialogs">
+    {% for field_name, field_metadata in one_to_many_field_metadata.items %}
+    {% for template_name, template in field_metadata.templates.items %}
+    {% with template_id=field_name|add:'-'|add:template_name|add:'-form-template' %}
+    {{ template|json_script:template_id }}
+    {% endwith %}
+    {% endfor %}
+    {% endfor %}
+
     {# One-to-one dialogs #}
     {% for field_name, field_metadata in one_to_one_field_metadata.items %}
     {# New dialogs #}

@@ -1,9 +1,5 @@
 import { FormDialog } from "/static/editor/form_dialog.js";
 
-const oneToOneFields = Array.from(
-    document.querySelectorAll(".one-to-one-field"),
-);
-
 class OneToOneField {
     constructor(oneToOneField) {
         this.oneToOneField = oneToOneField;
@@ -178,8 +174,11 @@ class OneToOneField {
     }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+export function initialiseOneToOneFields() {
+    const oneToOneFields = Array.from(
+        document.querySelectorAll(".one-to-one-field"),
+    );
     oneToOneFields.forEach((oneToOneField) => {
         new OneToOneField(oneToOneField);
     });
-});
+}

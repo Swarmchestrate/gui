@@ -2,6 +2,8 @@ import { AsyncFormHandler } from "/static/editor/async_forms.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
 import { loadEditorTabbedForm } from "/static/editor/editor_tabbed_form.js";
 import { loadEditorToc } from "/static/editor/editor_toc.js";
+import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
+import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
     const tabPaneButtons = Array.from(
@@ -31,4 +33,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
     linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();
+    initialiseOneToOneFields();
+    initialiseOneToManyFields();
 });
