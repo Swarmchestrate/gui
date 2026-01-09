@@ -1,8 +1,7 @@
 from postgrest.base.base_api_clients import ApiClient
 
-from .utils import UNCATEGORISED_CATEGORY
-
 # from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
+from .utils import UNCATEGORISED_CATEGORY
 
 
 def _add_category_descendents(
@@ -50,7 +49,10 @@ def _add_category_descendents(
         if (
             category in possible_descendent_name
             and category != possible_descendent_name
-            and ":" not in possible_descendent_name.replace(category_with_colon, "") # Checks if "direct" descendent.
+            and ":"
+            not in possible_descendent_name.replace(
+                category_with_colon, ""
+            )  # Checks if "direct" descendent.
         )
     ]
     for dn in descendent_names:

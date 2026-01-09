@@ -61,7 +61,9 @@ class EditorCategoriesTemplateView(TemplateView):
 
     def setup_categories(self):
         self.category_names = list(
-            set(r.get("category", "") for r in self.column_metadata)
+            set(
+                r.get("category", "") for r in self.column_metadata if r.get("category")
+            )
         )
         self.category_names.sort()
         self.categories = get_categories_for_editor(
