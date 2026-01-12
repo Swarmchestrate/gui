@@ -59,24 +59,28 @@
                 </div>
             </div>
             {% endif %}
-            <div class="d-flex flex-column align-items-sm-end align-items-stretch row-gap-2">
-                <button
-                    id="editor-submit-button"
-                    type="submit"
-                    class="btn btn-primary"
-                    {% if category_data.next %}
-                    {% with next_category_id_base=category_data.next.lower|kebab_case %}
-                    data-next-tab-id="{{ next_category_id_base }}-tab"
-                    {% endwith %}
-                    {% endif %}>
-                    {% if not category_data.next %}
-                    Finish & Review
-                    {% else %}
-                    Next Step
-                    {% endif %}
-                </button>
+            <div class="d-flex flex-column align-items-stretch row-gap-2">
+                <div class="d-flex flex-sm-row flex-column justify-content-sm-end align-items-stretch column-gap-2 row-gap-2">
+                    <button class="btn btn-outline-primary" type="submit">
+                        Save
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        {% if category_data.next %}
+                        {% with next_category_id_base=category_data.next.lower|kebab_case %}
+                        data-next-tab-id="{{ next_category_id_base }}-tab"
+                        {% endwith %}
+                        {% endif %}>
+                        {% if not category_data.next %}
+                        Finish & Review
+                        {% else %}
+                        Next Step
+                        {% endif %}
+                    </button>
+                </div>
                 {% if category_data.next %}
-                <div class="form-text text-center">
+                <div class="form-text text-end">
                     {{ category_data.next.title|split_by_colon|join:': ' }}
                 </div>
                 {% endif %}

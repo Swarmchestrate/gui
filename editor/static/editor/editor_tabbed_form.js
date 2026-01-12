@@ -1,12 +1,11 @@
 const editorTabbedFormUrl = JSON.parse(
     document.querySelector("#tabbed_form_url").textContent,
 );
-const editorTabbedFormWrapper = document.querySelector(".editor-layout__body");
 const initialCategory = JSON.parse(
     document.querySelector("#initial_category").textContent,
 );
 
-export async function loadEditorTabbedForm() {
+export async function getEditorTabbedFormHtml() {
     const response = await fetch(
         `${editorTabbedFormUrl}?${new URLSearchParams({ category: initialCategory }).toString()}`,
         { method: "GET" },
@@ -26,5 +25,5 @@ export async function loadEditorTabbedForm() {
             error,
         );
     }
-    editorTabbedFormWrapper.innerHTML = responseContent;
+    return responseContent;
 }

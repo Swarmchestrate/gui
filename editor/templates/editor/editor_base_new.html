@@ -12,24 +12,24 @@
 {% endblock scripts %}
 
 {% block content %}
-<div class="editor-layout">
-    <h1 class="visually-hidden">
-        {{ resource_type_readable.title }} {{ resource_id }}
-    </h1>
-    <div class="editor-layout__content">
-        {# TOC #}
-        <div class="editor-layout__toc">
-            {% include 'editor/placeholders/toc_placeholder.html' %}
-        </div>
-        {# Editor main content #}
-        <div class="editor-layout__body">
-            {% block editor_main_content %}
-            {% include 'editor/placeholders/fields_placeholder.html' %}
-            {% endblock editor_main_content %}
+<div class="position-relative">
+    <div class="editor-layout">
+        <h1 class="visually-hidden">
+            {{ resource_type_readable.title }} {{ resource_id }}
+        </h1>
+        <div class="editor-layout__content">
+            {# TOC #}
+            <div class="editor-layout__toc">
+                {% include 'editor/placeholders/toc_placeholder.html' %}
+            </div>
+            {# Editor main content #}
+            <div class="editor-layout__body">
+                {% block editor_main_content %}
+                {% include 'editor/placeholders/fields_placeholder.html' %}
+                {% endblock editor_main_content %}
+            </div>
         </div>
     </div>
-</div>
-<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3">
-
+    <div id="toast-container" class="toast-container position-absolute top-0 start-50 translate-middle p-3"></div>
 </div>
 {% endblock content %}

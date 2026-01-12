@@ -1,13 +1,16 @@
 import { AsyncFormHandler } from "/static/editor/async_forms.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
-import { loadEditorTabbedForm } from "/static/editor/editor_tabbed_form.js";
-import { loadEditorToc } from "/static/editor/editor_toc.js";
+import { getEditorTabbedFormHtml } from "/static/editor/editor_tabbed_form.js";
+import { getEditorTocHtml } from "/static/editor/editor_toc.js";
 import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
 import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
 import {
     displayToast,
-    displayToastWithoutAutoHide,
+    displayToastUntilDismissed,
 } from "/static/editor/toasts.js";
+
+const editorTocWrapper = document.querySelector(".editor-layout__toc");
+const editorTabbedFormWrapper = document.querySelector(".editor-layout__body");
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
     const tabPaneButtons = Array.from(
@@ -28,7 +31,14 @@ function linkEditorTabSwitchingToCurrentPageCategory() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-    await Promise.all([loadEditorTabbedForm(), loadEditorToc()]);
+    const editorHtmlSections = await Promise.all([
+        getEditorTabbedFormHtml(),
+        getEditorTocHtml(),
+    ]);
+    const editorTocHtml = editorHtmlSections[1];
+    editorTocWrapper.innerHTML = editorTocHtml;
+    const editorTabbedFormHtml = editorHtmlSections[0];
+    editorTabbedFormWrapper.innerHTML = editorTabbedFormHtml;
     const bsEditorTab = new bootstrap.Tab("#editor-tab");
     const editorTabForms = Array.from(
         document.querySelectorAll("#editor-tab-content form"),
@@ -49,15 +59,15 @@ window.addEventListener("DOMContentLoaded", async () => {
             const nextTabId = nextTabButton.dataset.nextTabId;
             const nextTab = document.querySelector(`#${nextTabId}`);
             nextTabInstance = bootstrap.Tab.getOrCreateInstance(nextTab);
+            nextTabButton.addEventListener("click", () => {
+                nextTabInstance.show();
+            });
         }
         new AsyncFormHandler(form, {
             onSuccess: (responseData) => {
-                if (nextTabInstance) {
-                    const responseMessage =
-                        responseData.message || "Applied changes.";
-                    displayToast("Wizard", responseMessage);
-                    nextTabInstance.show();
-                }
+                const responseMessage =
+                    responseData.message || "Applied changes.";
+                displayToast(responseMessage);
             },
         });
     });

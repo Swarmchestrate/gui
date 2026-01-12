@@ -1,10 +1,9 @@
 const editorTocUrl = JSON.parse(document.querySelector("#toc_url").textContent);
-const editorTocWrapper = document.querySelector(".editor-layout__toc");
 const initialCategory = JSON.parse(
     document.querySelector("#initial_category").textContent,
 );
 
-export async function loadEditorToc() {
+export async function getEditorTocHtml() {
     const response = await fetch(
         `${editorTocUrl}?${new URLSearchParams({ category: initialCategory }).toString()}`,
         { method: "GET" },
@@ -24,5 +23,5 @@ export async function loadEditorToc() {
             error,
         );
     }
-    editorTocWrapper.innerHTML = responseContent;
+    return responseContent;
 }
