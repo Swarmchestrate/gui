@@ -13,18 +13,16 @@ function appendToastToContainer(toastElement) {
     toastContainer.appendChild(toastElement);
 }
 
-export function displayToast(title, message) {
+export function displayToast(message) {
     const newToastElement = createNewToastElement();
-    newToastElement.querySelector(".toast-header strong").textContent = title;
     newToastElement.querySelector(".toast-body").textContent = message;
     appendToastToContainer(newToastElement);
     const bootstrapToast = new bootstrap.Toast(newToastElement, {});
     bootstrapToast.show();
 }
 
-export function displayToastWithoutAutoHide(title, message) {
+export function displayToastUntilDismissed(message) {
     const newToastElement = createNewToastElement();
-    newToastElement.querySelector(".toast-header strong").textContent = title;
     newToastElement.querySelector(".toast-body").textContent = message;
     appendToastToContainer(newToastElement);
     const bootstrapToast = new bootstrap.Toast(newToastElement, {
