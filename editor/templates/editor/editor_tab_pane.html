@@ -44,46 +44,36 @@
         {% endif %}
         {% endfor %}
         <div class="d-flex flex-sm-row flex-column align-items-sm-baseline align-items-stretch justify-content-between row-gap-3 my-4">
-            {% if category_data.previous %}
-            <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
+            <div class="d-flex flex-row justify-content-sm-start justify-content-center column-gap-2">
+                {% if category_data.previous %}
                 <button
                     class="btn btn-light"
                     type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="{{ category_data.previous.title|split_by_colon|join:': ' }}"
                     {% with prev_category_id_base=category_data.previous.lower|kebab_case %}
                     data-prev-tab-id="{{ prev_category_id_base }}-tab"
                     {% endwith %}>
-                    Previous Step
+                    <i class="bi bi-chevron-left"></i>
                 </button>
-                <div class="form-text text-center">
-                    {{ category_data.previous.title|split_by_colon|join:': ' }}
-                </div>
-            </div>
-            {% endif %}
-            <div class="d-flex flex-column align-items-stretch row-gap-2">
-                <div class="d-flex flex-sm-row flex-column justify-content-sm-end align-items-stretch column-gap-2 row-gap-2">
-                    <button class="btn btn-outline-primary" type="submit">
-                        Save
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        {% if category_data.next %}
-                        {% with next_category_id_base=category_data.next.lower|kebab_case %}
-                        data-next-tab-id="{{ next_category_id_base }}-tab"
-                        {% endwith %}
-                        {% endif %}>
-                        {% if not category_data.next %}
-                        Finish & Review
-                        {% else %}
-                        Next Step
-                        {% endif %}
-                    </button>
-                </div>
-                {% if category_data.next %}
-                <div class="form-text text-end">
-                    {{ category_data.next.title|split_by_colon|join:': ' }}
-                </div>
                 {% endif %}
+                {% if category_data.next %}
+                <button
+                    class="btn btn-light"
+                    type="button"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="{{ category_data.next.title|split_by_colon|join:': ' }}"
+                    {% with next_category_id_base=category_data.next.lower|kebab_case %}
+                    data-next-tab-id="{{ next_category_id_base }}-tab"
+                    {% endwith %}>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                {% endif %}
+            </div>
+            <div class="d-flex flex-column align-items-stretch row-gap-2">
+                <button class="btn btn-primary" type="submit">
+                    Save
+                </button>
                 <div class="text-center">
                     {% include 'editor/util_templates/form_errors_list.html' %}
                 </div>

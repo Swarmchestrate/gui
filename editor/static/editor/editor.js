@@ -75,4 +75,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     setupFormsetTables();
     initialiseOneToOneFields();
     initialiseOneToManyFields();
+    const tooltipTriggerElements = Array.from(
+        document.querySelectorAll("[data-bs-toggle='tooltip']"),
+    );
+    tooltipTriggerElements.forEach((tooltipTriggerElement) => {
+        new bootstrap.Tooltip(tooltipTriggerElement);
+    });
 });
