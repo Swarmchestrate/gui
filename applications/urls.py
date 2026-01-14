@@ -31,6 +31,11 @@ urlpatterns = [
         name="application_editor_tabbed_form",
     ),
     path(
+        "applications/api/<resource_id>/edit/",
+        views.ApplicationEditorCategoryBasedFormView.as_view(),
+        name="update_application_by_category",
+    ),
+    path(
         "applications/<resource_id>/overview/",
         views.ApplicationEditorOverviewTemplateView.as_view(),
         name="application_overview",
@@ -38,7 +43,7 @@ urlpatterns = [
     path(
         "applications/<resource_id>/edit/",
         views.ApplicationEditorBaseTemplateView.as_view(),
-        name="update_application_by_category",
+        name="application_editor",
     ),
     path(
         "applications/<resource_id>/delete/",

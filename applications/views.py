@@ -55,7 +55,7 @@ class ApplicationViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = ApplicationApiClient
-    editor_reverse_base = "applications:update_application_by_category"
+    editor_reverse_base = "applications:application_editor"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
     column_metadata_api_client_class = ApplicationColumnMetadataApiClient

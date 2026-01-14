@@ -13,5 +13,5 @@ class ApplicationEditorForm(OpenApiSpecificationBasedForm):
     definition_name = "application"
 
 
-class ApplicationCategoryBasedEditorForm(OpenApiSpecificationBasedForm):
+class ApplicationCategoryBasedEditorForm(OpenApiSpecificationCategoryBasedForm):
     definition_name = "application"

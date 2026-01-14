@@ -52,7 +52,7 @@ class EdgeCapacityViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = EdgeCapacityApiClient
-    editor_reverse_base = "capacities:update_edge_capacity_by_category"
+    editor_reverse_base = "capacities:edge_capacity_editor"
     editor_start_reverse_base = "capacities:new_edge_capacity"
     editor_overview_reverse_base = "capacities:edge_capacity_overview"
     column_metadata_api_client_class = EdgeCapacityColumnMetadataApiClient

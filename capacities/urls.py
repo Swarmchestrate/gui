@@ -114,9 +114,14 @@ urlpatterns = [
         name="edge_capacity_editor_tabbed_form",
     ),
     path(
+        "edge-capacities/api/<resource_id>/edit/",
+        edge_capacity_views.EdgeCapacityEditorCategoryBasedFormView.as_view(),
+        name="update_edge_capacity_by_category",
+    ),
+    path(
         "edge-capacities/<resource_id>/edit/",
         edge_capacity_views.EdgeCapacityEditorBaseTemplateView.as_view(),
-        name="update_edge_capacity_by_category",
+        name="edge_capacity_editor",
     ),
     path(
         "edge-capacities/<resource_id>/delete/",
