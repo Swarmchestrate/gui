@@ -21,11 +21,11 @@ from editor.base_views import (
 from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
+    EditorBaseTemplateView,
     EditorCategoryBasedFormView,
     EditorEnabledTabListTemplateView,
     EditorFormView,
     EditorOverviewTemplateView,
-    EditorProcessFormView,
     EditorStartFormView,
     EditorTabbedFormTemplateView,
     NewOneToManyRelationFormView,
@@ -122,7 +122,9 @@ class CloudCapacityEditorTabbedFormTemplateView(
     )
 
 
-class CloudCapacityEditorProcessFormView(CloudCapacityViewMixin, EditorProcessFormView):
+class CloudCapacityEditorBaseTemplateView(
+    CloudCapacityViewMixin, EditorBaseTemplateView
+):
     template_name = "capacities/cloud_capacity_editor.html"
     success_url = reverse_lazy("capacities:new_cloud_capacity")
     toc_url = reverse_lazy("capacities:cloud_capacity_editor_toc")

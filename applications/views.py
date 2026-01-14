@@ -9,8 +9,8 @@ from editor.base_views import (
 from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
+    EditorBaseTemplateView,
     EditorOverviewTemplateView,
-    EditorProcessFormView,
     EditorStartFormView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
@@ -65,7 +65,7 @@ class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationEditorProcessFormView(ApplicationViewMixin, EditorProcessFormView):
+class ApplicationEditorBaseTemplateView(ApplicationViewMixin, EditorBaseTemplateView):
     template_name = "applications/application_editor.html"
     form_class = ApplicationEditorForm
     success_url = reverse_lazy("applications:new_application")

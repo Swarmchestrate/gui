@@ -15,8 +15,8 @@ from editor.base_views import (
     ResourceTypeNameContextMixin,
 )
 from editor.views import (
+    EditorBaseTemplateView,
     EditorOverviewTemplateView,
-    EditorProcessFormView,
     EditorStartFormView,
 )
 from postgrest.api_clients import (
@@ -64,7 +64,7 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     form_class = EdgeCapacityRegistrationForm
 
 
-class EdgeCapacityEditorProcessFormView(EdgeCapacityViewMixin, EditorProcessFormView):
+class EdgeCapacityEditorBaseTemplateView(EdgeCapacityViewMixin, EditorBaseTemplateView):
     template_name = "capacities/edge_capacity_editor.html"
     form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy("capacities:new_edge_capacity")

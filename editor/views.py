@@ -488,7 +488,7 @@ class EditorTabbedFormTemplateView(
         return context
 
 
-class EditorProcessFormView(TemplateView):
+class EditorBaseTemplateView(TemplateView):
     template_name = "editor/editor_base_new.html"
 
     api_client: ApiClient
