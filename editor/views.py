@@ -396,7 +396,7 @@ class EditorCategoryBasedFormView(EditorFormView):
             logger.exception(error_msg)
             return self.api_invalid()
 
-        message = f"Saved changes to {self.category}."
+        message = f"Saved changes to {self.category.replace(':', ': ')}."
         return JsonResponse({"message": message})
 
     def form_invalid(self, form):
