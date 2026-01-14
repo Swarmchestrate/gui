@@ -1,5 +1,5 @@
 {% load readable_text_helpers %}
 {% application_type_readable as page_title_base %}
-{% with page_title=page_title_base.title|add:' Wizard' url_name='applications:application_editor' resource_id_in_url=resource_id %}
+{% with page_title=page_title_base.title|add:' Wizard' url_name='applications:update_application_by_category' resource_id_in_url=resource_id %}
 {% include 'breadcrumbs/item_base.html' %}
 {% endwith %}

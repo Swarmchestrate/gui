@@ -10,8 +10,12 @@ from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
     EditorBaseTemplateView,
+    EditorCategoryBasedFormView,
+    EditorEnabledTabListTemplateView,
+    EditorFormView,
     EditorOverviewTemplateView,
     EditorStartFormView,
+    EditorTabbedFormTemplateView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
     UpdateOneToManyRelationFormView,
@@ -35,7 +39,11 @@ from resource_management.views import (
     ResourceListFormView,
 )
 
-from .forms import ApplicationEditorForm, ApplicationRegistrationForm
+from .forms import (
+    ApplicationCategoryBasedEditorForm,
+    ApplicationEditorForm,
+    ApplicationRegistrationForm,
+)
 from .utils import application_type_readable, application_type_readable_plural
 
 
@@ -47,7 +55,7 @@ class ApplicationViewMixin(
     ResourceListContextMixin,
 ):
     api_client_class = ApplicationApiClient
-    editor_reverse_base = "applications:application_editor"
+    editor_reverse_base = "applications:update_application_by_category"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
     column_metadata_api_client_class = ApplicationColumnMetadataApiClient
@@ -65,10 +73,27 @@ class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
     success_url = reverse_lazy("applications:new_application")
 
 
-class ApplicationEditorBaseTemplateView(ApplicationViewMixin, EditorBaseTemplateView):
-    template_name = "applications/application_editor.html"
+class ApplicationEditorEnabledTabListTemplateView(
+    ApplicationViewMixin, EditorEnabledTabListTemplateView
+):
+    pass
+
+
+class ApplicationEditorFormView(ApplicationViewMixin, EditorFormView):
     form_class = ApplicationEditorForm
-    success_url = reverse_lazy("applications:new_application")
+
+
+class ApplicationEditorCategoryBasedFormView(
+    ApplicationViewMixin, EditorCategoryBasedFormView
+):
+    form_class = ApplicationCategoryBasedEditorForm
+
+
+class ApplicationEditorTabbedFormTemplateView(
+    ApplicationViewMixin, EditorTabbedFormTemplateView
+):
+    form_class = ApplicationEditorForm
+    editor_form_reverse = "applications:update_application_by_category"
     new_one_to_one_relation_reverse_base = (
         "applications:new_application_one_to_one_relation"
     )
@@ -87,6 +112,13 @@ class ApplicationEditorBaseTemplateView(ApplicationViewMixin, EditorBaseTemplate
     delete_one_to_many_relation_reverse_base = (
         "applications:delete_application_one_to_many_relation"
     )
+
+
+class ApplicationEditorBaseTemplateView(ApplicationViewMixin, EditorBaseTemplateView):
+    template_name = "applications/application_editor.html"
+    success_url = reverse_lazy("applications:new_application")
+    toc_url = reverse_lazy("applications:application_editor_toc")
+    tabbed_form_reverse = "applications:application_editor_tabbed_form"
 
 
 class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
