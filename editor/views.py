@@ -34,61 +34,6 @@ from .utils import UNCATEGORISED_CATEGORY
 logger = logging.getLogger(__name__)
 
 
-class EditorCategoriesTemplateView(TemplateView):
-    api_client: ApiClient
-    column_metadata_api_client_class: type[ColumnMetadataApiClient]
-    column_metadata_api_client: ColumnMetadataApiClient
-    categories: dict
-    category_names: list[str]
-    column_metadata: list[dict]
-    column_names: set[str]
-
-    def setup(self, request, *args, **kwargs):
-        self.category = request.GET.get("category")
-        self.setup_column_metadata()
-        self.setup_categories()
-        return super().setup(request, *args, **kwargs)
-
-    def setup_column_metadata(self):
-        self.column_metadata = (
-            self.column_metadata_api_client.get_resources_for_enabled_categories()
-        )
-        self.column_names = set(
-            cm.get("column_name", "")
-            for cm in self.column_metadata
-            if cm.get("column_name", "")
-        )
-
-    def setup_categories(self):
-        self.category_names = list(
-            set(
-                r.get("category", "") for r in self.column_metadata if r.get("category")
-            )
-        )
-        self.category_names.sort()
-        self.categories = get_categories_for_editor(
-            self.api_client, self.column_metadata, self.category_names
-        )
-
-    def _get_first_category(self):
-        return next(iter(self.category_names), None)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "toc_list_items": self.categories,
-                "category_names": self.category_names,
-                "initial_category": self.category,
-            }
-        )
-        return context
-
-
-class EditorEnabledTabListTemplateView(EditorCategoriesTemplateView):
-    template_name = "editor/toc_new/toc_base.html"
-
-
 class EditorTocTemplateView(TemplateView):
     api_client: ApiClient
     column_metadata_api_client_class: type[ColumnMetadataApiClient]
@@ -99,6 +44,7 @@ class EditorTocTemplateView(TemplateView):
     column_names: set[str]
 
     def setup(self, request, *args, **kwargs):
+        self.category = request.GET.get("category")
         self.setup_column_metadata()
         self.setup_categories()
         return super().setup(request, *args, **kwargs)
@@ -130,9 +76,15 @@ class EditorTocTemplateView(TemplateView):
         context.update(
             {
                 "toc_list_items": self.categories,
+                "category_names": self.category_names,
+                "initial_category": self.category,
             }
         )
         return context
+
+
+class EditorEnabledTabListTemplateView(EditorTocTemplateView):
+    template_name = "editor/toc_new/toc_base.html"
 
 
 class EditorStartFormView(
@@ -491,7 +443,7 @@ class EditorCategoryBasedFormView(EditorFormView):
 class EditorTabbedFormTemplateView(
     EditorFormView,
     EditorForeignKeyFieldsTemplateView,
-    EditorCategoriesTemplateView,
+    EditorTocTemplateView,
     TemplateView,
 ):
     template_name = "editor/editor_tab.html"
