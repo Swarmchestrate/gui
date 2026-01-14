@@ -1,5 +1,5 @@
 {% load readable_text_helpers %}
 {% edge_capacity_type_readable as page_title_base %}
-{% with page_title=page_title_base.title|add:' Wizard' url_name='capacities:edge_capacity_editor' resource_id_in_url=resource_id %}
+{% with page_title=page_title_base.title|add:' Wizard' url_name='capacities:update_edge_capacity_by_category' resource_id_in_url=resource_id %}
 {% include 'breadcrumbs/item_base.html' %}
 {% endwith %}
