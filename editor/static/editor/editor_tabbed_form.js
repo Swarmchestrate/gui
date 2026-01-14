@@ -11,9 +11,10 @@ export async function getEditorTabbedFormHtml() {
         { method: "GET" },
     );
     if (!response.ok) {
-        return console.error(
-            "Could not load editor form due to an error: ",
-            error,
+        console.error(
+            "Received an error whilst loading the form: ",
+            response.status,
+            response.statusText,
         );
     }
     let responseContent = "";

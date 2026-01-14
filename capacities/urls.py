@@ -104,9 +104,19 @@ urlpatterns = [
         name="edge_capacity_overview",
     ),
     path(
+        "edge-capacities/api/editor-toc/",
+        edge_capacity_views.EdgeCapacityEditorEnabledTabListTemplateView.as_view(),
+        name="edge_capacity_editor_toc",
+    ),
+    path(
+        "edge-capacities/api/<resource_id>/editor/",
+        edge_capacity_views.EdgeCapacityEditorTabbedFormTemplateView.as_view(),
+        name="edge_capacity_editor_tabbed_form",
+    ),
+    path(
         "edge-capacities/<resource_id>/edit/",
         edge_capacity_views.EdgeCapacityEditorBaseTemplateView.as_view(),
-        name="edge_capacity_editor",
+        name="update_edge_capacity_by_category",
     ),
     path(
         "edge-capacities/<resource_id>/delete/",

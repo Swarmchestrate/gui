@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 
 from capacities.forms.edge_capacity_forms import (
+    EdgeCapacityCategoryBasedEditorForm,
     EdgeCapacityEditorForm,
     EdgeCapacityRegistrationForm,
 )
@@ -16,8 +17,12 @@ from editor.base_views import (
 )
 from editor.views import (
     EditorBaseTemplateView,
+    EditorCategoryBasedFormView,
+    EditorEnabledTabListTemplateView,
+    EditorFormView,
     EditorOverviewTemplateView,
     EditorStartFormView,
+    EditorTabbedFormTemplateView,
 )
 from postgrest.api_clients import (
     EdgeCapacityApiClient,
@@ -64,10 +69,52 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     form_class = EdgeCapacityRegistrationForm
 
 
+class EdgeCapacityEditorEnabledTabListTemplateView(
+    EdgeCapacityViewMixin, EditorEnabledTabListTemplateView
+):
+    pass
+
+
+class EdgeCapacityEditorFormView(EdgeCapacityViewMixin, EditorFormView):
+    form_class = EdgeCapacityEditorForm
+
+
+class EdgeCapacityEditorCategoryBasedFormView(
+    EdgeCapacityViewMixin, EditorCategoryBasedFormView
+):
+    form_class = EdgeCapacityCategoryBasedEditorForm
+
+
+class EdgeCapacityEditorTabbedFormTemplateView(
+    EdgeCapacityViewMixin, EditorTabbedFormTemplateView
+):
+    form_class = EdgeCapacityEditorForm
+    editor_form_reverse = "capacities:update_edge_capacity_by_category"
+    new_one_to_one_relation_reverse_base = (
+        "capacities:new_edge_capacity_one_to_one_relation"
+    )
+    update_one_to_one_relation_reverse_base = (
+        "capacities:update_edge_capacity_one_to_one_relation"
+    )
+    delete_one_to_one_relation_reverse_base = (
+        "capacities:delete_edge_capacity_one_to_one_relation"
+    )
+    new_one_to_many_relation_reverse_base = (
+        "capacities:new_edge_capacity_one_to_many_relation"
+    )
+    update_one_to_many_relation_reverse_base = (
+        "capacities:update_edge_capacity_one_to_many_relation"
+    )
+    delete_one_to_many_relation_reverse_base = (
+        "capacities:delete_edge_capacity_one_to_many_relation"
+    )
+
+
 class EdgeCapacityEditorBaseTemplateView(EdgeCapacityViewMixin, EditorBaseTemplateView):
     template_name = "capacities/edge_capacity_editor.html"
-    form_class = EdgeCapacityEditorForm
     success_url = reverse_lazy("capacities:new_edge_capacity")
+    toc_url = reverse_lazy("capacities:edge_capacity_editor_toc")
+    tabbed_form_reverse = "capacities:edge_capacity_editor_tabbed_form"
 
 
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):

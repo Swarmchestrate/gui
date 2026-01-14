@@ -4,6 +4,7 @@ from editor.forms.base_forms import (
     EditorForm,
     OpenApiSpecificationBasedForm,
     OpenApiSpecificationBasedRegistrationForm,
+    OpenApiSpecificationCategoryBasedForm,
 )
 
 
@@ -14,6 +15,11 @@ class EdgeCapacityRegistrationForm(OpenApiSpecificationBasedRegistrationForm):
 
 class EdgeCapacityEditorForm(OpenApiSpecificationBasedForm):
     definition_name = "capacity_new"
+
+
+class EdgeCapacityCategoryBasedEditorForm(OpenApiSpecificationCategoryBasedForm):
+    definition_name = "capacity_new"
+    disabled_categories = ["System Specific"]
 
 
 # Forms to be used in formsets to help with the input
