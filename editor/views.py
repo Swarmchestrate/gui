@@ -329,10 +329,6 @@ class EditorFormView(FormView):
             return self.form_invalid(form)
 
         message = "Successfully applied changes."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return redirect(self.success_url)
-            # return super().form_valid(form)
         return JsonResponse(
             {
                 "message": message,
@@ -341,11 +337,9 @@ class EditorFormView(FormView):
         )
 
     def form_invalid(self, form):
-        error_msg = "Some fields were invalid. Please see feedback below."
-        if self.request.accepts("text/html"):
-            messages.error(self.request, error_msg)
-            return redirect(self.success_url)
-            # return super().form_invalid(form)
+        error_msg = (
+            "Some fields were invalid. Please apply fixes for the highlighted fields."
+        )
         return JsonResponse(
             {
                 "feedback": error_msg,
@@ -403,19 +397,14 @@ class EditorCategoryBasedFormView(EditorFormView):
             return self.api_invalid()
 
         message = f"Saved changes to {self.category}."
-        return JsonResponse(
-            {
-                "message": message,
-            }
-        )
+        return JsonResponse({"message": message})
 
     def form_invalid(self, form):
-        error_msg = "Some fields were invalid. Please see feedback below."
+        error_msg = (
+            "Some fields were invalid. Please apply fixes for the highlighted fields."
+        )
         return JsonResponse(
-            {
-                "message": error_msg,
-                "feedback": json.loads(form.errors.as_json()),
-            },
+            {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
             status=HTTPStatus.BAD_REQUEST,
         )
 
