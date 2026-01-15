@@ -1,6 +1,7 @@
 from postgrest.base.base_api_clients import ApiClient
 
 # from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
+from .forms.custom_fields import GeometryPointField
 from .utils import UNCATEGORISED_CATEGORY
 
 
@@ -138,3 +139,16 @@ def get_categories_for_editor(
         categories.update({UNCATEGORISED_CATEGORY: uncategorised_metadata})
         category_names.append(UNCATEGORISED_CATEGORY)
     return categories
+
+
+def prepare_initial_form_data(unprocessed_initial_data: dict):
+    processed_initial_data = unprocessed_initial_data
+    if not unprocessed_initial_data:
+        return unprocessed_initial_data
+    gps_location_property_name = "gps_location"
+    gps_location = unprocessed_initial_data.get(gps_location_property_name)
+    if gps_location:
+        coordinates = gps_location.get("coordinates", [])
+        lat, long = coordinates[0], coordinates[1]
+        processed_initial_data.update({gps_location_property_name: (lat, long)})
+    return processed_initial_data

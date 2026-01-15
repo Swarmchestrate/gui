@@ -67,6 +67,7 @@ class OneToOneField {
                             this.updateDialogForm.querySelector(
                                 `[name="${property}"]`,
                             );
+                        if (!fieldForProperty) continue;
                         if (propertyValue === null) {
                             propertyValue = "";
                         }
@@ -100,19 +101,49 @@ class OneToOneField {
                 onFormSuccess: (responseData) => {
                     for (const property in responseData.resource) {
                         let propertyValue = responseData.resource[property];
+                        // Set the value preview element displaying the property's
+                        // value before the dialog is open.
                         const elementForProperty =
                             this.oneToOneField.querySelector(
                                 `[data-field="${property}"]`,
                             );
                         if (!elementForProperty) continue;
                         elementForProperty.textContent = propertyValue;
+                        if (Array.isArray(propertyValue)) {
+                            elementForProperty.textContent =
+                                propertyValue.join(", ");
+                        }
                         if (!propertyValue) {
                             elementForProperty.textContent = "None";
                         }
+                        // Set the value of multiple input fields assigned
+                        // for the property (if applicable).
+                        const fieldsForProperty = Array.from(
+                            this.updateDialogForm.querySelectorAll(
+                                `[data-multi-value-field="${property}"]`,
+                            ),
+                        );
+                        if (fieldsForProperty.length !== 0) {
+                            if (propertyValue === null) {
+                                propertyValue = "";
+                                fieldsForProperty.forEach(
+                                    (field) =>
+                                        (field.defaultValue = propertyValue),
+                                );
+                                continue;
+                            }
+                            fieldsForProperty.forEach((field, i) => {
+                                field.defaultValue = propertyValue[i];
+                            });
+                            continue;
+                        }
+                        // Set the input field value for the property.
                         const fieldForProperty =
                             this.updateDialogForm.querySelector(
                                 `[name="${property}"]`,
                             );
+
+                        if (!fieldForProperty) continue;
                         if (propertyValue === null) {
                             propertyValue = "";
                         }
@@ -126,8 +157,8 @@ class OneToOneField {
                                 option.setAttribute("selected", "selected");
                             }
                         }
-                        this.updateDialogForm.reset();
                     }
+                    this.updateDialogForm.reset();
                 },
             },
             this.updateDialogForm,

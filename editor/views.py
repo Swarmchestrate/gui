@@ -28,7 +28,7 @@ from .forms.base_forms import (
     SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
     SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
 )
-from .services import get_categories_for_editor
+from .services import get_categories_for_editor, prepare_initial_form_data
 from .utils import UNCATEGORISED_CATEGORY
 
 logger = logging.getLogger(__name__)
@@ -166,7 +166,7 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                 pass
             if fk_resource_id:
                 existing_resource = fk_api_client.get(fk_resource_id)
-                initial = existing_resource
+                initial = prepare_initial_form_data(existing_resource)
             one_to_one_field_metadata.update(
                 {
                     field_name: {
@@ -215,7 +215,9 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                                     fk_api_client,
                                     ColumnMetadataApiClient(),
                                     id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.pk_field_name}",
-                                    initial=existing_resource,
+                                    initial=prepare_initial_form_data(
+                                        existing_resource
+                                    ),
                                 ),
                                 "delete_form": ResourceDeletionForm(
                                     initial={
@@ -352,7 +354,7 @@ class EditorFormView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "initial": self.resource,
+                "initial": prepare_initial_form_data(self.resource),
                 "api_client": self.api_client,
                 "column_metadata_api_client": self.column_metadata_api_client,
             }
@@ -361,7 +363,6 @@ class EditorFormView(FormView):
 
 
 class EditorCategoryBasedFormView(EditorFormView):
-    template_name = "editor/"
     form_class: forms.Form
 
     api_client: ApiClient
@@ -420,7 +421,7 @@ class EditorCategoryBasedFormView(EditorFormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
-                "initial": self.resource,
+                "initial": prepare_initial_form_data(self.resource),
                 "api_client": self.api_client,
                 "column_metadata_api_client": self.column_metadata_api_client,
                 "category": self.category,
@@ -585,7 +586,7 @@ class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({"resource": new_resource})
+        return JsonResponse({"resource": prepare_initial_form_data(new_resource)})
 
 
 class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
@@ -600,7 +601,7 @@ class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({"resource": resource})
+        return JsonResponse({"resource": prepare_initial_form_data(resource)})
 
 
 class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
@@ -686,7 +687,7 @@ class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({"resource": new_resource})
+        return JsonResponse({"resource": prepare_initial_form_data(new_resource)})
 
 
 class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
@@ -704,7 +705,7 @@ class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({"resource": resource})
+        return JsonResponse({"resource": prepare_initial_form_data(resource)})
 
 
 class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):

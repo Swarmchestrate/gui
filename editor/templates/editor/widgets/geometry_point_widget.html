@@ -1,0 +1,10 @@
+<div class="row gx-2">
+    {% for subwidget in widget.subwidgets %}
+    <div class="col-6">
+        {% include subwidget.template_name with widget=subwidget %}
+        {% with invalid_feedback_id_prefix=subwidget.attrs.id %}
+        {% include 'editor/field_templates/invalid_feedback.html' %}
+        {% endwith %}
+    </div>
+    {% endfor %}
+</div>
