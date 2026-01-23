@@ -119,7 +119,7 @@ class EditorStartFormView(
         new_resource = self.api_client.register(form.cleaned_data)
         messages.success(
             self.request,
-            f"New {self.api_client.endpoint_definition.definition_name} registered.",
+            f"New {self.api_client.type_readable} registered.",
         )
         self.success_url = reverse_lazy(
             self.editor_reverse_base,
