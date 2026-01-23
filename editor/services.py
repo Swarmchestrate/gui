@@ -150,5 +150,5 @@ def prepare_initial_form_data(unprocessed_initial_data: dict):
     if gps_location:
         coordinates = gps_location.get("coordinates", [])
         lat, long = coordinates[0], coordinates[1]
-        processed_initial_data.update({gps_location_property_name: (lat, long)})
+        processed_initial_data.update({gps_location_property_name: [lat, long]})
     return processed_initial_data
