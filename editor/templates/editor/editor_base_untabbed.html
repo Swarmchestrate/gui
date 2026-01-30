@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block scripts %}
+{% endblock scripts %}
+{% block content %}
+<div class="editor-layout">
+    <div class="editor-layout__content">
+        {# Editor header #}
+        <div class="editor-layout__header">
+            {% block top_section %}
+            <hgroup class="d-flex flex-column row-gap-1">
+                <h1 class="mb-0">{{ main_heading }}</h1>
+                <p class="fs-6 text-body-secondary">
+                    {% url editor_overview_reverse_base resource_id as overview_url %}
+                    <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover">
+                        {{ main_subheading }} {{ resource_id }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                        </svg>
+                    </a>
+                </p>
+            </hgroup>
+            {% endblock top_section %}
+        </div>
+        {# TOC #}
+        <div class="editor-layout__toc">
+            <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top">
+                {% for list_item, list_item_data in toc_list_items.items %}
+                <li class="nav-item">
+                    {% block list_item %}
+                    {% include 'editor/toc_untabbed/active_editor_toc_list_item.html' %}
+                    {% endblock list_item %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {# Editor main content #}
+        <div class="editor-layout__body">
+            {% block editor_main_content %}
+            {% endblock editor_main_content %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

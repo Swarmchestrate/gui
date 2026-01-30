@@ -2,7 +2,7 @@
 
 {# List item link #}
 {% block list_item_link %}
-{% include 'editor/toc/active_editor_toc_list_item_link.html' %}
+{% include 'editor/toc_untabbed/active_editor_toc_list_item_link.html' %}
 {% endblock %}
 
 {# List item descendents #}
@@ -11,7 +11,7 @@
     {% for li_descendent, li_descendent_data in list_item_data.descendents.items %}
     {% with list_item=li_descendent list_item_data=li_descendent_data %}
     {% block descendent_list_item %}
-    {% include 'editor/toc/active_editor_toc_list_item.html' %}
+    {% include 'editor/toc_untabbed/active_editor_toc_list_item.html' %}
     {% endblock %}
     {% endwith %}
     {% endfor %}

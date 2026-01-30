@@ -1,4 +1,4 @@
-{% extends 'editor/editor_base.html' %}
+{% extends 'editor/editor_base_untabbed.html' %}
 {% block scripts %}{% endblock scripts %}
 {% block top_section %}
 <h1>{{ title }}</h1>
@@ -7,7 +7,7 @@
 {% endblock top_section %}
 {# TOC #}
 {% block list_item %}
-{% include 'editor/toc/inactive_editor_toc_list_item.html' %}
+{% include 'editor/toc_untabbed/inactive_editor_toc_list_item.html' %}
 {% endblock list_item %}
 {# Editor main content #}
 {% block editor_main_content %}

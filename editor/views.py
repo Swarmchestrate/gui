@@ -84,7 +84,7 @@ class EditorTocTemplateView(TemplateView):
 
 
 class EditorEnabledTabListTemplateView(EditorTocTemplateView):
-    template_name = "editor/toc_new/toc_base.html"
+    template_name = "editor/toc_tabbed/toc_base.html"
 
 
 class EditorStartFormView(
@@ -479,7 +479,7 @@ class EditorTabbedFormTemplateView(
 
 
 class EditorBaseTemplateView(TemplateView):
-    template_name = "editor/editor_base_new.html"
+    template_name = "editor/editor_base_tabbed.html"
 
     api_client: ApiClient
     editor_overview_reverse_base: str
@@ -732,7 +732,7 @@ class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
 
 
 class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
-    template_name = "editor/overview.html"
+    template_name = "editor/overview_base.html"
 
     api_client: ApiClient
     resource_type_readable: str
