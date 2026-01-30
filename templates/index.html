@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% load readable_text_helpers %}
 {% block content %}
-<h1>Swarmchestrate Application Templates</h1>
+<h1>Swarmchestrate TOSCA Templates</h1>
 {% capacity_type_readable_plural as capacity_type_readable_plural %}
 {% application_type_readable_plural as application_type_readable_plural %}
 <p>
-    A portal for registering and managing Swarmchestrate Application
-    Templates (SATs) for {{ capacity_type_readable_plural.title }} and {{ application_type_readable_plural.title }}.
+    A portal for registering and managing Swarmchestrate TOSCA
+    Templates for {{ capacity_type_readable_plural.title }}
+    (Capacity Description Templates or CDTs) and
+    {{ application_type_readable_plural.title }} (Application Description
+    Templates or ADTs).
 </p>
 <section>
     {% cloud_capacity_type_readable as cloud_capacity_type_readable %}
