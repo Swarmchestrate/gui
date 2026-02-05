@@ -3,6 +3,12 @@ from abc import abstractmethod
 import lxml.html
 
 
+# The PostgREST API uses OAS ver. 2 for the its
+# OAS.
+# "Definition" refers to a data structure stored in
+# the global "definitions" section described in OAS
+# ver. 2:
+# https://swagger.io/docs/specification/v2_0/basic-structure/#input-and-output-models.
 class BaseOpenApiDefinition:
     definition_name: str
     _pk_field_name: str

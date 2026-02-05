@@ -6,7 +6,6 @@ from http import HTTPStatus
 from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -23,13 +22,13 @@ from postgrest.base.base_api_clients import ApiClient
 #     MockColumnMetadataApiClient as ColumnMetadataApiClient,
 # )
 from resource_management.forms import ResourceDeletionForm
+from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 from .forms.base_forms import (
     SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
     SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
 )
 from .services import get_categories_for_editor, prepare_initial_form_data
-from .utils import UNCATEGORISED_CATEGORY
 
 logger = logging.getLogger(__name__)
 
@@ -749,7 +748,7 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
             value = self.resource.get(field_name)
             extra_metadata = column_metadata_by_column_name.get(field_name)
             field_title = field_name.replace("_", " ").title()
-            field_category = UNCATEGORISED_CATEGORY
+            field_category = UNKNOWN_ATTRIBUTE_CATEGORY
             if extra_metadata:
                 field_title = extra_metadata.get("title")
                 field_category = extra_metadata.get("category")

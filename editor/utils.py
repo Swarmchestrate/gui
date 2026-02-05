@@ -1,1 +1,0 @@
-UNCATEGORISED_CATEGORY = "Uncategorised"

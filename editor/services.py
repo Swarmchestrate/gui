@@ -1,8 +1,7 @@
 from postgrest.base.base_api_clients import ApiClient
 
 # from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
-from .forms.custom_fields import GeometryPointField
-from .utils import UNCATEGORISED_CATEGORY
+from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
 def _add_metadata_for_category(
@@ -111,10 +110,10 @@ def get_categories_for_editor(
     uncategorised_metadata = {}
     if uncategorised_property_names:
         last_category = category_names[-1]
-        categories[last_category].update({"next": UNCATEGORISED_CATEGORY})
+        categories[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
         uncategorised_metadata = {
-            "title": UNCATEGORISED_CATEGORY,
-            "non_toc_title": UNCATEGORISED_CATEGORY,
+            "title": UNKNOWN_ATTRIBUTE_CATEGORY,
+            "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
             "descendents": dict(),
             "previous": last_category,
             "next": None,
@@ -136,8 +135,8 @@ def get_categories_for_editor(
     # Add uncategorised metadata last to avoid potential
     # confusion.
     if uncategorised_property_names:
-        categories.update({UNCATEGORISED_CATEGORY: uncategorised_metadata})
-        category_names.append(UNCATEGORISED_CATEGORY)
+        categories.update({UNKNOWN_ATTRIBUTE_CATEGORY: uncategorised_metadata})
+        category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
     return categories
 
 

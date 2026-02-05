@@ -2,11 +2,11 @@ from enum import Enum
 
 from django import forms
 
-from editor.utils import UNCATEGORISED_CATEGORY
 from postgrest.api_clients import ColumnMetadataApiClient
 
 # from postgrest.base.base_api_clients import ApiClient
 from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
+from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 from .custom_fields import EnumField, GeometryPointField
 from .custom_widgets import GeometryPointWidget, SelectWithDisabledFirstOption
@@ -57,7 +57,6 @@ class FormWithIdAttributeSuffix(forms.Form):
 
 
 class OpenApiSpecificationBasedForm(EditorForm):
-    error_css_class = "is-invalid"
     definition_name = ""
 
     def __init__(
@@ -142,7 +141,7 @@ class OpenApiSpecificationBasedForm(EditorForm):
         field = field_class(**kwargs)
         category = field_metadata.get("category")
         if not category:
-            category = UNCATEGORISED_CATEGORY
+            category = UNKNOWN_ATTRIBUTE_CATEGORY
         field.category = category
         return field
 
@@ -322,7 +321,7 @@ class OpenApiSpecificationCategoryBasedForm(OpenApiSpecificationBasedForm):
 
     def get_data_for_form_fields(self) -> dict:
         field_data = super().get_data_for_form_fields()
-        if self.category.lower() == UNCATEGORISED_CATEGORY.lower():
+        if self.category.lower() == UNKNOWN_ATTRIBUTE_CATEGORY.lower():
             column_metadata = self.column_metadata_api_client.get_resources()
             column_names = set(
                 cm.get("column_name", "")
