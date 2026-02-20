@@ -1,5 +1,6 @@
 asgiref==3.9.1
 attrs==25.3.0
+casefy==1.1.0
 certifi==2025.7.14
 chardet==5.2.0
 charset-normalizer==3.4.2
@@ -14,6 +15,7 @@ jsonschema-path==0.3.4
 jsonschema-specifications==2025.4.1
 lazy-object-proxy==1.11.0
 libsass==0.23.0
+lxml==6.0.2
 numpy==2.2.6
 openapi-schema-validator==0.6.3
 openapi-spec-validator==0.7.2
