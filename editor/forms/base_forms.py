@@ -56,6 +56,13 @@ class FormWithIdAttributeSuffix(forms.Form):
         super().__init__(*args, **kwargs)
 
 
+class FormWithConfigurableFields(EditorForm):
+    def __init__(self, fields: dict, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in fields.items():
+            self.fields.update({field_name: field})
+
+
 class OpenApiSpecificationBasedForm(EditorForm):
     definition_name = ""
 
