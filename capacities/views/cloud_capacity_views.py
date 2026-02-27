@@ -29,6 +29,7 @@ from editor.views import (
     EditorEnabledTabListTemplateView,
     EditorOverviewTemplateView,
     EditorStartFormView,
+    # EditorTabbedFormTemplateView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
     UpdateOneToManyRelationFormView,
@@ -104,6 +105,7 @@ class CloudCapacityEditorCategoryBasedFormView(
 class CloudCapacityEditorTabbedFormTemplateView(
     CloudCapacityViewMixin, EditorTabbedFormTemplateView
 ):
+    # form_class = CloudCapacityEditorForm
     form_class = FormWithConfigurableFields
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = (
@@ -128,9 +130,10 @@ class CloudCapacityEditorTabbedFormTemplateView(
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         properties_metadata = PropertiesMetadata(
-            'capacity',
+            'capacity_new',
             self.api_client.get_openapi_spec(),
-            self.column_metadata_api_client.get_resources()
+            self.column_metadata_api_client.get_resources(),
+            column_metadata_table_name='capacity'
         ).as_dict()
         fields = FormConfig(properties_metadata).get_fields()
         kwargs.update({
