@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 
 from .property_metadata import PropertyMetadata
@@ -18,13 +19,17 @@ class PropertiesMetadata:
             self,
             definition_name: str,
             openapi_spec: dict,
-            column_metadata: list[dict]):
+            column_metadata: list[dict],
+            column_metadata_table_name: str | None = None):
         self._definition_name = definition_name
         definitions = openapi_spec.get("definitions")
-        self._definition = definitions.get(definition_name)
+        self._definition = definitions.get(definition_name, {})
         self._column_metadata_as_dict = self._create_dict_copy_of_column_metadata(
             column_metadata
         )
+        self._column_metadata_table_name = definition_name
+        if column_metadata_table_name:
+            self._column_metadata_table_name = column_metadata_table_name
     
     def _create_dict_copy_of_column_metadata(
             self,
@@ -68,7 +73,8 @@ class PropertiesMetadata:
         for name, metadata in properties_from_definition.items():
             is_required = name in names_of_required_properties
             column_metadata_for_table = self._column_metadata_as_dict.get(
-                self._definition_name
+                self._column_metadata_table_name,
+                {}
             )
             column_metadata_for_property = column_metadata_for_table.get(name, {})
             properties_metadata_as_dict.update({
@@ -107,10 +113,12 @@ class FormConfig:
         self._properties_metadata = properties_metadata
         
     def _get_field_config_class_from_format(self, format: str):
+        format_enum = None
         try:
             format_enum = OasDefinitionPropertyFormat(format)
         except ValueError:
             pass
+
         match format_enum:
             case OasDefinitionPropertyFormat.BOOLEAN:
                 return BooleanFieldConfig
@@ -130,15 +138,18 @@ class FormConfig:
         fields = dict()
         for name, metadata in self._properties_metadata.items():
             field_config_class = self._get_field_config_class_from_format(metadata.format)
+            additional_args = []
             if metadata.enum:
                 choices = [
                     (field_enum, field_enum.replace("_", " "))
                     for field_enum in metadata.enum
                 ]
                 choices.insert(0, ("", "None"))
-                field_config_class = ChoiceFieldConfig(choices)
+                additional_args.append(choices)
+                field_config_class = ChoiceFieldConfig
             fields.update({
                 name: field_config_class(
+                    *additional_args,
                     name,
                     metadata.is_required,
                     metadata.title,
