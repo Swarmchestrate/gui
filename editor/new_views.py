@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import lxml.html
 from http import HTTPStatus
 
 from django import forms
@@ -14,6 +15,15 @@ from django.views.generic import (
 
 from postgrest.api_clients import ColumnMetadataApiClient
 from postgrest.base.base_api_clients import ApiClient
+from resource_management.forms import ResourceDeletionForm
+from postgrest.forms.form_config import (
+    FormConfig,
+    PropertiesMetadata,
+)
+from postgrest.forms.foreign_key_fields import (
+    get_foreign_key_form_configs,
+    get_one_to_one_field_forms,
+)
 
 # from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
 # from postgrest.mocks.mock_api_clients import (
@@ -245,7 +255,6 @@ class EditorForeignKeyFieldsTemplateView(TemplateView):
                     },
                 }
             )
-        return one_to_many_field_metadata
 
 
 class EditorFormView(FormView):
@@ -315,20 +324,55 @@ class EditorTabbedFormTemplateView(
     editor_form_reverse: str
     editor_form_url: str
 
+    def initialise_main_form_kwargs(self):
+        self.properties_metadata = PropertiesMetadata(
+            'capacity_new',
+            self.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name='capacity'
+        ).as_dict()
+        self.fields = FormConfig(self.properties_metadata).get_fields()
+
+    def initialise_one_to_one_field_forms(self):
+        properties_by_fk_tables = dict()
+        for property_name, property_metadata in self.properties_metadata.items():
+            try:
+                xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
+            except TypeError:
+                continue
+            fk_table_name = next(iter(xpath_results), None)
+            if not fk_table_name:
+                continue
+            if fk_table_name not in properties_by_fk_tables:
+                properties_by_fk_tables.update({
+                    fk_table_name: [],
+                })
+            properties_by_fk_tables[fk_table_name].append(property_name)
+        form_configs = get_foreign_key_form_configs(
+            properties_by_fk_tables.keys(),
+            self.openapi_spec,
+            self.column_metadata
+        )
+        self.one_to_one_field_metadata = get_one_to_one_field_forms(
+            self.resource,
+            form_configs,
+            properties_by_fk_tables
+        )
+
+    async def get(self, request, *args, **kwargs):
+        self.one_to_many_field_metadata = self.get_one_to_many_field_metadata()
+        return super().get(request, *args, **kwargs)
+
     def dispatch(self, request, *args, **kwargs):
         self.category = request.GET.get("category")
         self.editor_form_url = reverse_lazy(
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
+        self.openapi_spec = self.api_client.get_openapi_spec()
+        self.column_metadata = self.column_metadata_api_client.get_resources()
+        self.initialise_main_form_kwargs()
+        self.initialise_one_to_one_field_forms()
         return super().dispatch(request, *args, **kwargs)
-
-    async def get(self, request, *args, **kwargs):
-        field_metadata = await asyncio.gather(
-            self.get_one_to_one_field_metadata(), self.get_one_to_many_field_metadata()
-        )
-        self.one_to_one_field_metadata = field_metadata[0]
-        self.one_to_many_field_metadata = field_metadata[1]
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -21,15 +21,15 @@ class PropertiesMetadata:
             openapi_spec: dict,
             column_metadata: list[dict],
             column_metadata_table_name: str | None = None):
-        self._definition_name = definition_name
         definitions = openapi_spec.get("definitions")
         self._definition = definitions.get(definition_name, {})
         self._column_metadata_as_dict = self._create_dict_copy_of_column_metadata(
             column_metadata
         )
         self._column_metadata_table_name = definition_name
-        if column_metadata_table_name:
-            self._column_metadata_table_name = column_metadata_table_name
+        if not column_metadata_table_name:
+            return
+        self._column_metadata_table_name = column_metadata_table_name
     
     def _create_dict_copy_of_column_metadata(
             self,
@@ -107,6 +107,7 @@ class OasDefinitionPropertyFormat(Enum):
 
 
 class FormConfig:
+    initial = None
     _properties_metadata: dict[str, PropertyMetadata]
     
     def __init__(self, properties_metadata: dict[str, PropertyMetadata]):

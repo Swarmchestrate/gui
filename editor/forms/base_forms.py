@@ -56,11 +56,28 @@ class FormWithIdAttributeSuffix(forms.Form):
         super().__init__(*args, **kwargs)
 
 
-class FormWithConfigurableFields(EditorForm):
+class FormWithDynamicallyPopulatedFields(EditorForm):
     def __init__(self, fields: dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in fields.items():
             self.fields.update({field_name: field})
+
+
+class ForeignKeyFormWithDynamicallyPopulatedFields(FormWithDynamicallyPopulatedFields):
+    def __init__(
+            self,
+            fields: dict,
+            *args,
+            id_prefix: str = "",
+            id_suffix: str = "",
+            **kwargs):
+        auto_id = "id_%s"
+        if id_prefix:
+            auto_id = f"{id_prefix}-{auto_id}"
+        if id_suffix:
+            auto_id = f"{auto_id}-{id_suffix}"
+        kwargs.update({"auto_id": auto_id})
+        super().__init__(fields, *args, **kwargs)
 
 
 class OpenApiSpecificationBasedForm(EditorForm):

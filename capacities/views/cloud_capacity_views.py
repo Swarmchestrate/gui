@@ -20,7 +20,7 @@ from editor.base_views import (
     ResourceTypeNameContextMixin,
 )
 # Refactoring
-from editor.forms.base_forms import FormWithConfigurableFields
+from editor.forms.base_forms import FormWithDynamicallyPopulatedFields
 from editor.views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
@@ -41,10 +41,6 @@ from editor.new_views import (
 from postgrest.api_clients import (
     CloudCapacityApiClient,
     CloudCapacityColumnMetadataApiClient,
-)
-from postgrest.forms.form_config import (
-    FormConfig,
-    PropertiesMetadata,
 )
 
 # from postgrest.mocks.mock_api_clients import (
@@ -106,7 +102,7 @@ class CloudCapacityEditorTabbedFormTemplateView(
     CloudCapacityViewMixin, EditorTabbedFormTemplateView
 ):
     # form_class = CloudCapacityEditorForm
-    form_class = FormWithConfigurableFields
+    form_class = FormWithDynamicallyPopulatedFields
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = (
         "capacities:new_cloud_capacity_one_to_one_relation"
@@ -126,18 +122,11 @@ class CloudCapacityEditorTabbedFormTemplateView(
     delete_one_to_many_relation_reverse_base = (
         "capacities:delete_cloud_capacity_one_to_many_relation"
     )
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        properties_metadata = PropertiesMetadata(
-            'capacity_new',
-            self.api_client.get_openapi_spec(),
-            self.column_metadata_api_client.get_resources(),
-            column_metadata_table_name='capacity'
-        ).as_dict()
-        fields = FormConfig(properties_metadata).get_fields()
         kwargs.update({
-            "fields": fields,
+            "fields": self.fields,
         })
         return kwargs
 
