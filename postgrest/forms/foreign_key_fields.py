@@ -2,7 +2,7 @@ import lxml.html
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 
-from .form_config import FormConfig, PropertiesMetadata
+from .form_config import FormConfig, Properties
 
 from editor.forms.base_forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.services import prepare_initial_form_data
@@ -22,10 +22,10 @@ def get_foreign_key_form_configs(
         table_names (list[str]): The names of the
         tables for the foreign key fields.
         openapi_spec (dict): The OpenAPI 2.0 spec to
-        pass to the PropertiesMetadata class.
+        pass to the Properties class.
         column_metadata (list[dict]): The list of
         records from the column_metadata table to pass
-        to the PropertiesMetadata class.
+        to the Properties class.
 
     Returns:
         dict: Key-value pairs of each foreign key field's
@@ -36,13 +36,13 @@ def get_foreign_key_form_configs(
     # and vice versa).
     form_configs = {}
     for table_name in table_names:
-        properties_metadata = PropertiesMetadata(
+        properties = Properties(
             table_name,
             openapi_spec,
             column_metadata,
         ).as_dict()
         form_configs.update({
-            table_name: FormConfig(properties_metadata),
+            table_name: FormConfig(properties),
         })
     return form_configs
 

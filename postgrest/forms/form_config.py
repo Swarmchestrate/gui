@@ -14,7 +14,7 @@ from .field_config import (
 )
 
 
-class PropertiesMetadata:
+class Properties:
     def __init__(
             self,
             definition_name: str,
@@ -23,6 +23,7 @@ class PropertiesMetadata:
             column_metadata_table_name: str | None = None):
         definitions = openapi_spec.get("definitions")
         self._definition = definitions.get(definition_name, {})
+        self._one_to_many_properties = dict()
         self._column_metadata_as_dict = self._create_dict_copy_of_column_metadata(
             column_metadata
         )
@@ -59,7 +60,7 @@ class PropertiesMetadata:
             )
         return column_metadata_as_dict
 
-    def get_property_metadata_instance(
+    def _get_property_metadata_instance(
             self,
             name: str,
             metadata: dict,
@@ -77,11 +78,17 @@ class PropertiesMetadata:
             help_text=extra_metadata_for_property.get("description")
         )
 
+    def add_one_to_many_property(self, name: str):
+        self._one_to_many_properties.update({
+            name: dict(),
+        })
+
     def as_categorised_dict(self) -> dict:
         UNKNOWN_CATEGORY = 'Uncategorised'
-        categorised_properties_metadata_as_dict = {UNKNOWN_CATEGORY: dict()}
-        properties_from_definition = self._definition.get("properties")
-        names_of_required_properties = self._definition.get("required")
+        categorised_properties_as_dict = {UNKNOWN_CATEGORY: dict()}
+        properties_from_definition = self._definition.get("properties", dict())
+        properties_from_definition.update(self._one_to_many_properties)
+        names_of_required_properties = self._definition.get("required", list())
         column_metadata_for_table = self._column_metadata_as_dict.get(
             self._column_metadata_table_name,
             {}
@@ -91,8 +98,8 @@ class PropertiesMetadata:
             extra_metadata_for_property = column_metadata_for_table.get(name, {})
             property_category = extra_metadata_for_property.get("category")
             if not property_category:
-                categorised_properties_metadata_as_dict[UNKNOWN_CATEGORY].update({
-                    name: self.get_property_metadata_instance(
+                categorised_properties_as_dict[UNKNOWN_CATEGORY].update({
+                    name: self._get_property_metadata_instance(
                         name,
                         metadata,
                         extra_metadata_for_property,
@@ -100,19 +107,19 @@ class PropertiesMetadata:
                     )
                 })
                 continue
-            if property_category not in categorised_properties_metadata_as_dict:
-                categorised_properties_metadata_as_dict.update({
+            if property_category not in categorised_properties_as_dict:
+                categorised_properties_as_dict.update({
                     property_category: dict(),
                 })
-            categorised_properties_metadata_as_dict[property_category].update({
-                name: self.get_property_metadata_instance(
+            categorised_properties_as_dict[property_category].update({
+                name: self._get_property_metadata_instance(
                     name,
                     metadata,
                     extra_metadata_for_property,
                     is_required
                 )
             })
-        return categorised_properties_metadata_as_dict
+        return categorised_properties_as_dict
     
     def as_dict(self) -> dict:
         """Generates a dict of PropertyMetadata instances mapped
@@ -122,9 +129,10 @@ class PropertiesMetadata:
             dict: a dict of PropertyMetadata instances mapped by
             property name.
         """
-        properties_metadata_as_dict = {}
-        properties_from_definition = self._definition.get("properties")
-        names_of_required_properties = self._definition.get("required")
+        properties_as_dict = {}
+        properties_from_definition = self._definition.get("properties", dict())
+        properties_from_definition.update(self._one_to_many_properties)
+        names_of_required_properties = self._definition.get("required", list())
         column_metadata_for_table = self._column_metadata_as_dict.get(
             self._column_metadata_table_name,
             {}
@@ -132,15 +140,15 @@ class PropertiesMetadata:
         for name, metadata in properties_from_definition.items():
             is_required = name in names_of_required_properties
             extra_metadata_for_property = column_metadata_for_table.get(name, {})
-            properties_metadata_as_dict.update({
-                name: self.get_property_metadata_instance(
+            properties_as_dict.update({
+                name: self._get_property_metadata_instance(
                     name,
                     metadata,
                     extra_metadata_for_property,
                     is_required
                 )
             })
-        return properties_metadata_as_dict
+        return properties_as_dict
 
 
 class OasDefinitionPropertyFormat(Enum):
@@ -158,10 +166,10 @@ class OasDefinitionPropertyFormat(Enum):
 
 class FormConfig:
     initial = None
-    _properties_metadata: dict[str, PropertyMetadata]
+    _properties: dict[str, PropertyMetadata]
     
-    def __init__(self, properties_metadata: dict[str, PropertyMetadata]):
-        self._properties_metadata = properties_metadata
+    def __init__(self, properties: dict[str, PropertyMetadata]):
+        self._properties = properties
         
     def _get_field_config_class_from_format(self, format: str):
         format_enum = None
@@ -187,7 +195,7 @@ class FormConfig:
 
     def get_fields(self) -> dict:
         fields = dict()
-        for name, metadata in self._properties_metadata.items():
+        for name, metadata in self._properties.items():
             field_config_class = self._get_field_config_class_from_format(metadata.format)
             additional_args = []
             if metadata.enum:

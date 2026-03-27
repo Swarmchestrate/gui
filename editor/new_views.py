@@ -7,7 +7,7 @@ from postgrest.api_clients import ColumnMetadataApiClient
 from postgrest.base.base_api_clients import ApiClient
 from postgrest.forms.form_config import (
     FormConfig,
-    PropertiesMetadata,
+    Properties,
 )
 from postgrest.forms.foreign_key_fields import (
     get_foreign_key_form_configs,
@@ -92,30 +92,34 @@ class EditorTabbedFormTemplateView(
 
     editor_form_reverse: str
     editor_form_url: str
-
-    def initialise_categorised_forms(self):
-        properties_metadata = PropertiesMetadata(
-            "capacity_new",
+    
+    def initialise_one_to_many_field_forms(self):
+        definitions = self.openapi_spec.get("definitions", {})
+        table_names = list()
+        for definition_name, definition in definitions.items():
+            if 'capacity_id' not in definition.get("properties", {}):
+                continue
+            table_names.append(definition_name)
+            self._properties.add_one_to_many_property(definition_name)
+        form_configs = get_foreign_key_form_configs(
+            table_names,
             self.openapi_spec,
-            self.column_metadata,
-            column_metadata_table_name="capacity"
+            self.column_metadata
         )
-        self.properties_metadata = dict()
-        categorised_properties_metadata = properties_metadata.as_categorised_dict()
-        for properties_metadata in categorised_properties_metadata.values():
-            self.properties_metadata.update(properties_metadata)
-        self.forms_by_category = {
-            category: FormWithDynamicallyPopulatedFields(
-                FormConfig(properties_metadata).get_fields(),
-                initial=self.resource,
-            )
-            for category, properties_metadata in categorised_properties_metadata.items()
-        }
-        
+        # Check each definition for references to the references to the main form type.
+        # E.g., a property is called "capacity_id" or "application_id", or, there is
+        # an explicit "@fk_table_name" expression. E.g. fk_table_name="capacity".
+        self.one_to_many_field_metadata = get_one_to_many_field_forms(
+            self.request,
+            self.resource_id,
+            form_configs,
+            self.update_one_to_many_relation_reverse_base,
+            self.delete_one_to_many_relation_reverse_base
+        )
 
     def initialise_one_to_one_field_forms(self):
         properties_by_fk_tables = dict()
-        for property_name, property_metadata in self.properties_metadata.items():
+        for property_name, property_metadata in self.properties.items():
             try:
                 xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
             except TypeError:
@@ -138,29 +142,19 @@ class EditorTabbedFormTemplateView(
             form_configs,
             properties_by_fk_tables
         )
-    
-    def initialise_one_to_many_field_forms(self):
-        definitions = self.openapi_spec.get("definitions", {})
-        table_names = list()
-        for definition_name, definition in definitions.items():
-            if 'capacity_id' not in definition.get("properties", {}):
-                continue
-            table_names.append(definition_name)
-        form_configs = get_foreign_key_form_configs(
-            table_names,
-            self.openapi_spec,
-            self.column_metadata
-        )
-        # Check each definition for references to the references to the main form type.
-        # E.g., a property is called "capacity_id" or "application_id", or, there is
-        # an explicit "@fk_table_name" expression. E.g. fk_table_name="capacity".
-        self.one_to_many_field_metadata = get_one_to_many_field_forms(
-            self.request,
-            self.resource_id,
-            form_configs,
-            self.update_one_to_many_relation_reverse_base,
-            self.delete_one_to_many_relation_reverse_base
-        )
+
+    def initialise_categorised_forms(self):
+        categorised_properties = self._properties.as_categorised_dict()
+        self.properties = dict()
+        for properties in categorised_properties.values():
+            self.properties.update(properties)
+        self.forms_by_category = {
+            category: FormWithDynamicallyPopulatedFields(
+                FormConfig(properties).get_fields(),
+                initial=self.resource,
+            )
+            for category, properties in categorised_properties.items()
+        }
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -175,9 +169,18 @@ class EditorTabbedFormTemplateView(
         )
         self.openapi_spec = self.api_client.get_openapi_spec()
         self.column_metadata = self.column_metadata_api_client.get_resources()
+        self._properties = Properties(
+            "capacity_new",
+            self.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name="capacity"
+        )
+        # One-to-many fields are handled first, as they are
+        # added to the category-based forms before they
+        # are generated.
+        self.initialise_one_to_many_field_forms()
         self.initialise_categorised_forms()
         self.initialise_one_to_one_field_forms()
-        self.initialise_one_to_many_field_forms()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
