@@ -97,7 +97,8 @@ dialog {
     transition: opacity 0.25s;
     display: flex;
     flex-direction: column;
-    max-inline-size: MIN(90vw, 60ch);
+    min-inline-size: MIN(90vw, 80ch);
+    max-inline-size: MIN(90vw, 80ch);
     max-block-size: MIN(80vh, 100%);
     max-block-size: MIN(80dvb, 100%);
     margin: auto;
@@ -113,7 +114,8 @@ dialog[open] {
     pointer-events: inherit;
 }
 
-html:has(dialog[open]) {
+html:has(dialog[open]),
+body:has(dialog[open]) {
     overflow: hidden;
 }
 
