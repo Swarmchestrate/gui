@@ -1,4 +1,4 @@
-import json
+from django import forms
 from enum import Enum
 
 from .property_metadata import PropertyMetadata
@@ -58,6 +58,61 @@ class PropertiesMetadata:
                 cm_record
             )
         return column_metadata_as_dict
+
+    def get_property_metadata_instance(
+            self,
+            name: str,
+            metadata: dict,
+            extra_metadata_for_property: dict,
+            is_required: bool):
+        return PropertyMetadata(
+            name=name,
+            is_required=is_required,
+            format=metadata.get("format"),
+            type=metadata.get("type"),
+            description=metadata.get("description"),
+            enum=metadata.get("enum"),
+            title=extra_metadata_for_property.get("title"),
+            category=extra_metadata_for_property.get("category"),
+            help_text=extra_metadata_for_property.get("description")
+        )
+
+    def as_categorised_dict(self) -> dict:
+        UNKNOWN_CATEGORY = 'Uncategorised'
+        categorised_properties_metadata_as_dict = {UNKNOWN_CATEGORY: dict()}
+        properties_from_definition = self._definition.get("properties")
+        names_of_required_properties = self._definition.get("required")
+        column_metadata_for_table = self._column_metadata_as_dict.get(
+            self._column_metadata_table_name,
+            {}
+        )
+        for name, metadata in properties_from_definition.items():
+            is_required = name in names_of_required_properties
+            extra_metadata_for_property = column_metadata_for_table.get(name, {})
+            property_category = extra_metadata_for_property.get("category")
+            if not property_category:
+                categorised_properties_metadata_as_dict[UNKNOWN_CATEGORY].update({
+                    name: self.get_property_metadata_instance(
+                        name,
+                        metadata,
+                        extra_metadata_for_property,
+                        is_required
+                    )
+                })
+                continue
+            if property_category not in categorised_properties_metadata_as_dict:
+                categorised_properties_metadata_as_dict.update({
+                    property_category: dict(),
+                })
+            categorised_properties_metadata_as_dict[property_category].update({
+                name: self.get_property_metadata_instance(
+                    name,
+                    metadata,
+                    extra_metadata_for_property,
+                    is_required
+                )
+            })
+        return categorised_properties_metadata_as_dict
     
     def as_dict(self) -> dict:
         """Generates a dict of PropertyMetadata instances mapped
@@ -70,24 +125,19 @@ class PropertiesMetadata:
         properties_metadata_as_dict = {}
         properties_from_definition = self._definition.get("properties")
         names_of_required_properties = self._definition.get("required")
+        column_metadata_for_table = self._column_metadata_as_dict.get(
+            self._column_metadata_table_name,
+            {}
+        )
         for name, metadata in properties_from_definition.items():
             is_required = name in names_of_required_properties
-            column_metadata_for_table = self._column_metadata_as_dict.get(
-                self._column_metadata_table_name,
-                {}
-            )
-            column_metadata_for_property = column_metadata_for_table.get(name, {})
+            extra_metadata_for_property = column_metadata_for_table.get(name, {})
             properties_metadata_as_dict.update({
-                name: PropertyMetadata(
-                    name=name,
-                    is_required=is_required,
-                    format=metadata.get("format"),
-                    type=metadata.get("type"),
-                    description=metadata.get("description"),
-                    enum=metadata.get("enum"),
-                    title=column_metadata_for_property.get("title"),
-                    category=column_metadata_for_property.get("category"),
-                    help_text=column_metadata_for_property.get("description")
+                name: self.get_property_metadata_instance(
+                    name,
+                    metadata,
+                    extra_metadata_for_property,
+                    is_required
                 )
             })
         return properties_metadata_as_dict
@@ -134,7 +184,7 @@ class FormConfig:
             case OasDefinitionPropertyFormat.TEXT_ARRAY | OasDefinitionPropertyFormat.JSONB:
                 return JsonFieldConfig
         return DefaultFieldConfig
-    
+
     def get_fields(self) -> dict:
         fields = dict()
         for name, metadata in self._properties_metadata.items():

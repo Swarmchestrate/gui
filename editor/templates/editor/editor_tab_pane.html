@@ -23,10 +23,8 @@
     <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
     <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST">
         {% csrf_token %}
-        {% for field_group in field_groups %}
-        {% if field_group.grouper != category %}
-        {% else %}
-        {% for field in field_group.list %}
+        {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
+        {% for field in form %}
         {% if field.name in one_to_one_field_metadata %}
         {% with field_metadata=one_to_one_field_metadata|get_key_value_or_empty_dict:field.name %}
         {% include 'editor/foreign_key_fields/one_to_one_field.html' %}
@@ -41,8 +39,7 @@
         {% include 'editor/field_templates/field_template.html' %}
         {% endif %}
         {% endfor %}
-        {% endif %}
-        {% endfor %}
+        {% endwith %}
         <div class="d-flex flex-sm-row flex-column justify-content-sm-between align-items-sm-baseline align-items-stretch gap-4 my-4">
             <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
                 <button class="btn btn-outline-primary" type="submit">
