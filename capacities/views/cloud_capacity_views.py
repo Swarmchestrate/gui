@@ -127,6 +127,7 @@ class CloudCapacityEditorTabbedFormTemplateView(
         kwargs = super().get_form_kwargs()
         kwargs.update({
             "fields": self.fields,
+            "initial": self.resource,
         })
         return kwargs
 

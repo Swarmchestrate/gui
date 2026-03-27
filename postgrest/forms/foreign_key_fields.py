@@ -1,4 +1,6 @@
 import lxml.html
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
 
 from .form_config import FormConfig, PropertiesMetadata
 
@@ -70,7 +72,7 @@ def get_one_to_one_field_forms(
         resource: dict,
         form_configs: dict[str, FormConfig],
         categorised_field_names: dict[str, list]
-    ) -> dict[str, ForeignKeyFormWithDynamicallyPopulatedFields]:
+    ) -> dict[str, dict]:
     """Generates separate forms for one-to-one foreign key
     fields (as these are sent separately from the main editor
     form).
@@ -105,7 +107,7 @@ def get_one_to_one_field_forms(
                 property_name: {
                     "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
                         form_config.get_fields(),
-                        id_prefix='new'
+                        id_prefix=f'new_{property_name}'
                     ),
                     "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
                         form_config.get_fields(),
@@ -122,8 +124,106 @@ def get_one_to_one_field_forms(
     return one_to_one_field_metadata
 
 
-def get_one_to_many_field_update_forms(
+def get_one_to_many_field_forms(
+    request,
     resource_id: int,
-    form_configs: dict[str, FormConfig]
-) -> dict[str, ForeignKeyFormWithDynamicallyPopulatedFields]:
-    pass
+    form_configs: dict[str, FormConfig],
+    update_one_to_many_relation_reverse_base: str,
+    delete_one_to_many_relation_reverse_base: str
+) -> dict[str, dict]:
+    # Table names become the field names in the main form.
+    one_to_many_field_metadata = {}
+    for table_name, form_config in form_configs.items():
+        fk_api_client = ApiClient.get_client_instance_by_endpoint(table_name)
+        if not fk_api_client:
+            continue
+        fk_resources = fk_api_client.get_resources_referencing_resource_id(
+            'capacity_id', resource_id,
+        )
+        pk_field_name = fk_api_client.endpoint_definition.pk_field_name
+        one_to_many_field_metadata.update({
+            table_name: {
+                "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                    form_config.get_fields(),
+                    id_prefix=f'new_{table_name}'
+                ),
+                "resource_forms": {
+                    fk_resource.get(pk_field_name): {
+                        "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                            form_config.get_fields(),
+                            id_suffix=f"{table_name}_{pk_field_name}",
+                            initial=prepare_initial_form_data(fk_resource),
+                        ),
+                        "delete_form": ResourceDeletionForm(
+                            initial={
+                                "resource_id_to_delete": fk_resource.get(pk_field_name)
+                            }
+                        ),
+                    }
+                    for fk_resource in fk_resources
+                },
+                "type_readable": fk_api_client.type_readable,
+                "type_readable_plural": fk_api_client.type_readable_plural,
+                "templates": {
+                    "update_dialog": render_to_string(
+                        "editor/dialogs/update_dialog.html",
+                        {
+                            "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                                form_config.get_fields(),
+                                id_suffix="__resource_id__",
+                            ),
+                            "resource_id": "__resource_id__",
+                            "update_resource_url": reverse_lazy(
+                                update_one_to_many_relation_reverse_base,
+                                kwargs={
+                                    "resource_id": resource_id,
+                                    "fk_column_name": table_name,
+                                    "fk_resource_id": "__resource_id__",
+                                },
+                            ),
+                            "dialog_id": f"update-{table_name}-__resource_id__-dialog",
+                            "dialog_extra_classes": "col-lg-10",
+                            "resource_type_readable": fk_api_client.endpoint,
+                        },
+                        request=request
+                    ),
+                    "delete_dialog": render_to_string(
+                        "editor/dialogs/delete_dialog.html",
+                        {
+                            "form": ResourceDeletionForm(
+                                initial={
+                                    "resource_id_to_delete": "__resource_id__"
+                                }
+                            ),
+                            "resource_id": "__resource_id__",
+                            "delete_resource_url": reverse_lazy(
+                                delete_one_to_many_relation_reverse_base,
+                                kwargs={
+                                    "resource_id": resource_id,
+                                    "fk_column_name": table_name,
+                                    "fk_resource_id": "__resource_id__",
+                                },
+                            ),
+                            "dialog_id": f"delete-{table_name}-__resource_id__-dialog",
+                            "dialog_extra_classes": "col-lg-10",
+                            "resource_type_readable": fk_api_client.endpoint,
+                        },
+                        request=request
+                    ),
+                    "list_item": render_to_string(
+                        "editor/foreign_key_fields/one_to_many_field_list_item.html",
+                        {
+                            "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                                form_config.get_fields(),
+                                id_suffix="__resource_id__",
+                            ),
+                            "resource_id": "__resource_id__",
+                            "resource_type_readable": fk_api_client.endpoint,
+                            "field": {"name": table_name},
+                        },
+                        request=request
+                    ),
+                },
+            },
+        })
+    return one_to_many_field_metadata

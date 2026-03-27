@@ -22,6 +22,7 @@ from postgrest.forms.form_config import (
 )
 from postgrest.forms.foreign_key_fields import (
     get_foreign_key_form_configs,
+    get_one_to_many_field_forms,
     get_one_to_one_field_forms,
 )
 
@@ -326,10 +327,10 @@ class EditorTabbedFormTemplateView(
 
     def initialise_main_form_kwargs(self):
         self.properties_metadata = PropertiesMetadata(
-            'capacity_new',
+            "capacity_new",
             self.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name='capacity'
+            column_metadata_table_name="capacity"
         ).as_dict()
         self.fields = FormConfig(self.properties_metadata).get_fields()
 
@@ -358,9 +359,32 @@ class EditorTabbedFormTemplateView(
             form_configs,
             properties_by_fk_tables
         )
+    
+    def initialise_one_to_many_field_forms(self):
+        definitions = self.openapi_spec.get("definitions", {})
+        table_names = list()
+        for definition_name, definition in definitions.items():
+            if 'capacity_id' not in definition.get("properties", {}):
+                continue
+            table_names.append(definition_name)
+        form_configs = get_foreign_key_form_configs(
+            table_names,
+            self.openapi_spec,
+            self.column_metadata
+        )
+        # Check each definition for references to the references to the main form type.
+        # E.g., a property is called "capacity_id" or "application_id", or, there is
+        # an explicit "@fk_table_name" expression. E.g. fk_table_name="capacity".
+        self.one_to_many_field_metadata = get_one_to_many_field_forms(
+            self.request,
+            self.resource_id,
+            form_configs,
+            self.update_one_to_many_relation_reverse_base,
+            self.delete_one_to_many_relation_reverse_base
+        )
 
     async def get(self, request, *args, **kwargs):
-        self.one_to_many_field_metadata = self.get_one_to_many_field_metadata()
+        # self.one_to_many_field_metadata = self.get_one_to_many_field_metadata()
         return super().get(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -372,6 +396,7 @@ class EditorTabbedFormTemplateView(
         self.column_metadata = self.column_metadata_api_client.get_resources()
         self.initialise_main_form_kwargs()
         self.initialise_one_to_one_field_forms()
+        self.initialise_one_to_many_field_forms()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
