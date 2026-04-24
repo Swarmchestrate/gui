@@ -51,7 +51,7 @@ def get_new_one_to_one_field_forms(
         form_config: FormConfig
     ) -> dict[str, ForeignKeyFormWithDynamicallyPopulatedFields]:
     return ForeignKeyFormWithDynamicallyPopulatedFields(
-        form_config.get_fields(),
+        fields=form_config.get_fields(),
         id_prefix='new'
     )
 
@@ -62,7 +62,7 @@ def get_one_to_one_field_update_form(
         form_config: FormConfig
     ) -> ForeignKeyFormWithDynamicallyPopulatedFields:
     return  ForeignKeyFormWithDynamicallyPopulatedFields(
-        form_config.get_fields(),
+        fields=form_config.get_fields(),
         id_suffix=f'{table_name}_{resource_id}',
         initial=form_config.initial
     )
@@ -106,11 +106,11 @@ def get_one_to_one_field_forms(
             one_to_one_field_metadata.update({
                 property_name: {
                     "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                        form_config.get_fields(),
+                        fields=form_config.get_fields(),
                         id_prefix=f'new_{property_name}'
                     ),
                     "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                        form_config.get_fields(),
+                        fields=form_config.get_fields(),
                         id_suffix=f"{property_name}",
                         initial=initial,
                     ),
@@ -144,13 +144,13 @@ def get_one_to_many_field_forms(
         one_to_many_field_metadata.update({
             table_name: {
                 "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    form_config.get_fields(),
+                    fields=form_config.get_fields(),
                     id_prefix=f'new_{table_name}'
                 ),
                 "resource_forms": {
                     fk_resource.get(pk_field_name): {
                         "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                            form_config.get_fields(),
+                            fields=form_config.get_fields(),
                             id_suffix=f"{table_name}_{pk_field_name}",
                             initial=prepare_initial_form_data(fk_resource),
                         ),
@@ -169,7 +169,7 @@ def get_one_to_many_field_forms(
                         "editor/dialogs/update_dialog.html",
                         {
                             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                                form_config.get_fields(),
+                                fields=form_config.get_fields(),
                                 id_suffix="__resource_id__",
                             ),
                             "resource_id": "__resource_id__",
@@ -214,7 +214,7 @@ def get_one_to_many_field_forms(
                         "editor/foreign_key_fields/one_to_many_field_list_item.html",
                         {
                             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                                form_config.get_fields(),
+                                fields=form_config.get_fields(),
                                 id_suffix="__resource_id__",
                             ),
                             "resource_id": "__resource_id__",

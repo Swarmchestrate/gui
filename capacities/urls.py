@@ -25,17 +25,17 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/api/editor-toc/",
-        cloud_capacity_views.CloudCapacityEditorEnabledTabListTemplateView.as_view(),
+        cloud_capacity_views.CloudCapacityEditorTableOfContentsView.as_view(),
         name="cloud_capacity_editor_toc",
     ),
     path(
         "cloud-capacities/api/<resource_id>/editor/",
-        cloud_capacity_views.CloudCapacityEditorTabbedFormTemplateView.as_view(),
+        cloud_capacity_views.CloudCapacityEditorTabSectionView.as_view(),
         name="cloud_capacity_editor_tabbed_form",
     ),
     path(
         "cloud-capacities/api/<resource_id>/edit/",
-        cloud_capacity_views.CloudCapacityEditorCategoryBasedFormView.as_view(),
+        cloud_capacity_views.UpdateCloudCapacityByCategoryView.as_view(),
         name="update_cloud_capacity_by_category",
     ),
     path(
@@ -45,7 +45,7 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/<resource_id>/edit/",
-        cloud_capacity_views.CloudCapacityEditorBaseTemplateView.as_view(),
+        cloud_capacity_views.CloudCapacityEditorSkeletonLoaderView.as_view(),
         name="cloud_capacity_editor",
     ),
     path(

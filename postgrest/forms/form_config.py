@@ -13,6 +13,8 @@ from .field_config import (
     NumericFieldConfig,
 )
 
+from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+
 
 class Properties:
     def __init__(
@@ -21,7 +23,7 @@ class Properties:
             openapi_spec: dict,
             column_metadata: list[dict],
             column_metadata_table_name: str | None = None):
-        definitions = openapi_spec.get("definitions")
+        definitions = openapi_spec.get("definitions", {})
         self._definition = definitions.get(definition_name, {})
         self._one_to_many_properties = dict()
         self._column_metadata_as_dict = self._create_dict_copy_of_column_metadata(
@@ -84,8 +86,8 @@ class Properties:
         })
 
     def as_categorised_dict(self) -> dict:
-        UNKNOWN_CATEGORY = 'Uncategorised'
-        categorised_properties_as_dict = {UNKNOWN_CATEGORY: dict()}
+        UNKNOWN_ATTRIBUTE_CATEGORY = 'Uncategorised'
+        categorised_properties_as_dict = {UNKNOWN_ATTRIBUTE_CATEGORY: dict()}
         properties_from_definition = self._definition.get("properties", dict())
         properties_from_definition.update(self._one_to_many_properties)
         names_of_required_properties = self._definition.get("required", list())
@@ -98,7 +100,7 @@ class Properties:
             extra_metadata_for_property = column_metadata_for_table.get(name, {})
             property_category = extra_metadata_for_property.get("category")
             if not property_category:
-                categorised_properties_as_dict[UNKNOWN_CATEGORY].update({
+                categorised_properties_as_dict[UNKNOWN_ATTRIBUTE_CATEGORY].update({
                     name: self._get_property_metadata_instance(
                         name,
                         metadata,
@@ -168,7 +170,9 @@ class FormConfig:
     initial = None
     _properties: dict[str, PropertyMetadata]
     
-    def __init__(self, properties: dict[str, PropertyMetadata]):
+    def __init__(
+            self,
+            properties: dict[str, PropertyMetadata]):
         self._properties = properties
         
     def _get_field_config_class_from_format(self, format: str):
@@ -192,28 +196,56 @@ class FormConfig:
             case OasDefinitionPropertyFormat.TEXT_ARRAY | OasDefinitionPropertyFormat.JSONB:
                 return JsonFieldConfig
         return DefaultFieldConfig
+    
+    def _get_field_config_instance(self, name: str, metadata: PropertyMetadata):
+        field_config_class = self._get_field_config_class_from_format(metadata.format)
+        additional_args = []
+        if metadata.enum:
+            choices = [
+                (field_enum, field_enum.replace("_", " "))
+                for field_enum in metadata.enum
+            ]
+            choices.insert(0, ("", "None"))
+            additional_args.append(choices)
+            field_config_class = ChoiceFieldConfig
+        return field_config_class(
+            *additional_args,
+            name,
+            metadata.is_required,
+            metadata.title,
+            metadata.help_text,
+            metadata.category,
+        )
 
     def get_fields(self) -> dict:
         fields = dict()
         for name, metadata in self._properties.items():
-            field_config_class = self._get_field_config_class_from_format(metadata.format)
-            additional_args = []
-            if metadata.enum:
-                choices = [
-                    (field_enum, field_enum.replace("_", " "))
-                    for field_enum in metadata.enum
-                ]
-                choices.insert(0, ("", "None"))
-                additional_args.append(choices)
-                field_config_class = ChoiceFieldConfig
+            field_config_instance = self._get_field_config_instance(name, metadata)
             fields.update({
-                name: field_config_class(
-                    *additional_args,
-                    name,
-                    metadata.is_required,
-                    metadata.title,
-                    metadata.help_text,
-                    metadata.category,
-                ).get_field()
+                name: field_config_instance.get_field()
+            })
+        return fields
+    
+    def get_fields_for_category(self, category) -> dict:
+        fields = dict()
+        for name, metadata in self._properties.items():
+            if category == UNKNOWN_ATTRIBUTE_CATEGORY and metadata.category:
+                continue
+            if category and not metadata.category:
+                continue
+            field_config_instance = self._get_field_config_instance(name, metadata)
+            fields.update({
+                name: field_config_instance.get_field()
+            })
+        return fields
+    
+    def get_required_fields(self) -> dict:
+        fields = dict()
+        for name, metadata in self._properties.items():
+            if not metadata.is_required:
+                continue
+            field_config_instance = self._get_field_config_instance(name, metadata)
+            fields.update({
+                name: field_config_instance.get_field()
             })
         return fields
