@@ -69,7 +69,8 @@ class CloudCapacityEditorTabSectionView(EditorTabSectionView):
 
 
 class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
-    table_name = "capacity"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
 
 
 class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):

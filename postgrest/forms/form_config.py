@@ -233,6 +233,8 @@ class FormConfig:
                 continue
             if category and not metadata.category:
                 continue
+            if not category == metadata.category:
+                continue
             field_config_instance = self._get_field_config_instance(name, metadata)
             fields.update({
                 name: field_config_instance.get_field()

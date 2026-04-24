@@ -15,7 +15,10 @@ from django.views.generic import (
 from .new_forms import FormWithDynamicallyPopulatedFields
 from .view_helpers import EditorTableOfContents
 
-from postgrest.new_api import ApiClient
+from postgrest.new_api import (
+    ApiClient,
+    OpenApiSpecification,
+)
 from postgrest.forms.foreign_key_fields import (
     get_foreign_key_form_configs,
     get_one_to_many_field_forms,
@@ -117,7 +120,7 @@ class EditorTabSectionView(TemplateView):
     
     table_name: str
     column_metadata_table_name: str
-    openapi_spec: dict
+    openapi_spec: OpenApiSpecification
 
     new_one_to_one_relation_reverse_base: str
     update_one_to_one_relation_reverse_base: str
@@ -128,18 +131,53 @@ class EditorTabSectionView(TemplateView):
 
     editor_form_reverse: str
     editor_form_url: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.category = request.GET.get("category")
+        
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        resource_endpoint = self.api_client.get_endpoint(self.table_name)
+        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
+        self.resource = resource_endpoint.get(self.resource_id)
+        self.title_base = f"{resource_endpoint.resource_type.title()} {self.resource_id}"
+        self.editor_form_url = reverse_lazy(
+            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
+        )
+        self.column_metadata = [
+            resource.as_dict()
+            for resource in column_metadata_endpoint.get_resources()
+        ]
+        self._properties = Properties(
+            self.table_name,
+            self.openapi_spec.as_dict(),
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        # One-to-many fields are handled first, as they are
+        # added to the category-based forms before they
+        # are generated.
+        self.initialise_one_to_many_field_forms()
+        self.initialise_categorised_forms()
+        self.initialise_one_to_one_field_forms()
+        self.initialise_toc_list_items()
+        return super().dispatch(request, *args, **kwargs)
     
     def initialise_one_to_many_field_forms(self):
-        definitions = self.openapi_spec.get("definitions", {})
+        definitions = self.openapi_spec.get_definitions()
         table_names = list()
         for definition_name, definition in definitions.items():
-            if 'capacity_id' not in definition.get("properties", {}):
+            if f'{self.column_metadata_table_name}_id' not in definition.as_dict():
                 continue
             table_names.append(definition_name)
             self._properties.add_one_to_many_property(definition_name)
         form_configs = get_foreign_key_form_configs(
             table_names,
-            self.openapi_spec,
+            self.openapi_spec.as_dict(),
             self.column_metadata
         )
         # Check each definition for references to the references to the main form type.
@@ -170,7 +208,7 @@ class EditorTabSectionView(TemplateView):
             properties_by_fk_tables[fk_table_name].append(property_name)
         form_configs = get_foreign_key_form_configs(
             properties_by_fk_tables.keys(),
-            self.openapi_spec,
+            self.openapi_spec.as_dict(),
             self.column_metadata
         )
         self.one_to_one_field_metadata = get_one_to_one_field_forms(
@@ -193,11 +231,10 @@ class EditorTabSectionView(TemplateView):
         }
     
     def initialise_toc_list_items(self):
-        api_client = ApiClient()
-        definition = api_client.get_endpoint(self.table_name).definition
+        definition = self.openapi_spec.get_definition(self.table_name)
         column_metadata = [
             resource.as_dict()
-            for resource in api_client.get_endpoint("column_metadata").get_resources()
+            for resource in self.api_client.get_endpoint("column_metadata").get_resources()
         ]
         category_names = list(set(
             resource.get("category", "")
@@ -211,38 +248,6 @@ class EditorTabSectionView(TemplateView):
             column_metadata,
             definition.properties.keys()
         ).as_dict()
-
-    def dispatch(self, request, *args, **kwargs):
-        self.resource_id = self.kwargs["resource_id"]
-        self.category = request.GET.get("category")
-        
-        api_client = ApiClient()
-        resource_endpoint = api_client.get_endpoint(self.table_name)
-        column_metadata_endpoint = api_client.get_endpoint("column_metadata")
-        self.resource = resource_endpoint.get(self.resource_id)
-        self.title_base = f"{resource_endpoint.resource_type.title()} {self.resource_id}"
-        self.editor_form_url = reverse_lazy(
-            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
-        )
-        self.openapi_spec = api_client.openapi_spec.as_dict()
-        self.column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
-        self._properties = Properties(
-            "capacity_new",
-            self.openapi_spec,
-            self.column_metadata,
-            column_metadata_table_name="capacity"
-        )
-        # One-to-many fields are handled first, as they are
-        # added to the category-based forms before they
-        # are generated.
-        self.initialise_one_to_many_field_forms()
-        self.initialise_categorised_forms()
-        self.initialise_one_to_one_field_forms()
-        self.initialise_toc_list_items()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -270,7 +275,9 @@ class EditorTabSectionView(TemplateView):
 class UpdateResourceByCategoryView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
 
+    openapi_spec: OpenApiSpecification
     table_name: str
+    column_metadata_table_name: str
     editor_overview_reverse_base: str
     resource_type_readable: str
 
@@ -279,7 +286,11 @@ class UpdateResourceByCategoryView(FormView):
         self.category = self.request.GET.get("category")
         if not self.category:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
         self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -292,7 +303,10 @@ class UpdateResourceByCategoryView(FormView):
     def form_valid(self, form):
         update_data = form.cleaned_data
         try:
-            self.api_client.get_endpoint(self.table_name).update(self.resource_id, update_data)
+            self.api_client.get_endpoint(self.table_name).update(
+                self.resource_id,
+                update_data
+            )
         except Exception:
             error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
@@ -318,16 +332,18 @@ class UpdateResourceByCategoryView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        openapi_spec = self.api_client.openapi_spec.as_dict()
+        column_metadata_endpoint = self.api_client.get_endpoint(
+            "column_metadata"
+        )
         column_metadata = [
             resource.as_dict()
             for resource in column_metadata_endpoint.get_resources()
         ]
         properties = Properties(
             self.table_name,
-            openapi_spec,
-            column_metadata
+            self.openapi_spec.as_dict(),
+            column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
         )
         kwargs.update({
             "fields": FormConfig(properties.as_dict()).get_fields_for_category(self.category),
@@ -337,16 +353,21 @@ class UpdateResourceByCategoryView(FormView):
 
 class EditorStartFormView(FormView):
     table_name: str
+    openapi_spec: OpenApiSpecification
     pk_field_name: str
     editor_reverse_base: str
     resource_type_readable: str
 
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        new_resource = self.api_client.get_endpoint(self.table_name).register(form.cleaned_data)
+        new_resource = self.api_client.get_endpoint(
+            self.table_name
+        ).register(form.cleaned_data)
         messages.success(
             self.request,
             f"New {self.resource_type_readable} registered.",
@@ -359,10 +380,12 @@ class EditorStartFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        definition = self.api_client.get_endpoint(self.table_name).definition
+        definition = self.openapi_spec.get_definition(self.table_name)
         column_metadata = [
             resource.as_dict()
-            for resource in self.api_client.get_endpoint("column_metadata").get_resources()
+            for resource in self.api_client.get_endpoint(
+                "column_metadata"
+            ).get_resources()
         ]
         category_names = list(set(
             resource.get("category", "")
@@ -384,15 +407,16 @@ class EditorStartFormView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        openapi_spec = self.api_client.openapi_spec.as_dict()
+        column_metadata_endpoint = self.api_client.get_endpoint(
+            "column_metadata"
+        )
         column_metadata = [
             resource.as_dict()
             for resource in column_metadata_endpoint.get_resources()
         ]
         properties = Properties(
             self.table_name,
-            openapi_spec,
+            self.openapi_spec.as_dict(),
             column_metadata
         )
         kwargs.update({

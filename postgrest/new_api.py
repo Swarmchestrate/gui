@@ -239,7 +239,13 @@ class OpenApiSpecification:
     def __init__(self, data: dict):
         self._data = data
 
-    def get_definition(self, table_name: str) -> dict:
+    def get_definitions(self) -> dict[str, Definition]:
+        return {
+            definition_name: Definition(definition)
+            for definition_name, definition in self._data.get("definitions", {}).items()
+        }
+
+    def get_definition(self, table_name: str) -> Definition:
         return Definition(self._data.get("definitions", {}).get(table_name, {}))
 
     def get_foreign_key_references_to_table(self, table_name: str) -> dict:
@@ -276,14 +282,22 @@ class OpenApiSpecification:
 
 
 class ApiClient:
+    openapi_spec: OpenApiSpecification
+    
     def __init__(self):
         self.api_url = os.environ.get("API_URL")
-        self.openapi_spec = OpenApiSpecification(
+
+    def _get_openapi_spec(self) -> OpenApiSpecification:
+        return OpenApiSpecification(
             requests.get(self.api_url).json()
         )
-    
-    def get_endpoint(self, table_name: str) -> Endpoint:
-        return Endpoint(
-            table_name,
-            self.openapi_spec.get_definition(table_name)
-        )
+
+    def initialise_openapi_spec(self):
+        self.openapi_spec = self._get_openapi_spec()
+
+    def get_endpoint(
+            self,
+            table_name: str) -> Endpoint:
+        if not hasattr(self, "openapi_spec"):
+            self.initialise_openapi_spec()
+        return Endpoint(table_name, self.openapi_spec.get_definition(table_name))
