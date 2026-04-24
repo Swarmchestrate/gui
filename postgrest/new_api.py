@@ -29,7 +29,16 @@ class Resource:
         return self._data.get(self.pk_column_name)
 
     def as_dict(self):
-        return self._data
+        data_as_dict = self._data
+        # Transform GPS location property value to something
+        # easier to work with (if it exists).
+        gps_location_property_name = "gps_location"
+        gps_location = data_as_dict.get(gps_location_property_name)
+        if gps_location:
+            coordinates = gps_location.get("coordinates", [])
+            lat, long = coordinates[0], coordinates[1]
+            data_as_dict.update({gps_location_property_name: [lat, long]})
+        return data_as_dict
 
 
 class Definition:

@@ -3,20 +3,6 @@ from django import forms
 
 class EditorForm(forms.Form):
     error_css_class = "is-invalid"
-    
-    def __init__(self, *args, **kwargs):
-        if "initial" not in kwargs:
-            super().__init__(*args, **kwargs)
-        initial = kwargs["initial"]
-        # Transform GPS location property value to something
-        # easier to work with (if it exists).
-        gps_location_property_name = "gps_location"
-        gps_location = initial.get(gps_location_property_name)
-        if gps_location:
-            coordinates = gps_location.get("coordinates", [])
-            lat, long = coordinates[0], coordinates[1]
-            initial.update({gps_location_property_name: [lat, long]})
-        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()

@@ -4,9 +4,8 @@ from django.urls import reverse_lazy
 
 from .form_config import FormConfig, Properties
 
-from editor.forms.base_forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.services import prepare_initial_form_data
-from postgrest.api_clients import ApiClient
+from editor.new_forms import ForeignKeyFormWithDynamicallyPopulatedFields
+from postgrest.new_api import ApiClient, Resource
 from resource_management.forms import ResourceDeletionForm
 
 
@@ -69,10 +68,9 @@ def get_one_to_one_field_update_form(
 
 
 def get_one_to_one_field_forms(
-        resource: dict,
+        resource: Resource,
         form_configs: dict[str, FormConfig],
-        categorised_field_names: dict[str, list]
-    ) -> dict[str, dict]:
+        categorised_field_names: dict[str, list]) -> dict[str, dict]:
     """Generates separate forms for one-to-one foreign key
     fields (as these are sent separately from the main editor
     form).
@@ -92,17 +90,19 @@ def get_one_to_one_field_forms(
     one_to_one_field_metadata = {}
     for fk_table_name, form_config in form_configs.items():
         property_names = categorised_field_names.get(fk_table_name, list())
-        fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        fk_table_endpoint = api_client.get_endpoint(fk_table_name)
         for property_name in property_names:
             initial = dict()
             fk_resource_id = None
             try:
-                fk_resource_id = resource.get(property_name)
+                fk_resource_id = resource.as_dict().get(property_name)
             except AttributeError:
                 pass
             if fk_resource_id:
-                fk_resource = fk_api_client.get(fk_resource_id)
-                initial = prepare_initial_form_data(fk_resource)
+                fk_resource = fk_table_endpoint.get(fk_resource_id)
+                initial = fk_resource.as_dict()
             one_to_one_field_metadata.update({
                 property_name: {
                     "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
@@ -117,8 +117,8 @@ def get_one_to_one_field_forms(
                     "delete_form": ResourceDeletionForm(
                         initial={"resource_id_to_delete": fk_resource_id}
                     ),
-                    "type_readable": fk_api_client.type_readable,
-                    "type_readable_plural": fk_api_client.type_readable_plural,
+                    "type_readable": fk_table_endpoint.resource_type,
+                    "type_readable_plural": fk_table_endpoint.resource_type,
                 },
             })
     return one_to_one_field_metadata
@@ -134,13 +134,15 @@ def get_one_to_many_field_forms(
     # Table names become the field names in the main form.
     one_to_many_field_metadata = {}
     for table_name, form_config in form_configs.items():
-        fk_api_client = ApiClient.get_client_instance_by_endpoint(table_name)
-        if not fk_api_client:
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        fk_table_endpoint = api_client.get_endpoint(table_name)
+        if not fk_table_endpoint.definition.as_dict():
             continue
-        fk_resources = fk_api_client.get_resources_referencing_resource_id(
-            'capacity_id', resource_id,
+        fk_resources = fk_table_endpoint.get_resources_referencing_resource_id(
+            'capacity_id',
+            resource_id,
         )
-        pk_field_name = fk_api_client.endpoint_definition.pk_field_name
         one_to_many_field_metadata.update({
             table_name: {
                 "new_form": ForeignKeyFormWithDynamicallyPopulatedFields(
@@ -148,22 +150,22 @@ def get_one_to_many_field_forms(
                     id_prefix=f'new_{table_name}'
                 ),
                 "resource_forms": {
-                    fk_resource.get(pk_field_name): {
+                    fk_resource.pk: {
                         "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
                             fields=form_config.get_fields(),
-                            id_suffix=f"{table_name}_{pk_field_name}",
-                            initial=prepare_initial_form_data(fk_resource),
+                            id_suffix=f"{table_name}_{fk_table_endpoint.definition.pk_column_name}",
+                            initial=fk_resource,
                         ),
                         "delete_form": ResourceDeletionForm(
                             initial={
-                                "resource_id_to_delete": fk_resource.get(pk_field_name)
+                                "resource_id_to_delete": fk_resource.pk
                             }
                         ),
                     }
                     for fk_resource in fk_resources
                 },
-                "type_readable": fk_api_client.type_readable,
-                "type_readable_plural": fk_api_client.type_readable_plural,
+                "type_readable": fk_table_endpoint.resource_type,
+                "type_readable_plural": fk_table_endpoint.resource_type,
                 "templates": {
                     "update_dialog": render_to_string(
                         "editor/dialogs/update_dialog.html",
@@ -183,7 +185,7 @@ def get_one_to_many_field_forms(
                             ),
                             "dialog_id": f"update-{table_name}-__resource_id__-dialog",
                             "dialog_extra_classes": "col-lg-10",
-                            "resource_type_readable": fk_api_client.endpoint,
+                            "resource_type_readable": fk_table_endpoint.resource_type,
                         },
                         request=request
                     ),
@@ -206,7 +208,7 @@ def get_one_to_many_field_forms(
                             ),
                             "dialog_id": f"delete-{table_name}-__resource_id__-dialog",
                             "dialog_extra_classes": "col-lg-10",
-                            "resource_type_readable": fk_api_client.endpoint,
+                            "resource_type_readable": fk_table_endpoint.resource_type,
                         },
                         request=request
                     ),
@@ -218,7 +220,7 @@ def get_one_to_many_field_forms(
                                 id_suffix="__resource_id__",
                             ),
                             "resource_id": "__resource_id__",
-                            "resource_type_readable": fk_api_client.endpoint,
+                            "resource_type_readable": fk_table_endpoint.resource_type,
                             "field": {"name": table_name},
                         },
                         request=request
