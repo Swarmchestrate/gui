@@ -91,6 +91,7 @@ class MultiCloudCapacityDeletionFormView(CloudCapacityViewMixin, MultiResourceDe
 
 class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
+    table_name = "capacity_new"
 
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
