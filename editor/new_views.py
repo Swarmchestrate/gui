@@ -171,7 +171,10 @@ class EditorTabSectionView(TemplateView):
         definitions = self.openapi_spec.get_definitions()
         table_names = list()
         for definition_name, definition in definitions.items():
-            if f'{self.column_metadata_table_name}_id' not in definition.as_dict():
+            # TEMP: replace foreign key criteria with presence of
+            # <fk table_name="..." column_name="..."> in description
+            # instead of presence of property name.
+            if f'{self.column_metadata_table_name}_id' not in definition.properties:
                 continue
             table_names.append(definition_name)
             self._properties.add_one_to_many_property(definition_name)

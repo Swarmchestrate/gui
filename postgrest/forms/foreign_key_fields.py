@@ -153,7 +153,7 @@ def get_one_to_many_field_forms(
                         "update_form": ForeignKeyFormWithDynamicallyPopulatedFields(
                             fields=form_config.get_fields(),
                             id_suffix=f"{table_name}_{fk_table_endpoint.definition.pk_column_name}",
-                            initial=fk_resource,
+                            initial=fk_resource.as_dict(),
                         ),
                         "delete_form": ResourceDeletionForm(
                             initial={
