@@ -13,6 +13,11 @@ from capacities.utils import (
     cloud_capacity_type_readable_plural,
 )
 
+from editor.new_foreign_key_views import (
+    NewOneToOneRelationFormView,
+    UpdateOneToOneRelationFormView,
+    DeleteOneToOneRelationFormView,
+)
 from editor.new_views import (
     EditorSkeletonLoaderView,
     UpdateResourceByCategoryView,
@@ -99,9 +104,10 @@ class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOver
 
 
 class CloudCapacityNewOneToOneRelationFormView(
-    CloudCapacityViewMixin, TemplateView
+    CloudCapacityViewMixin, NewOneToOneRelationFormView
 ):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -112,9 +118,10 @@ class CloudCapacityNewOneToOneRelationFormView(
 
 
 class CloudCapacityUpdateOneToOneRelationFormView(
-    CloudCapacityViewMixin, TemplateView
+    CloudCapacityViewMixin, UpdateOneToOneRelationFormView
 ):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -125,9 +132,10 @@ class CloudCapacityUpdateOneToOneRelationFormView(
 
 
 class CloudCapacityDeleteOneToOneRelationFormView(
-    CloudCapacityViewMixin, TemplateView
+    CloudCapacityViewMixin, DeleteOneToOneRelationFormView
 ):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(

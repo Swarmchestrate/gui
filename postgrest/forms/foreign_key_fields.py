@@ -38,9 +38,9 @@ def get_foreign_key_form_configs(
             table_name,
             openapi_spec,
             column_metadata,
-        ).as_dict()
+        )
         form_configs.update({
-            table_name: FormConfig(properties),
+            table_name: FormConfig(properties.as_dict()),
         })
     return form_configs
 

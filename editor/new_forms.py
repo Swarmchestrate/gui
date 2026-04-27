@@ -37,6 +37,8 @@ class ForeignKeyFormWithDynamicallyPopulatedFields(FormWithDynamicallyPopulatedF
             id_prefix: str = "",
             id_suffix: str = "",
             **kwargs):
+        if not id_prefix and not id_suffix:
+            return super().__init__(*args, fields=fields, **kwargs)
         auto_id = "id_%s"
         if id_prefix:
             auto_id = f"{id_prefix}-{auto_id}"

@@ -35,7 +35,11 @@ class Resource:
         gps_location_property_name = "gps_location"
         gps_location = data_as_dict.get(gps_location_property_name)
         if gps_location:
-            coordinates = gps_location.get("coordinates", [])
+            coordinates = list()
+            if isinstance(gps_location, list):
+                coordinates = gps_location
+            elif isinstance(gps_location, dict):
+                coordinates = gps_location.get("coordinates", [])
             lat, long = coordinates[0], coordinates[1]
             data_as_dict.update({gps_location_property_name: [lat, long]})
         return data_as_dict
@@ -63,6 +67,29 @@ class Definition:
                 continue
             return property_name
         return None
+
+    def get_foreign_key_table_name_for_column_name(self, column_name: str):
+        property_metadata = self.properties.get(column_name, {})
+        if "description" not in property_metadata:
+            return None
+        description = property_metadata.get("description")
+        fk_table_name = next(iter(
+            lxml.html.fromstring(description).xpath("fk/@table")
+        ), None)
+        fk_column_name = next(iter(
+            lxml.html.fromstring(description).xpath("fk/@column")
+        ), None)
+        if not fk_table_name or not fk_column_name:
+            return None
+        return fk_table_name
+
+    def has_reference_to_table(self, table_name) -> bool:
+        for property_name in self.properties.keys():
+            table_name_for_property = self.get_foreign_key_table_name_for_column_name(property_name)
+            if not table_name == table_name_for_property:
+                continue
+            return True
+        return False
 
     def as_dict(self):
         return self._data
@@ -106,8 +133,8 @@ class Endpoint:
     def _get_existing_resource_ids(self):
         params = {"select": f"{self.definition.pk_column_name}"}
         return [
-            data.get(self.definition.pk_column_name)
-            for data in self.get_resources(params=params)
+            resource.pk
+            for resource in self.get_resources(params=params)
         ]
 
     def _generate_random_id(self) -> int:
@@ -257,33 +284,16 @@ class OpenApiSpecification:
     def get_definition(self, table_name: str) -> Definition:
         return Definition(self._data.get("definitions", {}).get(table_name, {}))
 
-    def get_foreign_key_references_to_table(self, table_name: str) -> dict:
-        references = dict()
-        definitions = self._data.get("definitions", {})
+    def get_foreign_key_references_to_table(self, table_name: str) -> list:
+        references = list()
+        definitions = self.get_definitions()
         # Go through each definition's properties and find a property
         # description containing XML: <fk table=table_name column="...">
         for definition_name, definition in definitions.items():
-            properties = definition.get("properties", {})
-            for property_metadata in properties.values():
-                if "description" not in property_metadata:
-                    continue
-                description = property_metadata.get("description")
-                if table_name not in description:
-                    continue
-                fk_table_name = next(iter(
-                    lxml.html.fromstring(description).xpath("fk/@table")
-                ), None)
-                fk_column_name = next(iter(
-                    lxml.html.fromstring(description).xpath("fk/@column")
-                ), None)
-                if not fk_table_name or not fk_column_name:
-                    continue
-                references.update({
-                    definition_name: {
-                        "table_name": table_name,
-                        "column_name": fk_column_name,
-                    }
-                })
+            has_reference_to_table_name = definition.has_reference_to_table()
+            if not has_reference_to_table_name:
+                continue
+            references.append(definition_name)
         return references
 
     def as_dict(self) -> dict:
