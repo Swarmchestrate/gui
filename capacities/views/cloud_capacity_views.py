@@ -3,11 +3,6 @@ from dataclasses import dataclass
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from capacities.forms.cloud_capacity_forms import (
-    CloudCapacityCategoryBasedEditorForm,
-    CloudCapacityEditorForm,
-    CloudCapacityRegistrationForm,
-)
 from capacities.utils import (
     cloud_capacity_type_readable,
     cloud_capacity_type_readable_plural,
@@ -17,6 +12,9 @@ from editor.new_foreign_key_views import (
     NewOneToOneRelationFormView,
     UpdateOneToOneRelationFormView,
     DeleteOneToOneRelationFormView,
+    NewOneToManyRelationFormView,
+    UpdateOneToManyRelationFormView,
+    DeleteOneToManyRelationFormView,
 )
 from editor.new_views import (
     EditorSkeletonLoaderView,
@@ -103,9 +101,7 @@ class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOver
     template_name = "capacities/cloud_capacity_overview.html"
 
 
-class CloudCapacityNewOneToOneRelationFormView(
-    CloudCapacityViewMixin, NewOneToOneRelationFormView
-):
+class CloudCapacityNewOneToOneRelationFormView(CloudCapacityViewMixin, NewOneToOneRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = "capacity_new"
 
@@ -118,8 +114,8 @@ class CloudCapacityNewOneToOneRelationFormView(
 
 
 class CloudCapacityUpdateOneToOneRelationFormView(
-    CloudCapacityViewMixin, UpdateOneToOneRelationFormView
-):
+        CloudCapacityViewMixin,
+        UpdateOneToOneRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = "capacity_new"
 
@@ -132,8 +128,8 @@ class CloudCapacityUpdateOneToOneRelationFormView(
 
 
 class CloudCapacityDeleteOneToOneRelationFormView(
-    CloudCapacityViewMixin, DeleteOneToOneRelationFormView
-):
+        CloudCapacityViewMixin,
+        DeleteOneToOneRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = "capacity_new"
 
@@ -146,9 +142,11 @@ class CloudCapacityDeleteOneToOneRelationFormView(
 
 
 class CloudCapacityNewOneToManyRelationFormView(
-    CloudCapacityViewMixin, TemplateView
-):
+        CloudCapacityViewMixin,
+        NewOneToManyRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
+    possible_fk_table_column_name = "capacity_id"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -159,9 +157,11 @@ class CloudCapacityNewOneToManyRelationFormView(
 
 
 class CloudCapacityUpdateOneToManyRelationFormView(
-    CloudCapacityViewMixin, TemplateView
-):
+        CloudCapacityViewMixin,
+        UpdateOneToManyRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
+    possible_fk_table_column_name = "capacity_id"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -172,9 +172,11 @@ class CloudCapacityUpdateOneToManyRelationFormView(
 
 
 class CloudCapacityDeleteOneToManyRelationFormView(
-    CloudCapacityViewMixin, TemplateView
-):
+        CloudCapacityViewMixin,
+        DeleteOneToManyRelationFormView):
     template_name = "capacities/cloud_capacity_editor.html"
+    table_name = "capacity_new"
+    possible_fk_table_column_name = "capacity_id"
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(

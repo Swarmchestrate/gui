@@ -42,18 +42,20 @@
     {% with form=field_metadata.new_form dialog_id='new-'|add:field_name|add:'-dialog' resource_type_readable=field_metadata.type_readable %}
     {% include 'editor/dialogs/new_dialog.html' %}
     {% endwith %}
-    {% for resource_id, forms in field_metadata.resource_forms.items %}
+    {% for fk_resource_id, forms in field_metadata.resource_forms.items %}
     {# Update dialogs #}
-    {% url update_one_to_many_relation_reverse_base resource_id field_name resource_id as update_resource_url %}
-    {% with resource_id_str=resource_id|stringformat:'s' %}
-    {% with form=forms.update_form dialog_id='update-'|add:field_name|add:'-'|add:resource_id_str|add:'-dialog' resource_type_readable=field_metadata.type_readable %}
+    {% url update_one_to_many_relation_reverse_base resource_id field_name fk_resource_id as update_resource_url %}
+    {# The "resource_id" for update_dialog.html is the ID of the FK resource ("fk_resource_id"). #}
+    {% with resource_id=fk_resource_id fk_resource_id_str=fk_resource_id|stringformat:'s' %}
+    {% with form=forms.update_form dialog_id='update-'|add:field_name|add:'-'|add:fk_resource_id_str|add:'-dialog' resource_type_readable=field_metadata.type_readable %}
     {% include 'editor/dialogs/update_dialog.html' %}
     {% endwith %}
     {% endwith %}
     {# Delete dialogs #}
-    {% url delete_one_to_many_relation_reverse_base resource_id field_name resource_id as delete_resource_url %}
-    {% with resource_id_str=resource_id|stringformat:'s' resource_id=resource_id %}
-    {% with form=forms.delete_form dialog_id='delete-'|add:field_name|add:'-'|add:resource_id_str|add:'-dialog' resource_type_readable=field_metadata.type_readable %}
+    {% url delete_one_to_many_relation_reverse_base resource_id field_name fk_resource_id as delete_resource_url %}
+    {# The "resource_id" for update_dialog.html is the ID of the FK resource ("fk_resource_id"). #}
+    {% with resource_id=fk_resource_id fk_resource_id_str=fk_resource_id|stringformat:'s' %}
+    {% with form=forms.delete_form dialog_id='delete-'|add:field_name|add:'-'|add:fk_resource_id_str|add:'-dialog' resource_type_readable=field_metadata.type_readable %}
     {% include 'editor/dialogs/delete_dialog.html' %}
     {% endwith %}
     {% endwith %}

@@ -66,17 +66,17 @@ urlpatterns = [
         name="delete_application_one_to_one_relation",
     ),
     path(
-        "applications/<resource_id>/one-to-many-column/<fk_column_name>/new/",
+        "applications/<resource_id>/one-to-many-column/<fk_table_name>/new/",
         views.ApplicationNewOneToManyRelationFormView.as_view(),
         name="new_application_one_to_many_relation",
     ),
     path(
-        "applications/<resource_id>/one-to-many-column/<fk_column_name>/<fk_resource_id>/",
+        "applications/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/",
         views.ApplicationUpdateOneToManyRelationFormView.as_view(),
         name="update_application_one_to_many_relation",
     ),
     path(
-        "applications/<resource_id>/one-to-many-column/<fk_column_name>/<fk_resource_id>/delete/",
+        "applications/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
         views.ApplicationDeleteOneToManyRelationFormView.as_view(),
         name="delete_application_one_to_many_relation",
     ),

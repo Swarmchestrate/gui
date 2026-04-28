@@ -68,7 +68,7 @@ class Definition:
             return property_name
         return None
 
-    def get_foreign_key_table_name_for_column_name(self, column_name: str):
+    def get_foreign_key_table_name_for_column(self, column_name: str):
         property_metadata = self.properties.get(column_name, {})
         if "description" not in property_metadata:
             return None
@@ -83,13 +83,20 @@ class Definition:
             return None
         return fk_table_name
 
-    def has_reference_to_table(self, table_name) -> bool:
+    def find_foreign_key_reference_to_table(self, table_name: str) -> dict | None:
         for property_name in self.properties.keys():
-            table_name_for_property = self.get_foreign_key_table_name_for_column_name(property_name)
+            table_name_for_property = self.get_foreign_key_table_name_for_column(
+                property_name
+            )
             if not table_name == table_name_for_property:
                 continue
-            return True
-        return False
+            return {
+                "column_name": property_name,
+            }
+        return None
+
+    def has_column(self, column_name: str) -> bool:
+        return column_name in self.properties
 
     def as_dict(self):
         return self._data
@@ -284,16 +291,46 @@ class OpenApiSpecification:
     def get_definition(self, table_name: str) -> Definition:
         return Definition(self._data.get("definitions", {}).get(table_name, {}))
 
-    def get_foreign_key_references_to_table(self, table_name: str) -> list:
-        references = list()
+    def find_foreign_key_references_to_table(self, table_name: str) -> dict:
+        references = dict()
         definitions = self.get_definitions()
         # Go through each definition's properties and find a property
         # description containing XML: <fk table=table_name column="...">
         for definition_name, definition in definitions.items():
-            has_reference_to_table_name = definition.has_reference_to_table()
-            if not has_reference_to_table_name:
+            column_name_referencing_table = definition.find_foreign_key_reference_to_table(
+                table_name
+            )
+            if not column_name_referencing_table:
                 continue
-            references.append(definition_name)
+            references.update({
+                definition_name: column_name_referencing_table,
+            })
+        return references
+
+    def find_references_to_table(
+            self,
+            table_name: str,
+            possible_column_name: str = None):
+        references = dict()
+        definitions = self.get_definitions()
+        # Go through each definition's properties and find a property
+        # description containing XML: <fk table=table_name column="...">
+        for definition_name, definition in definitions.items():
+            fk_column_name_referencing_table = definition.find_foreign_key_reference_to_table(
+                table_name
+            )
+            if fk_column_name_referencing_table:
+                references.update({
+                    definition_name: fk_column_name_referencing_table,
+                })
+                continue
+            if not possible_column_name:
+                continue
+            has_column_name_referencing_table = definition.has_column(possible_column_name)
+            if has_column_name_referencing_table:
+                references.update({
+                    definition_name: possible_column_name,
+                })
         return references
 
     def as_dict(self) -> dict:

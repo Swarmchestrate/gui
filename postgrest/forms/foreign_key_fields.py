@@ -172,7 +172,7 @@ def get_one_to_many_field_forms(
                                 update_one_to_many_relation_reverse_base,
                                 kwargs={
                                     "resource_id": resource_id,
-                                    "fk_column_name": table_name,
+                                    "fk_table_name": table_name,
                                     "fk_resource_id": "__resource_id__",
                                 },
                             ),
@@ -195,7 +195,7 @@ def get_one_to_many_field_forms(
                                 delete_one_to_many_relation_reverse_base,
                                 kwargs={
                                     "resource_id": resource_id,
-                                    "fk_column_name": table_name,
+                                    "fk_table_name": table_name,
                                     "fk_resource_id": "__resource_id__",
                                 },
                             ),

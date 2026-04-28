@@ -69,17 +69,17 @@ urlpatterns = [
         name="delete_cloud_capacity_one_to_one_relation",
     ),
     path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_column_name>/new/",
+        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/new/",
         cloud_capacity_views.CloudCapacityNewOneToManyRelationFormView.as_view(),
         name="new_cloud_capacity_one_to_many_relation",
     ),
     path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_column_name>/<fk_resource_id>/",
+        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/",
         cloud_capacity_views.CloudCapacityUpdateOneToManyRelationFormView.as_view(),
         name="update_cloud_capacity_one_to_many_relation",
     ),
     path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_column_name>/<fk_resource_id>/delete/",
+        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
         cloud_capacity_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
         name="delete_cloud_capacity_one_to_many_relation",
     ),
