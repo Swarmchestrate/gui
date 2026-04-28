@@ -13,9 +13,9 @@ class EditorTableOfContents:
         self.category_names = category_names
         self.column_metadata = column_metadata
         self.definition_properties = definition_properties
-        self.disabled_categories = list()
-        if disabled_categories:
-            self.disabled_categories = disabled_categories
+        self.disabled_categories = disabled_categories
+        if not disabled_categories:
+            self.disabled_categories = list()
 
     def _add_metadata_for_category(
             self,

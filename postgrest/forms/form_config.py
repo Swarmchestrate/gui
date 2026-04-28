@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from enum import Enum
 
 from .property_metadata import PropertyMetadata
@@ -168,13 +169,22 @@ class OasDefinitionPropertyFormat(Enum):
 
 
 class FormConfig:
+    extra_disabled_properties: list
     initial = None
     _properties: dict[str, PropertyMetadata]
+    _default_disabled_properties = [
+        "created_at",
+        "updated_at",
+    ]
     
     def __init__(
             self,
-            properties: dict[str, PropertyMetadata]):
+            properties: dict[str, PropertyMetadata],
+            extra_disabled_properties: list[str] = None):
         self._properties = properties
+        self.extra_disabled_properties = extra_disabled_properties
+        if not extra_disabled_properties:
+            self.extra_disabled_properties = list()
         
     def _get_field_config_class_from_format(self, format: str):
         format_enum = None
@@ -221,37 +231,37 @@ class FormConfig:
             metadata.category,
         )
 
-    def get_fields(self) -> dict:
+    def _get_fields(
+            self,
+            extra_skip_conditions: list[Callable[[PropertyMetadata], bool]] = None) -> dict:
         fields = dict()
         for name, metadata in self._properties.items():
+            if (metadata.is_pk
+                or name in self._default_disabled_properties
+                or name in self.extra_disabled_properties):
+                continue
+            if extra_skip_conditions and any(
+                check(metadata)
+                for check in extra_skip_conditions
+            ):
+                continue
             field_config_instance = self._get_field_config_instance(name, metadata)
             fields.update({
                 name: field_config_instance.get_field()
             })
         return fields
+
+    def get_fields(self) -> dict:
+        return self._get_fields()
     
     def get_fields_for_category(self, category) -> dict:
-        fields = dict()
-        for name, metadata in self._properties.items():
-            if category == UNKNOWN_ATTRIBUTE_CATEGORY and metadata.category:
-                continue
-            if category and not metadata.category:
-                continue
-            if not category == metadata.category:
-                continue
-            field_config_instance = self._get_field_config_instance(name, metadata)
-            fields.update({
-                name: field_config_instance.get_field()
-            })
-        return fields
+        return self._get_fields(extra_skip_conditions=[
+            lambda metadata: category == UNKNOWN_ATTRIBUTE_CATEGORY and metadata.category,
+            lambda metadata: category and not metadata.category,
+            lambda metadata: not (category == metadata.category),
+        ])
     
     def get_required_fields(self) -> dict:
-        fields = dict()
-        for name, metadata in self._properties.items():
-            if not metadata.is_required:
-                continue
-            field_config_instance = self._get_field_config_instance(name, metadata)
-            fields.update({
-                name: field_config_instance.get_field()
-            })
-        return fields
+        return self._get_fields(extra_skip_conditions=[
+            lambda metadata: not metadata.is_required,
+        ])

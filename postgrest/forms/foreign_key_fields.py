@@ -11,7 +11,8 @@ from resource_management.forms import ResourceDeletionForm
 def get_foreign_key_form_configs(
         table_names: list[str],
         openapi_spec: OpenApiSpecification,
-        column_metadata: list[Resource]
+        column_metadata: list[Resource],
+        disabled_property_names: list[str] = None
     ) -> dict[str, FormConfig]:
     """Gets the form configs for each foreign key
     field in a definition.
@@ -33,6 +34,8 @@ def get_foreign_key_form_configs(
     # (each definition corresponds to a table
     # and vice versa).
     form_configs = {}
+    if not disabled_property_names:
+        disabled_property_names = list()
     for table_name in table_names:
         properties = Properties(
             table_name,
@@ -40,7 +43,10 @@ def get_foreign_key_form_configs(
             column_metadata,
         )
         form_configs.update({
-            table_name: FormConfig(properties.as_dict()),
+            table_name: FormConfig(
+                properties.as_dict(),
+                extra_disabled_properties=disabled_property_names
+            ),
         })
     return form_configs
 
@@ -51,18 +57,6 @@ def get_new_one_to_one_field_forms(
     return ForeignKeyFormWithDynamicallyPopulatedFields(
         fields=form_config.get_fields(),
         id_prefix='new'
-    )
-
-
-def get_one_to_one_field_update_form(
-        resource_id: int,
-        table_name: str,
-        form_config: FormConfig
-    ) -> ForeignKeyFormWithDynamicallyPopulatedFields:
-    return  ForeignKeyFormWithDynamicallyPopulatedFields(
-        fields=form_config.get_fields(),
-        id_suffix=f'{table_name}_{resource_id}',
-        initial=form_config.initial
     )
 
 

@@ -178,7 +178,8 @@ class EditorTabSectionView(TemplateView):
         form_configs = get_foreign_key_form_configs(
             table_names,
             self.openapi_spec,
-            self.column_metadata
+            self.column_metadata,
+            disabled_property_names=[f'{self.column_metadata_table_name}_id']
         )
         # Check each definition for references to the references to the main form type.
         # E.g., a property is called "capacity_id" or "application_id", or, there is
