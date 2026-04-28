@@ -148,13 +148,10 @@ class EditorTabSectionView(TemplateView):
         self.editor_form_url = reverse_lazy(
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
-        self.column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
+        self.column_metadata = column_metadata_endpoint.get_resources()
         self._properties = Properties(
             self.table_name,
-            self.openapi_spec.as_dict(),
+            self.openapi_spec.get_definition(self.table_name),
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
@@ -180,7 +177,7 @@ class EditorTabSectionView(TemplateView):
             self._properties.add_one_to_many_property(definition_name)
         form_configs = get_foreign_key_form_configs(
             table_names,
-            self.openapi_spec.as_dict(),
+            self.openapi_spec,
             self.column_metadata
         )
         # Check each definition for references to the references to the main form type.
@@ -211,7 +208,7 @@ class EditorTabSectionView(TemplateView):
             properties_by_fk_tables[fk_table_name].append(property_name)
         form_configs = get_foreign_key_form_configs(
             properties_by_fk_tables.keys(),
-            self.openapi_spec.as_dict(),
+            self.openapi_spec,
             self.column_metadata
         )
         self.one_to_one_field_metadata = get_one_to_one_field_forms(
@@ -338,14 +335,10 @@ class UpdateResourceByCategoryView(FormView):
         column_metadata_endpoint = self.api_client.get_endpoint(
             "column_metadata"
         )
-        column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
         properties = Properties(
             self.table_name,
-            self.openapi_spec.as_dict(),
-            column_metadata,
+            self.openapi_spec.get_definition(self.table_name),
+            column_metadata_endpoint.get_resources(),
             column_metadata_table_name=self.column_metadata_table_name
         )
         kwargs.update({
@@ -355,9 +348,10 @@ class UpdateResourceByCategoryView(FormView):
 
 
 class EditorStartFormView(FormView):
+    form_class = FormWithDynamicallyPopulatedFields
+
     table_name: str
     openapi_spec: OpenApiSpecification
-    pk_field_name: str
     editor_reverse_base: str
     resource_type_readable: str
 
@@ -413,14 +407,10 @@ class EditorStartFormView(FormView):
         column_metadata_endpoint = self.api_client.get_endpoint(
             "column_metadata"
         )
-        column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
         properties = Properties(
             self.table_name,
-            self.openapi_spec.as_dict(),
-            column_metadata
+            self.openapi_spec.get_definition(self.table_name),
+            column_metadata_endpoint.get_resources()
         )
         kwargs.update({
             "fields": FormConfig(properties.as_dict()).get_required_fields(),

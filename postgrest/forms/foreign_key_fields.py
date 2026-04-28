@@ -4,14 +4,14 @@ from django.urls import reverse_lazy
 from .form_config import FormConfig, Properties
 
 from editor.new_forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from postgrest.new_api import ApiClient, Resource
+from postgrest.new_api import ApiClient, OpenApiSpecification, Resource
 from resource_management.forms import ResourceDeletionForm
 
 
 def get_foreign_key_form_configs(
         table_names: list[str],
-        openapi_spec: dict,
-        column_metadata: list[dict]
+        openapi_spec: OpenApiSpecification,
+        column_metadata: list[Resource]
     ) -> dict[str, FormConfig]:
     """Gets the form configs for each foreign key
     field in a definition.
@@ -36,7 +36,7 @@ def get_foreign_key_form_configs(
     for table_name in table_names:
         properties = Properties(
             table_name,
-            openapi_spec,
+            openapi_spec.get_definition(table_name),
             column_metadata,
         )
         form_configs.update({

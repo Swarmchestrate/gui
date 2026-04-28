@@ -1,4 +1,3 @@
-from django import forms
 from enum import Enum
 
 from .property_metadata import PropertyMetadata
@@ -13,6 +12,7 @@ from .field_config import (
     NumericFieldConfig,
 )
 
+from postgrest.new_api import Definition, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
@@ -20,11 +20,10 @@ class Properties:
     def __init__(
             self,
             definition_name: str,
-            openapi_spec: dict,
-            column_metadata: list[dict],
+            definition: Definition,
+            column_metadata: list[Resource],
             column_metadata_table_name: str | None = None):
-        definitions = openapi_spec.get("definitions", {})
-        self._definition = definitions.get(definition_name, {})
+        self._definition = definition
         self._one_to_many_properties = dict()
         self._column_metadata_as_dict = self._create_dict_copy_of_column_metadata(
             column_metadata
@@ -36,7 +35,7 @@ class Properties:
     
     def _create_dict_copy_of_column_metadata(
             self,
-            column_metadata: list[dict]) -> dict:
+            column_metadata: list[Resource]) -> dict:
         """Maps a list of records from the column metadata
         table to a dict, grouping metadata in the following order:
         table_name -> column_name -> column_metadata.
@@ -47,9 +46,10 @@ class Properties:
             dict: a list of column metadata mapped to a dict.
         """
         column_metadata_as_dict = {}
-        for cm_record in column_metadata:
-            table_name = cm_record.get("table_name")
-            column_name = cm_record.get("column_name")
+        for resource in column_metadata:
+            resource_as_dict = resource.as_dict()
+            table_name = resource_as_dict.get("table_name")
+            column_name = resource_as_dict.get("column_name")
             if table_name not in column_metadata_as_dict:
                 column_metadata_as_dict.update({
                     table_name: {},
@@ -58,7 +58,7 @@ class Properties:
                 column_name: {},
             })
             column_metadata_as_dict[table_name][column_name].update(
-                cm_record
+                resource_as_dict
             )
         return column_metadata_as_dict
 
@@ -70,6 +70,7 @@ class Properties:
             is_required: bool):
         return PropertyMetadata(
             name=name,
+            is_pk=(name == self._definition.pk_column_name),
             is_required=is_required,
             format=metadata.get("format"),
             type=metadata.get("type"),
@@ -88,9 +89,9 @@ class Properties:
     def as_categorised_dict(self) -> dict:
         UNKNOWN_ATTRIBUTE_CATEGORY = 'Uncategorised'
         categorised_properties_as_dict = {UNKNOWN_ATTRIBUTE_CATEGORY: dict()}
-        properties_from_definition = self._definition.get("properties", dict())
+        properties_from_definition = self._definition.properties
         properties_from_definition.update(self._one_to_many_properties)
-        names_of_required_properties = self._definition.get("required", list())
+        names_of_required_properties = self._definition.required
         column_metadata_for_table = self._column_metadata_as_dict.get(
             self._column_metadata_table_name,
             {}
@@ -132,9 +133,9 @@ class Properties:
             property name.
         """
         properties_as_dict = {}
-        properties_from_definition = self._definition.get("properties", dict())
+        properties_from_definition = self._definition.properties
         properties_from_definition.update(self._one_to_many_properties)
-        names_of_required_properties = self._definition.get("required", list())
+        names_of_required_properties = self._definition.required
         column_metadata_for_table = self._column_metadata_as_dict.get(
             self._column_metadata_table_name,
             {}
@@ -205,6 +206,9 @@ class FormConfig:
                 (field_enum, field_enum.replace("_", " "))
                 for field_enum in metadata.enum
             ]
+            # Fields with choices are optional, so
+            # a blank choice is added so an actual
+            # choice isn't set by default.
             choices.insert(0, ("", "None"))
             additional_args.append(choices)
             field_config_class = ChoiceFieldConfig

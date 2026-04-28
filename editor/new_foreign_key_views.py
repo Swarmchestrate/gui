@@ -67,15 +67,10 @@ class NewOneToOneRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        openapi_spec = self.api_client.openapi_spec.as_dict()
-        column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
         properties = Properties(
             self.fk_table_name,
-            openapi_spec,
-            column_metadata
+            self.api_client.openapi_spec.get_definition(self.fk_table_name),
+            column_metadata_endpoint.get_resources()
         )
         kwargs.update({
             "fields": FormConfig(properties.as_dict()).get_fields(),
@@ -126,15 +121,10 @@ class UpdateOneToOneRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        openapi_spec = self.api_client.openapi_spec.as_dict()
-        column_metadata = [
-            resource.as_dict()
-            for resource in column_metadata_endpoint.get_resources()
-        ]
         properties = Properties(
             self.fk_table_name,
-            openapi_spec,
-            column_metadata
+            self.api_client.openapi_spec.get_definition(self.fk_table_name),
+            column_metadata_endpoint.get_resources()
         )
         kwargs.update({
             "fields": FormConfig(properties.as_dict()).get_fields(),

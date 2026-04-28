@@ -11,6 +11,7 @@ class PropertyMetadata:
     # Custom attributes to make it easier to work
     # with FieldConfig.
     name: str
+    is_pk: bool = False
     is_required: bool = False
     # Defined in the PostgREST OpenAPI Specification
     format: str | None = None
