@@ -358,6 +358,15 @@ label:has(~ :required)::after,
     margin-inline: 0.25em;
 }
 
+.list-group:empty::after {
+    content: attr(placeholder);
+    color: var(--bs-secondary-color);
+    padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
+    background-color: var(--bs-list-group-bg);
+    border: 2px dashed var(--bs-list-group-border-color);
+    border-radius: inherit;
+}
+
 /* Wizard nav */
 .editor-toc.nav-pills .nav-link:not(.active):hover,
 .editor-toc.nav-pills .nav-link:not(.active):focus {
