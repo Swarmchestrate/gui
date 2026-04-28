@@ -80,6 +80,7 @@ class EditorSkeletonLoaderView(TemplateView):
 
 class EditorTableOfContentsSectionView(TemplateView):
     table_name: str
+    column_metadata_table_name: str
     categories: dict
     disabled_categories: list
     template_name = "editor/toc_tabbed/toc_base.html"
@@ -96,10 +97,12 @@ class EditorTableOfContentsSectionView(TemplateView):
             resource.as_dict()
             for resource in api_client.get_endpoint("column_metadata").get_resources()
         ]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
         category_names = list(set(
             resource.get("category", "")
             for resource in column_metadata
-            if resource.get("table_name", "") == self.table_name
+            if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
         categories = EditorTableOfContents(
@@ -165,21 +168,18 @@ class EditorTabSectionView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
     
     def initialise_one_to_many_field_forms(self):
-        definitions = self.openapi_spec.get_definitions()
-        table_names = list()
-        for definition_name, definition in definitions.items():
-            # TEMP: replace foreign key criteria with presence of
-            # <fk table_name="..." column_name="..."> in description
-            # instead of presence of property name.
-            if f'{self.column_metadata_table_name}_id' not in definition.properties:
-                continue
-            table_names.append(definition_name)
-            self._properties.add_one_to_many_property(definition_name)
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = self.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            self._properties.add_one_to_many_property(table_name)
         form_configs = get_foreign_key_form_configs(
-            table_names,
+            referring_tables.keys(),
             self.openapi_spec,
             self.column_metadata,
-            disabled_property_names=[f'{self.column_metadata_table_name}_id']
+            disabled_property_names=[possible_fk_table_column_name]
         )
         # Check each definition for references to the references to the main form type.
         # E.g., a property is called "capacity_id" or "application_id", or, there is
@@ -188,6 +188,7 @@ class EditorTabSectionView(TemplateView):
             self.request,
             self.resource_id,
             form_configs,
+            referring_tables,
             self.update_one_to_many_relation_reverse_base,
             self.delete_one_to_many_relation_reverse_base
         )
@@ -352,6 +353,7 @@ class EditorStartFormView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
 
     table_name: str
+    column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
     editor_reverse_base: str
     resource_type_readable: str
@@ -385,17 +387,20 @@ class EditorStartFormView(FormView):
                 "column_metadata"
             ).get_resources()
         ]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
         category_names = list(set(
             resource.get("category", "")
             for resource in column_metadata
-            if resource.get("table_name", "") == self.table_name
+            if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
         categories = EditorTableOfContents(
             self.table_name,
             category_names,
             column_metadata,
-            definition.properties.keys()
+            definition.properties.keys(),
+            add_unknown_category_if_needed=False
         ).as_dict()
         context.update({
             "toc_list_items": categories,
@@ -411,7 +416,8 @@ class EditorStartFormView(FormView):
         properties = Properties(
             self.table_name,
             self.openapi_spec.get_definition(self.table_name),
-            column_metadata_endpoint.get_resources()
+            column_metadata_endpoint.get_resources(),
+            column_metadata_table_name=self.column_metadata_table_name
         )
         kwargs.update({
             "fields": FormConfig(properties.as_dict()).get_required_fields(),

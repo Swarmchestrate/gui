@@ -53,7 +53,7 @@ class OneToOneField {
                     this.updateDialogButton.classList.remove("d-none");
                     this.deleteDialogButton.classList.remove("d-none");
                     for (const property in responseData.resource) {
-                        const propertyValue = responseData.resource[property];
+                        let propertyValue = responseData.resource[property];
                         const elementForProperty =
                             this.oneToOneField.querySelector(
                                 `[data-field="${property}"]`,

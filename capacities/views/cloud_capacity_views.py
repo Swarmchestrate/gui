@@ -9,20 +9,20 @@ from capacities.utils import (
 )
 
 from editor.new_foreign_key_views import (
-    NewOneToOneRelationFormView,
-    UpdateOneToOneRelationFormView,
+    DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
+    NewOneToOneRelationFormView,
     UpdateOneToManyRelationFormView,
-    DeleteOneToManyRelationFormView,
+    UpdateOneToOneRelationFormView,
 )
 from editor.new_views import (
-    EditorSkeletonLoaderView,
-    UpdateResourceByCategoryView,
     EditorOverviewTemplateView,
+    EditorSkeletonLoaderView,
+    EditorStartFormView,
     EditorTableOfContentsSectionView,
     EditorTabSectionView,
-    EditorStartFormView,
+    UpdateResourceByCategoryView,
 )
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -55,7 +55,8 @@ class CloudCapacityEditorSkeletonLoaderView(CloudCapacityViewMixin, EditorSkelet
 
 
 class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
-    table_name = "capacity"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
     disabled_categories = ["Edge Specific", "Networking"]
 
 
@@ -78,7 +79,8 @@ class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceBy
 
 class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
-    table_name = "capacity"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
 
 
 # Resource management views

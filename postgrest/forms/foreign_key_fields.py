@@ -118,12 +118,12 @@ def get_one_to_one_field_forms(
 
 
 def get_one_to_many_field_forms(
-    request,
-    resource_id: int,
-    form_configs: dict[str, FormConfig],
-    update_one_to_many_relation_reverse_base: str,
-    delete_one_to_many_relation_reverse_base: str
-) -> dict[str, dict]:
+        request,
+        resource_id: int,
+        form_configs: dict[str, FormConfig],
+        referring_tables: dict[str, str],
+        update_one_to_many_relation_reverse_base: str,
+        delete_one_to_many_relation_reverse_base: str) -> dict[str, dict]:
     # Table names become the field names in the main form.
     one_to_many_field_metadata = {}
     for table_name, form_config in form_configs.items():
@@ -133,7 +133,7 @@ def get_one_to_many_field_forms(
         if not fk_table_endpoint.definition.as_dict():
             continue
         fk_resources = fk_table_endpoint.get_resources_referencing_resource_id(
-            'capacity_id',
+            referring_tables.get(table_name),
             resource_id,
         )
         one_to_many_field_metadata.update({

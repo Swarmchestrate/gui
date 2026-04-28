@@ -22,17 +22,17 @@ urlpatterns = [
     ),
     path(
         "applications/api/editor-toc/",
-        views.ApplicationEditorEnabledTabListTemplateView.as_view(),
+        views.ApplicationEditorTableOfContentsView.as_view(),
         name="application_editor_toc",
     ),
     path(
         "applications/api/<resource_id>/editor/",
-        views.ApplicationEditorTabbedFormTemplateView.as_view(),
+        views.ApplicationEditorTabSectionView.as_view(),
         name="application_editor_tabbed_form",
     ),
     path(
         "applications/api/<resource_id>/edit/",
-        views.ApplicationEditorCategoryBasedFormView.as_view(),
+        views.UpdateApplicationByCategoryView.as_view(),
         name="update_application_by_category",
     ),
     path(
@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     path(
         "applications/<resource_id>/edit/",
-        views.ApplicationEditorBaseTemplateView.as_view(),
+        views.ApplicationEditorSkeletonLoaderView.as_view(),
         name="application_editor",
     ),
     path(

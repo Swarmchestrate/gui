@@ -8,7 +8,8 @@ class EditorTableOfContents:
             category_names: list[str],
             column_metadata: list[dict],
             definition_properties: list[str],
-            disabled_categories: list[str] = None):
+            disabled_categories: list[str] = None,
+            add_unknown_category_if_needed: bool = True):
         self.table_name = table_name
         self.category_names = category_names
         self.column_metadata = column_metadata
@@ -16,6 +17,7 @@ class EditorTableOfContents:
         self.disabled_categories = disabled_categories
         if not disabled_categories:
             self.disabled_categories = list()
+        self.add_unknown_category_if_needed = add_unknown_category_if_needed
 
     def _add_metadata_for_category(
             self,
@@ -110,9 +112,28 @@ class EditorTableOfContents:
                 processed_categories
             )
 
-        # Check if an "uncategorised" category
-        # is needed before sorting categories
-        # into descendents.
+        # Check if an "uncategorised" category is needed before sorting
+        # categories into descendents, as it will be harder to set
+        # the "next" property of the current last category when it's
+        # nested.
+        properties_with_category = set(
+            cm.get("column_name", "")
+            for cm in self.column_metadata
+            if cm.get("column_name", "")
+        )
+        uncategorised_property_names = self.definition_properties - properties_with_category
+        uncategorised_metadata = {}
+        if (self.add_unknown_category_if_needed
+            and uncategorised_property_names):
+            last_category = self.category_names[-1]
+            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
+            uncategorised_metadata = {
+                "title": UNKNOWN_ATTRIBUTE_CATEGORY,
+                "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
+                "descendents": dict(),
+                "previous": last_category,
+                "next": None,
+            }
 
         # Sort categories in hierarchical order
         descendent_categories = set()
@@ -127,26 +148,10 @@ class EditorTableOfContents:
         for descendent_category in descendent_categories:
             table_of_contents.pop(descendent_category)
         
-        # Check if an "uncategorised" category is needed. It's
-        # added last to avoid potential confusion with real
-        # categories.
-        properties_with_category = set(
-            cm.get("column_name", "")
-            for cm in self.column_metadata
-            if cm.get("column_name", "")
-        )
-        uncategorised_property_names = self.definition_properties - properties_with_category
-        uncategorised_metadata = {}
-        if uncategorised_property_names:
-            last_category = self.category_names[-1]
-            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
-            uncategorised_metadata = {
-                "title": UNKNOWN_ATTRIBUTE_CATEGORY,
-                "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
-                "descendents": dict(),
-                "previous": last_category,
-                "next": None,
-            }
+        # The "uncategorised" category is added last to
+        # avoid potential confusion with real categories.
+        if (self.add_unknown_category_if_needed
+            and uncategorised_property_names):
             table_of_contents.update({UNKNOWN_ATTRIBUTE_CATEGORY: uncategorised_metadata})
-            self.category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
+            # self.category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
         return table_of_contents
