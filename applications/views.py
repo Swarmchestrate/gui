@@ -16,10 +16,6 @@ from editor.views import (
     EditorTabSectionView,
     UpdateResourceByCategoryView,
 )
-from postgrest.api_clients import (
-    ApplicationApiClient,
-    ApplicationColumnMetadataApiClient,
-)
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -30,11 +26,9 @@ from .utils import application_type_readable, application_type_readable_plural
 
 
 class ApplicationViewMixin:
-    api_client_class = ApplicationApiClient
     editor_reverse_base = "applications:application_editor"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
-    column_metadata_api_client_class = ApplicationColumnMetadataApiClient
     resource_list_reverse = "applications:application_list"
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"
