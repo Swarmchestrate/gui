@@ -125,7 +125,7 @@ class Properties:
             })
         return categorised_properties_as_dict
     
-    def as_dict(self) -> dict:
+    def as_dict(self) -> dict[str, PropertyMetadata]:
         """Generates a dict of PropertyMetadata instances mapped
         by property name.
 

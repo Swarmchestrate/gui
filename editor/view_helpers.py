@@ -1,3 +1,4 @@
+from postgrest.forms.property_metadata import PropertyMetadata
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
@@ -8,13 +9,11 @@ class EditorTableOfContents:
             self,
             table_name: str,
             category_names: list[str],
-            column_metadata: list[dict],
-            definition_properties: list[str],
+            properties: dict[str, PropertyMetadata],
             add_unknown_category_if_needed: bool = True):
         self.table_name = table_name
         self.category_names = category_names
-        self.column_metadata = column_metadata
-        self.definition_properties = definition_properties
+        self.properties = properties
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
         self.add_unknown_category_if_needed = add_unknown_category_if_needed
@@ -118,15 +117,13 @@ class EditorTableOfContents:
         # categories into descendents, as it will be harder to set
         # the "next" property of the current last category when it's
         # nested.
-        properties_with_category = set(
-            cm.get("column_name", "")
-            for cm in self.column_metadata
-            if cm.get("column_name", "")
+        is_any_property_uncategorised = any(
+            not metadata.category
+            for property, metadata in self.properties.items()
         )
-        uncategorised_property_names = self.definition_properties - properties_with_category
         uncategorised_metadata = {}
         if (self.add_unknown_category_if_needed
-            and uncategorised_property_names):
+            and is_any_property_uncategorised):
             last_category = self.category_names[-1]
             table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
             uncategorised_metadata = {
@@ -155,7 +152,7 @@ class EditorTableOfContents:
         # The "uncategorised" category is added last to
         # avoid potential confusion with real categories.
         if (self.add_unknown_category_if_needed
-            and uncategorised_property_names):
+            and is_any_property_uncategorised):
             table_of_contents.update({UNKNOWN_ATTRIBUTE_CATEGORY: uncategorised_metadata})
             # self.category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
         return table_of_contents

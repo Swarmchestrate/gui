@@ -94,24 +94,30 @@ class EditorTableOfContentsSectionView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         api_client = ApiClient()
-        definition = api_client.get_endpoint(self.table_name).definition
-        column_metadata = [
-            resource.as_dict()
-            for resource in api_client.get_endpoint("column_metadata").get_resources()
-        ]
+        column_metadata = api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
         category_names = list(set(
-            resource.get("category", "")
+            resource.as_dict().get("category", "")
             for resource in column_metadata
-            if resource.get("table_name", "") == self.column_metadata_table_name
+            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
+        properties = Properties(
+            self.table_name,
+            api_client.openapi_spec.get_definition(self.table_name),
+            column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        form_fields = FormConfig(properties.as_dict()).get_fields()
         categories = self.toc_class(
             self.table_name,
             category_names,
-            column_metadata,
-            definition.properties.keys()
+            {
+                property_name: metadata
+                for property_name, metadata in properties.as_dict().items()
+                if property_name in form_fields
+            }
         ).as_dict()
         context.update({
             "toc_list_items": categories,
@@ -236,22 +242,28 @@ class EditorTabSectionView(TemplateView):
         }
     
     def initialise_toc_list_items(self):
-        definition = self.openapi_spec.get_definition(self.table_name)
-        column_metadata = [
-            resource.as_dict()
-            for resource in self.api_client.get_endpoint("column_metadata").get_resources()
-        ]
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         category_names = list(set(
-            resource.get("category", "")
+            resource.as_dict().get("category", "")
             for resource in column_metadata
-            if resource.get("table_name", "") == self.column_metadata_table_name
+            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
+        properties = Properties(
+            self.table_name,
+            self.api_client.openapi_spec.get_definition(self.table_name),
+            column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        form_fields = FormConfig(properties.as_dict()).get_fields()
         self.toc_list_items = self.toc_class(
             self.table_name,
             category_names,
-            column_metadata,
-            definition.properties.keys()
+            {
+                property_name: metadata
+                for property_name, metadata in properties.as_dict().items()
+                if property_name in form_fields
+            }
         ).as_dict()
 
     def get_context_data(self, **kwargs):
@@ -386,26 +398,30 @@ class EditorStartFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        definition = self.openapi_spec.get_definition(self.table_name)
-        column_metadata = [
-            resource.as_dict()
-            for resource in self.api_client.get_endpoint(
-                "column_metadata"
-            ).get_resources()
-        ]
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
         category_names = list(set(
-            resource.get("category", "")
+            resource.as_dict().get("category", "")
             for resource in column_metadata
-            if resource.get("table_name", "") == self.column_metadata_table_name
+            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
+        properties = Properties(
+            self.table_name,
+            self.api_client.openapi_spec.get_definition(self.table_name),
+            column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        form_fields = FormConfig(properties.as_dict()).get_fields()
         categories = self.toc_class(
             self.table_name,
             category_names,
-            column_metadata,
-            definition.properties.keys(),
+            {
+                property_name: metadata
+                for property_name, metadata in properties.as_dict().items()
+                if property_name in form_fields
+            },
             add_unknown_category_if_needed=False
         ).as_dict()
         context.update({
@@ -448,51 +464,51 @@ class EditorOverviewTemplateView(TemplateView):
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.properties = Properties(
+            self.table_name,
+            self.api_client.openapi_spec.get_definition(self.table_name),
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        self.form_fields = FormConfig(self.properties.as_dict()).get_fields()
         return super().dispatch(request, *args, **kwargs)
     
     def get_toc(self):
-        definition = self.openapi_spec.get_definition(self.table_name)
-        column_metadata = [
-            resource.as_dict()
-            for resource in self.column_metadata
-        ]
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         category_names = list(set(
-            resource.get("category", "")
-            for resource in column_metadata
-            if resource.get("table_name", "") == self.column_metadata_table_name
+            resource.as_dict().get("category", "")
+            for resource in self.column_metadata
+            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
+        form_fields = FormConfig(self.properties.as_dict()).get_fields()
         return self.toc_class(
             self.table_name,
             category_names,
-            column_metadata,
-            definition.properties.keys()
+            {
+                property_name: metadata
+                for property_name, metadata in self.properties.as_dict().items()
+                if property_name in form_fields
+            }
         ).as_dict()
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
-        column_metadata_by_column_name = dict(
-            (
-                resource.as_dict().get("column_name"),
-                resource.as_dict()
-            )
-            for resource in self.column_metadata
-        )
-        properties = self.openapi_spec.get_definition(self.table_name).properties
-        for field_name, field_metadata in properties.items():
-            value = self.resource.as_dict().get(field_name)
-            extra_metadata = column_metadata_by_column_name.get(field_name)
-            field_title = field_name.replace("_", " ").title()
-            field_category = UNKNOWN_ATTRIBUTE_CATEGORY
-            if extra_metadata:
-                field_title = extra_metadata.get("title")
-                field_category = extra_metadata.get("category")
+        for property_name, metadata in self.properties.as_dict().items():
+            if property_name not in self.form_fields:
+                continue
+            value = self.resource.as_dict().get(property_name)
+            field_title = metadata.title
+            if not field_title:
+                field_title = " ".join(property_name.split("_")).title()
+            field_category = metadata.category
+            if not field_category:
+                field_category = UNKNOWN_ATTRIBUTE_CATEGORY
             if field_category not in formatted_resource_data:
                 formatted_resource_data.update({field_category: dict()})
             formatted_resource_data[field_category].update({
-                field_name: {
+                property_name: {
                     "title": field_title,
                     "value": value,
                 }
