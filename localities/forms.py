@@ -1,29 +1,13 @@
 from django import forms
 
-from editor.forms.base_forms import EditorForm, OpenApiSpecificationBasedForm
-from resource_management.forms import OpenApiSpecificationBasedFormWithIdAttributeSuffix
-
-
-class LocalityRegistrationForm(OpenApiSpecificationBasedForm):
-    definition_name = "locality"
-
-    def add_prefix(self, field_name):
-        return "new-" + field_name
-
-
-class LocalityUpdateForm(OpenApiSpecificationBasedFormWithIdAttributeSuffix):
-    definition_name = "locality"
-
 
 class LocalityOptionsSearchForm(forms.Form):
     query = forms.CharField(
         label="Enter a Continent/Country/City Name",
-        widget=forms.Select(
-            attrs={
-                "class": "form-select",
-                "placeholder": "e.g. 'Mauritius' or 'London'",
-            }
-        ),
+        widget=forms.Select(attrs={
+            "class": "form-select",
+            "placeholder": "e.g. 'Mauritius' or 'London'",
+        }),
         help_text="Enter the name of a continent, country or city.",
         required=False,
     )
@@ -31,11 +15,8 @@ class LocalityOptionsSearchForm(forms.Form):
 
 class GetLocalityByNameForm(forms.Form):
     geoname_id = forms.IntegerField(required=True)
-
     continent_code = forms.CharField(required=False)
-
     country_code = forms.CharField(required=False)
-
     city_name = forms.CharField(required=False)
 
 
@@ -83,28 +64,26 @@ class GpsLocationField(forms.MultiValueField):
 class GetLocalityByGpsForm(forms.Form):
     gps_location = GpsLocationField(
         label="Enter the Edge Device's GPS Co-ordinates",
-        widget=SplitGpsLocationWidget(
-            widgets={
-                "latitude": forms.NumberInput(
-                    attrs={
-                        "class": "form-control",
-                        "placeholder": "e.g. 51.5072",
-                        "step": "any",
-                        "min": -90,
-                        "max": 90,
-                    }
-                ),
-                "longitude": forms.NumberInput(
-                    attrs={
-                        "class": "form-control",
-                        "placeholder": "e.g. -0.1276",
-                        "step": "any",
-                        "min": -180,
-                        "max": 180,
-                    }
-                ),
-            }
-        ),
+        widget=SplitGpsLocationWidget(widgets={
+            "latitude": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "e.g. 51.5072",
+                    "step": "any",
+                    "min": -90,
+                    "max": 90,
+                }
+            ),
+            "longitude": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "e.g. -0.1276",
+                    "step": "any",
+                    "min": -180,
+                    "max": 180,
+                }
+            ),
+        }),
         help_text="Enter the GPS co-ordinates of an edge device. e.g. 51.5072 (-90 to 90), -0.1276 (-180 to 180)",
         required=False,
     )

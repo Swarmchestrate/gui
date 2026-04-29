@@ -5,77 +5,11 @@ import reverse_geocode
 from django.http import JsonResponse
 from django.views.generic.edit import ProcessFormView
 
-from editor.base_views import (
-    ApiClientTemplateView,
-    ColumnMetadataApiClientTemplateView,
-    ResourceTypeNameContextMixin,
-)
-
-# from postgrest.mocks.mock_api_clients import (
-#     MockColumnMetadataApiClient as ColumnMetadataApiClient,
-# )
-from postgrest.api_clients import ColumnMetadataApiClient, LocalityApiClient
-from postgrest.readable_text_utils import (
-    locality_type_readable,
-    locality_type_readable_plural,
-)
-
-# from postgrest.mocks.mock_api_clients import MockLocalityApiClient as LocalityApiClient
-from resource_management.views import (
-    BasicResourceListFormView,
-    MultiResourceDeletionFormView,
-    NewResourceFormView,
-    ResourceDeletionFormView,
-    ResourceListContextMixin,
-    ResourceUpdateFormView,
-)
-
 from .forms import (
     GetLocalityByGpsForm,
     GetLocalityByNameForm,
     LocalityOptionsSearchForm,
-    LocalityRegistrationForm,
-    LocalityUpdateForm,
 )
-
-
-class LocalityViewMixin(
-    ApiClientTemplateView,
-    ColumnMetadataApiClientTemplateView,
-    ResourceTypeNameContextMixin,
-    ResourceListContextMixin,
-):
-    api_client_class = LocalityApiClient
-    column_metadata_api_client_class = ColumnMetadataApiClient
-    resource_list_reverse = "localities:locality_list"
-    resource_update_reverse = "localities:update_locality"
-    new_resource_reverse = "localities:new_locality"
-    resource_deletion_reverse = "localities:delete_locality"
-    multi_resource_deletion_reverse = "localities:delete_localities"
-    resource_type_readable = locality_type_readable()
-    resource_type_readable_plural = locality_type_readable_plural()
-
-
-class LocalityUpdateFormView(LocalityViewMixin, ResourceUpdateFormView):
-    form_class = LocalityUpdateForm
-
-
-class NewLocalityFormView(LocalityViewMixin, NewResourceFormView):
-    form_class = LocalityRegistrationForm
-
-
-class LocalityDeletionFormView(LocalityViewMixin, ResourceDeletionFormView):
-    template_name = "localities/localities.html"
-
-
-class MultiLocalityDeletionFormView(LocalityViewMixin, MultiResourceDeletionFormView):
-    template_name = "localities/localities.html"
-
-
-class LocalityListFormView(LocalityViewMixin, BasicResourceListFormView):
-    template_name = "localities/localities.html"
-    new_resource_form_class = LocalityRegistrationForm
-    resource_update_form_class = LocalityUpdateForm
 
 
 class CapacityLocalityOptionsSearchProcessFormView(ProcessFormView):
