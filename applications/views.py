@@ -50,7 +50,7 @@ class ApplicationEditorTableOfContentsView(EditorTableOfContentsSectionView):
     column_metadata_table_name = "application"
 
 
-class ApplicationEditorTabSectionView(EditorTabSectionView):
+class ApplicationEditorTabSectionView(ApplicationViewMixin, EditorTabSectionView):
     table_name = "application_new"
     column_metadata_table_name = "application"
     editor_form_reverse = "applications:update_application_by_category"
@@ -99,6 +99,8 @@ class ApplicationEditorOverviewTemplateView(
         ApplicationViewMixin,
         EditorOverviewTemplateView):
     template_name = "applications/application_overview.html"
+    table_name = "application_new"
+    column_metadata_table_name = "application"
 
 
 class ApplicationNewOneToOneRelationFormView(

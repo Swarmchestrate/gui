@@ -55,7 +55,7 @@ class EdgeCapacityTableOfContentsView(EditorTableOfContentsSectionView):
     disabled_categories = ["System Specific"]
 
 
-class EdgeCapacityEditorTabSectionView(EditorTabSectionView):
+class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
@@ -97,3 +97,5 @@ class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
 
 class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/edge_capacity_overview.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"

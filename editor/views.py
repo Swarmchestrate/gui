@@ -261,6 +261,7 @@ class EditorTabSectionView(TemplateView):
                 "forms_by_category": self.forms_by_category,
                 "editor_form_url": self.editor_form_url,
                 "toc_list_items": self.toc_list_items,
+                "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "one_to_one_field_metadata": self.one_to_one_field_metadata,
                 "one_to_many_field_metadata": self.one_to_many_field_metadata,
                 "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
@@ -429,17 +430,53 @@ class EditorOverviewTemplateView(TemplateView):
     template_name = "editor/overview_base.html"
 
     table_name: str
+    column_metadata_table_name: str
+    
+    editor_reverse_base: str
     resource_type_readable: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_toc(self):
+        definition = self.openapi_spec.get_definition(self.table_name)
+        column_metadata = [
+            resource.as_dict()
+            for resource in self.column_metadata
+        ]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        category_names = list(set(
+            resource.get("category", "")
+            for resource in column_metadata
+            if resource.get("table_name", "") == self.column_metadata_table_name
+        ))
+        category_names.sort()
+        return EditorTableOfContents(
+            self.table_name,
+            category_names,
+            column_metadata,
+            definition.properties.keys()
+        ).as_dict()
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
         column_metadata_by_column_name = dict(
-            (cm.get("column_name"), cm)
-            for cm in self.column_metadata
+            (
+                resource.as_dict().get("column_name"),
+                resource.as_dict()
+            )
+            for resource in self.column_metadata
         )
-        user_specifiable_fields = self.endpoint.definition.properties
-        for field_name, field_metadata in user_specifiable_fields.items():
-            value = self.resource.get(field_name)
+        properties = self.openapi_spec.get_definition(self.table_name).properties
+        for field_name, field_metadata in properties.items():
+            value = self.resource.as_dict().get(field_name)
             extra_metadata = column_metadata_by_column_name.get(field_name)
             field_title = field_name.replace("_", " ").title()
             field_category = UNKNOWN_ATTRIBUTE_CATEGORY
@@ -456,13 +493,6 @@ class EditorOverviewTemplateView(TemplateView):
             })
         return formatted_resource_data
 
-    def dispatch(self, request, *args, **kwargs):
-        self.api_client = ApiClient()
-        self.endpoint = self.api_client.get_endpoint(self.table_name)
-        self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.endpoint.get(self.resource_id)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
@@ -471,7 +501,9 @@ class EditorOverviewTemplateView(TemplateView):
                 "main_heading": "Overview",
                 "main_subheading": f"{self.resource_type_readable.title()}",
                 "resource_data_by_category": self.format_resource_data_for_template(),
-                "resource": self.resource,
+                "resource": self.resource.as_dict(),
+                "toc_list_items": self.get_toc(),
+                "editor_reverse_base": self.editor_reverse_base,
             }
         )
         return context

@@ -60,7 +60,7 @@ class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
     disabled_categories = ["Edge Specific", "Networking"]
 
 
-class CloudCapacityEditorTabSectionView(EditorTabSectionView):
+class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
@@ -103,6 +103,8 @@ class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
 
 
 class CloudCapacityNewOneToOneRelationFormView(CloudCapacityViewMixin, NewOneToOneRelationFormView):
