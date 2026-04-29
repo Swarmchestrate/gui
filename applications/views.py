@@ -85,6 +85,7 @@ class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
 class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
     template_name = "applications/applications.html"
     success_url = reverse_lazy("applications:application_list")
+    table_name = "application_new"
 
 
 class MultiApplicationDeletionFormView(
@@ -92,6 +93,7 @@ class MultiApplicationDeletionFormView(
         MultiResourceDeletionFormView):
     template_name = "applications/applications.html"
     success_url = reverse_lazy("applications:application_list")
+    table_name = "application_new"
 
 
 class ApplicationListFormView(ApplicationViewMixin, ResourceListFormView):

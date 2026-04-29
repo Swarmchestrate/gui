@@ -81,11 +81,13 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
     template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
+    table_name = "capacity_new"
 
 
 class MultiEdgeCapacityDeletionFormView(EdgeCapacityViewMixin, MultiResourceDeletionFormView):
     template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_edge_capacities")
+    table_name = "capacity_new"
 
 
 class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):

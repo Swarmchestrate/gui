@@ -87,11 +87,13 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
 class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
     template_name = "capacities/cloud_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
+    table_name = "capacity_new"
 
 
 class MultiCloudCapacityDeletionFormView(CloudCapacityViewMixin, MultiResourceDeletionFormView):
     template_name = "capacities/cloud_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
+    table_name = "capacity_new"
 
 
 class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
