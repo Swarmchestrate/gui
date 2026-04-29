@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 
 from .form_config import FormConfig, Properties
 
-from editor.new_forms import ForeignKeyFormWithDynamicallyPopulatedFields
+from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from postgrest.new_api import ApiClient, OpenApiSpecification, Resource
 from resource_management.forms import ResourceDeletionForm
 

@@ -12,7 +12,7 @@ from django.views.generic import (
     TemplateView,
 )
 
-from .new_forms import FormWithDynamicallyPopulatedFields
+from .forms import FormWithDynamicallyPopulatedFields
 from .view_helpers import EditorTableOfContents
 
 from postgrest.new_api import (
