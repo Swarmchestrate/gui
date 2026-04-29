@@ -8,7 +8,7 @@ from capacities.utils import (
     cloud_capacity_type_readable_plural,
 )
 
-from editor.new_foreign_key_views import (
+from editor.foreign_key_views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
@@ -16,7 +16,7 @@ from editor.new_foreign_key_views import (
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
-from editor.new_views import (
+from editor.views import (
     EditorOverviewTemplateView,
     EditorSkeletonLoaderView,
     EditorStartFormView,

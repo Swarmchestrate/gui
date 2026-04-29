@@ -1,9 +1,8 @@
-import asyncio
 import json
 import logging
+import lxml.html
 from http import HTTPStatus
 
-from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -11,489 +10,44 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     FormView,
     TemplateView,
-    View,
 )
 
-from postgrest.api_clients import ColumnMetadataApiClient
-from postgrest.base.base_api_clients import ApiClient
+from .new_forms import FormWithDynamicallyPopulatedFields
+from .view_helpers import EditorTableOfContents
 
-# from postgrest.mocks.base.mock_base_api_clients import MockApiClient as ApiClient
-# from postgrest.mocks.mock_api_clients import (
-#     MockColumnMetadataApiClient as ColumnMetadataApiClient,
-# )
-from resource_management.forms import ResourceDeletionForm
+from postgrest.new_api import (
+    ApiClient,
+    OpenApiSpecification,
+)
+from postgrest.forms.foreign_key_fields import (
+    get_foreign_key_form_configs,
+    get_one_to_many_field_forms,
+    get_one_to_one_field_forms,
+)
+from postgrest.forms.form_config import (
+    FormConfig,
+    Properties,
+)
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
-from .forms.base_forms import (
-    SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix,
-    SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix,
-)
-from .services import get_categories_for_editor, prepare_initial_form_data
 
 logger = logging.getLogger(__name__)
 
 
-class EditorTocTemplateView(TemplateView):
-    api_client: ApiClient
-    column_metadata_api_client_class: type[ColumnMetadataApiClient]
-    column_metadata_api_client: ColumnMetadataApiClient
-    categories: dict
-    category_names: list[str]
-    column_metadata: list[dict]
-    column_names: set[str]
-
-    def setup(self, request, *args, **kwargs):
-        self.category = request.GET.get("category")
-        self.setup_column_metadata()
-        self.setup_categories()
-        return super().setup(request, *args, **kwargs)
-
-    def setup_column_metadata(self):
-        self.column_metadata = (
-            self.column_metadata_api_client.get_resources_for_enabled_categories()
-        )
-        self.column_names = set(
-            cm.get("column_name", "")
-            for cm in self.column_metadata
-            if cm.get("column_name", "")
-        )
-
-    def setup_categories(self):
-        self.category_names = list(
-            set(r.get("category", "") for r in self.column_metadata)
-        )
-        self.category_names.sort()
-        self.categories = get_categories_for_editor(
-            self.api_client, self.column_metadata, self.category_names
-        )
-
-    def _get_first_category(self):
-        return next(iter(self.category_names), None)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "toc_list_items": self.categories,
-                "category_names": self.category_names,
-                "initial_category": self.category,
-            }
-        )
-        return context
-
-
-class EditorEnabledTabListTemplateView(EditorTocTemplateView):
-    template_name = "editor/toc_tabbed/toc_base.html"
-
-
-class EditorStartFormView(
-    EditorTocTemplateView,
-    FormView,
-):
-    api_client: ApiClient
-    pk_field_name: str
-    editor_reverse_base: str
-    resource_type_readable: str
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": f"New {self.resource_type_readable.title()}",
-            }
-        )
-        return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "api_client": self.api_client,
-                "column_metadata_api_client": self.column_metadata_api_client,
-            }
-        )
-        return kwargs
-
-    def form_valid(self, form):
-        new_resource = self.api_client.register(form.cleaned_data)
-        messages.success(
-            self.request,
-            f"New {self.api_client.type_readable} registered.",
-        )
-        self.success_url = reverse_lazy(
-            self.editor_reverse_base,
-            kwargs={"resource_id": new_resource.get(self.pk_field_name)},
-        )
-        return super().form_valid(form)
-
-
-class EditorForeignKeyFieldsTemplateView(TemplateView):
-    resource: dict
-    resource_id: int
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
-    editor_reverse_base: str
-
-    new_one_to_one_relation_reverse_base: str
-    update_one_to_one_relation_reverse_base: str
-    delete_one_to_one_relation_reverse_base: str
-    new_one_to_many_relation_reverse_base: str
-    update_one_to_many_relation_reverse_base: str
-    delete_one_to_many_relation_reverse_base: str
-
-    async def get_one_to_one_field_metadata(self) -> dict:
-        one_to_one_field_metadata = dict()
-        one_to_one_fields = (
-            self.api_client.endpoint_definition.get_user_specifiable_one_to_one_fields()
-        )
-
-        for field_name, field_metadata in one_to_one_fields.items():
-            fk_table_name = field_metadata.get("fk_table_name", "")
-            fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
-            if not fk_api_client:
-                continue
-            new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
-                fk_api_client,
-                ColumnMetadataApiClient(),
-                id_prefix="new",
-            )
-            initial = dict()
-            fk_resource_id = None
-            try:
-                fk_resource_id = self.resource.get(field_name)
-            except AttributeError:
-                pass
-            if fk_resource_id:
-                existing_resource = fk_api_client.get(fk_resource_id)
-                initial = prepare_initial_form_data(existing_resource)
-            one_to_one_field_metadata.update(
-                {
-                    field_name: {
-                        "new_form": new_form,
-                        "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
-                            fk_api_client,
-                            ColumnMetadataApiClient(),
-                            id_suffix=f"{fk_table_name}_{self.resource_id}",
-                            initial=initial,
-                        ),
-                        "delete_form": ResourceDeletionForm(
-                            initial={"resource_id_to_delete": fk_resource_id}
-                        ),
-                        "type_readable": fk_api_client.type_readable,
-                        "type_readable_plural": fk_api_client.type_readable_plural,
-                    },
-                }
-            )
-        return one_to_one_field_metadata
-
-    async def get_one_to_many_field_metadata(self) -> dict:
-        one_to_many_field_metadata = dict()
-        one_to_many_fields = self.api_client.endpoint_definition.get_user_specifiable_one_to_many_fields()
-        for field_name, field_metadata in one_to_many_fields.items():
-            fk_table_name = field_metadata.get("fk_table_name", "")
-            fk_api_client = ApiClient.get_client_instance_by_endpoint(fk_table_name)
-            if not fk_api_client:
-                continue
-            new_form = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix(
-                fk_api_client,
-                ColumnMetadataApiClient(),
-                id_prefix="new",
-            )
-            existing_resources = fk_api_client.get_resources_referencing_resource_id(
-                field_metadata.get("fk_table_column_name"), self.resource_id
-            )
-            one_to_many_field_metadata.update(
-                {
-                    field_name: {
-                        "new_form": new_form,
-                        "resource_forms": {
-                            existing_resource.get(
-                                fk_api_client.endpoint_definition.pk_field_name
-                            ): {
-                                "update_form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
-                                    fk_api_client,
-                                    ColumnMetadataApiClient(),
-                                    id_suffix=f"{fk_table_name}_{fk_api_client.endpoint_definition.pk_field_name}",
-                                    initial=prepare_initial_form_data(
-                                        existing_resource
-                                    ),
-                                ),
-                                "delete_form": ResourceDeletionForm(
-                                    initial={
-                                        "resource_id_to_delete": existing_resource.get(
-                                            fk_api_client.endpoint_definition.pk_field_name
-                                        )
-                                    }
-                                ),
-                            }
-                            for existing_resource in existing_resources
-                        },
-                        "type_readable": fk_api_client.type_readable,
-                        "type_readable_plural": fk_api_client.type_readable_plural,
-                        "templates": {
-                            "update_dialog": render_to_string(
-                                "editor/dialogs/update_dialog.html",
-                                {
-                                    "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
-                                        fk_api_client,
-                                        ColumnMetadataApiClient(),
-                                        id_suffix="__resource_id__",
-                                    ),
-                                    "resource_id": "__resource_id__",
-                                    "update_resource_url": reverse_lazy(
-                                        self.update_one_to_many_relation_reverse_base,
-                                        kwargs={
-                                            "resource_id": self.resource_id,
-                                            "fk_column_name": field_name,
-                                            "fk_resource_id": "__resource_id__",
-                                        },
-                                    ),
-                                    "dialog_id": f"update-{field_name}-__resource_id__-dialog",
-                                    "dialog_extra_classes": "col-lg-10",
-                                    "resource_type_readable": fk_api_client.endpoint,
-                                },
-                            ),
-                            "delete_dialog": render_to_string(
-                                "editor/dialogs/delete_dialog.html",
-                                {
-                                    "form": ResourceDeletionForm(
-                                        initial={
-                                            "resource_id_to_delete": "__resource_id__"
-                                        }
-                                    ),
-                                    "resource_id": "__resource_id__",
-                                    "delete_resource_url": reverse_lazy(
-                                        self.delete_one_to_many_relation_reverse_base,
-                                        kwargs={
-                                            "resource_id": self.resource_id,
-                                            "fk_column_name": field_name,
-                                            "fk_resource_id": "__resource_id__",
-                                        },
-                                    ),
-                                    "dialog_id": f"delete-{field_name}-__resource_id__-dialog",
-                                    "dialog_extra_classes": "col-lg-10",
-                                    "resource_type_readable": fk_api_client.endpoint,
-                                },
-                            ),
-                            "list_item": render_to_string(
-                                "editor/foreign_key_fields/one_to_many_field_list_item.html",
-                                {
-                                    "form": SimpleOpenApiSpecificationBasedFormWithIdAttributeSuffix(
-                                        fk_api_client,
-                                        ColumnMetadataApiClient(),
-                                        id_suffix="__resource_id__",
-                                    ),
-                                    "resource_id": "__resource_id__",
-                                    "resource_type_readable": fk_api_client.endpoint,
-                                    "field": {"name": field_name},
-                                },
-                            ),
-                        },
-                    },
-                }
-            )
-        return one_to_many_field_metadata
-
-
-class EditorFormView(FormView):
-    template_name = "editor/"
-    form_class: forms.Form
-
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
-    editor_overview_reverse_base: str
-    resource_type_readable: str
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.api_client.get(self.resource_id)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.category = self.request.GET.get("category")
-        self.success_url = reverse_lazy(
-            self.editor_overview_reverse_base,
-            kwargs={
-                "resource_id": self.resource_id,
-            },
-        )
-        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        update_data = form.cleaned_data
-        try:
-            self.api_client.update(self.resource_id, update_data)
-        except Exception:
-            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
-            logger.exception(error_msg)
-            return self.form_invalid(form)
-
-        message = "Successfully applied changes."
-        return JsonResponse(
-            {
-                "message": message,
-                "redirect": self.success_url,
-            }
-        )
-
-    def form_invalid(self, form):
-        error_msg = (
-            "Some fields were invalid. Please apply fixes for the highlighted fields."
-        )
-        return JsonResponse(
-            {
-                "feedback": error_msg,
-                "url": self.request.get_full_path(),
-            },
-            status=HTTPStatus.BAD_REQUEST,
-        )
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "initial": prepare_initial_form_data(self.resource),
-                "api_client": self.api_client,
-                "column_metadata_api_client": self.column_metadata_api_client,
-            }
-        )
-        return kwargs
-
-
-class EditorCategoryBasedFormView(EditorFormView):
-    form_class: forms.Form
-
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
-    editor_overview_reverse_base: str
-    resource_type_readable: str
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.api_client.get(self.resource_id)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.category = self.request.GET.get("category")
-        if not self.category:
-            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        self.success_url = reverse_lazy(
-            self.editor_overview_reverse_base,
-            kwargs={
-                "resource_id": self.resource_id,
-            },
-        )
-        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        update_data = form.cleaned_data
-        try:
-            self.api_client.update(self.resource_id, update_data)
-        except Exception:
-            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
-            logger.exception(error_msg)
-            return self.api_invalid()
-
-        message = f"Saved changes to {self.category.replace(':', ': ')}."
-        return JsonResponse({"message": message})
-
-    def form_invalid(self, form):
-        error_msg = (
-            "Some fields were invalid. Please apply fixes for the highlighted fields."
-        )
-        return JsonResponse(
-            {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
-            status=HTTPStatus.BAD_REQUEST,
-        )
-
-    def api_invalid(self):
-        return JsonResponse(
-            {
-                "message": f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied.",
-            },
-            status=HTTPStatus.BAD_REQUEST,
-        )
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "initial": prepare_initial_form_data(self.resource),
-                "api_client": self.api_client,
-                "column_metadata_api_client": self.column_metadata_api_client,
-                "category": self.category,
-            }
-        )
-        return kwargs
-
-
-class EditorTabbedFormTemplateView(
-    EditorFormView,
-    EditorForeignKeyFieldsTemplateView,
-    EditorTocTemplateView,
-    TemplateView,
-):
-    template_name = "editor/editor_tab.html"
-    view_is_async = True
-
-    editor_form_reverse: str
-    editor_form_url: str
-
-    def dispatch(self, request, *args, **kwargs):
-        self.category = request.GET.get("category")
-        self.editor_form_url = reverse_lazy(
-            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-    async def get(self, request, *args, **kwargs):
-        field_metadata = await asyncio.gather(
-            self.get_one_to_one_field_metadata(), self.get_one_to_many_field_metadata()
-        )
-        self.one_to_one_field_metadata = field_metadata[0]
-        self.one_to_many_field_metadata = field_metadata[1]
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "resource": self.resource,
-                "resource_id": self.resource_id,
-                "initial_category": self.category,
-                "editor_form_url": self.editor_form_url,
-                "one_to_one_field_metadata": self.one_to_one_field_metadata,
-                "one_to_many_field_metadata": self.one_to_many_field_metadata,
-                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
-                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
-                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
-                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
-                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
-                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
-            }
-        )
-        return context
-
-
-class EditorBaseTemplateView(TemplateView):
+class EditorSkeletonLoaderView(TemplateView):
     template_name = "editor/editor_base_tabbed.html"
 
-    api_client: ApiClient
+    table_name: str
     editor_overview_reverse_base: str
     toc_url: str
     tabbed_form_url: str
     tabbed_form_reverse: str
     resource_type_readable: str
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.api_client.get(self.resource_id)
-        self.category = request.GET.get("category", "")
-
     def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.resource = ApiClient().get_endpoint(self.table_name).get(self.resource_id)
+        self.category = request.GET.get("category", "")
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -524,226 +78,366 @@ class EditorBaseTemplateView(TemplateView):
         return context
 
 
-class OneToOneRelationView(View):
-    form_class = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
+class EditorTableOfContentsSectionView(TemplateView):
+    table_name: str
+    column_metadata_table_name: str
+    categories: dict
+    disabled_categories: list
+    template_name = "editor/toc_tabbed/toc_base.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.resource_id = int(self.kwargs["resource_id"])
-        self.resource = self.api_client.get(self.resource_id)
-        self.fk_column_name = self.kwargs["fk_column_name"]
-        fk_fields = self.api_client.endpoint_definition.get_user_specifiable_foreign_key_fields()
-        self.fk_table_name = fk_fields.get(self.fk_column_name, {}).get("fk_table_name")
-        self.fk_api_client = ApiClient.get_client_instance_by_endpoint(
-            self.fk_table_name
-        )
+        self.category = request.GET.get("category")
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        api_client = ApiClient()
+        definition = api_client.get_endpoint(self.table_name).definition
+        column_metadata = [
+            resource.as_dict()
+            for resource in api_client.get_endpoint("column_metadata").get_resources()
+        ]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        category_names = list(set(
+            resource.get("category", "")
+            for resource in column_metadata
+            if resource.get("table_name", "") == self.column_metadata_table_name
+        ))
+        category_names.sort()
+        categories = EditorTableOfContents(
+            self.table_name,
+            category_names,
+            column_metadata,
+            definition.properties.keys()
+        ).as_dict()
+        context.update({
+            "toc_list_items": categories,
+            "initial_category": self.category,
+        })
+        return context
 
-class OneToOneRelationBasedFormView(OneToOneRelationView, FormView):
-    def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
-        if self.request.accepts("text/html"):
-            messages.error(self.request, "The form submitted was not valid.")
-            return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "api_client": ApiClient.get_client_instance_by_endpoint(
-                    self.fk_table_name
-                ),
-                "column_metadata_api_client": ColumnMetadataApiClient(),
-                "id_prefix": "new",
-            }
+class EditorTabSectionView(TemplateView):
+    template_name = "editor/editor_tab.html"
+    
+    table_name: str
+    column_metadata_table_name: str
+    openapi_spec: OpenApiSpecification
+
+    new_one_to_one_relation_reverse_base: str
+    update_one_to_one_relation_reverse_base: str
+    delete_one_to_one_relation_reverse_base: str
+    new_one_to_many_relation_reverse_base: str
+    update_one_to_many_relation_reverse_base: str
+    delete_one_to_many_relation_reverse_base: str
+
+    editor_form_reverse: str
+    editor_form_url: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.category = request.GET.get("category")
+        
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        resource_endpoint = self.api_client.get_endpoint(self.table_name)
+        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
+        self.resource = resource_endpoint.get(self.resource_id)
+        self.title_base = f"{resource_endpoint.resource_type.title()} {self.resource_id}"
+        self.editor_form_url = reverse_lazy(
+            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
-        return kwargs
-
-
-class NewOneToOneRelationFormView(OneToOneRelationBasedFormView):
-    def form_valid(self, form):
-        new_resource = self.fk_api_client.register(form.cleaned_data)
-        new_resource.update(
-            {
-                "pk": new_resource.get(
-                    self.fk_api_client.endpoint_definition.pk_field_name
-                )
-            }
+        self.column_metadata = column_metadata_endpoint.get_resources()
+        self._properties = Properties(
+            self.table_name,
+            self.openapi_spec.get_definition(self.table_name),
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
         )
-        self.api_client.update(
+        # One-to-many fields are handled first, as they are
+        # added to the category-based forms before they
+        # are generated.
+        self.initialise_one_to_many_field_forms()
+        self.initialise_categorised_forms()
+        self.initialise_one_to_one_field_forms()
+        self.initialise_toc_list_items()
+        return super().dispatch(request, *args, **kwargs)
+    
+    def initialise_one_to_many_field_forms(self):
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = self.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            self._properties.add_one_to_many_property(table_name)
+        form_configs = get_foreign_key_form_configs(
+            referring_tables.keys(),
+            self.openapi_spec,
+            self.column_metadata,
+            disabled_property_names=[possible_fk_table_column_name]
+        )
+        # Check each definition for references to the references to the main form type.
+        # E.g., a property is called "capacity_id" or "application_id", or, there is
+        # an explicit "@fk_table_name" expression. E.g. fk_table_name="capacity".
+        self.one_to_many_field_metadata = get_one_to_many_field_forms(
+            self.request,
             self.resource_id,
+            form_configs,
+            referring_tables,
+            self.update_one_to_many_relation_reverse_base,
+            self.delete_one_to_many_relation_reverse_base
+        )
+
+    def initialise_one_to_one_field_forms(self):
+        properties_by_fk_tables = dict()
+        for property_name, property_metadata in self.properties.items():
+            try:
+                xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
+            except TypeError:
+                continue
+            fk_table_name = next(iter(xpath_results), None)
+            if not fk_table_name:
+                continue
+            if fk_table_name not in properties_by_fk_tables:
+                properties_by_fk_tables.update({
+                    fk_table_name: [],
+                })
+            properties_by_fk_tables[fk_table_name].append(property_name)
+        form_configs = get_foreign_key_form_configs(
+            properties_by_fk_tables.keys(),
+            self.openapi_spec,
+            self.column_metadata
+        )
+        self.one_to_one_field_metadata = get_one_to_one_field_forms(
+            self.resource,
+            form_configs,
+            properties_by_fk_tables
+        )
+
+    def initialise_categorised_forms(self):
+        categorised_properties = self._properties.as_categorised_dict()
+        self.properties = dict()
+        for properties in categorised_properties.values():
+            self.properties.update(properties)
+        self.forms_by_category = {
+            category: FormWithDynamicallyPopulatedFields(
+                fields=FormConfig(properties).get_fields(),
+                initial=self.resource.as_dict(),
+            )
+            for category, properties in categorised_properties.items()
+        }
+    
+    def initialise_toc_list_items(self):
+        definition = self.openapi_spec.get_definition(self.table_name)
+        column_metadata = [
+            resource.as_dict()
+            for resource in self.api_client.get_endpoint("column_metadata").get_resources()
+        ]
+        category_names = list(set(
+            resource.get("category", "")
+            for resource in column_metadata
+            if resource.get("table_name", "") == self.column_metadata_table_name
+        ))
+        category_names.sort()
+        self.toc_list_items = EditorTableOfContents(
+            self.table_name,
+            category_names,
+            column_metadata,
+            definition.properties.keys()
+        ).as_dict()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
             {
-                self.fk_column_name: new_resource.get(
-                    self.fk_api_client.endpoint_definition.pk_field_name
-                )
+                "resource": self.resource,
+                "resource_id": self.resource_id,
+                "initial_category": self.category,
+                "forms_by_category": self.forms_by_category,
+                "editor_form_url": self.editor_form_url,
+                "toc_list_items": self.toc_list_items,
+                "one_to_one_field_metadata": self.one_to_one_field_metadata,
+                "one_to_many_field_metadata": self.one_to_many_field_metadata,
+                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
+                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
+                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
+                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
+                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
+                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
+            }
+        )
+        return context
+
+
+class UpdateResourceByCategoryView(FormView):
+    form_class = FormWithDynamicallyPopulatedFields
+
+    openapi_spec: OpenApiSpecification
+    table_name: str
+    column_metadata_table_name: str
+    editor_overview_reverse_base: str
+    resource_type_readable: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.category = self.request.GET.get("category")
+        if not self.category:
+            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        self.success_url = reverse_lazy(
+            self.editor_overview_reverse_base,
+            kwargs={
+                "resource_id": self.resource_id,
             },
         )
-        message = f"Added new {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"resource": prepare_initial_form_data(new_resource)})
-
-
-class UpdateOneToOneRelationFormView(OneToOneRelationBasedFormView):
-    def form_valid(self, form):
-        fk_resource_id = int(self.resource.get(self.fk_column_name))
-        self.fk_api_client.update(fk_resource_id, form.cleaned_data)
-        message = f"Updated {self.fk_table_name} registration."
-        resource = self.fk_api_client.get(fk_resource_id)
-        resource.update(
-            {"pk": resource.get(self.fk_api_client.endpoint_definition.pk_field_name)}
-        )
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"resource": prepare_initial_form_data(resource)})
-
-
-class DeleteOneToOneRelationFormView(OneToOneRelationView, FormView):
-    form_class = ResourceDeletionForm
-
-    def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
-        if self.request.accepts("text/html"):
-            messages.error(self.request, "The form submitted was not valid.")
-            return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
-
-    def form_valid(self, form):
-        fk_resource_id = int(self.resource.get(self.fk_column_name))
-        self.fk_api_client.delete(fk_resource_id)
-        self.api_client.update(self.resource_id, {self.fk_column_name: None})
-        message = f"Deleted {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"result": "success"})
-
-
-class OneToManyRelationView(View):
-    form_class = SimpleOpenApiSpecificationBasedFormWithIdAttributePrefix
-    api_client: ApiClient
-    column_metadata_api_client: ColumnMetadataApiClient
-
-    def dispatch(self, request, *args, **kwargs):
-        self.resource_id = int(self.kwargs["resource_id"])
-        self.resource = self.api_client.get(self.resource_id)
-        self.fk_column_name = self.kwargs["fk_column_name"]
-        one_to_many_fields = (
-            self.api_client.endpoint_definition._get_one_to_many_fields()
-        )
-        self.fk_table_name = one_to_many_fields.get(self.fk_column_name, {}).get(
-            "fk_table_name"
-        )
-        self.fk_table_column_name = one_to_many_fields.get(self.fk_column_name, {}).get(
-            "fk_table_column_name"
-        )
-        self.fk_api_client = ApiClient.get_client_instance_by_endpoint(
-            self.fk_table_name
-        )
+        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        update_data = form.cleaned_data
+        try:
+            self.api_client.get_endpoint(self.table_name).update(
+                self.resource_id,
+                update_data
+            )
+        except Exception:
+            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
+            logger.exception(error_msg)
+            return self.api_invalid()
 
-class OneToManyRelationBasedFormView(OneToManyRelationView, FormView):
+        message = f"Saved changes to {self.category.replace(':', ': ')}."
+        return JsonResponse({"message": message})
+
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
-        if self.request.accepts("text/html"):
-            messages.error(self.request, "The form submitted was not valid.")
-            return super().form_invalid(form)
-        return super().form_invalid(form)
+        error_msg = "Some fields were invalid. Please apply fixes for the highlighted fields."
+        return JsonResponse(
+            {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def api_invalid(self):
+        return JsonResponse(
+            {
+                "message": f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied.",
+            },
+            status=HTTPStatus.BAD_REQUEST,
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "api_client": ApiClient.get_client_instance_by_endpoint(
-                    self.fk_table_name
-                ),
-                "column_metadata_api_client": ColumnMetadataApiClient(),
-                "id_prefix": "new",
-            }
+        column_metadata_endpoint = self.api_client.get_endpoint(
+            "column_metadata"
         )
+        properties = Properties(
+            self.table_name,
+            self.openapi_spec.get_definition(self.table_name),
+            column_metadata_endpoint.get_resources(),
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        kwargs.update({
+            "fields": FormConfig(properties.as_dict()).get_fields_for_category(self.category),
+        })
         return kwargs
 
 
-class NewOneToManyRelationFormView(OneToManyRelationBasedFormView):
-    def form_valid(self, form):
-        cleaned_data = form.cleaned_data
-        cleaned_data.update({self.fk_table_column_name: self.resource_id})
-        new_resource = self.fk_api_client.register(cleaned_data)
-        new_resource.update(
-            {
-                "pk": new_resource.get(
-                    self.fk_api_client.endpoint_definition.pk_field_name
-                )
-            }
-        )
-        message = f"Added new {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"resource": prepare_initial_form_data(new_resource)})
+class EditorStartFormView(FormView):
+    form_class = FormWithDynamicallyPopulatedFields
 
+    table_name: str
+    column_metadata_table_name: str
+    openapi_spec: OpenApiSpecification
+    editor_reverse_base: str
+    resource_type_readable: str
 
-class UpdateOneToManyRelationFormView(OneToManyRelationBasedFormView):
     def dispatch(self, request, *args, **kwargs):
-        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        self.fk_api_client.update(self.fk_resource_id, form.cleaned_data)
-        message = f"Updated {self.fk_table_name} registration."
-        resource = self.fk_api_client.get(self.fk_resource_id)
-        resource.update(
-            {"pk": resource.get(self.fk_api_client.endpoint_definition.pk_field_name)}
+        new_resource = self.api_client.get_endpoint(
+            self.table_name
+        ).register(form.cleaned_data)
+        messages.success(
+            self.request,
+            f"New {self.resource_type_readable} registered.",
         )
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"resource": prepare_initial_form_data(resource)})
+        self.success_url = reverse_lazy(
+            self.editor_reverse_base,
+            kwargs={"resource_id": new_resource.pk},
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        definition = self.openapi_spec.get_definition(self.table_name)
+        column_metadata = [
+            resource.as_dict()
+            for resource in self.api_client.get_endpoint(
+                "column_metadata"
+            ).get_resources()
+        ]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        category_names = list(set(
+            resource.get("category", "")
+            for resource in column_metadata
+            if resource.get("table_name", "") == self.column_metadata_table_name
+        ))
+        category_names.sort()
+        categories = EditorTableOfContents(
+            self.table_name,
+            category_names,
+            column_metadata,
+            definition.properties.keys(),
+            add_unknown_category_if_needed=False
+        ).as_dict()
+        context.update({
+            "toc_list_items": categories,
+            "title": f"New {self.resource_type_readable.title()}",
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        column_metadata_endpoint = self.api_client.get_endpoint(
+            "column_metadata"
+        )
+        properties = Properties(
+            self.table_name,
+            self.openapi_spec.get_definition(self.table_name),
+            column_metadata_endpoint.get_resources(),
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        kwargs.update({
+            "fields": FormConfig(properties.as_dict()).get_required_fields(),
+        })
+        return kwargs
 
 
-class DeleteOneToManyRelationFormView(OneToManyRelationView, FormView):
-    form_class = ResourceDeletionForm
-
-    def dispatch(self, request, *args, **kwargs):
-        self.fk_resource_id = int(self.kwargs["fk_resource_id"])
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
-        if self.request.accepts("text/html"):
-            messages.error(self.request, "The form submitted was not valid.")
-            return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
-
-    def form_valid(self, form):
-        self.fk_api_client.delete(self.fk_resource_id)
-        message = f"Deleted {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
-        return JsonResponse({"result": "success"})
-
-
-class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
+class EditorOverviewTemplateView(TemplateView):
     template_name = "editor/overview_base.html"
 
-    api_client: ApiClient
+    table_name: str
     resource_type_readable: str
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
         column_metadata_by_column_name = dict(
-            (cm.get("column_name"), cm) for cm in self.column_metadata
+            (cm.get("column_name"), cm)
+            for cm in self.column_metadata
         )
-        user_specifiable_fields = (
-            self.api_client.endpoint_definition.get_all_user_specifiable_fields()
-        )
+        user_specifiable_fields = self.endpoint.definition.properties
         for field_name, field_metadata in user_specifiable_fields.items():
             value = self.resource.get(field_name)
             extra_metadata = column_metadata_by_column_name.get(field_name)
@@ -754,19 +448,19 @@ class EditorOverviewTemplateView(EditorTocTemplateView, TemplateView):
                 field_category = extra_metadata.get("category")
             if field_category not in formatted_resource_data:
                 formatted_resource_data.update({field_category: dict()})
-            formatted_resource_data[field_category].update(
-                {
-                    field_name: {
-                        "title": field_title,
-                        "value": value,
-                    }
+            formatted_resource_data[field_category].update({
+                field_name: {
+                    "title": field_title,
+                    "value": value,
                 }
-            )
+            })
         return formatted_resource_data
 
     def dispatch(self, request, *args, **kwargs):
+        self.api_client = ApiClient()
+        self.endpoint = self.api_client.get_endpoint(self.table_name)
         self.resource_id = self.kwargs["resource_id"]
-        self.resource = self.api_client.get(self.resource_id)
+        self.resource = self.endpoint.get(self.resource_id)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
