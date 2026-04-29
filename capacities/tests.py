@@ -1,62 +1,58 @@
 from django.test import SimpleTestCase
 
-from editor.test_mixins import ApiClientTestCaseHelperMixin
-from postgrest.mocks.mock_api_clients import (
-    MockCloudCapacityApiClient as CloudCapacityApiClient,
-)
-from postgrest.mocks.mock_api_clients import (
-    MockEdgeCapacityApiClient as EdgeCapacityApiClient,
-)
+from postgrest.new_api import ApiClient, Resource
+from postgrest.test_mixins import PostgrestApiTestTeardownHelperMixin
 
 
-class CapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
-    api_client_class = CloudCapacityApiClient
+class CapacityPostgrestApiTestCase(
+        PostgrestApiTestTeardownHelperMixin,
+        SimpleTestCase):
+    table_name = "capacity_new"
+    
+    def setUp(self):
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        self.endpoint = api_client.get_endpoint(self.table_name)
+        self.initialise_test_teardown_helper_components()
+        return super().setUp()
+
+    def tearDown(self):
+        self.delete_resources_added_during_test()
+        return super().tearDown()
 
     def test_get_resources(self):
-        capacities = self.api_client.get_resources()
+        capacities = self.endpoint.get_resources()
         self.assertIsInstance(capacities, list)
-
-
-class CloudCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
-    api_client_class = CloudCapacityApiClient
-
-    def test_get_resources(self):
-        capacities = self.api_client.get_resources()
-        self.assertIsInstance(capacities, list)
+        if len(capacities) > 0:
+            self.assertTrue(all(
+                isinstance(resource, Resource)
+                for resource in capacities
+            ))
 
     def test_register(self):
-        new_resource = self.api_client.register()
-        self.assertIsInstance(new_resource, dict)
+        new_resource = self.endpoint.register({})
+        self.resource_ids_added_during_tests.append(new_resource.pk)
+        self.assertIsInstance(new_resource, Resource)
 
     def test_delete(self):
-        resource_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_client.delete(resource_id)
+        new_resource = self.endpoint.register({})
+        self.resource_ids_added_during_tests.append(new_resource.pk)
+        self.endpoint.delete(new_resource.pk)
 
     def test_update(self):
-        # Test setup
-        new_resource = self.register_with_api_client_for_test()
-        self.assertEqual(new_resource.get("mobility"), None)
-        # Update
+        TEST_PROPERTY = "description"
+        TEST_CONTENT = "Updated"
+        # Register new resource for testing
+        new_resource = self.endpoint.register({})
+        self.resource_ids_added_during_tests.append(new_resource.pk)
+        self.assertEqual(new_resource.as_dict().get(TEST_PROPERTY), None)
+        # Test update is applied
         update_data = {
-            "mobility": True,
+            TEST_PROPERTY: TEST_CONTENT,
         }
-        pk_field_name = self.api_client.endpoint_definition.pk_field_name
-        self.api_client.update(new_resource.get(pk_field_name), update_data)
-        updated_resource = self.api_client.get(new_resource.get(pk_field_name))
-        self.assertEqual(updated_resource.get("mobility"), True)
-
-
-class EdgeCapacityApiClientTestCase(ApiClientTestCaseHelperMixin, SimpleTestCase):
-    api_client_class = EdgeCapacityApiClient
-
-    def test_get_resources(self):
-        capacities = self.api_client.get_resources()
-        self.assertIsInstance(capacities, list)
-
-    def test_register(self):
-        new_resource = self.api_client.register()
-        self.assertIsInstance(new_resource, dict)
-
-    def test_delete(self):
-        resource_id = self.generate_random_id_and_add_to_test_ids()
-        self.api_client.delete(resource_id)
+        self.endpoint.update(new_resource.pk, update_data)
+        updated_resource = self.endpoint.get(new_resource.pk)
+        self.assertEqual(
+            updated_resource.as_dict().get(TEST_PROPERTY),
+            TEST_CONTENT
+        )
