@@ -47,6 +47,7 @@ class OneToManyField {
             [this.newDialogElement.querySelector(".btn-close")],
             [this.newDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.newDialogForm.reset();
                     const listItem = this.setupResource(responseData.resource);
@@ -198,6 +199,7 @@ class OneToManyFieldListItem {
             [this.updateDialogElement.querySelector(".btn-close")],
             [this.updateDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     for (const property in responseData.resource) {
                         let propertyValue = responseData.resource[property];
@@ -241,6 +243,7 @@ class OneToManyFieldListItem {
             [this.deleteDialogElement.querySelector(".btn-close")],
             [this.deleteDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.removeListItem();
                 },

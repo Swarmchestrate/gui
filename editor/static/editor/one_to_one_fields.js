@@ -47,6 +47,7 @@ class OneToOneField {
             [this.newDialogElement.querySelector(".btn-close")],
             [this.newDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.newDialogForm.reset();
                     this.newDialogButton.classList.add("d-none");
@@ -98,6 +99,7 @@ class OneToOneField {
             [this.updateDialogElement.querySelector(".btn-close")],
             [this.updateDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     for (const property in responseData.resource) {
                         let propertyValue = responseData.resource[property];
@@ -171,6 +173,7 @@ class OneToOneField {
             [this.deleteDialogElement.querySelector(".btn-close")],
             [this.deleteDialogButton],
             {
+                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.newDialogButton.classList.remove("d-none");
                     this.updateDialogButton.classList.add("d-none");
