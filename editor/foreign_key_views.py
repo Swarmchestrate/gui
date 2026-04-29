@@ -3,8 +3,7 @@ from django.contrib import messages
 from django.views.generic import FormView, View
 from django.http import JsonResponse
 
-from editor.forms.base_forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.services import prepare_initial_form_data
+from editor.new_forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from http import HTTPStatus
 from postgrest.new_api import ApiClient, Resource
 from postgrest.forms.form_config import FormConfig, Properties
