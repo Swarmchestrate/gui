@@ -105,22 +105,22 @@ urlpatterns = [
     ),
     path(
         "edge-capacities/api/editor-toc/",
-        edge_capacity_views.EdgeCapacityEditorEnabledTabListTemplateView.as_view(),
+        edge_capacity_views.EdgeCapacityTableOfContentsView.as_view(),
         name="edge_capacity_editor_toc",
     ),
     path(
         "edge-capacities/api/<resource_id>/editor/",
-        edge_capacity_views.EdgeCapacityEditorTabbedFormTemplateView.as_view(),
+        edge_capacity_views.EdgeCapacityEditorTabSectionView.as_view(),
         name="edge_capacity_editor_tabbed_form",
     ),
     path(
         "edge-capacities/api/<resource_id>/edit/",
-        edge_capacity_views.EdgeCapacityEditorCategoryBasedFormView.as_view(),
+        edge_capacity_views.UpdateEdgeCapacityByCategoryView.as_view(),
         name="update_edge_capacity_by_category",
     ),
     path(
         "edge-capacities/<resource_id>/edit/",
-        edge_capacity_views.EdgeCapacityEditorBaseTemplateView.as_view(),
+        edge_capacity_views.EdgeCapacityEditorSkeletonLoaderView.as_view(),
         name="edge_capacity_editor",
     ),
     path(
