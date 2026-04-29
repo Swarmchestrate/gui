@@ -79,11 +79,13 @@ class EditorSkeletonLoaderView(TemplateView):
 
 
 class EditorTableOfContentsSectionView(TemplateView):
+    template_name = "editor/toc_tabbed/toc_base.html"
+
     table_name: str
     column_metadata_table_name: str
+    toc_class = EditorTableOfContents
+
     categories: dict
-    disabled_categories: list
-    template_name = "editor/toc_tabbed/toc_base.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.category = request.GET.get("category")
@@ -105,7 +107,7 @@ class EditorTableOfContentsSectionView(TemplateView):
             if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
-        categories = EditorTableOfContents(
+        categories = self.toc_class(
             self.table_name,
             category_names,
             column_metadata,
@@ -124,6 +126,7 @@ class EditorTabSectionView(TemplateView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
+    toc_class = EditorTableOfContents
 
     new_one_to_one_relation_reverse_base: str
     update_one_to_one_relation_reverse_base: str
@@ -244,7 +247,7 @@ class EditorTabSectionView(TemplateView):
             if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
-        self.toc_list_items = EditorTableOfContents(
+        self.toc_list_items = self.toc_class(
             self.table_name,
             category_names,
             column_metadata,
@@ -356,6 +359,8 @@ class EditorStartFormView(FormView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
+    toc_class = EditorTableOfContents
+
     editor_reverse_base: str
     resource_type_readable: str
 
@@ -396,7 +401,7 @@ class EditorStartFormView(FormView):
             if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
-        categories = EditorTableOfContents(
+        categories = self.toc_class(
             self.table_name,
             category_names,
             column_metadata,
@@ -431,7 +436,8 @@ class EditorOverviewTemplateView(TemplateView):
 
     table_name: str
     column_metadata_table_name: str
-    
+    toc_class = EditorTableOfContents
+
     editor_reverse_base: str
     resource_type_readable: str
 
@@ -458,7 +464,7 @@ class EditorOverviewTemplateView(TemplateView):
             if resource.get("table_name", "") == self.column_metadata_table_name
         ))
         category_names.sort()
-        return EditorTableOfContents(
+        return self.toc_class(
             self.table_name,
             category_names,
             column_metadata,

@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
 
 from capacities.utils import (
     cloud_capacity_type_readable,
     cloud_capacity_type_readable_plural,
 )
+from capacities.view_helpers import CloudCapacityEditorTableOfContents
 
 from editor.foreign_key_views import (
     DeleteOneToManyRelationFormView,
@@ -57,12 +57,13 @@ class CloudCapacityEditorSkeletonLoaderView(CloudCapacityViewMixin, EditorSkelet
 class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    disabled_categories = ["Edge Specific", "Networking"]
+    toc_class = CloudCapacityEditorTableOfContents
 
 
 class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    toc_class = CloudCapacityEditorTableOfContents
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
@@ -81,6 +82,14 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    toc_class = CloudCapacityEditorTableOfContents
+
+
+class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
+    template_name = "capacities/cloud_capacity_overview.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    toc_class = CloudCapacityEditorTableOfContents
 
 
 # Resource management views
@@ -99,12 +108,6 @@ class MultiCloudCapacityDeletionFormView(CloudCapacityViewMixin, MultiResourceDe
 class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
     table_name = "capacity_new"
-
-
-class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
-    template_name = "capacities/cloud_capacity_overview.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
 
 
 class CloudCapacityNewOneToOneRelationFormView(CloudCapacityViewMixin, NewOneToOneRelationFormView):

@@ -4,6 +4,7 @@ from capacities.utils import (
     edge_capacity_type_readable,
     edge_capacity_type_readable_plural,
 )
+from capacities.view_helpers import EdgeCapacityEditorTableOfContents
 from editor.foreign_key_views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
@@ -52,12 +53,13 @@ class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeleton
 class EdgeCapacityTableOfContentsView(EditorTableOfContentsSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    disabled_categories = ["System Specific"]
+    toc_class = EdgeCapacityEditorTableOfContents
 
 
 class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    toc_class = EdgeCapacityEditorTableOfContents
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
@@ -76,6 +78,14 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    toc_class = EdgeCapacityEditorTableOfContents
+
+
+class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
+    template_name = "capacities/edge_capacity_overview.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    toc_class = EdgeCapacityEditorTableOfContents
 
 
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
@@ -93,9 +103,3 @@ class MultiEdgeCapacityDeletionFormView(EdgeCapacityViewMixin, MultiResourceDele
 class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
     table_name = "capacity_new"
-
-
-class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
-    template_name = "capacities/edge_capacity_overview.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"

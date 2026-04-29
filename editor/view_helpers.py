@@ -2,20 +2,20 @@ from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
 class EditorTableOfContents:
+    disabled_categories: list[str]
+    
     def __init__(
             self,
             table_name: str,
             category_names: list[str],
             column_metadata: list[dict],
             definition_properties: list[str],
-            disabled_categories: list[str] = None,
             add_unknown_category_if_needed: bool = True):
         self.table_name = table_name
         self.category_names = category_names
         self.column_metadata = column_metadata
         self.definition_properties = definition_properties
-        self.disabled_categories = disabled_categories
-        if not disabled_categories:
+        if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
         self.add_unknown_category_if_needed = add_unknown_category_if_needed
 
@@ -106,6 +106,8 @@ class EditorTableOfContents:
         processed_categories = set()
         # Add metadata for each category
         for category in self.category_names:
+            if category in self.disabled_categories:
+                continue
             self._add_metadata_for_category(
                 category,
                 table_of_contents,
@@ -139,6 +141,8 @@ class EditorTableOfContents:
         descendent_categories = set()
         processed_categories = set()
         for category in self.category_names:
+            if category in self.disabled_categories:
+                continue
             self._add_descendents_for_category(
                 category,
                 table_of_contents,
