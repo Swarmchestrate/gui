@@ -1,22 +1,15 @@
-from postgrest.forms.property_metadata import PropertyMetadata
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
 class EditorTableOfContents:
-    disabled_categories: list[str]
-    
     def __init__(
             self,
             table_name: str,
             category_names: list[str],
-            properties: dict[str, PropertyMetadata],
-            add_unknown_category_if_needed: bool = True):
+            is_unknown_category_needed: bool = False):
         self.table_name = table_name
         self.category_names = category_names
-        self.properties = properties
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
-        self.add_unknown_category_if_needed = add_unknown_category_if_needed
+        self.is_unknown_category_needed = is_unknown_category_needed
 
     def _add_metadata_for_category(
             self,
@@ -105,8 +98,6 @@ class EditorTableOfContents:
         processed_categories = set()
         # Add metadata for each category
         for category in self.category_names:
-            if category in self.disabled_categories:
-                continue
             self._add_metadata_for_category(
                 category,
                 table_of_contents,
@@ -117,13 +108,8 @@ class EditorTableOfContents:
         # categories into descendents, as it will be harder to set
         # the "next" property of the current last category when it's
         # nested.
-        is_any_property_uncategorised = any(
-            not metadata.category
-            for property, metadata in self.properties.items()
-        )
         uncategorised_metadata = {}
-        if (self.add_unknown_category_if_needed
-            and is_any_property_uncategorised):
+        if (self.is_unknown_category_needed):
             last_category = self.category_names[-1]
             table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
             uncategorised_metadata = {
@@ -138,8 +124,6 @@ class EditorTableOfContents:
         descendent_categories = set()
         processed_categories = set()
         for category in self.category_names:
-            if category in self.disabled_categories:
-                continue
             self._add_descendents_for_category(
                 category,
                 table_of_contents,
@@ -151,8 +135,7 @@ class EditorTableOfContents:
         
         # The "uncategorised" category is added last to
         # avoid potential confusion with real categories.
-        if (self.add_unknown_category_if_needed
-            and is_any_property_uncategorised):
+        if (self.is_unknown_category_needed):
             table_of_contents.update({UNKNOWN_ATTRIBUTE_CATEGORY: uncategorised_metadata})
             # self.category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
         return table_of_contents

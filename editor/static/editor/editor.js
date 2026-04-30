@@ -35,10 +35,10 @@ window.addEventListener("DOMContentLoaded", async () => {
         getEditorTabbedFormHtml(),
         getEditorTocHtml(),
     ]);
-    const editorTocHtml = editorHtmlSections[1];
-    editorTocWrapper.innerHTML = editorTocHtml;
     const editorTabbedFormHtml = editorHtmlSections[0];
     editorTabbedFormWrapper.innerHTML = editorTabbedFormHtml;
+    const editorTocHtml = editorHtmlSections[1];
+    editorTocWrapper.innerHTML = editorTocHtml;
     const bsEditorTab = new bootstrap.Tab("#editor-tab");
     const editorTabForms = Array.from(
         document.querySelectorAll("#editor-tab-content form"),

@@ -53,13 +53,13 @@ class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeleton
 class EdgeCapacityTableOfContentsView(EditorTableOfContentsSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = EdgeCapacityEditorTableOfContents
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = EdgeCapacityEditorTableOfContents
+    disabled_categories = ["System Specific"]
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
@@ -72,20 +72,21 @@ class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionVi
 class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = EdgeCapacityEditorTableOfContents
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/edge_capacity_overview.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = EdgeCapacityEditorTableOfContents
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):

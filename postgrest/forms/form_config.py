@@ -169,7 +169,7 @@ class OasDefinitionPropertyFormat(Enum):
 
 
 class FormConfig:
-    extra_disabled_properties: list
+    extra_disabled_properties: list[str]
     initial = None
     _properties: dict[str, PropertyMetadata]
     _default_disabled_properties = [

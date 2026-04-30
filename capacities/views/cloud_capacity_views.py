@@ -57,13 +57,13 @@ class CloudCapacityEditorSkeletonLoaderView(CloudCapacityViewMixin, EditorSkelet
 class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = CloudCapacityEditorTableOfContents
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSectionView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = CloudCapacityEditorTableOfContents
+    disabled_categories = ["Edge Specific", "Networking"]
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
@@ -76,20 +76,21 @@ class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSection
 class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = CloudCapacityEditorTableOfContents
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
-    toc_class = CloudCapacityEditorTableOfContents
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 # Resource management views

@@ -38,6 +38,7 @@ class EditorSkeletonLoaderView(TemplateView):
     template_name = "editor/editor_base_tabbed.html"
 
     table_name: str
+
     editor_overview_reverse_base: str
     toc_url: str
     tabbed_form_url: str
@@ -83,12 +84,14 @@ class EditorTableOfContentsSectionView(TemplateView):
 
     table_name: str
     column_metadata_table_name: str
-    toc_class = EditorTableOfContents
+    disabled_categories: list[str]
 
     categories: dict
 
     def dispatch(self, request, *args, **kwargs):
         self.category = request.GET.get("category")
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -100,7 +103,8 @@ class EditorTableOfContentsSectionView(TemplateView):
         category_names = list(set(
             resource.as_dict().get("category", "")
             for resource in column_metadata
-            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+                and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
         properties = Properties(
@@ -109,15 +113,19 @@ class EditorTableOfContentsSectionView(TemplateView):
             column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
-        form_fields = FormConfig(properties.as_dict()).get_fields()
-        categories = self.toc_class(
+        properties_as_dict = {
+            property_name: metadata
+            for property_name, metadata in properties.as_dict().items()
+            if metadata.category not in self.disabled_categories
+        }
+        form_fields = FormConfig(properties_as_dict).get_fields()
+        categories = EditorTableOfContents(
             self.table_name,
             category_names,
-            {
-                property_name: metadata
-                for property_name, metadata in properties.as_dict().items()
-                if property_name in form_fields
-            }
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in form_fields.values()
+            )
         ).as_dict()
         context.update({
             "toc_list_items": categories,
@@ -132,7 +140,7 @@ class EditorTabSectionView(TemplateView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
-    toc_class = EditorTableOfContents
+    disabled_categories: list[str]
 
     new_one_to_one_relation_reverse_base: str
     update_one_to_one_relation_reverse_base: str
@@ -167,6 +175,8 @@ class EditorTabSectionView(TemplateView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
         # One-to-many fields are handled first, as they are
         # added to the category-based forms before they
         # are generated.
@@ -204,7 +214,7 @@ class EditorTabSectionView(TemplateView):
 
     def initialise_one_to_one_field_forms(self):
         properties_by_fk_tables = dict()
-        for property_name, property_metadata in self.properties.items():
+        for property_name, property_metadata in self.properties_as_dict.items():
             try:
                 xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
             except TypeError:
@@ -230,9 +240,14 @@ class EditorTabSectionView(TemplateView):
 
     def initialise_categorised_forms(self):
         categorised_properties = self._properties.as_categorised_dict()
-        self.properties = dict()
+        categorised_properties = {
+            category: properties
+            for category, properties in categorised_properties.items()
+            if category not in self.disabled_categories
+        }
+        self.properties_as_dict = dict()
         for properties in categorised_properties.values():
-            self.properties.update(properties)
+            self.properties_as_dict.update(properties)
         self.forms_by_category = {
             category: FormWithDynamicallyPopulatedFields(
                 fields=FormConfig(properties).get_fields(),
@@ -246,7 +261,8 @@ class EditorTabSectionView(TemplateView):
         category_names = list(set(
             resource.as_dict().get("category", "")
             for resource in column_metadata
-            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+                and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
         properties = Properties(
@@ -255,15 +271,19 @@ class EditorTabSectionView(TemplateView):
             column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
-        form_fields = FormConfig(properties.as_dict()).get_fields()
-        self.toc_list_items = self.toc_class(
+        properties_as_dict = {
+            property_name: metadata
+            for property_name, metadata in properties.as_dict().items()
+            if metadata.category not in self.disabled_categories
+        }
+        form_fields = FormConfig(properties_as_dict).get_fields()
+        self.toc_list_items = EditorTableOfContents(
             self.table_name,
             category_names,
-            {
-                property_name: metadata
-                for property_name, metadata in properties.as_dict().items()
-                if property_name in form_fields
-            }
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in form_fields.values()
+            )
         ).as_dict()
 
     def get_context_data(self, **kwargs):
@@ -296,6 +316,8 @@ class UpdateResourceByCategoryView(FormView):
     openapi_spec: OpenApiSpecification
     table_name: str
     column_metadata_table_name: str
+    disabled_categories: list[str]
+    
     editor_overview_reverse_base: str
     resource_type_readable: str
 
@@ -309,6 +331,8 @@ class UpdateResourceByCategoryView(FormView):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -359,8 +383,13 @@ class UpdateResourceByCategoryView(FormView):
             column_metadata_endpoint.get_resources(),
             column_metadata_table_name=self.column_metadata_table_name
         )
+        properties_as_dict = {
+            property_name: metadata
+            for property_name, metadata in properties.as_dict().items()
+            if metadata.category not in self.disabled_categories
+        }
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_fields_for_category(self.category),
+            "fields": FormConfig(properties_as_dict).get_fields_for_category(self.category),
         })
         return kwargs
 
@@ -371,7 +400,7 @@ class EditorStartFormView(FormView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
-    toc_class = EditorTableOfContents
+    disabled_categories: list[str]
 
     editor_reverse_base: str
     resource_type_readable: str
@@ -380,6 +409,19 @@ class EditorStartFormView(FormView):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
+        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        properties = Properties(
+            self.table_name,
+            self.api_client.openapi_spec.get_definition(self.table_name),
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name
+        )
+        properties_as_dict = {
+            property_name: metadata
+            for property_name, metadata in properties.as_dict().items()
+            if metadata.category not in self.disabled_categories
+        }
+        self.form_config = FormConfig(properties_as_dict)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -398,31 +440,22 @@ class EditorStartFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
         category_names = list(set(
             resource.as_dict().get("category", "")
-            for resource in column_metadata
-            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            for resource in self.column_metadata
+            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+                and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
-        properties = Properties(
-            self.table_name,
-            self.api_client.openapi_spec.get_definition(self.table_name),
-            column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
-        )
-        form_fields = FormConfig(properties.as_dict()).get_fields()
-        categories = self.toc_class(
+        categories = EditorTableOfContents(
             self.table_name,
             category_names,
-            {
-                property_name: metadata
-                for property_name, metadata in properties.as_dict().items()
-                if property_name in form_fields
-            },
-            add_unknown_category_if_needed=False
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self.form_config.get_fields().values()
+            )
         ).as_dict()
         context.update({
             "toc_list_items": categories,
@@ -432,17 +465,8 @@ class EditorStartFormView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint(
-            "column_metadata"
-        )
-        properties = Properties(
-            self.table_name,
-            self.openapi_spec.get_definition(self.table_name),
-            column_metadata_endpoint.get_resources(),
-            column_metadata_table_name=self.column_metadata_table_name
-        )
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_required_fields(),
+            "fields": self.form_config.get_required_fields(),
         })
         return kwargs
 
@@ -452,7 +476,7 @@ class EditorOverviewTemplateView(TemplateView):
 
     table_name: str
     column_metadata_table_name: str
-    toc_class = EditorTableOfContents
+    disabled_categories: list[str]
 
     editor_reverse_base: str
     resource_type_readable: str
@@ -466,36 +490,40 @@ class EditorOverviewTemplateView(TemplateView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        self.properties = Properties(
+        properties = Properties(
             self.table_name,
             self.api_client.openapi_spec.get_definition(self.table_name),
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
-        self.form_fields = FormConfig(self.properties.as_dict()).get_fields()
+        self.properties_as_dict = {
+            property_name: metadata
+            for property_name, metadata in properties.as_dict().items()
+            if metadata.category not in self.disabled_categories
+        }
+        self.form_fields = FormConfig(self.properties_as_dict).get_fields()
         return super().dispatch(request, *args, **kwargs)
     
     def get_toc(self):
         category_names = list(set(
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
-            if resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+                and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
-        form_fields = FormConfig(self.properties.as_dict()).get_fields()
-        return self.toc_class(
+        return EditorTableOfContents(
             self.table_name,
             category_names,
-            {
-                property_name: metadata
-                for property_name, metadata in self.properties.as_dict().items()
-                if property_name in form_fields
-            }
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self.form_fields.values()
+            )
         ).as_dict()
 
     def format_resource_data_for_template(self) -> dict:
         formatted_resource_data = dict()
-        for property_name, metadata in self.properties.as_dict().items():
+        for property_name, metadata in self.properties_as_dict.items():
             if property_name not in self.form_fields:
                 continue
             value = self.resource.as_dict().get(property_name)
