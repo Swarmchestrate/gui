@@ -1,8 +1,9 @@
 {% extends 'dialog_base.html' %}
+{% load humanise_terms %}
 
 {% block dialog_header_content %}
 <div>
-    Update {{ resource_type_readable|title }} {{ resource_id }}
+    Update {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
 </div>
 {% endblock dialog_header_content %}
 

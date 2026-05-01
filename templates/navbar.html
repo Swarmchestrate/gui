@@ -9,31 +9,26 @@
         <div id="navbar-content" class="collapse navbar-collapse flex-grow-0">
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
-                    {% load readable_text_helpers %}
-                    {% capacity_type_readable_plural as capacity_type_readable_plural %}
+                    {% load humanise_terms %}
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ capacity_type_readable_plural.title }}
+                        {{ 'capacity'|humanise_resource_type_plural|title }}
                     </a>
                     <ul class="dropdown-menu shadow">
                         <li>
-                            {% cloud_capacity_type_readable_plural as cloud_capacity_type_readable_plural %}
-                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacity_list' %}">{{ cloud_capacity_type_readable_plural.title }}</a>
+                            <a class="dropdown-item" href="{% url 'capacities:cloud_capacity_list' %}">{{ 'cloud_capacity'|humanise_resource_type_plural|title }}</a>
                         </li>
                         <li>
-                            {% edge_capacity_type_readable_plural as edge_capacity_type_readable_plural %}
-                            <a class="dropdown-item" href="{% url 'capacities:edge_capacity_list' %}">{{ edge_capacity_type_readable_plural.title }}</a>
+                            <a class="dropdown-item" href="{% url 'capacities:edge_capacity_list' %}">{{ 'edge_capacity'|humanise_resource_type_plural|title }}</a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    {% application_type_readable as application_type_readable %}
-                    {% application_type_readable_plural as application_type_readable_plural %}
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ application_type_readable_plural.title }}
+                        {{ 'application'|humanise_resource_type_plural|title }}
                     </a>
                     <ul class="dropdown-menu shadow">
                         <li>
-                            <a class="dropdown-item" href="{% url 'applications:application_list' %}">{{ application_type_readable_plural.title }}</a>
+                            <a class="dropdown-item" href="{% url 'applications:application_list' %}">{{ 'application'|humanise_resource_type_plural|title }}</a>
                         </li>
                     </ul>
                 </li>

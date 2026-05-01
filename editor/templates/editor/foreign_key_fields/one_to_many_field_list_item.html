@@ -1,7 +1,8 @@
+{% load humanise_terms %}
 <li class="list-group-item">
     <div class="row align-items-center gx-4 gy-3">
         <div class="col-xl-10">
-            {{ resource_type_readable }} {{ resource_id }}
+            {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
             <div class="form-text text-truncate">
                 {% for field in form %}
                 <span class="{% if not forloop.last %}me-2{% endif %}">

@@ -83,6 +83,7 @@ class ResourceListFormView(TemplateView):
             },
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
+            "resource_type": self.resource_type,
         })
         return context
 

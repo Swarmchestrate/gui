@@ -1,12 +1,13 @@
 {% extends 'dialog_base.html' %}
+{% load humanise_terms %}
 
 {% block dialog_header_content %}
-Delete  {{ resource_type_readable_plural|title }}
+Delete {{ resource_type|humanise_resource_type_plural|title }}
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
 <form method="dialog">
-    <p>Are you sure you want to delete these {{ resource_type_readable_plural }}?</p>
+    <p>Are you sure you want to delete these {{ resource_type|humanise_resource_type_plural }}?</p>
     <div class="d-flex flex-sm-row flex-column align-items-sm-start align-items-stretch justify-content-sm-end justify-content-stretch column-gap-2 row-gap-3">
         <button class="btn btn-light flex-grow-1" value="cancel" formmethod="dialog">Cancel</button>
         <div class="d-flex flex-column row-gap-2">

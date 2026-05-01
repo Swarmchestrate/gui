@@ -1,5 +1,4 @@
-{% load readable_text_helpers %}
-{% application_type_readable_plural as page_title %}
-{% with page_title=page_title.title url_name='applications:application_list' %}
+{% load humanise_terms %}
+{% with page_title='application'|humanise_resource_type_plural|title url_name='applications:application_list' %}
 {% include 'breadcrumbs/item_base.html' %}
 {% endwith %}

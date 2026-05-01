@@ -2,6 +2,7 @@ import casefy
 from dateutil import parser
 from django import template
 
+
 register = template.Library()
 
 

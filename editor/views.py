@@ -29,9 +29,7 @@ from postgrest.forms.form_config import (
     Properties,
 )
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.humanise import (
-    humanise_resource_type,
-)
+from utils.humanise import humanise_resource_type
 
 
 logger = logging.getLogger(__name__)
@@ -41,12 +39,12 @@ class EditorSkeletonLoaderView(TemplateView):
     template_name = "editor/editor_base_tabbed.html"
 
     table_name: str
+    resource_type: str
 
     editor_overview_reverse_base: str
     toc_url: str
     tabbed_form_url: str
     tabbed_form_reverse: str
-    resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
@@ -79,6 +77,7 @@ class EditorSkeletonLoaderView(TemplateView):
                 "tabbed_form_url": self.tabbed_form_url,
                 "initial_category": self.category,
                 "toast_template": render_to_string("editor/toast_template.html", {}),
+                "resource_type": self.resource_type,
             }
         )
         return context

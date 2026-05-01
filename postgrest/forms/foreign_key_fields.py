@@ -114,8 +114,7 @@ def get_one_to_one_field_forms(
                     "delete_form": ResourceDeletionForm(
                         initial={"resource_id_to_delete": fk_resource_id}
                     ),
-                    "type_readable": humanise_resource_type(fk_table_endpoint.resource_type),
-                    "type_readable_plural": humanise_resource_type_plural(fk_table_endpoint.resource_type),
+                    "resource_type": fk_table_endpoint.resource_type,
                 },
             })
     return one_to_one_field_metadata
@@ -161,8 +160,7 @@ def get_one_to_many_field_forms(
                     }
                     for fk_resource in fk_resources
                 },
-                "type_readable": humanise_resource_type(fk_table_endpoint.resource_type),
-                "type_readable_plural": humanise_resource_type_plural(fk_table_endpoint.resource_type),
+                "resource_type": fk_table_endpoint.resource_type,
                 "templates": {
                     "update_dialog": render_to_string(
                         "editor/dialogs/update_dialog.html",
@@ -182,7 +180,7 @@ def get_one_to_many_field_forms(
                             ),
                             "dialog_id": f"update-{table_name}-__resource_id__-dialog",
                             "dialog_extra_classes": "col-lg-10",
-                            "resource_type_readable": humanise_resource_type(fk_table_endpoint.resource_type),
+                            "resource_type": fk_table_endpoint.resource_type,
                         },
                         request=request
                     ),
@@ -205,7 +203,7 @@ def get_one_to_many_field_forms(
                             ),
                             "dialog_id": f"delete-{table_name}-__resource_id__-dialog",
                             "dialog_extra_classes": "col-lg-10",
-                            "resource_type_readable": humanise_resource_type(fk_table_endpoint.resource_type),
+                            "resource_type": fk_table_endpoint.resource_type,
                         },
                         request=request
                     ),
@@ -217,7 +215,7 @@ def get_one_to_many_field_forms(
                                 id_suffix="__resource_id__",
                             ),
                             "resource_id": "__resource_id__",
-                            "resource_type_readable": humanise_resource_type(fk_table_endpoint.resource_type),
+                            "resource_type": fk_table_endpoint.resource_type,
                             "field": {"name": table_name},
                         },
                         request=request

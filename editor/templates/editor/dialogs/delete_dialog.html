@@ -1,14 +1,15 @@
 {% extends 'dialog_base.html' %}
+{% load humanise_terms %}
 
 {% block dialog_header_content %}
 <div>
-    Delete {{ resource_type_readable|title }} <span class="dialog-id-to-delete">{{ resource_id }}</span>
+    Delete {{ resource_type|humanise_resource_type|title }} <span class="dialog-id-to-delete">{{ resource_id }}</span>
 </div>
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
 <form method="POST" action="{{ delete_resource_url }}">
-    <p>Are you sure you want to delete this {{ resource_type_readable }}?</p>
+    <p>Are you sure you want to delete this {{ resource_type|humanise_resource_type }}?</p>
     {% csrf_token %}
     {% include 'editor/util_templates/form_errors_list.html' %}
     {{ form }}
