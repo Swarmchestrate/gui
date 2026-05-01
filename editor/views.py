@@ -117,6 +117,13 @@ class EditorTableOfContentsSectionView(TemplateView):
             column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = api_client.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            properties.add_one_to_many_property(table_name)
         properties_as_dict = {
             property_name: metadata
             for property_name, metadata in properties.as_dict().items()
@@ -276,6 +283,13 @@ class EditorTabSectionView(TemplateView):
             column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = self.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            properties.add_one_to_many_property(table_name)
         properties_as_dict = {
             property_name: metadata
             for property_name, metadata in properties.as_dict().items()
@@ -426,6 +440,13 @@ class EditorStartFormView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = self.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            properties.add_one_to_many_property(table_name)
         properties_as_dict = {
             property_name: metadata
             for property_name, metadata in properties.as_dict().items()
@@ -508,6 +529,13 @@ class EditorOverviewTemplateView(TemplateView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
+        referring_tables = self.openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        for table_name in referring_tables.keys():
+            properties.add_one_to_many_property(table_name)
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
         self.properties_as_dict = {

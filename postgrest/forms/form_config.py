@@ -247,7 +247,7 @@ class FormConfig:
                 continue
             field_config_instance = self._get_field_config_instance(name, metadata)
             fields.update({
-                name: field_config_instance.get_field()
+                name: field_config_instance.get_field(),
             })
         return fields
 
