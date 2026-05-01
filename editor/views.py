@@ -29,6 +29,9 @@ from postgrest.forms.form_config import (
     Properties,
 )
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from utils.humanise import (
+    humanise_resource_type,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -43,7 +46,7 @@ class EditorSkeletonLoaderView(TemplateView):
     toc_url: str
     tabbed_form_url: str
     tabbed_form_reverse: str
-    resource_type_readable: str
+    resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
@@ -58,7 +61,9 @@ class EditorSkeletonLoaderView(TemplateView):
         self.tabbed_form_url = reverse_lazy(
             self.tabbed_form_reverse, kwargs={"resource_id": self.resource_id}
         )
-        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -66,7 +71,7 @@ class EditorSkeletonLoaderView(TemplateView):
         context.update(
             {
                 "title": self.title_base,
-                "main_subheading": self.resource_type_readable.title(),
+                "main_subheading": humanise_resource_type(self.resource_type).title(),
                 "main_heading": self.title_base,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
@@ -319,7 +324,7 @@ class UpdateResourceByCategoryView(FormView):
     disabled_categories: list[str]
     
     editor_overview_reverse_base: str
-    resource_type_readable: str
+    resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
@@ -339,7 +344,9 @@ class UpdateResourceByCategoryView(FormView):
                 "resource_id": self.resource_id,
             },
         )
-        self.title_base = f"{self.resource_type_readable.title()} {self.resource_id}"
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -350,7 +357,7 @@ class UpdateResourceByCategoryView(FormView):
                 update_data
             )
         except Exception:
-            error_msg = f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied."
+            error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
             return self.api_invalid()
 
@@ -367,7 +374,7 @@ class UpdateResourceByCategoryView(FormView):
     def api_invalid(self):
         return JsonResponse(
             {
-                "message": f"An error occurred whilst updating {self.resource_type_readable} {self.resource_id}. The update may not have been applied.",
+                "message": f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied.",
             },
             status=HTTPStatus.BAD_REQUEST,
         )
@@ -403,7 +410,7 @@ class EditorStartFormView(FormView):
     disabled_categories: list[str]
 
     editor_reverse_base: str
-    resource_type_readable: str
+    resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
@@ -422,6 +429,8 @@ class EditorStartFormView(FormView):
             if metadata.category not in self.disabled_categories
         }
         self.form_config = FormConfig(properties_as_dict)
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -430,7 +439,7 @@ class EditorStartFormView(FormView):
         ).register(form.cleaned_data)
         messages.success(
             self.request,
-            f"New {self.resource_type_readable} registered.",
+            f"New {humanise_resource_type(self.resource_type)} registered.",
         )
         self.success_url = reverse_lazy(
             self.editor_reverse_base,
@@ -459,7 +468,7 @@ class EditorStartFormView(FormView):
         ).as_dict()
         context.update({
             "toc_list_items": categories,
-            "title": f"New {self.resource_type_readable.title()}",
+            "title": f"New {humanise_resource_type(self.resource_type).title()}",
         })
         return context
 
@@ -479,7 +488,7 @@ class EditorOverviewTemplateView(TemplateView):
     disabled_categories: list[str]
 
     editor_reverse_base: str
-    resource_type_readable: str
+    resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
@@ -496,12 +505,16 @@ class EditorOverviewTemplateView(TemplateView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name
         )
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
         self.properties_as_dict = {
             property_name: metadata
             for property_name, metadata in properties.as_dict().items()
             if metadata.category not in self.disabled_categories
         }
         self.form_fields = FormConfig(self.properties_as_dict).get_fields()
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
     
     def get_toc(self):
@@ -547,9 +560,9 @@ class EditorOverviewTemplateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"{self.resource_type_readable.title()} {self.resource_id} | Overview",
+                "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
                 "main_heading": "Overview",
-                "main_subheading": f"{self.resource_type_readable.title()}",
+                "main_subheading": f"{humanise_resource_type(self.resource_type).title()}",
                 "resource_data_by_category": self.format_resource_data_for_template(),
                 "resource": self.resource.as_dict(),
                 "toc_list_items": self.get_toc(),

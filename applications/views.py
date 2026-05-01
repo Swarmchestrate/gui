@@ -22,8 +22,6 @@ from resource_management.views import (
     ResourceListFormView,
 )
 
-from .utils import application_type_readable, application_type_readable_plural
-
 
 class ApplicationViewMixin:
     editor_reverse_base = "applications:application_editor"
@@ -33,8 +31,6 @@ class ApplicationViewMixin:
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"
     multi_resource_deletion_reverse = "applications:delete_applications"
-    resource_type_readable = application_type_readable()
-    resource_type_readable_plural = application_type_readable_plural()
 
 
 class ApplicationEditorSkeletonLoaderView(ApplicationViewMixin, EditorSkeletonLoaderView):

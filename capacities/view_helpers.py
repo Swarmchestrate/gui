@@ -1,12 +1,5 @@
 from dataclasses import dataclass
 
-from .utils import (
-    cloud_capacity_type_readable,
-    cloud_capacity_type_readable_plural,
-    edge_capacity_type_readable,
-    edge_capacity_type_readable_plural,
-)
-
 
 @dataclass
 class CloudCapacityViewMixin:
@@ -18,8 +11,7 @@ class CloudCapacityViewMixin:
     new_resource_reverse = "capacities:new_cloud_capacity"
     resource_deletion_reverse = "capacities:delete_cloud_capacity"
     multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"
-    resource_type_readable = cloud_capacity_type_readable()
-    resource_type_readable_plural = cloud_capacity_type_readable_plural()
+    resource_type = "cloud_capacity"
 
 
 @dataclass
@@ -31,5 +23,4 @@ class EdgeCapacityViewMixin:
     new_resource_reverse = "capacities:new_edge_capacity"
     resource_deletion_reverse = "capacities:delete_edge_capacity"
     multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
-    resource_type_readable = edge_capacity_type_readable()
-    resource_type_readable_plural = edge_capacity_type_readable_plural()
+    resource_type = "edge_capacity"
