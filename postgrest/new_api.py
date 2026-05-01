@@ -214,6 +214,23 @@ class Endpoint:
             for resource_unformatted in response.json()
         ]
 
+    def get_resources_by_type(self, type: str, params: dict | None = None) -> list[Resource]:
+        if not params:
+            params = dict()
+        params.update({
+            "resource_type": f"eq.{type}"
+        })
+        response = requests.get(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+        return [
+            Resource(
+                resource_unformatted,
+                self.resource_type,
+                self.definition.pk_column_name
+            )
+            for resource_unformatted in response.json()
+        ]
+
     def get_resources_referencing_resource_id(
             self,
             column_name: str,

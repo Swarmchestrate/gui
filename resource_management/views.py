@@ -28,10 +28,8 @@ class ResourceListContextMixin(ContextMixin):
 
 class ResourceListFormView(TemplateView):
     template_name = "resource_management/resource_list.html"
-    resource_deletion_form_class: type[ResourceDeletionForm] = ResourceDeletionForm
-    multi_resource_deletion_form_class: type[MultiResourceDeletionForm] = (
-        MultiResourceDeletionForm
-    )
+    resource_deletion_form_class = ResourceDeletionForm
+    multi_resource_deletion_form_class = MultiResourceDeletionForm
 
     table_name: str
     resource_type_readable_plural: str
@@ -43,11 +41,13 @@ class ResourceListFormView(TemplateView):
     editor_reverse_base: str
     editor_overview_reverse_base: str
 
-    def dispatch(self, request, *args, **kwargs):
+    def get_resource_list(self):
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
-        resource_endpoint = api_client.get_endpoint(self.table_name)
-        self.resource_list = resource_endpoint.get_resources()
+        return api_client.get_endpoint(self.table_name).get_resources()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_list = self.get_resource_list()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

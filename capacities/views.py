@@ -13,6 +13,7 @@ from editor.views import (
     EditorTabSectionView,
     UpdateResourceByCategoryView,
 )
+from postgrest.new_api import ApiClient
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -85,6 +86,11 @@ class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
     table_name = "capacity_new"
 
+    def get_resource_list(self):
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        return api_client.get_endpoint("capacity_new").get_resources_by_type("Cloud")
+
 
 # Edge Capacity views (EC)
 class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeletonLoaderView):
@@ -150,3 +156,8 @@ class MultiEdgeCapacityDeletionFormView(EdgeCapacityViewMixin, MultiResourceDele
 class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
     table_name = "capacity_new"
+
+    def get_resource_list(self):
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        return api_client.get_endpoint("capacity_new").get_resources_by_type("Edge")
