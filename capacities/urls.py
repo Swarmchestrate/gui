@@ -1,131 +1,129 @@
 from django.urls import path
 
-from .views import (
-    cloud_capacity_views,
-    edge_capacity_views,
-)
+from . import views
+from . import foreign_key_views
 
 app_name = "capacities"
 
 urlpatterns = [
     path(
         "cloud-capacities/",
-        cloud_capacity_views.CloudCapacityListFormView.as_view(),
+        views.CloudCapacityListFormView.as_view(),
         name="cloud_capacity_list",
     ),
     path(
         "cloud-capacities/new/",
-        cloud_capacity_views.CloudCapacityEditorStartFormView.as_view(),
+        views.CloudCapacityEditorStartFormView.as_view(),
         name="new_cloud_capacity",
     ),
     path(
         "cloud-capacities/deletes/",
-        cloud_capacity_views.MultiCloudCapacityDeletionFormView.as_view(),
+        views.MultiCloudCapacityDeletionFormView.as_view(),
         name="delete_cloud_capacities",
     ),
     path(
         "cloud-capacities/api/editor-toc/",
-        cloud_capacity_views.CloudCapacityEditorTableOfContentsView.as_view(),
+        views.CloudCapacityEditorTableOfContentsView.as_view(),
         name="cloud_capacity_editor_toc",
     ),
     path(
         "cloud-capacities/api/<resource_id>/editor/",
-        cloud_capacity_views.CloudCapacityEditorTabSectionView.as_view(),
+        views.CloudCapacityEditorTabSectionView.as_view(),
         name="cloud_capacity_editor_tabbed_form",
     ),
     path(
         "cloud-capacities/api/<resource_id>/edit/",
-        cloud_capacity_views.UpdateCloudCapacityByCategoryView.as_view(),
+        views.UpdateCloudCapacityByCategoryView.as_view(),
         name="update_cloud_capacity_by_category",
     ),
     path(
         "cloud-capacities/<resource_id>/overview/",
-        cloud_capacity_views.CloudCapacityEditorOverviewTemplateView.as_view(),
+        views.CloudCapacityEditorOverviewTemplateView.as_view(),
         name="cloud_capacity_overview",
     ),
     path(
         "cloud-capacities/<resource_id>/edit/",
-        cloud_capacity_views.CloudCapacityEditorSkeletonLoaderView.as_view(),
+        views.CloudCapacityEditorSkeletonLoaderView.as_view(),
         name="cloud_capacity_editor",
     ),
     path(
         "cloud-capacities/<resource_id>/delete/",
-        cloud_capacity_views.CloudCapacityDeletionFormView.as_view(),
+        views.CloudCapacityDeletionFormView.as_view(),
         name="delete_cloud_capacity",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/new/",
-        cloud_capacity_views.CloudCapacityNewOneToOneRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityNewOneToOneRelationFormView.as_view(),
         name="new_cloud_capacity_one_to_one_relation",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/",
-        cloud_capacity_views.CloudCapacityUpdateOneToOneRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityUpdateOneToOneRelationFormView.as_view(),
         name="update_cloud_capacity_one_to_one_relation",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/delete/",
-        cloud_capacity_views.CloudCapacityDeleteOneToOneRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityDeleteOneToOneRelationFormView.as_view(),
         name="delete_cloud_capacity_one_to_one_relation",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/new/",
-        cloud_capacity_views.CloudCapacityNewOneToManyRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityNewOneToManyRelationFormView.as_view(),
         name="new_cloud_capacity_one_to_many_relation",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/",
-        cloud_capacity_views.CloudCapacityUpdateOneToManyRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityUpdateOneToManyRelationFormView.as_view(),
         name="update_cloud_capacity_one_to_many_relation",
     ),
     path(
         "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
-        cloud_capacity_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
+        foreign_key_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
         name="delete_cloud_capacity_one_to_many_relation",
     ),
     path(
         "edge-capacities/",
-        edge_capacity_views.EdgeCapacityListFormView.as_view(),
+        views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",
     ),
     path(
         "edge-capacities/new/",
-        edge_capacity_views.EdgeCapacityEditorStartFormView.as_view(),
+        views.EdgeCapacityEditorStartFormView.as_view(),
         name="new_edge_capacity",
     ),
     path(
         "edge-capacities/deletes/",
-        edge_capacity_views.MultiEdgeCapacityDeletionFormView.as_view(),
+        views.MultiEdgeCapacityDeletionFormView.as_view(),
         name="delete_edge_capacities",
     ),
     path(
         "edge-capacities/<resource_id>/overview/",
-        edge_capacity_views.EdgeCapacityEditorOverviewTemplateView.as_view(),
+        views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
     ),
     path(
         "edge-capacities/api/editor-toc/",
-        edge_capacity_views.EdgeCapacityTableOfContentsView.as_view(),
+        views.EdgeCapacityTableOfContentsView.as_view(),
         name="edge_capacity_editor_toc",
     ),
     path(
         "edge-capacities/api/<resource_id>/editor/",
-        edge_capacity_views.EdgeCapacityEditorTabSectionView.as_view(),
+        views.EdgeCapacityEditorTabSectionView.as_view(),
         name="edge_capacity_editor_tabbed_form",
     ),
     path(
         "edge-capacities/api/<resource_id>/edit/",
-        edge_capacity_views.UpdateEdgeCapacityByCategoryView.as_view(),
+        views.UpdateEdgeCapacityByCategoryView.as_view(),
         name="update_edge_capacity_by_category",
     ),
     path(
         "edge-capacities/<resource_id>/edit/",
-        edge_capacity_views.EdgeCapacityEditorSkeletonLoaderView.as_view(),
+        views.EdgeCapacityEditorSkeletonLoaderView.as_view(),
         name="edge_capacity_editor",
     ),
     path(
         "edge-capacities/<resource_id>/delete/",
-        edge_capacity_views.EdgeCapacityDeletionFormView.as_view(),
+        views.EdgeCapacityDeletionFormView.as_view(),
         name="delete_edge_capacity",
     ),
 ]

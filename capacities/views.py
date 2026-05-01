@@ -1,18 +1,10 @@
 from django.urls import reverse_lazy
 
-from capacities.utils import (
-    edge_capacity_type_readable,
-    edge_capacity_type_readable_plural,
+from .view_helpers import (
+    CloudCapacityViewMixin,
+    EdgeCapacityViewMixin,
 )
-from capacities.view_helpers import EdgeCapacityEditorTableOfContents
-from editor.foreign_key_views import (
-    DeleteOneToManyRelationFormView,
-    DeleteOneToOneRelationFormView,
-    NewOneToManyRelationFormView,
-    NewOneToOneRelationFormView,
-    UpdateOneToManyRelationFormView,
-    UpdateOneToOneRelationFormView,
-)
+
 from editor.views import (
     EditorOverviewTemplateView,
     EditorSkeletonLoaderView,
@@ -21,7 +13,6 @@ from editor.views import (
     EditorTabSectionView,
     UpdateResourceByCategoryView,
 )
-
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -29,19 +20,73 @@ from resource_management.views import (
 )
 
 
-# Edge Capacity
-class EdgeCapacityViewMixin:
-    editor_reverse_base = "capacities:edge_capacity_editor"
-    editor_start_reverse_base = "capacities:new_edge_capacity"
-    editor_overview_reverse_base = "capacities:edge_capacity_overview"
-    resource_list_reverse = "capacities:edge_capacity_list"
-    new_resource_reverse = "capacities:new_edge_capacity"
-    resource_deletion_reverse = "capacities:delete_edge_capacity"
-    multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
-    resource_type_readable = edge_capacity_type_readable()
-    resource_type_readable_plural = edge_capacity_type_readable_plural()
+# Cloud Capacity (CC)
+class CloudCapacityEditorSkeletonLoaderView(CloudCapacityViewMixin, EditorSkeletonLoaderView):
+    table_name = "capacity_new"
+    template_name = "capacities/cloud_capacity_editor.html"
+    success_url = reverse_lazy("capacities:new_cloud_capacity")
+    toc_url = reverse_lazy("capacities:cloud_capacity_editor_toc")
+    tabbed_form_reverse = "capacities:cloud_capacity_editor_tabbed_form"
 
 
+class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
+
+
+class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSectionView):
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
+    editor_form_reverse = "capacities:update_cloud_capacity_by_category"
+    new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
+    update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
+    delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
+    new_one_to_many_relation_reverse_base = "capacities:new_cloud_capacity_one_to_many_relation"
+    update_one_to_many_relation_reverse_base = "capacities:update_cloud_capacity_one_to_many_relation"
+    delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
+
+
+class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
+
+
+class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
+    template_name = "capacities/new_cloud_capacity_start.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
+
+
+class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
+    template_name = "capacities/cloud_capacity_overview.html"
+    table_name = "capacity_new"
+    column_metadata_table_name = "capacity"
+    disabled_categories = ["Edge Specific", "Networking"]
+
+
+# Resource management views (CC)
+class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
+    template_name = "capacities/cloud_capacities.html"
+    success_url = reverse_lazy("capacities:delete_cloud_capacities")
+    table_name = "capacity_new"
+
+
+class MultiCloudCapacityDeletionFormView(CloudCapacityViewMixin, MultiResourceDeletionFormView):
+    template_name = "capacities/cloud_capacities.html"
+    success_url = reverse_lazy("capacities:delete_cloud_capacities")
+    table_name = "capacity_new"
+
+
+class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
+    template_name = "capacities/cloud_capacities.html"
+    table_name = "capacity_new"
+
+
+# Edge Capacity views (EC)
 class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeletonLoaderView):
     table_name = "capacity_new"
     template_name = "capacities/edge_capacity_editor.html"
@@ -89,6 +134,7 @@ class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOvervi
     disabled_categories = ["System Specific"]
 
 
+# Resource management views (EC)
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
     template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
