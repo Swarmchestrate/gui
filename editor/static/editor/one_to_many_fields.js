@@ -240,10 +240,12 @@ class OneToManyFieldListItem {
     setupDeleteDialog() {
         new FormDialog(
             this.deleteDialogElement,
-            [this.deleteDialogElement.querySelector(".btn-close")],
+            [
+                this.deleteDialogElement.querySelector(".btn-close"),
+                this.deleteDialogElement.querySelector("button[value='cancel']"),
+            ],
             [this.deleteDialogButton],
             {
-                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.removeListItem();
                 },

@@ -170,10 +170,12 @@ class OneToOneField {
     setupDeleteDialog() {
         new FormDialog(
             this.deleteDialogElement,
-            [this.deleteDialogElement.querySelector(".btn-close")],
+            [
+                this.deleteDialogElement.querySelector(".btn-close"),
+                this.deleteDialogElement.querySelector("button[value='cancel']"),
+            ],
             [this.deleteDialogButton],
             {
-                lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.newDialogButton.classList.remove("d-none");
                     this.updateDialogButton.classList.add("d-none");
