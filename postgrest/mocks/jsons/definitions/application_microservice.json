@@ -3,7 +3,7 @@
     "required": ["id", "container_image"],
     "properties": {
         "application_id": {
-            "description": "Note:\nThis is a Foreign Key to `application.application_id`.<fk table='application' column='application_id'/>",
+            "description": "Note:\nThis is a Foreign Key to `application_new.application_id`.<fk table='application_new' column='application_id'/>",
             "format": "integer",
             "type": "integer"
         },

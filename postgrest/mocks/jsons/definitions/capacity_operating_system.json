@@ -7,7 +7,7 @@
             "type": "integer"
         },
         "capacity_id": {
-            "description": "Note:\nThis is a Foreign Key to `capacity.capacity_id`.<fk table='capacity' column='capacity_id'/>",
+            "description": "Note:\nThis is a Foreign Key to `capacity_new.capacity_id`.<fk table='capacity_new' column='capacity_id'/>",
             "format": "integer",
             "type": "integer"
         },
