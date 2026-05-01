@@ -1,4 +1,5 @@
 {% load helpers %}
+{% load humanise_terms %}
 <div
     class="tab-pane {% if category == initial_category %}show active{% elif not initial_category and not category_data.previous %}show active{% endif %}"
     id="{{ category_id_base }}-tab-pane"
@@ -12,7 +13,7 @@
             <h2 class="fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
             {% url editor_overview_reverse_base resource_id as overview_url %}
             <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
-                Go to Overview
+                {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
                     <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
                 </svg>

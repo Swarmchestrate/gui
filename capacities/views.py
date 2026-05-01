@@ -40,6 +40,7 @@ class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSection
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     disabled_categories = ["Edge Specific", "Networking"]
+    resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
@@ -111,6 +112,7 @@ class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionVi
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     disabled_categories = ["System Specific"]
+    resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
     new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"

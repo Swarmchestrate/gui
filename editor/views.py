@@ -145,6 +145,7 @@ class EditorTabSectionView(TemplateView):
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
     disabled_categories: list[str]
+    resource_type: str
 
     new_one_to_one_relation_reverse_base: str
     update_one_to_one_relation_reverse_base: str
@@ -292,6 +293,8 @@ class EditorTabSectionView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
         context.update(
             {
                 "resource": self.resource,
@@ -300,6 +303,7 @@ class EditorTabSectionView(TemplateView):
                 "forms_by_category": self.forms_by_category,
                 "editor_form_url": self.editor_form_url,
                 "toc_list_items": self.toc_list_items,
+                "resource_type": self.resource_type,
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "one_to_one_field_metadata": self.one_to_one_field_metadata,
                 "one_to_many_field_metadata": self.one_to_many_field_metadata,
