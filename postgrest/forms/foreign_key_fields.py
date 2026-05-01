@@ -6,10 +6,6 @@ from .form_config import FormConfig, Properties
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from postgrest.new_api import ApiClient, OpenApiSpecification, Resource
 from resource_management.forms import ResourceDeletionForm
-from utils.humanise import (
-    humanise_resource_type,
-    humanise_resource_type_plural,
-)
 
 
 def get_foreign_key_form_configs(
@@ -115,6 +111,7 @@ def get_one_to_one_field_forms(
                         initial={"resource_id_to_delete": fk_resource_id}
                     ),
                     "resource_type": fk_table_endpoint.resource_type,
+                    "existing_resource_id": fk_resource_id,
                 },
             })
     return one_to_one_field_metadata

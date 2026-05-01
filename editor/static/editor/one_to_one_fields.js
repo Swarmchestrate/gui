@@ -1,4 +1,5 @@
 import { FormDialog } from "/static/editor/form_dialog.js";
+import { displayToast } from "/static/editor/toasts.js";
 
 class OneToOneField {
     constructor(oneToOneField) {
@@ -32,6 +33,7 @@ class OneToOneField {
             `#${this.deleteDialogButton.dataset.dialogId}`,
         );
         this.deleteDialogForm = this.deleteDialogElement.querySelector("form");
+        this.resourceType = this.oneToOneField.dataset.resourceType;
     }
 
     setupDialogs() {
@@ -87,6 +89,7 @@ class OneToOneField {
                     this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']",
                     ).value = responseData.resource.pk;
+                    displayToast(`Registered ${this.resourceType} ${responseData.resource.pk}.`);
                 },
             },
             this.newDialogForm,
@@ -161,6 +164,7 @@ class OneToOneField {
                         }
                     }
                     this.updateDialogForm.reset();
+                    displayToast(`Updated ${this.resourceType} ${responseData.resource.pk}.`);
                 },
             },
             this.updateDialogForm,
@@ -203,6 +207,9 @@ class OneToOneField {
                     ).forEach((element) => {
                         element.textContent = "None";
                     });
+                    displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
+                        "[name='resource_id_to_delete']"
+                    ).value}.`);
                 },
             },
             this.deleteDialogForm,

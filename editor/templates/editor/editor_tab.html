@@ -25,12 +25,12 @@
     {% endwith %}
     {# Update dialogs #}
     {% url update_one_to_one_relation_reverse_base resource_id field_name as update_resource_url %}
-    {% with form=field_metadata.update_form dialog_id='update-'|add:field_name|add:'-dialog' resource_type=field_metadata.resource_type %}
+    {% with form=field_metadata.update_form dialog_id='update-'|add:field_name|add:'-dialog' resource_type=field_metadata.resource_type resource_id=field_metadata.existing_resource_id %}
     {% include 'editor/dialogs/update_dialog.html' %}
     {% endwith %}
     {# Delete dialogs #}
     {% url delete_one_to_one_relation_reverse_base resource_id field_name as delete_resource_url %}
-    {% with form=field_metadata.delete_form dialog_id='delete-'|add:field_name|add:'-dialog' resource_type=field_metadata.resource_type %}
+    {% with form=field_metadata.delete_form dialog_id='delete-'|add:field_name|add:'-dialog' resource_type=field_metadata.resource_type resource_id=field_metadata.existing_resource_id %}
     {% include 'editor/dialogs/delete_dialog.html' %}
     {% endwith %}
     {% endfor %}

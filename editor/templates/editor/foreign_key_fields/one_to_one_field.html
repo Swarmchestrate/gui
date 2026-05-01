@@ -1,4 +1,5 @@
-<section class="one-to-one-field py-4">
+{% load humanise_terms %}
+<section class="one-to-one-field py-4" data-resource-type="{{ field_metadata.resource_type|humanise_resource_type|title }}">
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
     <div class="d-flex flex-column align-items-start row-gap-3">
         <div class="w-100 rounded border p-3">
@@ -24,7 +25,6 @@
                         class="btn btn-light new-dialog-btn {% if field.value %}d-none{% endif %}"
                         type="button"
                         data-dialog-id="new-{{ field.name }}-dialog">
-                        {% load humanise_terms %}
                         Add {{ field_metadata.resource_type|humanise_resource_type|title }}
                     </button>
                     <button

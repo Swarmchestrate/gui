@@ -4,10 +4,7 @@ import { getEditorTabbedFormHtml } from "/static/editor/editor_tabbed_form.js";
 import { getEditorTocHtml } from "/static/editor/editor_toc.js";
 import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
 import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
-import {
-    displayToast,
-    displayToastUntilDismissed,
-} from "/static/editor/toasts.js";
+import { displayToast } from "/static/editor/toasts.js";
 
 const editorTocWrapper = document.querySelector(".editor-layout__toc");
 const editorTabbedFormWrapper = document.querySelector(".editor-layout__body");
