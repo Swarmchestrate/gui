@@ -240,7 +240,12 @@ class Endpoint:
             params = dict()
         params.update({column_name: f"eq.{int(resource_id)}"})
         response = requests.get(self.endpoint_url, params=params)
-        self.log_and_raise_response_status_if_error(response)
+        try:
+            self.log_and_raise_response_status_if_error(response)
+        except Exception:
+            # Return an empty list so the wizard can continue
+            # rendering.
+            return []
         return [
             Resource(
                 resource_unformatted,
@@ -338,7 +343,7 @@ class OpenApiSpecification:
             )
             if fk_column_name_referencing_table:
                 references.update({
-                    definition_name: fk_column_name_referencing_table,
+                    definition_name: fk_column_name_referencing_table.get("column_name"),
                 })
                 continue
             if not possible_column_name:
