@@ -485,10 +485,7 @@ class EditorStartFormView(FormView):
         categories = EditorTableOfContents(
             self.table_name,
             category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in self.form_config.get_fields().values()
-            )
+            is_unknown_category_needed=False
         ).as_dict()
         context.update({
             "toc_list_items": categories,
