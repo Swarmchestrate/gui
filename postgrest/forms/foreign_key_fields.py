@@ -1,9 +1,10 @@
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 
-from .form_config import FormConfig, Properties
+from .form_config import FormConfig
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
+from editor.view_helpers import get_form_config_for_table
 from postgrest.new_api import ApiClient, OpenApiSpecification, Resource
 from resource_management.forms import ResourceDeletionForm
 
@@ -20,8 +21,8 @@ def get_foreign_key_form_configs(
     Args:
         table_names (list[str]): The names of the
         tables for the foreign key fields.
-        openapi_spec (dict): The OpenAPI 2.0 spec to
-        pass to the Properties class.
+        openapi_spec (dict): The OpenAPI 2.0 specification
+        to obtain the table definition from.
         column_metadata (list[dict]): The list of
         records from the column_metadata table to pass
         to the Properties class.
@@ -37,23 +38,20 @@ def get_foreign_key_form_configs(
     if not disabled_property_names:
         disabled_property_names = list()
     for table_name in table_names:
-        properties = Properties(
-            table_name,
-            openapi_spec.get_definition(table_name),
-            column_metadata,
-        )
         form_configs.update({
-            table_name: FormConfig(
-                properties.as_dict(),
-                extra_disabled_properties=disabled_property_names
+            table_name: get_form_config_for_table(
+                table_name,
+                openapi_spec,
+                column_metadata,
+                infer_one_to_many_properties=False,
+                disabled_properties=disabled_property_names
             ),
         })
     return form_configs
 
 
 def get_new_one_to_one_field_forms(
-        form_config: FormConfig
-    ) -> dict[str, ForeignKeyFormWithDynamicallyPopulatedFields]:
+        form_config: FormConfig) -> dict[str, ForeignKeyFormWithDynamicallyPopulatedFields]:
     return ForeignKeyFormWithDynamicallyPopulatedFields(
         fields=form_config.get_fields(),
         id_prefix='new'

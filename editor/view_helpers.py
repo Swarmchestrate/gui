@@ -1,7 +1,7 @@
 from postgrest.forms.form_config import (
     ColumnMetadata,
-    NewFormConfig,
-    NewProperties,
+    FormConfig,
+    Properties,
     OneToManyProperties,
 )
 from postgrest.new_api import OpenApiSpecification, Resource
@@ -152,9 +152,10 @@ def get_form_config_for_table(
         table_name: str,
         openapi_spec: OpenApiSpecification,
         column_metadata_as_list: list[Resource],
+        infer_one_to_many_properties: bool = True,
         column_metadata_table_name: str = None,
         disabled_categories: list[str] = None,
-        disabled_properties: list[str] = None) -> NewFormConfig:
+        disabled_properties: list[str] = None) -> FormConfig:
     if not column_metadata_table_name:
         column_metadata_table_name = table_name
     if not disabled_categories:
@@ -162,7 +163,7 @@ def get_form_config_for_table(
     if not disabled_properties:
         disabled_properties = list()
     column_metadata = ColumnMetadata(column_metadata_as_list)
-    properties = NewProperties(
+    properties = Properties(
         table_name,
         openapi_spec.get_definition(table_name),
         column_metadata,
@@ -174,17 +175,19 @@ def get_form_config_for_table(
         if metadata.category not in disabled_categories
     }
     possible_fk_table_column_name = f'{column_metadata_table_name}_id'
-    referring_tables = openapi_spec.find_references_to_table(
-        table_name,
-        possible_column_name=possible_fk_table_column_name
-    )
-    referring_tables.pop(table_name)
+    referring_tables = dict()
+    if infer_one_to_many_properties:
+        referring_tables = openapi_spec.find_references_to_table(
+            table_name,
+            possible_column_name=possible_fk_table_column_name
+        )
+        referring_tables.pop(table_name, None)
     one_to_many_properties = OneToManyProperties(
         table_name,
         list(referring_tables.keys()),
         column_metadata
     )
-    return NewFormConfig(
+    return FormConfig(
         properties_as_dict,
         one_to_many_properties=one_to_many_properties.as_dict(),
         extra_disabled_properties=disabled_properties

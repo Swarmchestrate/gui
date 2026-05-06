@@ -1,12 +1,13 @@
 import logging
+from http import HTTPStatus
+
 from django.contrib import messages
-from django.views.generic import FormView, View
+from django.views.generic import FormView
 from django.http import JsonResponse
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from http import HTTPStatus
+from editor.view_helpers import get_form_config_for_table
 from postgrest.new_api import ApiClient, Resource
-from postgrest.forms.form_config import FormConfig, Properties
 from resource_management.forms import ResourceDeletionForm
 
 
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 # E.g., A cloud capacity (locality_id) -> locality.
 class NewOneToOneRelationFormView(FormView):
     table_name: str
+    fk_table_name: str
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
 
     def dispatch(self, request, *args, **kwargs):
@@ -66,13 +68,14 @@ class NewOneToOneRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        properties = Properties(
+        form_config = get_form_config_for_table(
             self.fk_table_name,
-            self.api_client.openapi_spec.get_definition(self.fk_table_name),
-            column_metadata_endpoint.get_resources()
+            self.api_client.openapi_spec,
+            column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False
         )
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_fields(),
+            "fields": form_config.get_fields(),
         })
         return kwargs
 
@@ -120,13 +123,14 @@ class UpdateOneToOneRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        properties = Properties(
+        form_config = get_form_config_for_table(
             self.fk_table_name,
-            self.api_client.openapi_spec.get_definition(self.fk_table_name),
-            column_metadata_endpoint.get_resources()
+            self.api_client.openapi_spec,
+            column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False
         )
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_fields(),
+            "fields": form_config.get_fields(),
         })
         return kwargs
 
@@ -227,13 +231,14 @@ class NewOneToManyRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        properties = Properties(
+        form_config = get_form_config_for_table(
             self.fk_table_name,
-            self.api_client.openapi_spec.get_definition(self.fk_table_name),
-            column_metadata_endpoint.get_resources()
+            self.api_client.openapi_spec,
+            column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False
         )
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_fields(),
+            "fields": form_config.get_fields(),
         })
         return kwargs
 
@@ -300,13 +305,14 @@ class UpdateOneToManyRelationFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        properties = Properties(
+        form_config = get_form_config_for_table(
             self.fk_table_name,
-            self.api_client.openapi_spec.get_definition(self.fk_table_name),
-            column_metadata_endpoint.get_resources()
+            self.api_client.openapi_spec,
+            column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False
         )
         kwargs.update({
-            "fields": FormConfig(properties.as_dict()).get_fields(),
+            "fields": form_config.get_fields(),
         })
         return kwargs
 
