@@ -1,3 +1,10 @@
+from postgrest.forms.form_config import (
+    ColumnMetadata,
+    NewFormConfig,
+    NewProperties,
+    OneToManyProperties,
+)
+from postgrest.new_api import OpenApiSpecification, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
@@ -139,3 +146,46 @@ class EditorTableOfContents:
             table_of_contents.update({UNKNOWN_ATTRIBUTE_CATEGORY: uncategorised_metadata})
             # self.category_names.append(UNKNOWN_ATTRIBUTE_CATEGORY)
         return table_of_contents
+
+
+def get_form_config_for_table(
+        table_name: str,
+        openapi_spec: OpenApiSpecification,
+        column_metadata_as_list: list[Resource],
+        column_metadata_table_name: str = None,
+        disabled_categories: list[str] = None,
+        disabled_properties: list[str] = None) -> NewFormConfig:
+    if not column_metadata_table_name:
+        column_metadata_table_name = table_name
+    if not disabled_categories:
+        disabled_categories = list()
+    if not disabled_properties:
+        disabled_properties = list()
+    column_metadata = ColumnMetadata(column_metadata_as_list)
+    properties = NewProperties(
+        table_name,
+        openapi_spec.get_definition(table_name),
+        column_metadata,
+        column_metadata_table_name=column_metadata_table_name
+    )
+    properties_as_dict = {
+        property_name: metadata
+        for property_name, metadata in properties.as_dict().items()
+        if metadata.category not in disabled_categories
+    }
+    possible_fk_table_column_name = f'{column_metadata_table_name}_id'
+    referring_tables = openapi_spec.find_references_to_table(
+        table_name,
+        possible_column_name=possible_fk_table_column_name
+    )
+    referring_tables.pop(table_name)
+    one_to_many_properties = OneToManyProperties(
+        table_name,
+        list(referring_tables.keys()),
+        column_metadata
+    )
+    return NewFormConfig(
+        properties_as_dict,
+        one_to_many_properties=one_to_many_properties.as_dict(),
+        extra_disabled_properties=disabled_properties
+    )

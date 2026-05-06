@@ -15,18 +15,16 @@ from django.views.generic import (
 from .forms import FormWithDynamicallyPopulatedFields
 from .view_helpers import EditorTableOfContents
 
-from postgrest.new_api import (
-    ApiClient,
-    OpenApiSpecification,
-)
+from editor.view_helpers import get_form_config_for_table
 from postgrest.forms.foreign_key_fields import (
     get_foreign_key_form_configs,
     get_one_to_many_field_forms,
     get_one_to_one_field_forms,
 )
-from postgrest.forms.form_config import (
-    FormConfig,
-    Properties,
+from postgrest.new_api import (
+    ApiClient,
+    OpenApiSpecification,
+    Resource,
 )
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type
@@ -111,26 +109,15 @@ class EditorTableOfContentsSectionView(TemplateView):
                 and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
-        properties = Properties(
+        form_config = get_form_config_for_table(
             self.table_name,
-            api_client.openapi_spec.get_definition(self.table_name),
+            api_client.openapi_spec,
             column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
         )
-        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
-        referring_tables = api_client.openapi_spec.find_references_to_table(
-            self.table_name,
-            possible_column_name=possible_fk_table_column_name
-        )
-        for table_name in referring_tables.keys():
-            properties.add_one_to_many_property(table_name)
-        properties_as_dict = {
-            property_name: metadata
-            for property_name, metadata in properties.as_dict().items()
-            if metadata.category not in self.disabled_categories
-        }
-        form_fields = FormConfig(properties_as_dict).get_fields()
-        categories = EditorTableOfContents(
+        form_fields = form_config.get_fields()
+        toc_list_items = EditorTableOfContents(
             self.table_name,
             category_names,
             is_unknown_category_needed=any(
@@ -139,7 +126,7 @@ class EditorTableOfContentsSectionView(TemplateView):
             )
         ).as_dict()
         context.update({
-            "toc_list_items": categories,
+            "toc_list_items": toc_list_items,
             "initial_category": self.category,
         })
         return context
@@ -151,6 +138,8 @@ class EditorTabSectionView(TemplateView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
+    column_metadata: list[Resource]
+    referring_tables: dict[str, str]
     disabled_categories: list[str]
     resource_type: str
 
@@ -181,14 +170,15 @@ class EditorTabSectionView(TemplateView):
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
         self.column_metadata = column_metadata_endpoint.get_resources()
-        self._properties = Properties(
-            self.table_name,
-            self.openapi_spec.get_definition(self.table_name),
-            self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
-        )
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
+        self.form_config = get_form_config_for_table(
+            self.table_name,
+            self.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
+        )
         # One-to-many fields are handled first, as they are
         # added to the category-based forms before they
         # are generated.
@@ -204,8 +194,6 @@ class EditorTabSectionView(TemplateView):
             self.table_name,
             possible_column_name=possible_fk_table_column_name
         )
-        for table_name in referring_tables.keys():
-            self._properties.add_one_to_many_property(table_name)
         form_configs = get_foreign_key_form_configs(
             referring_tables.keys(),
             self.openapi_spec,
@@ -224,9 +212,29 @@ class EditorTabSectionView(TemplateView):
             self.delete_one_to_many_relation_reverse_base
         )
 
+    def initialise_categorised_forms(self):
+        self.forms_by_category = dict()
+        for category in self.form_config.get_field_categories():
+            if category in self.disabled_categories:
+                continue
+            if not category:
+                self.forms_by_category.update({
+                UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
+                        fields=self.form_config.get_fields_for_category(category),
+                        initial=self.resource.as_dict(),
+                    )
+                })
+                continue
+            self.forms_by_category.update({
+                category: FormWithDynamicallyPopulatedFields(
+                    fields=self.form_config.get_fields_for_category(category),
+                    initial=self.resource.as_dict(),
+                )
+            })
+
     def initialise_one_to_one_field_forms(self):
         properties_by_fk_tables = dict()
-        for property_name, property_metadata in self.properties_as_dict.items():
+        for property_name, property_metadata in self.form_config.get_properties().items():
             try:
                 xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
             except TypeError:
@@ -249,24 +257,6 @@ class EditorTabSectionView(TemplateView):
             form_configs,
             properties_by_fk_tables
         )
-
-    def initialise_categorised_forms(self):
-        categorised_properties = self._properties.as_categorised_dict()
-        categorised_properties = {
-            category: properties
-            for category, properties in categorised_properties.items()
-            if category not in self.disabled_categories
-        }
-        self.properties_as_dict = dict()
-        for properties in categorised_properties.values():
-            self.properties_as_dict.update(properties)
-        self.forms_by_category = {
-            category: FormWithDynamicallyPopulatedFields(
-                fields=FormConfig(properties).get_fields(),
-                initial=self.resource.as_dict(),
-            )
-            for category, properties in categorised_properties.items()
-        }
     
     def initialise_toc_list_items(self):
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
@@ -277,25 +267,7 @@ class EditorTabSectionView(TemplateView):
                 and resource.as_dict().get("category", "") not in self.disabled_categories)
         ))
         category_names.sort()
-        properties = Properties(
-            self.table_name,
-            self.api_client.openapi_spec.get_definition(self.table_name),
-            column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
-        )
-        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
-        referring_tables = self.openapi_spec.find_references_to_table(
-            self.table_name,
-            possible_column_name=possible_fk_table_column_name
-        )
-        for table_name in referring_tables.keys():
-            properties.add_one_to_many_property(table_name)
-        properties_as_dict = {
-            property_name: metadata
-            for property_name, metadata in properties.as_dict().items()
-            if metadata.category not in self.disabled_categories
-        }
-        form_fields = FormConfig(properties_as_dict).get_fields()
+        form_fields = self.form_config.get_fields()
         self.toc_list_items = EditorTableOfContents(
             self.table_name,
             category_names,
@@ -398,22 +370,21 @@ class UpdateResourceByCategoryView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint(
-            "column_metadata"
-        )
-        properties = Properties(
+        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
+        form_config = get_form_config_for_table(
             self.table_name,
-            self.openapi_spec.get_definition(self.table_name),
+            self.openapi_spec,
             column_metadata_endpoint.get_resources(),
-            column_metadata_table_name=self.column_metadata_table_name
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
         )
-        properties_as_dict = {
-            property_name: metadata
-            for property_name, metadata in properties.as_dict().items()
-            if metadata.category not in self.disabled_categories
-        }
+        if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
+            kwargs.update({
+                "fields": form_config.get_fields_for_category(None),
+            })
+            return kwargs
         kwargs.update({
-            "fields": FormConfig(properties_as_dict).get_fields_for_category(self.category),
+            "fields": form_config.get_fields_for_category(self.category),
         })
         return kwargs
 
@@ -434,25 +405,13 @@ class EditorStartFormView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        properties = Properties(
+        self.form_config = get_form_config_for_table(
             self.table_name,
-            self.api_client.openapi_spec.get_definition(self.table_name),
+            self.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
         )
-        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
-        referring_tables = self.openapi_spec.find_references_to_table(
-            self.table_name,
-            possible_column_name=possible_fk_table_column_name
-        )
-        for table_name in referring_tables.keys():
-            properties.add_one_to_many_property(table_name)
-        properties_as_dict = {
-            property_name: metadata
-            for property_name, metadata in properties.as_dict().items()
-            if metadata.category not in self.disabled_categories
-        }
-        self.form_config = FormConfig(properties_as_dict)
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
@@ -520,27 +479,17 @@ class EditorOverviewTemplateView(TemplateView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        properties = Properties(
-            self.table_name,
-            self.api_client.openapi_spec.get_definition(self.table_name),
-            self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name
-        )
-        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
-        referring_tables = self.openapi_spec.find_references_to_table(
-            self.table_name,
-            possible_column_name=possible_fk_table_column_name
-        )
-        for table_name in referring_tables.keys():
-            properties.add_one_to_many_property(table_name)
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
-        self.properties_as_dict = {
-            property_name: metadata
-            for property_name, metadata in properties.as_dict().items()
-            if metadata.category not in self.disabled_categories
-        }
-        self.form_fields = FormConfig(self.properties_as_dict).get_fields()
+        form_config = get_form_config_for_table(
+            self.table_name,
+            self.api_client.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
+        )
+        self.properties_as_dict = form_config.get_properties()
+        self.form_fields = form_config.get_fields()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
