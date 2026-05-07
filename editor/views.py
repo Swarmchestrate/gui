@@ -375,6 +375,7 @@ class UpdateResourceByCategoryView(FormView):
             self.table_name,
             self.openapi_spec,
             column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories
         )
