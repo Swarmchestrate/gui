@@ -80,4 +80,9 @@ urlpatterns = [
         views.ApplicationDeleteOneToManyRelationFormView.as_view(),
         name="delete_application_one_to_many_relation",
     ),
+    path(
+        "applications/<resource_id>/download/",
+        views.ApplicationDescriptionTemplateDownloadView.as_view(),
+        name="adt_download",
+    ),
 ]

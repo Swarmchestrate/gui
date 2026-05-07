@@ -1,5 +1,7 @@
 from django.urls import reverse_lazy
 
+from .tosca import generate_application_description_template
+
 from editor.foreign_key_views import (
     DeleteOneToManyRelationFormView,
     DeleteOneToOneRelationFormView,
@@ -20,6 +22,7 @@ from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
     ResourceListFormView,
+    ToscaTemplateDownloadView,
 )
 
 
@@ -31,6 +34,8 @@ class ApplicationViewMixin:
     new_resource_reverse = "applications:new_application"
     resource_deletion_reverse = "applications:delete_application"
     multi_resource_deletion_reverse = "applications:delete_applications"
+    tosca_template_download_reverse_base = "applications:adt_download"
+    resource_type = "application"
 
 
 class ApplicationEditorSkeletonLoaderView(ApplicationViewMixin, EditorSkeletonLoaderView):
@@ -184,3 +189,12 @@ class ApplicationDeleteOneToManyRelationFormView(
             kwargs={"resource_id": kwargs["resource_id"]},
         )
         return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationDescriptionTemplateDownloadView(
+        ApplicationViewMixin,
+        ToscaTemplateDownloadView):
+    table_name = "application_new"
+
+    def generate_tosca_template(self):
+        return generate_application_description_template(self.resource_id)

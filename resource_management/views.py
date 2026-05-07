@@ -1,9 +1,10 @@
 import logging
 
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 
 from .forms import (
@@ -44,6 +45,7 @@ class ResourceListFormView(TemplateView):
     multi_resource_deletion_reverse: str
     editor_reverse_base: str
     editor_overview_reverse_base: str
+    tosca_template_download_reverse_base: str
 
     def get_resource_list(self):
         api_client = ApiClient()
@@ -83,6 +85,7 @@ class ResourceListFormView(TemplateView):
             },
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
+            "tosca_template_download_reverse_base": self.tosca_template_download_reverse_base,
             "resource_type": self.resource_type,
         })
         return context
@@ -166,3 +169,27 @@ class MultiResourceDeletionFormView(FormView):
             success_msg = f"Deleted {len(resource_ids_to_delete)} {humanise_resource_type_plural(self.resource_type)}."
         messages.success(self.request, success_msg)
         return super().form_valid(form)
+
+
+class ToscaTemplateDownloadView(View):
+    resource_id: int
+    table_name: str
+    resource_type: str
+    
+    def generate_tosca_template(self) -> str:
+        pass
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = kwargs["resource_id"]
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        tosca_template = self.generate_tosca_template()
+        response = HttpResponse(
+            tosca_template,
+            content_type="application/yaml"
+        )
+        response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
+        return response

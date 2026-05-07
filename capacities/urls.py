@@ -82,6 +82,11 @@ urlpatterns = [
         name="delete_cloud_capacity_one_to_many_relation",
     ),
     path(
+        "cloud-capacities/<resource_id>/download/",
+        views.CloudCapacityDescriptionTemplateDownloadView.as_view(),
+        name="cloud_cdt_download",
+    ),
+    path(
         "edge-capacities/",
         views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",
@@ -155,5 +160,10 @@ urlpatterns = [
         "edge-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
         foreign_key_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
         name="delete_edge_capacity_one_to_many_relation",
+    ),
+    path(
+        "edge-capacities/<resource_id>/download/",
+        views.EdgeCapacityDescriptionTemplateDownloadView.as_view(),
+        name="edge_cdt_download",
     ),
 ]

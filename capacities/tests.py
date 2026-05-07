@@ -1,5 +1,7 @@
 from django.test import SimpleTestCase
 
+from .tosca import generate_capacity_description_template
+
 from postgrest.new_api import ApiClient, Resource
 from postgrest.test_mixins import PostgrestApiTestTeardownHelperMixin
 
@@ -56,3 +58,26 @@ class CapacityPostgrestApiTestCase(
             updated_resource.as_dict().get(TEST_PROPERTY),
             TEST_CONTENT
         )
+
+
+class CapacityDescriptionTemplateTestCase(
+        PostgrestApiTestTeardownHelperMixin,
+        SimpleTestCase):
+    table_name = "capacity_new"
+    
+    def setUp(self):
+        self.initialise_test_teardown_helper_components()
+        return super().setUp()
+
+    def tearDown(self):
+        self.delete_resources_added_during_test()
+        return super().tearDown()
+
+    def test_capacity_description_template_generation(self):
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        endpoint = api_client.get_endpoint(self.table_name)
+        new_resource = endpoint.register({})
+        self.resource_ids_added_during_tests.append(new_resource.pk)
+        cdt = generate_capacity_description_template(new_resource.pk)
+        self.assertIsInstance(cdt, str)

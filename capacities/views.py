@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 
+from .tosca import generate_capacity_description_template
 from .view_helpers import (
     CloudCapacityViewMixin,
     EdgeCapacityViewMixin,
@@ -18,6 +19,7 @@ from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
     ResourceListFormView,
+    ToscaTemplateDownloadView,
 )
 
 
@@ -93,6 +95,15 @@ class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
         return api_client.get_endpoint("capacity_new").get_resources_by_type("Cloud")
 
 
+class CloudCapacityDescriptionTemplateDownloadView(
+        CloudCapacityViewMixin,
+        ToscaTemplateDownloadView):
+    table_name = "capacity_new"
+
+    def generate_tosca_template(self):
+        return generate_capacity_description_template(self.resource_id)
+
+
 # Edge Capacity views (EC)
 class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeletonLoaderView):
     table_name = "capacity_new"
@@ -163,3 +174,12 @@ class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
         return api_client.get_endpoint("capacity_new").get_resources_by_type("Edge")
+
+
+class EdgeCapacityDescriptionTemplateDownloadView(
+        EdgeCapacityViewMixin,
+        ToscaTemplateDownloadView):
+    table_name = "capacity_new"
+
+    def generate_tosca_template(self):
+        return generate_capacity_description_template(self.resource_id)
