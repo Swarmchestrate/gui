@@ -13,6 +13,8 @@ class PropertyMetadata:
     name: str
     is_pk: bool = False
     is_required: bool = False
+    refers_to_table_name: str | None = None
+    created_from_table_name: str | None = None
     # Defined in the PostgREST OpenAPI Specification
     format: str | None = None
     type: str | None = None

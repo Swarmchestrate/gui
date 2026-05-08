@@ -1,3 +1,4 @@
+import lxml.html
 from collections.abc import Callable
 from enum import Enum
 
@@ -62,6 +63,13 @@ class Properties:
         if not column_metadata_table_name:
             return
         self._column_metadata_table_name = column_metadata_table_name
+    
+    def _get_foreign_key_table_name(self, description: str):
+        if not description:
+            return None
+        return next(iter(
+            lxml.html.fromstring(description).xpath("fk/@table")
+        ), None)
 
     def _get_property_metadata_instance(
             self,
@@ -73,6 +81,7 @@ class Properties:
             name=name,
             is_pk=(name == self._definition.pk_column_name),
             is_required=is_required,
+            refers_to_table_name=self._get_foreign_key_table_name(metadata.get("description")),
             format=metadata.get("format"),
             type=metadata.get("type"),
             description=metadata.get("description"),
@@ -140,6 +149,7 @@ class OneToManyProperties:
                 table_name: PropertyMetadata(
                     name=table_name,
                     is_pk=False,
+                    created_from_table_name=table_name,
                     is_required=False,
                     format=None,
                     type=None,
@@ -226,6 +236,7 @@ class FormConfig:
         return field_config_class(
             *additional_args,
             name,
+            metadata,
             metadata.is_required,
             metadata.title,
             metadata.help_text,

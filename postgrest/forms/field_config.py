@@ -21,11 +21,13 @@ class FieldConfig:
     def __init__(
             self,
             field_name: str,
+            metadata: dict,
             is_required: bool = False,
             label: str | None = None,
             help_text: str | None = None,
             category: str | None = None):
         self.field_name = field_name
+        self.metadata = metadata
         self.is_required = is_required
         self.label = label
         self.help_text = help_text
@@ -66,6 +68,7 @@ class FieldConfig:
         field.category = UNKNOWN_ATTRIBUTE_CATEGORY
         if self.category:
             field.category = self.category
+        field.metadata = self.metadata
         return field
 
 
