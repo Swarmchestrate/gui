@@ -2,8 +2,10 @@ import logging
 from http import HTTPStatus
 
 from django.contrib import messages
-from django.views.generic import FormView
 from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import FormView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
@@ -363,3 +365,139 @@ class DeleteOneToManyRelationFormView(FormView):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
         return JsonResponse({"feedback": form.errors})
+
+
+class OneToOneFieldEditorSectionView(View):
+    table_name: str
+
+    new_one_to_one_relation_reverse_base: str
+    update_one_to_one_relation_reverse_base: str
+    delete_one_to_one_relation_reverse_base: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = kwargs["resource_id"]
+        self.fk_column_name = self.kwargs["fk_column_name"]
+        # API client is instantiated here so it doesn't
+        # fetch the OpenAPI spec twice.
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        definition = self.api_client.openapi_spec.get_definition(self.table_name)
+        self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        self.form_config = get_form_config_for_table(
+            self.fk_table_name,
+            self.api_client.openapi_spec,
+            column_metadata,
+            infer_one_to_many_properties=False
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_resource(self):
+        # Get the main resource
+        endpoint = self.api_client.get_endpoint(self.table_name)
+        resource = endpoint.get(self.resource_id)
+        # Get the other resource that is referenced
+        # by the main resource (if any).
+        fk_table_endpoint = self.api_client.get_endpoint(self.fk_table_name)
+        fk_resource_id = resource.as_dict().get(self.fk_column_name)
+        if not fk_resource_id:
+            return None
+        return fk_table_endpoint.get(fk_resource_id)
+    
+    def get_section_template(self, resource: Resource):
+        initial = dict()
+        if resource:
+            initial = resource.as_dict()
+        return render_to_string("editor/foreign_key_fields/one_to_one_field_section.html", {
+            "field_name": self.fk_column_name,
+            "resource": self.get_resource(),
+            "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                fields=self.form_config.get_fields(),
+                initial=initial
+            ),
+            "resource_type": self.fk_table_name,
+        })
+
+    def get_new_dialog_template(self):
+        return render_to_string(
+            "editor/dialogs/new_dialog.html",
+            {
+                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                    fields=self.form_config.get_fields(),
+                    id_prefix=f'new_{self.fk_column_name}'
+                ),
+                "new_resource_url": reverse_lazy(
+                    self.new_one_to_one_relation_reverse_base,
+                    kwargs={
+                        "resource_id": self.resource_id,
+                        "fk_column_name": self.fk_column_name,
+                    }
+                ),
+                "dialog_id": f"new-{self.fk_column_name}-dialog",
+                "resource_type": self.fk_table_name,
+            },
+            request=self.request
+        )
+
+    def get_update_dialog_template(self, resource: Resource):
+        resource_id = None
+        initial = dict()
+        if resource:
+            resource_id = resource.pk
+            initial = resource.as_dict()
+        return render_to_string(
+            "editor/dialogs/update_dialog.html",
+            {
+                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                    fields=self.form_config.get_fields(),
+                    id_suffix=f"{self.fk_column_name}",
+                    initial=initial
+                ),
+                "update_resource_url": reverse_lazy(
+                    self.update_one_to_one_relation_reverse_base,
+                    kwargs={
+                        "resource_id": self.resource_id,
+                        "fk_column_name": self.fk_column_name,
+                    }
+                ),
+                "dialog_id": f"update-{self.fk_column_name}-dialog",
+                "resource_id": resource_id,
+                "resource_type": self.fk_table_name,
+            },
+            request=self.request
+        )
+
+    def get_delete_dialog_template(self, resource: Resource):
+        resource_id = None
+        initial = dict()
+        if resource:
+            resource_id = resource.pk
+            initial = {"resource_id_to_delete": resource_id}
+        return render_to_string(
+            "editor/dialogs/delete_dialog.html",
+            {
+                "form": ResourceDeletionForm(
+                    initial=initial
+                ),
+                "delete_resource_url": reverse_lazy(
+                    self.delete_one_to_one_relation_reverse_base,
+                    kwargs={
+                        "resource_id": self.resource_id,
+                        "fk_column_name": self.fk_column_name,
+                    }
+                ),
+                "dialog_id": f"delete-{self.fk_column_name}-dialog",
+                "resource_id": resource_id,
+                "resource_type": self.fk_table_name,
+            },
+            request=self.request
+        )
+
+    def get(self, request, *args, **kwargs):
+        resource = self.get_resource()
+        return JsonResponse({
+            "section": self.get_section_template(resource),
+            "update_dialog": self.get_update_dialog_template(resource),
+            "delete_dialog": self.get_delete_dialog_template(resource),
+            "new_dialog": self.get_new_dialog_template(),
+        })

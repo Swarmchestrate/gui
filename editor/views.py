@@ -150,6 +150,8 @@ class EditorTabSectionView(TemplateView):
     update_one_to_many_relation_reverse_base: str
     delete_one_to_many_relation_reverse_base: str
 
+    editor_overview_reverse_base: str
+    editor_one_to_one_section_reverse_base: str
     editor_form_reverse: str
     editor_form_url: str
 
@@ -184,7 +186,6 @@ class EditorTabSectionView(TemplateView):
         # are generated.
         self.initialise_one_to_many_field_forms()
         self.initialise_categorised_forms()
-        self.initialise_one_to_one_field_forms()
         self.initialise_toc_list_items()
         return super().dispatch(request, *args, **kwargs)
     
@@ -231,32 +232,6 @@ class EditorTabSectionView(TemplateView):
                     initial=self.resource.as_dict(),
                 )
             })
-
-    def initialise_one_to_one_field_forms(self):
-        properties_by_fk_tables = dict()
-        for property_name, property_metadata in self.form_config.get_properties().items():
-            try:
-                xpath_results = lxml.html.fromstring(property_metadata.description).xpath("fk/@table")
-            except TypeError:
-                continue
-            fk_table_name = next(iter(xpath_results), None)
-            if not fk_table_name:
-                continue
-            if fk_table_name not in properties_by_fk_tables:
-                properties_by_fk_tables.update({
-                    fk_table_name: [],
-                })
-            properties_by_fk_tables[fk_table_name].append(property_name)
-        form_configs = get_foreign_key_form_configs(
-            properties_by_fk_tables.keys(),
-            self.openapi_spec,
-            self.column_metadata
-        )
-        self.one_to_one_field_metadata = get_one_to_one_field_forms(
-            self.resource,
-            form_configs,
-            properties_by_fk_tables
-        )
     
     def initialise_toc_list_items(self):
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
@@ -291,7 +266,7 @@ class EditorTabSectionView(TemplateView):
                 "toc_list_items": self.toc_list_items,
                 "resource_type": self.resource_type,
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
-                "one_to_one_field_metadata": self.one_to_one_field_metadata,
+                "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
                 "one_to_many_field_metadata": self.one_to_many_field_metadata,
                 "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
                 "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,

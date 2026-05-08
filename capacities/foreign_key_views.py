@@ -10,6 +10,7 @@ from editor.foreign_key_views import (
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
+    OneToOneFieldEditorSectionView,
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
@@ -101,6 +102,13 @@ class CloudCapacityDeleteOneToManyRelationFormView(
         return super().dispatch(request, *args, **kwargs)
 
 
+class CloudCapacityOneToOneFieldEditorSectionView(CloudCapacityViewMixin, OneToOneFieldEditorSectionView):
+    table_name = "capacity_new"
+    new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
+    update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
+    delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
+
+
 # Edge Capacity views
 class EdgeCapacityNewOneToOneRelationFormView(EdgeCapacityViewMixin, NewOneToOneRelationFormView):
     template_name = "capacities/edge_capacity_editor.html"
@@ -185,3 +193,10 @@ class EdgeCapacityDeleteOneToManyRelationFormView(
             kwargs={"resource_id": kwargs["resource_id"]},
         )
         return super().dispatch(request, *args, **kwargs)
+
+
+class EdgeCapacityOneToOneFieldEditorSectionView(EdgeCapacityViewMixin, OneToOneFieldEditorSectionView):
+    table_name = "capacity_new"
+    new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
+    update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
+    delete_one_to_one_relation_reverse_base = "capacities:delete_edge_capacity_one_to_one_relation"

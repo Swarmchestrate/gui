@@ -1,0 +1,267 @@
+import { FormDialog } from "/static/editor/form_dialog.js";
+import { displayToast } from "/static/editor/toasts.js";
+import { htmlToNode } from "/static/editor/utils.js";
+
+class OneToOneField {
+    constructor(oneToOneField) {
+        this.oneToOneField = oneToOneField;
+        this.setupClassFields();
+        this.setupDialogs();
+    }
+
+    setupClassFields() {
+        // New dialog button
+        this.newDialogButton = this.oneToOneField.querySelector(
+            "button.new-dialog-btn[data-dialog-id]",
+        );
+        this.newDialogElement = document.querySelector(
+            `#${this.newDialogButton.dataset.dialogId}`,
+        );
+        this.newDialogForm = this.newDialogElement.querySelector("form");
+        // Update dialog button
+        this.updateDialogButton = this.oneToOneField.querySelector(
+            "button.update-dialog-btn[data-dialog-id]",
+        );
+        this.updateDialogElement = document.querySelector(
+            `#${this.updateDialogButton.dataset.dialogId}`,
+        );
+        this.updateDialogForm = this.updateDialogElement.querySelector("form");
+        // Delete dialog button
+        this.deleteDialogButton = this.oneToOneField.querySelector(
+            "button.delete-dialog-btn[data-dialog-id]",
+        );
+        this.deleteDialogElement = document.querySelector(
+            `#${this.deleteDialogButton.dataset.dialogId}`,
+        );
+        this.deleteDialogForm = this.deleteDialogElement.querySelector("form");
+        this.resourceType = this.oneToOneField.dataset.resourceType;
+    }
+
+    setupDialogs() {
+        // Setup dialogs
+        this.setupNewDialog();
+        this.setupUpdateDialog();
+        this.setupDeleteDialog();
+    }
+
+    setupNewDialog() {
+        new FormDialog(
+            this.newDialogElement,
+            [this.newDialogElement.querySelector(".btn-close")],
+            [this.newDialogButton],
+            {
+                lightDismiss: false,
+                onFormSuccess: (responseData) => {
+                    this.newDialogForm.reset();
+                    this.newDialogButton.classList.add("d-none");
+                    this.updateDialogButton.classList.remove("d-none");
+                    this.deleteDialogButton.classList.remove("d-none");
+                    for (const property in responseData.resource) {
+                        let propertyValue = responseData.resource[property];
+                        const elementForProperty =
+                            this.oneToOneField.querySelector(
+                                `[data-field="${property}"]`,
+                            );
+                        if (!elementForProperty) continue;
+                        elementForProperty.textContent = propertyValue;
+                        if (!propertyValue) {
+                            elementForProperty.textContent = "None";
+                        }
+                        const fieldForProperty =
+                            this.updateDialogForm.querySelector(
+                                `[name="${property}"]`,
+                            );
+                        if (!fieldForProperty) continue;
+                        if (propertyValue === null) {
+                            propertyValue = "";
+                        }
+                        fieldForProperty.defaultValue = propertyValue;
+                        if (fieldForProperty.options) {
+                            for (const option of fieldForProperty.options) {
+                                if (option.value !== propertyValue) {
+                                    option.removeAttribute("selected");
+                                    continue;
+                                }
+                                option.setAttribute("selected", "selected");
+                            }
+                        }
+                        this.updateDialogForm.reset();
+                    }
+                    this.deleteDialogForm.querySelector(
+                        "[name='resource_id_to_delete']",
+                    ).value = responseData.resource.pk;
+                    displayToast(`Registered ${this.resourceType} ${responseData.resource.pk}.`);
+                },
+            },
+            this.newDialogForm,
+        );
+    }
+
+    setupUpdateDialog() {
+        new FormDialog(
+            this.updateDialogElement,
+            [this.updateDialogElement.querySelector(".btn-close")],
+            [this.updateDialogButton],
+            {
+                lightDismiss: false,
+                onFormSuccess: (responseData) => {
+                    for (const property in responseData.resource) {
+                        let propertyValue = responseData.resource[property];
+                        // Set the value preview element displaying the property's
+                        // value before the dialog is open.
+                        const elementForProperty =
+                            this.oneToOneField.querySelector(
+                                `[data-field="${property}"]`,
+                            );
+                        if (!elementForProperty) continue;
+                        elementForProperty.textContent = propertyValue;
+                        if (Array.isArray(propertyValue)) {
+                            elementForProperty.textContent =
+                                propertyValue.join(", ");
+                        }
+                        if (!propertyValue) {
+                            elementForProperty.textContent = "None";
+                        }
+                        // Set the value of multiple input fields assigned
+                        // for the property (if applicable).
+                        const fieldsForProperty = Array.from(
+                            this.updateDialogForm.querySelectorAll(
+                                `[data-multi-value-field="${property}"]`,
+                            ),
+                        );
+                        if (fieldsForProperty.length !== 0) {
+                            if (propertyValue === null) {
+                                propertyValue = "";
+                                fieldsForProperty.forEach(
+                                    (field) =>
+                                        (field.defaultValue = propertyValue),
+                                );
+                                continue;
+                            }
+                            fieldsForProperty.forEach((field, i) => {
+                                field.defaultValue = propertyValue[i];
+                            });
+                            continue;
+                        }
+                        // Set the input field value for the property.
+                        const fieldForProperty =
+                            this.updateDialogForm.querySelector(
+                                `[name="${property}"]`,
+                            );
+
+                        if (!fieldForProperty) continue;
+                        if (propertyValue === null) {
+                            propertyValue = "";
+                        }
+                        fieldForProperty.defaultValue = propertyValue;
+                        if (fieldForProperty.options) {
+                            for (const option of fieldForProperty.options) {
+                                if (option.value !== propertyValue) {
+                                    option.removeAttribute("selected");
+                                    continue;
+                                }
+                                option.setAttribute("selected", "selected");
+                            }
+                        }
+                    }
+                    this.updateDialogForm.reset();
+                    displayToast(`Updated ${this.resourceType} ${responseData.resource.pk}.`);
+                },
+            },
+            this.updateDialogForm,
+        );
+    }
+
+    setupDeleteDialog() {
+        new FormDialog(
+            this.deleteDialogElement,
+            [
+                this.deleteDialogElement.querySelector(".btn-close"),
+                this.deleteDialogElement.querySelector("button[value='cancel']"),
+            ],
+            [this.deleteDialogButton],
+            {
+                onFormSuccess: (responseData) => {
+                    this.newDialogButton.classList.remove("d-none");
+                    this.updateDialogButton.classList.add("d-none");
+                    this.deleteDialogButton.classList.add("d-none");
+                    Array.from(
+                        this.updateDialogForm.querySelectorAll(
+                            "input, textarea, select",
+                        ),
+                    ).forEach((field) => {
+                        if (
+                            field.getAttribute("name") == "csrfmiddlewaretoken"
+                        ) {
+                            return;
+                        }
+                        try {
+                            field.defaultValue = "";
+                        } catch (error) {}
+                        try {
+                            field.value = "";
+                        } catch (error) {}
+                    });
+                    this.updateDialogForm.reset();
+                    Array.from(
+                        this.oneToOneField.querySelectorAll("[data-field]"),
+                    ).forEach((element) => {
+                        element.textContent = "None";
+                    });
+                    displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
+                        "[name='resource_id_to_delete']"
+                    ).value}.`);
+                },
+            },
+            this.deleteDialogForm,
+        );
+    }
+}
+
+async function getSection(sectionUrl) {
+    const response = await fetch(
+        sectionUrl,
+        { method: "GET" },
+    );
+    if (!response.ok) {
+        console.error(
+            "Received an error whilst loading an editor section: ",
+            response.status,
+            response.statusText,
+        );
+    }
+    let responseContent = "";
+    try {
+        responseContent = await response.json();
+    } catch (error) {
+        try {
+            console.log('response', response);
+            const content = await response.text();
+            console.log('content', content);
+        } catch (error) {
+            console.log("could not extract text from response");
+        }
+        return console.error(
+            "Could not load an editor section due to an error: ",
+            error,
+        );
+    }
+    return responseContent;
+}
+
+export async function loadOneToOneFieldSections() {
+    const oneToOneFieldSections = Array.from(
+        document.querySelectorAll(".one-to-one-field"),
+    );
+    const sectionUrls = oneToOneFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
+    const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
+    oneToOneFieldSections.forEach((section, i) => {
+        const sectionPlaceholder = section.querySelector("[data-section-url]");
+        sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
+        const dialogsSection = document.querySelector("#dialogs");
+        dialogsSection.append(htmlToNode(htmlForSections[i].new_dialog.trim()));
+        dialogsSection.append(htmlToNode(htmlForSections[i].update_dialog.trim()));
+        dialogsSection.append(htmlToNode(htmlForSections[i].delete_dialog.trim()));
+        new OneToOneField(section);
+    });
+}
