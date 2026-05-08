@@ -3,6 +3,7 @@ import { setupFormsetTables } from "/static/editor/formset_tables.js";
 import { getEditorTabbedFormHtml } from "/static/editor/editor_tabbed_form.js";
 import { getEditorTocHtml } from "/static/editor/editor_toc.js";
 import { loadOneToOneFieldSections } from "/static/editor/editor_one_to_one_field_sections.js";
+import { loadOneToManyFieldSections } from "/static/editor/editor_one_to_many_field_sections.js";
 import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
 import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
 import { displayToast } from "/static/editor/toasts.js";
@@ -72,6 +73,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();
     loadOneToOneFieldSections();
+    loadOneToManyFieldSections();
     // initialiseOneToOneFields();
     // initialiseOneToManyFields();
     const tooltipTriggerElements = Array.from(

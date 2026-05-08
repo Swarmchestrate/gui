@@ -37,6 +37,11 @@ urlpatterns = [
         name="cloud_capacity_editor_one_to_one_section",
     ),
     path(
+        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        foreign_key_views.CloudCapacityOneToManyFieldEditorSectionView.as_view(),
+        name="cloud_capacity_editor_one_to_many_section",
+    ),
+    path(
         "cloud-capacities/api/<resource_id>/edit/",
         views.UpdateCloudCapacityByCategoryView.as_view(),
         name="update_cloud_capacity_by_category",
@@ -125,6 +130,11 @@ urlpatterns = [
         "edge-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
         foreign_key_views.EdgeCapacityOneToOneFieldEditorSectionView.as_view(),
         name="edge_capacity_editor_one_to_one_section",
+    ),
+    path(
+        "edge-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        foreign_key_views.EdgeCapacityOneToManyFieldEditorSectionView.as_view(),
+        name="edge_capacity_editor_one_to_many_section",
     ),
     path(
         "edge-capacities/api/<resource_id>/edit/",

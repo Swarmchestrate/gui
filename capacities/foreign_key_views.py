@@ -10,6 +10,7 @@ from editor.foreign_key_views import (
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
+    OneToManyFieldEditorSectionView,
     OneToOneFieldEditorSectionView,
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
@@ -109,6 +110,14 @@ class CloudCapacityOneToOneFieldEditorSectionView(CloudCapacityViewMixin, OneToO
     delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
 
 
+class CloudCapacityOneToManyFieldEditorSectionView(CloudCapacityViewMixin, OneToManyFieldEditorSectionView):
+    table_name = "capacity_new"
+    possible_fk_table_column_name = "capacity_id"
+    new_one_to_many_relation_reverse_base = "capacities:new_cloud_capacity_one_to_many_relation"
+    update_one_to_many_relation_reverse_base = "capacities:update_cloud_capacity_one_to_many_relation"
+    delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
+
+
 # Edge Capacity views
 class EdgeCapacityNewOneToOneRelationFormView(EdgeCapacityViewMixin, NewOneToOneRelationFormView):
     template_name = "capacities/edge_capacity_editor.html"
@@ -200,3 +209,11 @@ class EdgeCapacityOneToOneFieldEditorSectionView(EdgeCapacityViewMixin, OneToOne
     new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "capacities:delete_edge_capacity_one_to_one_relation"
+
+
+class EdgeCapacityOneToManyFieldEditorSectionView(EdgeCapacityViewMixin, OneToManyFieldEditorSectionView):
+    table_name = "capacity_new"
+    possible_fk_table_column_name = "capacity_id"
+    new_one_to_many_relation_reverse_base = "capacities:new_edge_capacity_one_to_many_relation"
+    update_one_to_many_relation_reverse_base = "capacities:update_edge_capacity_one_to_many_relation"
+    delete_one_to_many_relation_reverse_base = "capacities:delete_edge_capacity_one_to_many_relation"

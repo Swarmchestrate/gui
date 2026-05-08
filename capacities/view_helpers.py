@@ -6,6 +6,7 @@ class CloudCapacityViewMixin:
     table_name = 'cloud_capacity'
     editor_reverse_base = "capacities:cloud_capacity_editor"
     editor_one_to_one_section_reverse_base = "capacities:cloud_capacity_editor_one_to_one_section"
+    editor_one_to_many_section_reverse_base = "capacities:cloud_capacity_editor_one_to_many_section"
     editor_start_reverse_base = "capacities:new_cloud_capacity"
     editor_overview_reverse_base = "capacities:cloud_capacity_overview"
     resource_list_reverse = "capacities:cloud_capacity_list"
@@ -20,6 +21,7 @@ class CloudCapacityViewMixin:
 class EdgeCapacityViewMixin:
     editor_reverse_base = "capacities:edge_capacity_editor"
     editor_one_to_one_section_reverse_base = "capacities:edge_capacity_editor_one_to_one_section"
+    editor_one_to_many_section_reverse_base = "capacities:edge_capacity_editor_one_to_many_section"
     editor_start_reverse_base = "capacities:new_edge_capacity"
     editor_overview_reverse_base = "capacities:edge_capacity_overview"
     resource_list_reverse = "capacities:edge_capacity_list"

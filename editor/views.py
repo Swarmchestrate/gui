@@ -152,6 +152,7 @@ class EditorTabSectionView(TemplateView):
 
     editor_overview_reverse_base: str
     editor_one_to_one_section_reverse_base: str
+    editor_one_to_many_section_reverse_base: str
     editor_form_reverse: str
     editor_form_url: str
 
@@ -184,34 +185,9 @@ class EditorTabSectionView(TemplateView):
         # One-to-many fields are handled first, as they are
         # added to the category-based forms before they
         # are generated.
-        self.initialise_one_to_many_field_forms()
         self.initialise_categorised_forms()
         self.initialise_toc_list_items()
         return super().dispatch(request, *args, **kwargs)
-    
-    def initialise_one_to_many_field_forms(self):
-        possible_fk_table_column_name = f'{self.column_metadata_table_name}_id'
-        referring_tables = self.openapi_spec.find_references_to_table(
-            self.table_name,
-            possible_column_name=possible_fk_table_column_name
-        )
-        form_configs = get_foreign_key_form_configs(
-            referring_tables.keys(),
-            self.openapi_spec,
-            self.column_metadata,
-            disabled_property_names=[possible_fk_table_column_name]
-        )
-        # Check each definition for references to the references to the main form type.
-        # E.g., a property is called "capacity_id" or "application_id", or, there is
-        # an explicit "@fk_table_name" expression. E.g. fk_table_name="capacity".
-        self.one_to_many_field_metadata = get_one_to_many_field_forms(
-            self.request,
-            self.resource_id,
-            form_configs,
-            referring_tables,
-            self.update_one_to_many_relation_reverse_base,
-            self.delete_one_to_many_relation_reverse_base
-        )
 
     def initialise_categorised_forms(self):
         self.forms_by_category = dict()
@@ -267,7 +243,7 @@ class EditorTabSectionView(TemplateView):
                 "resource_type": self.resource_type,
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
-                "one_to_many_field_metadata": self.one_to_many_field_metadata,
+                "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
                 "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
                 "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
                 "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
