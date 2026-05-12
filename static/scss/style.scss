@@ -358,13 +358,14 @@ label:has(~ :required)::after,
     margin-inline: 0.25em;
 }
 
-.list-group:empty::after {
-    content: attr(placeholder);
+.card:has(.list-group:empty) {
     color: var(--bs-secondary-color);
+    border: 2px dashed var(--bs-gray-300);
+}
+
+.card .list-group:empty::after {
+    content: attr(placeholder);
     padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
-    background-color: var(--bs-list-group-bg);
-    border: 2px dashed var(--bs-list-group-border-color);
-    border-radius: inherit;
 }
 
 /* Wizard nav */
