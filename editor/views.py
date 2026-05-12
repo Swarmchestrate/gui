@@ -238,6 +238,8 @@ class EditorStartFormView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
         self.form_config = get_form_config_for_table(
             self.table_name,
             self.openapi_spec,
