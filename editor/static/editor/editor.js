@@ -1,15 +1,8 @@
 import { AsyncFormHandler } from "/static/editor/async_forms.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
-import { getEditorTabbedFormHtml } from "/static/editor/editor_tabbed_form.js";
-import { getEditorTocHtml } from "/static/editor/editor_toc.js";
 import { loadOneToOneFieldSections } from "/static/editor/editor_one_to_one_field_sections.js";
 import { loadOneToManyFieldSections } from "/static/editor/editor_one_to_many_field_sections.js";
-import { initialiseOneToOneFields } from "/static/editor/one_to_one_fields.js";
-import { initialiseOneToManyFields } from "/static/editor/one_to_many_fields.js";
 import { displayToast } from "/static/editor/toasts.js";
-
-const editorTocWrapper = document.querySelector(".editor-layout__toc");
-const editorTabbedFormWrapper = document.querySelector(".editor-layout__body");
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
     const tabPaneButtons = Array.from(
@@ -30,14 +23,6 @@ function linkEditorTabSwitchingToCurrentPageCategory() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-    const editorHtmlSections = await Promise.all([
-        getEditorTabbedFormHtml(),
-        getEditorTocHtml(),
-    ]);
-    const editorTabbedFormHtml = editorHtmlSections[0];
-    editorTabbedFormWrapper.innerHTML = editorTabbedFormHtml;
-    const editorTocHtml = editorHtmlSections[1];
-    editorTocWrapper.innerHTML = editorTocHtml;
     const bsEditorTab = new bootstrap.Tab("#editor-tab");
     const editorTabForms = Array.from(
         document.querySelectorAll("#editor-tab-content form"),
@@ -74,8 +59,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     setupFormsetTables();
     loadOneToOneFieldSections();
     loadOneToManyFieldSections();
-    // initialiseOneToOneFields();
-    // initialiseOneToManyFields();
     const tooltipTriggerElements = Array.from(
         document.querySelectorAll("[data-bs-toggle='tooltip']"),
     );
