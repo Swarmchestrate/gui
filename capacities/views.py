@@ -43,6 +43,13 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
     column_metadata_table_name = "capacity"
     disabled_categories = ["Edge Specific", "Networking"]
 
+    def get_registration_data(self, form) -> dict:
+        registration_data = super().get_registration_data(form)
+        registration_data.update({
+            "resource_type": "Cloud",
+        })
+        return registration_data
+
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
@@ -104,6 +111,13 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     disabled_categories = ["System Specific"]
+
+    def get_registration_data(self, form) -> dict:
+        registration_data = super().get_registration_data(form)
+        registration_data.update({
+            "resource_type": "Edge",
+        })
+        return registration_data
 
 
 class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):

@@ -251,10 +251,13 @@ class EditorStartFormView(FormView):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
+    def get_registration_data(self, form) -> dict:
+        return form.cleaned_data
+
     def form_valid(self, form):
         new_resource = self.api_client.get_endpoint(
             self.table_name
-        ).register(form.cleaned_data)
+        ).register(self.get_registration_data(form))
         messages.success(
             self.request,
             f"New {humanise_resource_type(self.resource_type)} registered.",
