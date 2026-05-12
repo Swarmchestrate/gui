@@ -8,10 +8,7 @@ from .view_helpers import (
 
 from editor.views import (
     EditorOverviewTemplateView,
-    EditorSkeletonLoaderView,
     EditorStartFormView,
-    EditorTableOfContentsSectionView,
-    EditorTabSectionView,
     EditorView,
     UpdateResourceByCategoryView,
 )
@@ -32,34 +29,6 @@ class CloudCapacityEditorView(CloudCapacityViewMixin, EditorView):
     disabled_categories = ["Edge Specific", "Networking"]
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
-
-
-class CloudCapacityEditorSkeletonLoaderView(CloudCapacityViewMixin, EditorSkeletonLoaderView):
-    table_name = "capacity_new"
-    template_name = "capacities/cloud_capacity_editor.html"
-    success_url = reverse_lazy("capacities:new_cloud_capacity")
-    toc_url = reverse_lazy("capacities:cloud_capacity_editor_toc")
-    tabbed_form_reverse = "capacities:cloud_capacity_editor_tabbed_form"
-
-
-class CloudCapacityEditorTableOfContentsView(EditorTableOfContentsSectionView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
-    disabled_categories = ["Edge Specific", "Networking"]
-
-
-class CloudCapacityEditorTabSectionView(CloudCapacityViewMixin, EditorTabSectionView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
-    disabled_categories = ["Edge Specific", "Networking"]
-    resource_type = "cloud_capacity"
-    editor_form_reverse = "capacities:update_cloud_capacity_by_category"
-    new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
-    update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
-    delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
-    new_one_to_many_relation_reverse_base = "capacities:new_cloud_capacity_one_to_many_relation"
-    update_one_to_many_relation_reverse_base = "capacities:update_cloud_capacity_one_to_many_relation"
-    delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
 
 
 class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
@@ -122,34 +91,6 @@ class EdgeCapacityEditorView(EdgeCapacityViewMixin, EditorView):
     disabled_categories = ["System Specific"]
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
-
-
-class EdgeCapacityEditorSkeletonLoaderView(EdgeCapacityViewMixin, EditorSkeletonLoaderView):
-    table_name = "capacity_new"
-    template_name = "capacities/edge_capacity_editor.html"
-    success_url = reverse_lazy("capacities:new_edge_capacity")
-    toc_url = reverse_lazy("capacities:edge_capacity_editor_toc")
-    tabbed_form_reverse = "capacities:edge_capacity_editor_tabbed_form"
-
-
-class EdgeCapacityTableOfContentsView(EditorTableOfContentsSectionView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
-    disabled_categories = ["System Specific"]
-
-
-class EdgeCapacityEditorTabSectionView(EdgeCapacityViewMixin, EditorTabSectionView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
-    disabled_categories = ["System Specific"]
-    resource_type = "edge_capacity"
-    editor_form_reverse = "capacities:update_edge_capacity_by_category"
-    new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
-    update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
-    delete_one_to_one_relation_reverse_base = "capacities:delete_edge_capacity_one_to_one_relation"
-    new_one_to_many_relation_reverse_base = "capacities:new_edge_capacity_one_to_many_relation"
-    update_one_to_many_relation_reverse_base = "capacities:update_edge_capacity_one_to_many_relation"
-    delete_one_to_many_relation_reverse_base = "capacities:delete_edge_capacity_one_to_many_relation"
 
 
 class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCategoryView):

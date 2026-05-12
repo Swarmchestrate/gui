@@ -22,16 +22,6 @@ urlpatterns = [
         name="delete_cloud_capacities",
     ),
     path(
-        "cloud-capacities/api/editor-toc/",
-        views.CloudCapacityEditorTableOfContentsView.as_view(),
-        name="cloud_capacity_editor_toc",
-    ),
-    path(
-        "cloud-capacities/api/<resource_id>/editor/",
-        views.CloudCapacityEditorTabSectionView.as_view(),
-        name="cloud_capacity_editor_tabbed_form",
-    ),
-    path(
         "cloud-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
         foreign_key_views.CloudCapacityOneToOneFieldEditorSectionView.as_view(),
         name="cloud_capacity_editor_one_to_one_section",
@@ -115,16 +105,6 @@ urlpatterns = [
         "edge-capacities/<resource_id>/overview/",
         views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
-    ),
-    path(
-        "edge-capacities/api/editor-toc/",
-        views.EdgeCapacityTableOfContentsView.as_view(),
-        name="edge_capacity_editor_toc",
-    ),
-    path(
-        "edge-capacities/api/<resource_id>/editor/",
-        views.EdgeCapacityEditorTabSectionView.as_view(),
-        name="edge_capacity_editor_tabbed_form",
     ),
     path(
         "edge-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
