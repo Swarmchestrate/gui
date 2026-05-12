@@ -269,22 +269,33 @@ async function getSection(sectionUrl) {
         );
     }
     let responseContent = "";
+    
+    // Try to extract JSON from response, first.
+    let isJsonInResponse = true;
     try {
         responseContent = await response.json();
     } catch (error) {
-        try {
-            console.log('response', response);
-            const content = await response.text();
-            console.log('content', content);
-        } catch (error) {
-            console.log("could not extract text from response");
-        }
-        return console.error(
-            "Could not load an editor section due to an error: ",
-            error,
-        );
+        isJsonInResponse = false;
+        console.log("response", response);
+        console.error("The response was not in the expected format.");
     }
-    return responseContent;
+
+    if (isJsonInResponse) {
+        return responseContent;
+    }
+
+    // Inspect text from the response, in
+    // case something has gone wrong.
+    try {
+        const content = await response.text();
+        console.log("content", content);
+    } catch (error) {
+        console.error("Could not extract text from the response.");
+    }
+    return console.error(
+        "Could not load an editor section due to an error: ",
+        error,
+    );
 }
 
 export async function loadOneToManyFieldSections() {
