@@ -46,7 +46,6 @@ class EditorSkeletonLoaderView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        self.resource = ApiClient().get_endpoint(self.table_name).get(self.resource_id)
         self.category = request.GET.get("category", "")
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
@@ -69,7 +68,6 @@ class EditorSkeletonLoaderView(TemplateView):
                 "title": self.title_base,
                 "main_subheading": humanise_resource_type(self.resource_type).title(),
                 "main_heading": self.title_base,
-                "resource": self.resource,
                 "resource_id": self.resource_id,
                 "toc_url": self.toc_url,
                 "tabbed_form_url": self.tabbed_form_url,
