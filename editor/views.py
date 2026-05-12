@@ -143,13 +143,6 @@ class EditorTabSectionView(TemplateView):
     disabled_categories: list[str]
     resource_type: str
 
-    new_one_to_one_relation_reverse_base: str
-    update_one_to_one_relation_reverse_base: str
-    delete_one_to_one_relation_reverse_base: str
-    new_one_to_many_relation_reverse_base: str
-    update_one_to_many_relation_reverse_base: str
-    delete_one_to_many_relation_reverse_base: str
-
     editor_overview_reverse_base: str
     editor_one_to_one_section_reverse_base: str
     editor_one_to_many_section_reverse_base: str
@@ -182,9 +175,6 @@ class EditorTabSectionView(TemplateView):
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories
         )
-        # One-to-many fields are handled first, as they are
-        # added to the category-based forms before they
-        # are generated.
         self.initialise_categorised_forms()
         self.initialise_toc_list_items()
         return super().dispatch(request, *args, **kwargs)
@@ -244,12 +234,6 @@ class EditorTabSectionView(TemplateView):
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
                 "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
-                "new_one_to_one_relation_reverse_base": self.new_one_to_one_relation_reverse_base,
-                "update_one_to_one_relation_reverse_base": self.update_one_to_one_relation_reverse_base,
-                "delete_one_to_one_relation_reverse_base": self.delete_one_to_one_relation_reverse_base,
-                "new_one_to_many_relation_reverse_base": self.new_one_to_many_relation_reverse_base,
-                "update_one_to_many_relation_reverse_base": self.update_one_to_many_relation_reverse_base,
-                "delete_one_to_many_relation_reverse_base": self.delete_one_to_many_relation_reverse_base,
             }
         )
         return context

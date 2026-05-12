@@ -531,7 +531,8 @@ class OneToManyFieldEditorSectionView(View):
             self.fk_table_name,
             self.api_client.openapi_spec,
             column_metadata,
-            infer_one_to_many_properties=False
+            infer_one_to_many_properties=False,
+            disabled_properties=[self.possible_fk_table_column_name]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -559,8 +560,9 @@ class OneToManyFieldEditorSectionView(View):
                     id_suffix="__resource_id__",
                 ),
                 "resource_id": "__resource_id__",
-                "resource_type": self.resource_type,
+                "resource_type": self.fk_table_name,
                 "field": {"name": self.fk_table_name},
+                "field_name": self.fk_table_name,
             },
             request=self.request
         )
@@ -570,21 +572,18 @@ class OneToManyFieldEditorSectionView(View):
             "editor/dialogs/new_dialog.html",
             {
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                fields=self.form_config.get_fields(),
-                id_prefix=f'new_{self.fk_table_name}'
-            ),
-                "resource_id": "__resource_id__",
-                "update_resource_url": reverse_lazy(
+                    fields=self.form_config.get_fields(),
+                    id_prefix=f'new_{self.fk_table_name}'
+                ),
+                "new_resource_url": reverse_lazy(
                     self.new_one_to_many_relation_reverse_base,
                     kwargs={
                         "resource_id": self.resource_id,
                         "fk_table_name": self.fk_table_name,
-                        "fk_resource_id": "__resource_id__",
-                    },
+                    }
                 ),
-                "dialog_id": f"new-{self.fk_table_name}-__resource_id__-dialog",
-                "dialog_extra_classes": "col-lg-10",
-                "resource_type": self.resource_type,
+                "dialog_id": f"new-{self.fk_table_name}-dialog",
+                "resource_type": self.fk_table_name,
             },
             request=self.request
         )
@@ -620,7 +619,7 @@ class OneToManyFieldEditorSectionView(View):
                 ),
                 "dialog_id": f"update-{self.fk_table_name}-{fk_resource_id}-dialog",
                 "dialog_extra_classes": "col-lg-10",
-                "resource_type": self.resource_type,
+                "resource_type": self.fk_table_name,
             },
             request=self.request
         )
@@ -651,7 +650,7 @@ class OneToManyFieldEditorSectionView(View):
                 ),
                 "dialog_id": f"delete-{self.fk_table_name}-{fk_resource_id}-dialog",
                 "dialog_extra_classes": "col-lg-10",
-                "resource_type": self.resource_type,
+                "resource_type": self.fk_table_name,
             },
             request=self.request
         )
@@ -675,7 +674,7 @@ class OneToManyFieldEditorSectionView(View):
                     "update_dialog": self.get_update_dialog_template(
                         fk_resource
                     ),
-                    "delete_form": self.get_delete_dialog_template(
+                    "delete_dialog": self.get_delete_dialog_template(
                         fk_resource
                     ),
                 }
@@ -698,6 +697,13 @@ class OneToManyFieldEditorSectionView(View):
                     },
                     request=self.request
                 ),
-                "list_item": self.get_list_item_template(),
+                "list_item": render_to_string(
+                    "editor/utils/to_json_script.html",
+                    {
+                        "content": self.get_list_item_template(),
+                        "content_id": f"{self.fk_table_name}-list_item-form-template",
+                    },
+                    request=self.request
+                ),
             },
         })

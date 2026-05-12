@@ -295,12 +295,20 @@ export async function loadOneToManyFieldSections() {
     const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
     oneToManyFieldSections.forEach((section, i) => {
         const sectionPlaceholder = section.querySelector("[data-section-url]");
-        console.log(htmlForSections[i])
         sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
         dialogsContainer = document.querySelector("#dialogs");
-        // dialogsContainer.append(htmlToNode(htmlForSections[i].new_dialog.trim()));
-        // dialogsContainer.append(htmlToNode(htmlForSections[i].update_dialog.trim()));
-        // dialogsContainer.append(htmlToNode(htmlForSections[i].delete_dialog.trim()));
-        // new OneToManyField(section);
+        dialogsContainer.append(htmlToNode(htmlForSections[i].new_dialog.trim()));
+        const dialogsForResources = htmlForSections[i].resource_dialogs;
+        for (const resourceId in dialogsForResources) {
+            const dialogsForResource = dialogsForResources[resourceId];
+            dialogsContainer.append(htmlToNode(dialogsForResource.update_dialog.trim()));
+            dialogsContainer.append(htmlToNode(dialogsForResource.delete_dialog.trim()));
+        }
+        const headElement = document.querySelector("head");
+        const templates = htmlForSections[i].templates;
+        headElement.append(htmlToNode(templates.update_dialog.trim()));
+        headElement.append(htmlToNode(templates.delete_dialog.trim()));
+        headElement.append(htmlToNode(templates.list_item.trim()));
+        new OneToManyField(section);
     });
 }
