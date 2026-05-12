@@ -7,15 +7,15 @@ from editor.foreign_key_views import (
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
+    OneToManyFieldEditorSectionView,
+    OneToOneFieldEditorSectionView,
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
 )
 from editor.views import (
     EditorOverviewTemplateView,
-    EditorSkeletonLoaderView,
     EditorStartFormView,
-    EditorTableOfContentsSectionView,
-    EditorTabSectionView,
+    EditorView,
     UpdateResourceByCategoryView,
 )
 from resource_management.views import (
@@ -28,6 +28,8 @@ from resource_management.views import (
 
 class ApplicationViewMixin:
     editor_reverse_base = "applications:application_editor"
+    editor_one_to_one_section_reverse_base = "applications:application_editor_one_to_one_section"
+    editor_one_to_many_section_reverse_base = "applications:application_editor_one_to_many_section"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
     resource_list_reverse = "applications:application_list"
@@ -38,26 +40,23 @@ class ApplicationViewMixin:
     resource_type = "application"
 
 
-class ApplicationEditorSkeletonLoaderView(ApplicationViewMixin, EditorSkeletonLoaderView):
-    table_name = "application_new"
-    template_name = "applications/application_editor.html"
-    success_url = reverse_lazy("applications:new_application")
-    toc_url = reverse_lazy("applications:application_editor_toc")
-    tabbed_form_reverse = "applications:application_editor_tabbed_form"
-
-
-class ApplicationEditorTableOfContentsView(EditorTableOfContentsSectionView):
-    table_name = "application_new"
-    column_metadata_table_name = "application"
-
-
-class ApplicationEditorTabSectionView(ApplicationViewMixin, EditorTabSectionView):
+class ApplicationEditorView(ApplicationViewMixin, EditorView):
+    template_name = "applications/application_editor_new.html"
     table_name = "application_new"
     column_metadata_table_name = "application"
     editor_form_reverse = "applications:update_application_by_category"
+
+
+class ApplicationOneToOneFieldEditorSectionView(ApplicationViewMixin, OneToOneFieldEditorSectionView):
+    table_name = "application_new"
     new_one_to_one_relation_reverse_base = "applications:new_application_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "applications:update_application_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "applications:delete_application_one_to_one_relation"
+
+
+class ApplicationOneToManyFieldEditorSectionView(ApplicationViewMixin, OneToManyFieldEditorSectionView):
+    table_name = "application_new"
+    possible_fk_table_column_name = "application_id"
     new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
     update_one_to_many_relation_reverse_base = "applications:update_application_one_to_many_relation"
     delete_one_to_many_relation_reverse_base = "applications:delete_application_one_to_many_relation"

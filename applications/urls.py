@@ -21,14 +21,14 @@ urlpatterns = [
         name="delete_applications",
     ),
     path(
-        "applications/api/editor-toc/",
-        views.ApplicationEditorTableOfContentsView.as_view(),
-        name="application_editor_toc",
+        "applications/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
+        views.ApplicationOneToOneFieldEditorSectionView.as_view(),
+        name="application_editor_one_to_one_section",
     ),
     path(
-        "applications/api/<resource_id>/editor/",
-        views.ApplicationEditorTabSectionView.as_view(),
-        name="application_editor_tabbed_form",
+        "applications/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        views.ApplicationOneToManyFieldEditorSectionView.as_view(),
+        name="application_editor_one_to_many_section",
     ),
     path(
         "applications/api/<resource_id>/edit/",
@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     path(
         "applications/<resource_id>/edit/",
-        views.ApplicationEditorSkeletonLoaderView.as_view(),
+        views.ApplicationEditorView.as_view(),
         name="application_editor",
     ),
     path(
