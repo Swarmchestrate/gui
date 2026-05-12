@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load helpers %}
+{% load humanise_terms %}
+{% block scripts %}
+{{ toc_url|json_script:'toc_url' }}
+{{ tabbed_form_url|json_script:'tabbed_form_url' }}
+{{ initial_category|json_script:'initial_category' }}
+{{ toast_template|json_script:'toast-template' }}
+<script type="module" src="{% static 'editor/editor_new.js' %}"></script>
+{% block extra_scripts %}
+{% endblock extra_scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<div class="position-relative">
+    <div class="editor-layout">
+        <h1 class="visually-hidden">
+            {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
+        </h1>
+        <div class="editor-layout__content">
+            {# TOC #}
+            <div class="editor-layout__toc">
+                {% include 'editor/toc_tabbed/toc_base.html' %}
+            </div>
+            {# Editor main content #}
+            <div class="editor-layout__body">
+                {% block editor_main_content %}
+                {% include 'editor/editor_tab.html' %}
+                {% endblock editor_main_content %}
+            </div>
+        </div>
+    </div>
+    <div id="toast-container" class="toast-container position-fixed top-0 start-0 end-0 p-3 mx-auto"></div>
+</div>
+{% endblock content %}

@@ -173,31 +173,30 @@ class EditorTabSectionView(TemplateView):
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories
         )
-        self.initialise_categorised_forms()
-        self.initialise_toc_list_items()
         return super().dispatch(request, *args, **kwargs)
 
-    def initialise_categorised_forms(self):
-        self.forms_by_category = dict()
+    def get_forms_by_category(self):
+        forms_by_category = dict()
         for category in self.form_config.get_field_categories():
             if category in self.disabled_categories:
                 continue
             if not category:
-                self.forms_by_category.update({
+                forms_by_category.update({
                 UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
                         fields=self.form_config.get_fields_for_category(category),
                         initial=self.resource.as_dict(),
                     )
                 })
                 continue
-            self.forms_by_category.update({
+            forms_by_category.update({
                 category: FormWithDynamicallyPopulatedFields(
                     fields=self.form_config.get_fields_for_category(category),
                     initial=self.resource.as_dict(),
                 )
             })
+        return forms_by_category
     
-    def initialise_toc_list_items(self):
+    def get_toc_list_items(self):
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         category_names = list(set(
             resource.as_dict().get("category", "")
@@ -207,7 +206,7 @@ class EditorTabSectionView(TemplateView):
         ))
         category_names.sort()
         form_fields = self.form_config.get_fields()
-        self.toc_list_items = EditorTableOfContents(
+        return EditorTableOfContents(
             self.table_name,
             category_names,
             is_unknown_category_needed=any(
@@ -225,13 +224,122 @@ class EditorTabSectionView(TemplateView):
                 "resource": self.resource,
                 "resource_id": self.resource_id,
                 "initial_category": self.category,
-                "forms_by_category": self.forms_by_category,
+                "toc_list_items": self.get_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(),
                 "editor_form_url": self.editor_form_url,
-                "toc_list_items": self.toc_list_items,
                 "resource_type": self.resource_type,
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
                 "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+            }
+        )
+        return context
+
+
+class EditorView(TemplateView):
+    table_name: str
+    column_metadata_table_name: str
+    openapi_spec: OpenApiSpecification
+    column_metadata: list[Resource]
+    referring_tables: dict[str, str]
+    disabled_categories: list[str]
+    resource_type: str
+
+    editor_overview_reverse_base: str
+    editor_one_to_one_section_reverse_base: str
+    editor_one_to_many_section_reverse_base: str
+    editor_form_reverse: str
+    editor_form_url: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        self.category = request.GET.get("category")
+        
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        resource_endpoint = self.api_client.get_endpoint(self.table_name)
+        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
+        self.resource = resource_endpoint.get(self.resource_id)
+        self.title_base = f"{resource_endpoint.resource_type.title()} {self.resource_id}"
+        self.editor_form_url = reverse_lazy(
+            self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
+        )
+        self.column_metadata = column_metadata_endpoint.get_resources()
+        if not hasattr(self, "disabled_categories"):
+            self.disabled_categories = list()
+        self.form_config = get_form_config_for_table(
+            self.table_name,
+            self.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_categories=self.disabled_categories
+        )
+        self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_toc_list_items(self):
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        category_names = list(set(
+            resource.as_dict().get("category", "")
+            for resource in column_metadata
+            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+                and resource.as_dict().get("category", "") not in self.disabled_categories)
+        ))
+        category_names.sort()
+        form_fields = self.form_config.get_fields()
+        return EditorTableOfContents(
+            self.table_name,
+            category_names,
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in form_fields.values()
+            )
+        ).as_dict()
+
+    def get_forms_by_category(self):
+        forms_by_category = dict()
+        for category in self.form_config.get_field_categories():
+            if category in self.disabled_categories:
+                continue
+            if not category:
+                forms_by_category.update({
+                UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
+                        fields=self.form_config.get_fields_for_category(category),
+                        initial=self.resource.as_dict(),
+                    )
+                })
+                continue
+            forms_by_category.update({
+                category: FormWithDynamicallyPopulatedFields(
+                    fields=self.form_config.get_fields_for_category(category),
+                    initial=self.resource.as_dict(),
+                )
+            })
+        return forms_by_category
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        context.update(
+            {
+                "title": self.title_base,
+                "main_subheading": humanise_resource_type(self.resource_type).title(),
+                "main_heading": self.title_base,
+                "resource": self.resource,
+                "resource_id": self.resource_id,
+                "initial_category": self.category,
+                "resource_type": self.resource_type,
+                "editor_form_url": self.editor_form_url,
+                "editor_overview_reverse_base": self.editor_overview_reverse_base,
+                "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
+                "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+                "toc_list_items": self.get_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(),
+                "toast_template": render_to_string("editor/toast_template.html", {}),
             }
         )
         return context
