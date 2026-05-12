@@ -16,6 +16,7 @@ from .field_config import (
 
 from postgrest.new_api import Definition, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from utils.humanise import humanise_resource_type_plural
 
 
 class ColumnMetadata:
@@ -155,7 +156,7 @@ class OneToManyProperties:
                     type=None,
                     description=None,
                     enum=None,
-                    title=extra_metadata_for_property.get("title"),
+                    title=extra_metadata_for_property.get("title") or humanise_resource_type_plural(table_name).title(),
                     category=extra_metadata_for_property.get("category"),
                     help_text=extra_metadata_for_property.get("description")
                 )
