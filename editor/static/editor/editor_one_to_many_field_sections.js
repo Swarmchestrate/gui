@@ -1,4 +1,5 @@
 import { FormDialog } from "/static/editor/form_dialog.js";
+import { displayToast } from "/static/editor/toasts.js";
 import { htmlToNode } from "/static/editor/utils.js";
 
 let dialogsContainer;
@@ -40,6 +41,7 @@ class OneToManyField {
         this.csrfMiddlewareTokenInput = this.newDialogForm
             .querySelector("input[name='csrfmiddlewaretoken']")
             .cloneNode(true);
+        this.resourceType = this.oneToManyField.dataset.resourceType;
     }
 
     setupNewDialog() {
@@ -53,6 +55,7 @@ class OneToManyField {
                     this.newDialogForm.reset();
                     const listItem = this.setupResource(responseData.resource);
                     this.setupListItem(listItem);
+                    displayToast(`Registered ${this.resourceType} ${responseData.resource.pk}.`);
                 },
             },
             this.newDialogForm,
@@ -69,7 +72,7 @@ class OneToManyField {
     }
 
     setupListItem(listItem) {
-        new OneToManyFieldListItem(listItem);
+        new OneToManyFieldListItem(listItem, this.resourceType);
     }
 
     // New resource methods
@@ -160,8 +163,9 @@ class OneToManyField {
 }
 
 class OneToManyFieldListItem {
-    constructor(listItem) {
+    constructor(listItem, resourceType) {
         this.listItem = listItem;
+        this.resourceType = resourceType;
         this.setupClassFields();
         this.setupDialogs();
     }
@@ -232,6 +236,7 @@ class OneToManyFieldListItem {
                         }
                     }
                     this.updateDialogForm.reset();
+                    displayToast(`Updated ${this.resourceType} ${responseData.resource.pk}.`);
                 },
             },
             this.updateDialogForm,
@@ -249,6 +254,9 @@ class OneToManyFieldListItem {
             {
                 onFormSuccess: (responseData) => {
                     this.removeListItem();
+                    displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
+                        "[name='resource_id_to_delete']"
+                    ).value}.`);
                 },
             },
             this.deleteDialogForm,
