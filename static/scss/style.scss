@@ -206,6 +206,10 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+.editor-container {
+    position: relative;
+}
+
 .editor-layout {
     display: grid;
     column-gap: 2rem;

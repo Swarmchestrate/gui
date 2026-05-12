@@ -23,7 +23,7 @@ from resource_management.views import (
 
 # Cloud Capacity (CC)
 class CloudCapacityEditorView(CloudCapacityViewMixin, EditorView):
-    template_name = "capacities/cloud_capacity_editor_new.html"
+    template_name = "capacities/cloud_capacity_editor.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     disabled_categories = ["Edge Specific", "Networking"]
@@ -85,7 +85,7 @@ class CloudCapacityDescriptionTemplateDownloadView(
 
 # Edge Capacity views (EC)
 class EdgeCapacityEditorView(EdgeCapacityViewMixin, EditorView):
-    template_name = "capacities/edge_capacity_editor_new.html"
+    template_name = "capacities/edge_capacity_editor.html"
     table_name = "capacity_new"
     column_metadata_table_name = "capacity"
     disabled_categories = ["System Specific"]

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block scripts %}
+{% endblock scripts %}
+{% block content %}
+<div class="editor-container">
+    <div class="editor-layout">
+        <div class="editor-layout__content">
+            {# Editor header #}
+            <div class="editor-layout__header">
+                {% block top_section %}{% endblock top_section %}
+            </div>
+            {# TOC #}
+            <div class="editor-layout__toc">
+                {% block toc %}{% endblock toc %}
+            </div>
+            {# Editor main content #}
+            <div class="editor-layout__body">
+                {% block main_section %}{% endblock main_section %}
+            </div>
+        </div>
+    </div>
+    {% block extra_section %}{% endblock extra_section %}
+</div>
+{% endblock content %}

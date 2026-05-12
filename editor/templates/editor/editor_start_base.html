@@ -1,16 +1,17 @@
-{% extends 'editor/editor_base_untabbed.html' %}
+{% extends 'editor/editor_base.html' %}
 {% block scripts %}{% endblock scripts %}
+
 {% block top_section %}
 <h1>{{ title }}</h1>
 <p class="lead">{% block lead_text %}{% endblock lead_text %}</p>
 <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
 {% endblock top_section %}
-{# TOC #}
-{% block list_item %}
-{% include 'editor/toc_untabbed/inactive_editor_toc_list_item.html' %}
-{% endblock list_item %}
-{# Editor main content #}
-{% block editor_main_content %}
+
+{% block toc %}
+{% include 'editor/toc_as_links/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
 <form id="registration-form" action="{{ request.path }}" method="POST">
     {% csrf_token %}
     {% for field in form %}
@@ -24,4 +25,4 @@
         <button class="btn btn-primary" type="submit">Start</button>
     </div>
 </form>
-{% endblock editor_main_content %}
+{% endblock main_section %}

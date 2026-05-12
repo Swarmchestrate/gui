@@ -41,7 +41,7 @@ class ApplicationViewMixin:
 
 
 class ApplicationEditorView(ApplicationViewMixin, EditorView):
-    template_name = "applications/application_editor_new.html"
+    template_name = "applications/application_editor.html"
     table_name = "application_new"
     column_metadata_table_name = "application"
     editor_form_reverse = "applications:update_application_by_category"

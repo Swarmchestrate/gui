@@ -1,15 +1,21 @@
-{% extends 'editor/editor_base_untabbed.html' %}
+{% extends 'editor/editor_base.html' %}
 {% load helpers %}
+
 {% block top_section %}
 <hgroup class="d-flex flex-column row-gap-1">
     <h1 class="mb-0">{{ main_heading }}</h1>
     <p class="fs-6 text-body-secondary">{{ main_subheading }} {{ resource_id }}</p>
 </hgroup>
 {% endblock top_section %}
-{% block editor_main_content %}
+
+{% block toc %}
+{% include 'editor/toc_as_links/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
 {% for list_item, list_item_data in toc_list_items.items %}
 {% with heading_level='2' heading_classes='fs-5' %}
 {% include 'editor/overview_section.html' %}
 {% endwith %}
 {% endfor %}
-{% endblock editor_main_content %}
+{% endblock main_section %}

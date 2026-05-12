@@ -1,0 +1,31 @@
+{% extends 'editor/editor_base.html' %}
+{% load static %}
+{% load helpers %}
+{% load humanise_terms %}
+{% block scripts %}
+{{ toc_url|json_script:'toc_url' }}
+{{ tabbed_form_url|json_script:'tabbed_form_url' }}
+{{ initial_category|json_script:'initial_category' }}
+{{ toast_template|json_script:'toast-template' }}
+<script type="module" src="{% static 'editor/editor_new.js' %}"></script>
+{% block extra_scripts %}
+{% endblock extra_scripts %}
+{% endblock scripts %}
+
+{% block top_section %}
+<h1 class="visually-hidden">
+    {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
+</h1>
+{% endblock top_section %}
+
+{% block toc %}
+{% include 'editor/toc_as_tab_buttons/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
+{% include 'editor/editor_tab.html' %}
+{% endblock main_section %}
+
+{% block extra_section %}
+<div id="toast-container" class="toast-container position-fixed top-0 start-0 end-0 p-3 mx-auto"></div>
+{% endblock extra_section %}]
