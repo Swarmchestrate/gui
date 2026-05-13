@@ -6,7 +6,11 @@
             "format": "integer",
             "type": "integer"
         },
-        "application_id": { "format": "integer", "type": "integer" },
+        "application_microservice_id": {
+            "description": "Note:\nThis is a Foreign Key to `application_microservice.application_microservice_id`.<fk table='application_microservice' column='id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
         "name": { "format": "text", "type": "string" },
         "protocol": {
             "enum": ["TCP", "UDP"],
@@ -20,7 +24,7 @@
             "format": "public.port_type_enum",
             "type": "string"
         },
-        "cluster_ip": { "format": "text", "type": "string" }
+        "cluster_ip": { "format": "character varying", "type": "string" }
     },
     "type": "object"
 }

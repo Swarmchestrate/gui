@@ -6,7 +6,11 @@
             "format": "integer",
             "type": "integer"
         },
-        "application_id": { "format": "integer", "type": "integer" },
+        "application_microservice_id": {
+            "description": "Note:\nThis is a Foreign Key to `application_microservice.application_microservice_id`.<fk table='application_microservice' column='id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
         "target": { "format": "text", "type": "string" },
         "json_k8s_extra": { "format": "jsonb" }
     },
