@@ -129,7 +129,11 @@ class MockEndpoint(BaseEndpoint):
             return {}
         resources.append(cleaned_data)
         self._update_temp_data(resources)
-        return BaseResource(cleaned_data)
+        return BaseResource(
+            cleaned_data,
+            self.resource_type,
+            self.definition.pk_column_name
+        )
 
     def update(
             self,
