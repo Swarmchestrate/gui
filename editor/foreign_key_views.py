@@ -10,6 +10,7 @@ from django.views.generic import FormView, View
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
+from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
 
 
@@ -388,7 +389,14 @@ class OneToOneFieldEditorSectionView(View):
             self.fk_table_name,
             self.api_client.openapi_spec,
             column_metadata,
-            infer_one_to_many_properties=False
+            infer_one_to_many_properties=True,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                TableNames.APPLICATION_NEW,
+                TableNames.APPLICATION_MICROSERVICE,
+                TableNames.CAPACITY,
+                TableNames.CAPACITY_NEW,
+            ]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -531,8 +539,14 @@ class OneToManyFieldEditorSectionView(View):
             self.fk_table_name,
             self.api_client.openapi_spec,
             column_metadata,
-            infer_one_to_many_properties=False,
-            disabled_properties=[self.possible_fk_table_column_name]
+            infer_one_to_many_properties=True,
+            disabled_properties=[
+                f"{TableNames.APPLICATION}_id",
+                f"{TableNames.APPLICATION_NEW}_id",
+                f"{TableNames.APPLICATION_MICROSERVICE}_id",
+                f"{TableNames.CAPACITY}_id",
+                f"{TableNames.CAPACITY_NEW}_id",
+            ]
         )
         return super().dispatch(request, *args, **kwargs)
 
