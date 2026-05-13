@@ -40,6 +40,14 @@
         "order": null
     },
     {
+        "table_name": "application",
+        "column_name": "application_microservice",
+        "title": "Microservices",
+        "category": "Microservices",
+        "description": "Microservices of the application.",
+        "order": null
+    },
+    {
         "table_name": "application_microservice",
         "column_name": "container_image",
         "title": "Container Image",
