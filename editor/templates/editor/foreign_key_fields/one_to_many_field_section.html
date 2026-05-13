@@ -1,7 +1,7 @@
 {% load humanise_terms %}
 <div class="d-flex flex-column align-items-start">
     <div class="card w-100">
-        <ul class="list-group list-group-flush" placeholder="Nothing added.">{% for resource_id, forms in forms_for_existing_resources.items %}
+        <ul class="list-group list-group-flush" placeholder="No {{ resource_type|humanise_resource_type_plural }} added.">{% for resource_id, forms in forms_for_existing_resources.items %}
             {% with form=forms.update_form resource_type=resource_type %}
             {% include 'editor/foreign_key_fields/one_to_many_field_list_item.html' %}
             {% endwith %}
