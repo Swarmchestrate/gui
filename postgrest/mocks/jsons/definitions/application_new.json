@@ -13,6 +13,10 @@
             "maxLength": 255,
             "type": "string"
         },
+        "description": {
+            "format": "text",
+            "type": "string"
+        },
         "author": {
             "description": "Author of the application.",
             "format": "character varying",
@@ -34,6 +38,61 @@
             "description": "Classification/type of the application.",
             "format": "character varying",
             "maxLength": 255,
+            "type": "string"
+        },
+        "minimise_power_usage": {
+            "description": "Indicates if power usage should be minimised.",
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "energy_budget": {
+            "description": "Energy budget in kWh per hour.",
+            "format": "numeric",
+            "type": "number"
+        },
+        "minimise_cost": {
+            "description": "Indicates if cost should be minimised.",
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "cost_budget": {
+            "description": "Maximum cost budget (£/hour).",
+            "format": "numeric",
+            "type": "number"
+        },
+        "trust_level": {
+            "description": "Overall trust level score (percentage).",
+            "format": "double precision",
+            "type": "number"
+        },
+        "requests_per_sec": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "iops": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "io_throughput_bps": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "net_throughput_bps": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "database_writes": {
+            "format": "numeric",
+            "type": "number"
+        },
+        "created_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "updated_at": {
+            "default": "now()",
+            "format": "timestamp without time zone",
             "type": "string"
         }
     },
