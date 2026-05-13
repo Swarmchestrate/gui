@@ -28,6 +28,7 @@ class CloudCapacityEditorView(CloudCapacityViewMixin, EditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
+    disabled_properties = ["resource_type"]
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
 
@@ -57,6 +58,7 @@ class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOver
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
+    disabled_properties = ["resource_type"]
 
 
 # Resource management views (CC)
@@ -97,6 +99,7 @@ class EdgeCapacityEditorView(EdgeCapacityViewMixin, EditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
+    disabled_properties = ["resource_type"]
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
 
@@ -126,6 +129,7 @@ class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOvervi
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
+    disabled_properties = ["resource_type"]
 
 
 # Resource management views (EC)

@@ -35,6 +35,7 @@ class EditorView(TemplateView):
     column_metadata: list[Resource]
     referring_tables: dict[str, str]
     disabled_categories: list[str]
+    disabled_properties: list[str]
     resource_type: str
 
     editor_overview_reverse_base: str
@@ -62,6 +63,8 @@ class EditorView(TemplateView):
         self.column_metadata = column_metadata_endpoint.get_resources()
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
+        if not hasattr(self, "disabled_properties"):
+            self.disabled_properties = list()
         self.form_config = get_form_config_for_table(
             self.table_name,
             self.openapi_spec,
@@ -73,6 +76,7 @@ class EditorView(TemplateView):
                 TableNames.APPLICATION_NEW,
                 TableNames.CAPACITY,
                 TableNames.CAPACITY_NEW,
+                *self.disabled_properties,
             ]
         )
         self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
@@ -311,6 +315,7 @@ class EditorOverviewTemplateView(TemplateView):
     table_name: str
     column_metadata_table_name: str
     disabled_categories: list[str]
+    disabled_properties: list[str]
 
     editor_reverse_base: str
     resource_type: str
@@ -326,6 +331,8 @@ class EditorOverviewTemplateView(TemplateView):
             self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
+        if not hasattr(self, "disabled_properties"):
+            self.disabled_properties = list()
         form_config = get_form_config_for_table(
             self.table_name,
             self.api_client.openapi_spec,
@@ -337,6 +344,7 @@ class EditorOverviewTemplateView(TemplateView):
                 TableNames.APPLICATION_NEW,
                 TableNames.CAPACITY,
                 TableNames.CAPACITY_NEW,
+                *self.disabled_properties,
             ]
         )
         self.properties_as_dict = form_config.get_properties()
