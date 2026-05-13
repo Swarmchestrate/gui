@@ -5,7 +5,7 @@ from .form_config import FormConfig
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
-from postgrest.new_api import ApiClient, OpenApiSpecification, Resource
+from postgrest.api import ApiClient, OpenApiSpecification, Resource
 from resource_management.forms import ResourceDeletionForm
 
 

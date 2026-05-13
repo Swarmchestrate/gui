@@ -1,6 +1,6 @@
 import logging
 
-from .new_api import ApiClient
+from .api import ApiClient
 
 
 logger = logging.getLogger(__name__)

@@ -15,7 +15,7 @@ from .forms import FormWithDynamicallyPopulatedFields
 from .view_helpers import EditorTableOfContents
 
 from editor.view_helpers import get_form_config_for_table
-from postgrest.new_api import (
+from postgrest.api import (
     ApiClient,
     OpenApiSpecification,
     Resource,

@@ -16,7 +16,7 @@ from utils.humanise import (
     humanise_resource_type,
     humanise_resource_type_plural,
 )
-from postgrest.new_api import ApiClient
+from postgrest.api import ApiClient
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ from django.test import SimpleTestCase
 
 from .tosca import generate_application_description_template
 
-from postgrest.new_api import ApiClient, Resource
+from postgrest.api import ApiClient, Resource
 from postgrest.test_mixins import PostgrestApiTestTeardownHelperMixin
 
 

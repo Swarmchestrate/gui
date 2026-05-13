@@ -1,6 +1,6 @@
 import yaml
 
-from postgrest.new_api import ApiClient
+from postgrest.api import ApiClient
 
 
 def generate_application_description_template(application_id: int) -> str:

@@ -9,7 +9,7 @@ from django.views.generic import FormView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
-from postgrest.new_api import ApiClient, Resource
+from postgrest.api import ApiClient, Resource
 from resource_management.forms import ResourceDeletionForm
 
 

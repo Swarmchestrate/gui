@@ -14,7 +14,7 @@ from .field_config import (
     NumericFieldConfig,
 )
 
-from postgrest.new_api import Definition, Resource
+from postgrest.api import Definition, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type_plural
 

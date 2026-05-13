@@ -1,7 +1,7 @@
 import json
 from django.test import SimpleTestCase
 
-from .new_api import ApiClient, OpenApiSpecification
+from .api import ApiClient, OpenApiSpecification
 from .mock_api import generate_mock_openapi_spec
 
 # Create your tests here.

@@ -12,7 +12,7 @@ from editor.views import (
     EditorView,
     UpdateResourceByCategoryView,
 )
-from postgrest.new_api import ApiClient
+from postgrest.api import ApiClient
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,

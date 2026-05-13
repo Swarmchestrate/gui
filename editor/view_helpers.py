@@ -4,7 +4,7 @@ from postgrest.forms.form_config import (
     Properties,
     OneToManyProperties,
 )
-from postgrest.new_api import OpenApiSpecification, Resource
+from postgrest.api import OpenApiSpecification, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 
 
