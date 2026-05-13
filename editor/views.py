@@ -20,6 +20,7 @@ from postgrest.api import (
     OpenApiSpecification,
     Resource,
 )
+from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type
 
@@ -66,7 +67,13 @@ class EditorView(TemplateView):
             self.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories
+            disabled_categories=self.disabled_categories,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                TableNames.APPLICATION_NEW,
+                TableNames.CAPACITY,
+                TableNames.CAPACITY_NEW,
+            ]
         )
         self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
@@ -324,7 +331,13 @@ class EditorOverviewTemplateView(TemplateView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories
+            disabled_categories=self.disabled_categories,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                TableNames.APPLICATION_NEW,
+                TableNames.CAPACITY,
+                TableNames.CAPACITY_NEW,
+            ]
         )
         self.properties_as_dict = form_config.get_properties()
         self.form_fields = form_config.get_fields()
