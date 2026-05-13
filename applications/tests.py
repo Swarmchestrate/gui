@@ -4,13 +4,14 @@ from django.test import SimpleTestCase
 from .tosca import generate_application_description_template
 
 from postgrest.api import ApiClient, Resource
+from postgrest.table_names import TableNames
 from postgrest.test_mixins import PostgrestApiTestTeardownHelperMixin
 
 
 class ApplicationApiClientTestCase(
         PostgrestApiTestTeardownHelperMixin,
         SimpleTestCase):
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     TEST_REGISTRATION_DATA = {
         "name": "Weather Analytics App",
         "container_image": "https://hub.docker.com/myorg/weather-analytics:latest",
@@ -71,7 +72,7 @@ class ApplicationApiClientTestCase(
 class ApplicationDescriptionTemplateTestCase(
         PostgrestApiTestTeardownHelperMixin,
         SimpleTestCase):
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     
     def setUp(self):
         self.initialise_test_teardown_helper_components()

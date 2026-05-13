@@ -3,13 +3,14 @@ from django.test import SimpleTestCase
 from .tosca import generate_capacity_description_template
 
 from postgrest.api import ApiClient, Resource
+from postgrest.table_names import TableNames
 from postgrest.test_mixins import PostgrestApiTestTeardownHelperMixin
 
 
 class CapacityPostgrestApiTestCase(
         PostgrestApiTestTeardownHelperMixin,
         SimpleTestCase):
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
     
     def setUp(self):
         api_client = ApiClient()
@@ -63,7 +64,7 @@ class CapacityPostgrestApiTestCase(
 class CapacityDescriptionTemplateTestCase(
         PostgrestApiTestTeardownHelperMixin,
         SimpleTestCase):
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
     
     def setUp(self):
         self.initialise_test_teardown_helper_components()

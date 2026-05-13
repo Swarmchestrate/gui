@@ -13,6 +13,7 @@ from editor.views import (
     UpdateResourceByCategoryView,
 )
 from postgrest.api import ApiClient
+from postgrest.table_names import TableNames
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -24,23 +25,23 @@ from resource_management.views import (
 # Cloud Capacity (CC)
 class CloudCapacityEditorView(CloudCapacityViewMixin, EditorView):
     template_name = "capacities/cloud_capacity_editor.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
 
 
 class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
 
     def get_registration_data(self, form) -> dict:
@@ -53,8 +54,8 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
 
 class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
 
 
@@ -62,29 +63,29 @@ class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOver
 class CloudCapacityDeletionFormView(CloudCapacityViewMixin, ResourceDeletionFormView):
     template_name = "capacities/cloud_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
 
 class MultiCloudCapacityDeletionFormView(CloudCapacityViewMixin, MultiResourceDeletionFormView):
     template_name = "capacities/cloud_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
 
 class CloudCapacityListFormView(CloudCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/cloud_capacities.html"
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
     def get_resource_list(self):
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
-        return api_client.get_endpoint("capacity_new").get_resources_by_type("Cloud")
+        return api_client.get_endpoint(TableNames.CAPACITY_NEW).get_resources_by_type("Cloud")
 
 
 class CloudCapacityDescriptionTemplateDownloadView(
         CloudCapacityViewMixin,
         ToscaTemplateDownloadView):
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
     def generate_tosca_template(self):
         return generate_capacity_description_template(self.resource_id)
@@ -93,23 +94,23 @@ class CloudCapacityDescriptionTemplateDownloadView(
 # Edge Capacity views (EC)
 class EdgeCapacityEditorView(EdgeCapacityViewMixin, EditorView):
     template_name = "capacities/edge_capacity_editor.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
 
 
 class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCategoryView):
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
 
     def get_registration_data(self, form) -> dict:
@@ -122,8 +123,8 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
 
 class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/edge_capacity_overview.html"
-    table_name = "capacity_new"
-    column_metadata_table_name = "capacity"
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
 
 
@@ -131,29 +132,29 @@ class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOvervi
 class EdgeCapacityDeletionFormView(EdgeCapacityViewMixin, ResourceDeletionFormView):
     template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_cloud_capacities")
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
 
 class MultiEdgeCapacityDeletionFormView(EdgeCapacityViewMixin, MultiResourceDeletionFormView):
     template_name = "capacities/edge_capacities.html"
     success_url = reverse_lazy("capacities:delete_edge_capacities")
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
 
 class EdgeCapacityListFormView(EdgeCapacityViewMixin, ResourceListFormView):
     template_name = "capacities/edge_capacities.html"
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
     def get_resource_list(self):
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
-        return api_client.get_endpoint("capacity_new").get_resources_by_type("Edge")
+        return api_client.get_endpoint(TableNames.CAPACITY_NEW).get_resources_by_type("Edge")
 
 
 class EdgeCapacityDescriptionTemplateDownloadView(
         EdgeCapacityViewMixin,
         ToscaTemplateDownloadView):
-    table_name = "capacity_new"
+    table_name = TableNames.CAPACITY_NEW
 
     def generate_tosca_template(self):
         return generate_capacity_description_template(self.resource_id)

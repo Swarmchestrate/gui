@@ -18,6 +18,7 @@ from editor.views import (
     EditorView,
     UpdateResourceByCategoryView,
 )
+from postgrest.table_names import TableNames
 from resource_management.views import (
     MultiResourceDeletionFormView,
     ResourceDeletionFormView,
@@ -42,20 +43,20 @@ class ApplicationViewMixin:
 
 class ApplicationEditorView(ApplicationViewMixin, EditorView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
-    column_metadata_table_name = "application"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
     editor_form_reverse = "applications:update_application_by_category"
 
 
 class ApplicationOneToOneFieldEditorSectionView(ApplicationViewMixin, OneToOneFieldEditorSectionView):
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     new_one_to_one_relation_reverse_base = "applications:new_application_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "applications:update_application_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "applications:delete_application_one_to_one_relation"
 
 
 class ApplicationOneToManyFieldEditorSectionView(ApplicationViewMixin, OneToManyFieldEditorSectionView):
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
     update_one_to_many_relation_reverse_base = "applications:update_application_one_to_many_relation"
@@ -65,21 +66,21 @@ class ApplicationOneToManyFieldEditorSectionView(ApplicationViewMixin, OneToMany
 class UpdateApplicationByCategoryView(
         ApplicationViewMixin,
         UpdateResourceByCategoryView):
-    table_name = "application_new"
-    column_metadata_table_name = "application"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
     template_name = "applications/new_application_start.html"
-    table_name = "application_new"
-    column_metadata_table_name = "application"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
     success_url = reverse_lazy("applications:new_application")
 
 
 class ApplicationDeletionFormView(ApplicationViewMixin, ResourceDeletionFormView):
     template_name = "applications/applications.html"
     success_url = reverse_lazy("applications:application_list")
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
 
 class MultiApplicationDeletionFormView(
@@ -87,27 +88,27 @@ class MultiApplicationDeletionFormView(
         MultiResourceDeletionFormView):
     template_name = "applications/applications.html"
     success_url = reverse_lazy("applications:application_list")
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
 
 class ApplicationListFormView(ApplicationViewMixin, ResourceListFormView):
     template_name = "applications/applications.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
 
 class ApplicationEditorOverviewTemplateView(
         ApplicationViewMixin,
         EditorOverviewTemplateView):
     template_name = "applications/application_overview.html"
-    table_name = "application_new"
-    column_metadata_table_name = "application"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationNewOneToOneRelationFormView(
         ApplicationViewMixin,
         NewOneToOneRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -121,7 +122,7 @@ class ApplicationUpdateOneToOneRelationFormView(
         ApplicationViewMixin,
         UpdateOneToOneRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -135,7 +136,7 @@ class ApplicationDeleteOneToOneRelationFormView(
         ApplicationViewMixin,
         DeleteOneToOneRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
     def dispatch(self, request, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -149,7 +150,7 @@ class ApplicationNewOneToManyRelationFormView(
         ApplicationViewMixin,
         NewOneToManyRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
 
     def dispatch(self, request, *args, **kwargs):
@@ -164,7 +165,7 @@ class ApplicationUpdateOneToManyRelationFormView(
         ApplicationViewMixin,
         UpdateOneToManyRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
 
     def dispatch(self, request, *args, **kwargs):
@@ -179,7 +180,7 @@ class ApplicationDeleteOneToManyRelationFormView(
         ApplicationViewMixin,
         DeleteOneToManyRelationFormView):
     template_name = "applications/application_editor.html"
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
 
     def dispatch(self, request, *args, **kwargs):
@@ -193,7 +194,7 @@ class ApplicationDeleteOneToManyRelationFormView(
 class ApplicationDescriptionTemplateDownloadView(
         ApplicationViewMixin,
         ToscaTemplateDownloadView):
-    table_name = "application_new"
+    table_name = TableNames.APPLICATION_NEW
 
     def generate_tosca_template(self):
         return generate_application_description_template(self.resource_id)
