@@ -2,9 +2,17 @@
     {
         "table_name": "application",
         "column_name": "name",
-        "title": "Application Name",
+        "title": "Name",
         "category": "Metadata",
         "description": "Name of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "description",
+        "title": "Description",
+        "category": "Metadata",
+        "description": "Description of the application.",
         "order": null
     },
     {
@@ -37,6 +45,94 @@
         "title": "Classification",
         "category": "Metadata",
         "description": "Classification/type of the application.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "minimise_power_usage",
+        "title": "Minimise Power Usage",
+        "category": "QoS Goals",
+        "description": "Indicates if power usage should be minimised.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "energy_budget",
+        "title": "Energy Budget",
+        "category": "QoS Goals",
+        "description": "Energy budget in kWh per hour.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "minimise_cost",
+        "title": "Minimise Cost",
+        "category": "QoS Goals",
+        "description": "Indicates if cost should be minimised.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "cost_budget",
+        "title": "Cost Budget",
+        "category": "QoS Goals",
+        "description": "Maximum cost budget (£/hour).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "trust_level",
+        "title": "Trust Level",
+        "category": "QoS Goals",
+        "description": "Overall trust level score (percentage).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "response_time_ms",
+        "title": "Response Time (ms)",
+        "category": "QoS Goals",
+        "description": "Response time in milliseconds. Example: Rt >= 50 ms & Rt <= 100 ms.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "requests_per_sec",
+        "title": "Requests per Second",
+        "category": "QoS Goals",
+        "description": "Number of requests per second (throughput requirement).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "iops",
+        "title": "IOPS",
+        "category": "QoS Goals",
+        "description": "IOPS (Input/Output operations per second).",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "io_throughput_bps",
+        "title": "IO Throughput (bps)",
+        "category": "QoS Goals",
+        "description": "IO Throughput measured in bits per second.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "net_throughput_bps",
+        "title": "Net Throughput (bps)",
+        "category": "QoS Goals",
+        "description": "Net Throughput measured in bits per second.",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "database_writes",
+        "title": "Database Writes",
+        "category": "QoS Goals",
+        "description": "Number of database writes per second required.",
         "order": null
     },
     {
@@ -89,18 +185,18 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "min_memory_gb",
-        "title": "Minimum Memory (GB)",
-        "category": "Specs:Component",
-        "description": "Minimum required memory in GB.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
         "column_name": "max_cpu",
         "title": "Maximum CPU",
         "category": "Specs:Component",
         "description": "Maximum allowed CPU.",
+        "order": null
+    },
+    {
+        "table_name": "application_microservice",
+        "column_name": "min_memory_gb",
+        "title": "Minimum Memory (GB)",
+        "category": "Specs:Component",
+        "description": "Minimum required memory in GB.",
         "order": null
     },
     {
@@ -253,118 +349,6 @@
         "title": "Preferred Resource Provider",
         "category": "QoS Goals",
         "description": "Preferred specific providers with weights (e.g., Amazon 70%, Azure 50%).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "minimise_power_usage",
-        "title": "Minimise Power Usage",
-        "category": "QoS Goals:Energy",
-        "description": "Indicates if power usage should be minimised.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "energy_budget",
-        "title": "Energy Budget",
-        "category": "QoS Goals:Energy",
-        "description": "Energy budget in kWh per hour.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "minimise_cost",
-        "title": "Minimise Cost",
-        "category": "QoS Goals:Cost",
-        "description": "Indicates if cost should be minimised.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "cost_budget",
-        "title": "Cost Budget",
-        "category": "QoS Goals:Cost",
-        "description": "Maximum cost budget (£/hour).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "trust_level",
-        "title": "Trust Level",
-        "category": "QoS Goals",
-        "description": "Overall trust level score (percentage).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "response_time_ms",
-        "title": "Response Time (ms)",
-        "category": "QoS Goals:Performance",
-        "description": "Response time in milliseconds. Example: Rt >= 50 ms & Rt <= 100 ms.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "requests_per_sec",
-        "title": "Requests per Second",
-        "category": "QoS Goals:Performance",
-        "description": "Number of requests per second (throughput requirement).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "iops",
-        "title": "IOPS",
-        "category": "QoS Goals:Performance",
-        "description": "IOPS (Input/Output operations per second).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "io_throughput_bps",
-        "title": "IO Throughput (bps)",
-        "category": "QoS Goals:Performance",
-        "description": "IO Throughput measured in bits per second.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "net_throughput_bps",
-        "title": "Net Throughput (bps)",
-        "category": "QoS Goals:Performance",
-        "description": "Net Throughput measured in bits per second.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "database_writes",
-        "title": "Database Writes",
-        "category": "QoS Goals:Performance",
-        "description": "Number of database writes per second required.",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "custom_attributes",
-        "title": "Custom Attributes",
-        "category": "QoS Goals:Performance",
-        "description": "Custom attributes in key-value format (e.g., {\"latency\":\"<50ms\"}).",
-        "order": null
-    },
-    {
-        "table_name": "application_microservice",
-        "column_name": "custom_scaling_rules",
-        "title": "Custom Scaling Rules",
-        "category": "QoS Goals:Performance",
-        "description": "Custom scaling rules with higher priority over AI decision making in case of conflict.",
-        "order": null
-    },
-    {
-        "table_name": "application",
-        "column_name": "application_microservice",
-        "title": "Microservices",
-        "category": "Microservices",
-        "description": "",
         "order": null
     },
     {
