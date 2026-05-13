@@ -126,10 +126,14 @@ class OneToManyProperties:
             self,
             table_name: str,
             fk_table_names: list[str],
-            column_metadata: ColumnMetadata):
+            column_metadata: ColumnMetadata,
+            column_metadata_table_name: str = None):
         self._table_name = table_name
         self._fk_table_names = fk_table_names
         self._column_metadata_as_dict = column_metadata.as_dict()
+        self._column_metadata_table_name = column_metadata_table_name
+        if not column_metadata_table_name:
+            self._column_metadata_table_name = table_name
 
     def as_dict(self):
         """Generates a dict of PropertyMetadata instances mapped
@@ -141,7 +145,7 @@ class OneToManyProperties:
         """
         properties_as_dict = {}
         column_metadata_for_table = self._column_metadata_as_dict.get(
-            self._table_name,
+            self._column_metadata_table_name,
             {}
         )
         for table_name in self._fk_table_names:

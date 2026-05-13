@@ -185,7 +185,8 @@ def get_form_config_for_table(
     one_to_many_properties = OneToManyProperties(
         table_name,
         list(referring_tables.keys()),
-        column_metadata
+        column_metadata,
+        column_metadata_table_name=column_metadata_table_name
     )
     return FormConfig(
         properties_as_dict,
