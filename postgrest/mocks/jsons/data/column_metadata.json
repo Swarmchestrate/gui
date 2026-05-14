@@ -554,7 +554,7 @@
     {
         "table_name": "capacity",
         "column_name": "capacity_operating_system",
-        "title": "Operating System",
+        "title": "Operating Systems",
         "category": "System Specific",
         "description": "Supported operating systems with IDs (limited to Debian, Ubuntu, CentOS).",
         "order": null
