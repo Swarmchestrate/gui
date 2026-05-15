@@ -14,7 +14,7 @@
         <div class="col-xl-2 d-flex column-gap-2">
             <button
                 class="btn btn-light update-editor-btn ms-xl-auto"
-                data-editor-id="update-{{ field_name }}-{{ resource_id }}-editor"
+                data-editor-id="update-{{ fk_table_name }}-{{ resource_id }}-editor"
                 type="button"
                 aria-label="Edit"
                 title="Edit">
@@ -22,7 +22,7 @@
             </button>
             <button
                 class="btn btn-outline-danger delete-dialog-btn"
-                data-dialog-id="delete-{{ field_name }}-{{ resource_id }}-dialog"
+                data-dialog-id="delete-{{ fk_table_name }}-{{ resource_id }}-dialog"
                 type="button"
                 aria-label="Delete"
                 title="Delete">

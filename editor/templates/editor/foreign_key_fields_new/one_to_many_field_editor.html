@@ -2,10 +2,7 @@
     id="{{ editor_id }}"
     class="d-none card one-to-many-field-editor"
     data-form-id="{{ form_id }}">
-    <button
-        class="btn btn-light"
-        data-back-id="{{ fk_table_name }}-{{ resource_id }}">Back to Main Editor</button>
-    <div class="fields">
+    <div class="fields px-4 pb-4">
         {% include 'editor/util_templates/form_errors_list.html' %}
         {% for field in form %}
         {% if field.field.widget.input_type == 'checkbox' %}

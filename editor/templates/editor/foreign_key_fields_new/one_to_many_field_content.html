@@ -1,6 +1,6 @@
 {% load humanise_terms %}
 <div id="{{ fk_table_name }}-{{ resource_id }}" class="one-to-many-field-content">
-    <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-start initial-content">
         <div class="card w-100">
             <ul class="list-group list-group-flush" placeholder="No {{ resource_type|humanise_resource_type_plural }} added.">{% for resource_id, forms in forms_for_existing_resources.items %}
                 {% with form=forms.update_form resource_type=resource_type %}
@@ -10,7 +10,7 @@
             <button
                 class="btn btn-light new-editor-btn rounded-top-0 w-100 {% if field.value %}d-none{% endif %}"
                 type="button"
-                data-editor-id="new-{{ field_name }}-editor">
+                data-editor-id="new-{{ fk_table_name }}-editor">
                 <i class="bi bi-plus-lg"></i>
                 Add {{ resource_type|humanise_resource_type|title }}
             </button>

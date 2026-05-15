@@ -254,21 +254,25 @@ class OneToManyFieldEditorSectionView(View):
                 "resource_id": "__resource_id__",
                 "resource_type": self.fk_table_name,
                 "field": {"name": self.fk_table_name},
-                "field_name": self.fk_table_name,
+                "fk_table_name": self.fk_table_name,
             },
             request=self.request
         )
 
     def get_new_fk_resource_template(self):
+        form_id = f"new-{self.fk_table_name}-{self.resource_id}-form"
         return render_to_string(
             "editor/foreign_key_fields_new/one_to_many_field_editor.html",
             {
                 "resource_id": self.resource_id,
                 "fk_table_name": self.fk_table_name,
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
+                    fields=self.form_config.get_fields_assigned_to_form(
+                        form_id
+                    ),
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
+                "form_id": form_id,
                 "new_resource_url": reverse_lazy(
                     self.new_one_to_many_relation_reverse_base,
                     kwargs={
@@ -283,9 +287,11 @@ class OneToManyFieldEditorSectionView(View):
             request=self.request
         )
 
-    def get_update_form(self, fk_resource_id: int | str, initial: dict):
+    def get_update_form(self, form_id: str, fk_resource_id: int | str, initial: dict):
         return ForeignKeyFormWithDynamicallyPopulatedFields(
-            fields=self.form_config.get_fields(),
+            fields=self.form_config.get_fields_assigned_to_form(
+                form_id
+            ),
             id_suffix=f"{self.fk_table_name}_{fk_resource_id}",
             initial=initial,
         )
@@ -296,15 +302,18 @@ class OneToManyFieldEditorSectionView(View):
         if fk_resource:
             fk_resource_id = fk_resource.pk
             initial = fk_resource.as_dict()
+        form_id = f"update-{self.fk_table_name}-{fk_resource_id}-form"
         return render_to_string(
             "editor/foreign_key_fields_new/one_to_many_field_editor.html",
             {
                 "resource_id": self.resource_id,
                 "fk_table_name": self.fk_table_name,
                 "form": self.get_update_form(
+                    form_id,
                     fk_resource_id,
                     initial
                 ),
+                "form_id": form_id,
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
                     self.update_one_to_many_relation_reverse_base,
@@ -353,12 +362,23 @@ class OneToManyFieldEditorSectionView(View):
             request=self.request
         )
 
+    def get_empty_form(self, form_id: str, form_action: str):
+        return render_to_string(
+            "editor/utils/empty_form.html",
+            {
+                "form_id": form_id,
+                "form_action": form_action,
+            },
+            request=self.request
+        )
+
     def get(self, request, *args, **kwargs):
         fk_resources = self.get_resources()
         return JsonResponse({
             "initial_content": self.get_initial_content_template({
                 fk_resource.pk: {
                     "update_form": self.get_update_form(
+                        f"update-{self.fk_table_name}-{fk_resource.pk}-form",
                         fk_resource.pk,
                         fk_resource.as_dict()
                     ),
@@ -367,10 +387,31 @@ class OneToManyFieldEditorSectionView(View):
                 for fk_resource in fk_resources
             }),
             "new_editor": self.get_new_fk_resource_template(),
+            "empty_new_form": self.get_empty_form(
+                f"new-{self.fk_table_name}-{self.resource_id}-form",
+                reverse_lazy(
+                    self.new_one_to_many_relation_reverse_base,
+                    kwargs={
+                        "resource_id": self.resource_id,
+                        "fk_table_name": self.fk_table_name,
+                    }
+                )
+            ),
             "existing_resource_templates": {
                 fk_resource.pk: {
                     "update_editor": self.get_update_fk_resource_template(
                         fk_resource
+                    ),
+                    "empty_update_form": self.get_empty_form(
+                        f"update-{self.fk_table_name}-{fk_resource.pk}-form",
+                        reverse_lazy(
+                            self.update_one_to_many_relation_reverse_base,
+                            kwargs={
+                                "resource_id": self.resource_id,
+                                "fk_table_name": self.fk_table_name,
+                                "fk_resource_id": fk_resource.pk,
+                            },
+                        )
                     ),
                     "delete_dialog": self.get_delete_dialog_template(
                         fk_resource
@@ -383,7 +424,25 @@ class OneToManyFieldEditorSectionView(View):
                     "editor/utils/to_json_script.html",
                     {
                         "content": self.get_update_fk_resource_template(),
-                        "content_id": f"{self.fk_table_name}-update_dialog-form-template",
+                        "content_id": f"{self.fk_table_name}-update_editor-form-template",
+                    },
+                    request=self.request
+                ),
+                "empty_update_form": render_to_string(
+                    "editor/utils/to_json_script.html",
+                    {
+                        "content": self.get_empty_form(
+                            f"update-{self.fk_table_name}-__resource_id__-form",
+                            reverse_lazy(
+                                self.update_one_to_many_relation_reverse_base,
+                                kwargs={
+                                    "resource_id": self.resource_id,
+                                    "fk_table_name": self.fk_table_name,
+                                    "fk_resource_id": "__resource_id__",
+                                },
+                            )
+                        ),
+                        "content_id": f"{self.fk_table_name}-empty_update_form-form-template",
                     },
                     request=self.request
                 ),

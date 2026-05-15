@@ -62,7 +62,8 @@ class NewOneToOneRelationFormView(FormView):
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
@@ -117,7 +118,8 @@ class UpdateOneToOneRelationFormView(FormView):
         return JsonResponse({"resource": resource.as_dict()})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
@@ -156,7 +158,8 @@ class DeleteOneToOneRelationFormView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
@@ -225,7 +228,8 @@ class NewOneToManyRelationFormView(FormView):
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
@@ -299,7 +303,8 @@ class UpdateOneToManyRelationFormView(FormView):
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
@@ -361,7 +366,8 @@ class DeleteOneToManyRelationFormView(FormView):
         return JsonResponse({"result": "success"})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        for fieldname, error in form.errors.items():
+            logger.exception(error)
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
