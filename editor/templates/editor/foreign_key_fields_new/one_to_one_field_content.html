@@ -1,0 +1,47 @@
+{% load humanise_terms %}
+<div class="one-to-one-field-content">
+    <div id="{{ fk_column_name }}-{{ resource_id }}" class="initial-content w-100 rounded border p-3">
+        <div class="d-flex flex-md-row flex-column flex-wrap align-items-md-center align-items-start justify-content-between row-gap-3 column-gap-4">
+            <dl class="d-flex flex-md-row flex-column column-gap-4 form-text mb-0">
+                {% for field in form %}
+                <div>
+                    <dt>
+                        {{ field.label }}
+                    </dt>
+                    <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>
+                        {% if field.get_choices_display %}
+                        {{ field.get_choices_display|default:'None' }}
+                        {% else %}
+                        {{ field.value|default:'None' }}
+                        {% endif %}
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+            <div class="d-flex column-gap-2">
+                <button
+                    class="btn btn-light new-editor-btn {% if resource %}d-none{% endif %}"
+                    type="button"
+                    data-editor-id="new-{{ fk_column_name }}-editor">
+                    Add {{ resource_type|humanise_resource_type|title }}
+                </button>
+                <button
+                    class="btn btn-light update-editor-btn {% if not resource %}d-none{% endif %}"
+                    data-editor-id="update-{{ fk_column_name }}-editor"
+                    type="button"
+                    aria-label="Edit"
+                    title="Edit">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+                <button
+                    class="btn btn-outline-danger delete-dialog-btn {% if not resource %}d-none{% endif %}"
+                    data-dialog-id="delete-{{ fk_column_name }}-dialog"
+                    type="button"
+                    aria-label="Delete"
+                    title="Delete">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,7 @@
 import { AsyncFormHandler } from "/static/editor/async_forms.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
-import { loadOneToOneFieldSections } from "/static/editor/editor_one_to_one_field_sections.js";
-import { loadOneToManyFieldSections } from "/static/editor/editor_one_to_many_field_sections.js";
+import { loadOneToOneFields } from "/static/editor/one_to_one_field_loader.js";
+import { loadOneToManyFields } from "/static/editor/one_to_many_field_loader.js";
 import { displayToast } from "/static/editor/toasts.js";
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
@@ -47,18 +47,20 @@ window.addEventListener("DOMContentLoaded", async () => {
                 nextTabInstance.show();
             });
         }
-        new AsyncFormHandler(form, {
+        const asyncFormHandler = new AsyncFormHandler(form, {
             onSuccess: (responseData) => {
                 const responseMessage =
                     responseData.message || "Applied changes.";
                 displayToast(responseMessage);
             },
+            statusButtonSelector: "button[type='submit']:not([form])",
         });
+        asyncFormHandler.setup();
     });
     linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();
-    loadOneToOneFieldSections();
-    loadOneToManyFieldSections();
+    loadOneToOneFields();
+    loadOneToManyFields();
     const tooltipTriggerElements = Array.from(
         document.querySelectorAll("[data-bs-toggle='tooltip']"),
     );

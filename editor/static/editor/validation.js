@@ -18,7 +18,7 @@ export class EditorValidator {
          */
         const field = event.currentTarget;
         const isValid = field.checkValidity();
-        const feedback = this.form.querySelector(
+        const feedback = document.querySelector(
             `#${field.id} ~ .invalid-feedback`,
         );
         if (!isValid) {
@@ -133,5 +133,17 @@ export class EditorValidator {
         invalidFields.forEach((field) => {
             field.classList.remove("is-invalid");
         });
+    }
+}
+
+export class ForeignKeyFieldEditorValidator extends EditorValidator {
+    constructor(form) {
+        super(form);
+        this.form = form;
+        this.fields = document.querySelectorAll(`
+            input[form="${form.id}"],
+            select[form="${form.id}"],
+            textarea[form="${form.id}"]`);
+        this.formMessagesList = document.querySelector(`[data-form-id="${form.id}"] .form-messages-list`);
     }
 }

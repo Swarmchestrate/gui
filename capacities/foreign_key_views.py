@@ -10,10 +10,14 @@ from editor.foreign_key_views import (
     DeleteOneToOneRelationFormView,
     NewOneToManyRelationFormView,
     NewOneToOneRelationFormView,
-    OneToManyFieldEditorSectionView,
-    OneToOneFieldEditorSectionView,
+    # OneToManyFieldEditorSectionView,
+    # OneToOneFieldEditorSectionView,
     UpdateOneToManyRelationFormView,
     UpdateOneToOneRelationFormView,
+)
+from editor.foreign_key_views_new import (
+    OneToManyFieldEditorSectionView,
+    OneToOneFieldEditorSectionView,
 )
 from postgrest.table_names import TableNames
 

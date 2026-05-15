@@ -1,6 +1,9 @@
-import { EditorValidator } from "/static/editor/validation.js";
+import {
+    EditorValidator,
+    ForeignKeyFieldEditorValidator
+} from "/static/editor/validation.js";
 
-class AsyncFormSubmissionStatusButton {
+class StatusButton {
     constructor(statusButton) {
         this.statusButton = statusButton;
         this.defaultInnerHtml = statusButton.innerHTML;
@@ -19,6 +22,20 @@ class AsyncFormSubmissionStatusButton {
     }
 }
 
+class EmptyStatusButton {
+    constructor() {
+
+    }
+
+    showLoadingState() {
+
+    }
+
+    showDefaultState() {
+
+    }
+}
+
 export class AsyncFormHandler {
     constructor(form, options) {
         this.form = form;
@@ -28,12 +45,21 @@ export class AsyncFormHandler {
         if (!("onSuccess" in options)) {
             options.onSuccess = () => {};
         }
-        this.onSuccess = options.onSuccess;
+        if (!("statusButtonSelector" in options)) {
+            options.statusButtonSelector = "button[type='submit']";
+        }
+        this.options = options;
+    }
+
+    setup() {
+        this.onSuccess = this.options.onSuccess;
         this.validator = new EditorValidator(this.form);
         this.validator.setupInlineValidation();
-        this.statusButton = new AsyncFormSubmissionStatusButton(
-            this.form.querySelector("button[type='submit']"),
-        );
+        const statusButton = this.form.querySelector(this.options.statusButtonSelector);
+        this.statusButton = new EmptyStatusButton();
+        if (statusButton) {
+            this.statusButton = new StatusButton(statusButton);
+        }
         this.form.addEventListener("submit", async (event) => {
             event.preventDefault();
             this.showLoadingState();
@@ -97,5 +123,24 @@ export class AsyncFormHandler {
         const validationMessages = responseData.feedback || {};
         this.validator.displayValidationMessages(validationMessages);
         return false;
+    }
+}
+
+export class AsyncForeignKeyFieldFormHandler extends AsyncFormHandler {
+    setup() {
+        this.onSuccess = this.options.onSuccess;
+        this.validator = new ForeignKeyFieldEditorValidator(this.form);
+        this.validator.setupInlineValidation();
+        const statusButton = this.form.querySelector(this.options.statusButtonSelector);
+        this.statusButton = new EmptyStatusButton();
+        if (statusButton) {
+            this.statusButton = new StatusButton(statusButton);
+        }
+        this.form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            this.showLoadingState();
+            this.submitForm();
+            return false;
+        });
     }
 }

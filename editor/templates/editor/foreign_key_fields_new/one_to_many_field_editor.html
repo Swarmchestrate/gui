@@ -1,0 +1,28 @@
+<div
+    id="{{ editor_id }}"
+    class="d-none card one-to-many-field-editor"
+    data-form-id="{{ form_id }}">
+    <button
+        class="btn btn-light"
+        data-back-id="{{ fk_table_name }}-{{ resource_id }}">Back to Main Editor</button>
+    <div class="fields">
+        {% include 'editor/util_templates/form_errors_list.html' %}
+        {% for field in form %}
+        {% if field.field.widget.input_type == 'checkbox' %}
+        {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+        {% else %}
+        {% include 'editor/field_templates/field_template.html' %}
+        {% endif %}
+        {% endfor %}
+        <div class="d-flex justify-content-between gap-2 pt-4">
+            <button
+                class="btn btn-light"
+                type="button"
+                data-back-id="{{ fk_table_name }}-{{ main_resource_id }}">Cancel</button>
+            <button
+                class="btn btn-primary fw-semibold"
+                type="submit"
+                form="{{ form_id }}">{{ submit_button_text }}</button>
+        </div>
+    </div>
+</div>

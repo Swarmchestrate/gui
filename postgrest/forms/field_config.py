@@ -25,13 +25,17 @@ class FieldConfig:
             is_required: bool = False,
             label: str | None = None,
             help_text: str | None = None,
-            category: str | None = None):
+            category: str | None = None,
+            extra_widget_attrs: dict[str, str] | None = None):
         self.field_name = field_name
         self.metadata = metadata
         self.is_required = is_required
         self.label = label
         self.help_text = help_text
         self.category = category
+        if not extra_widget_attrs:
+            extra_widget_attrs = dict()
+        self.extra_widget_attrs.update(extra_widget_attrs)
 
     @property
     def widget_class(self) -> Widget:

@@ -28,11 +28,11 @@
         {% for field in form %}
         {% if field.field.metadata.refers_to_table_name %}
         {% with field_metadata=one_to_one_field_metadata|get_key_value_or_empty_dict:field.name %}
-        {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields_new/one_to_one_field_placeholder.html' %}
         {% endwith %}
         {% elif field.field.metadata.created_from_table_name %}
         {% with field_metadata=one_to_many_field_metadata|get_key_value_or_empty_dict:field.name %}
-        {% include 'editor/foreign_key_fields/one_to_many_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields_new/one_to_many_field_placeholder.html' %}
         {% endwith %}
         {% elif field.field.widget.input_type == 'checkbox' %}
         {% include 'editor/field_templates/checkbox_field_wrapper.html' %}

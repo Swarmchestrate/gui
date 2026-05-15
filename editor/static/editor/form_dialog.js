@@ -15,6 +15,7 @@ export class FormDialog extends Dialog {
                 this.dialog.close();
             },
         });
+        this.asyncFormHandler.setup();
     }
 
     isAnyFieldChanged() {

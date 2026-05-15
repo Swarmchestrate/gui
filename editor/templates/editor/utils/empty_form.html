@@ -1,0 +1,4 @@
+{# Form "action" is specified via the "formaction" attribute in the form's submit button.  #}
+<form id="{{ form_id }}" action="{{ form_action }}" method="POST">
+    {% csrf_token %}
+</form>

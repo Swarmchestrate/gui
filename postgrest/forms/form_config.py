@@ -224,7 +224,11 @@ class FormConfig:
                 return JsonFieldConfig
         return DefaultFieldConfig
     
-    def _get_field_config_instance(self, name: str, metadata: PropertyMetadata):
+    def _get_field_config_instance(
+            self,
+            name: str,
+            metadata: PropertyMetadata,
+            extra_widget_attrs: dict[str, str] = None):
         field_config_class = self._get_field_config_class_from_format(metadata.format)
         additional_args = []
         if metadata.enum:
@@ -238,6 +242,8 @@ class FormConfig:
             choices.insert(0, ("", "None"))
             additional_args.append(choices)
             field_config_class = ChoiceFieldConfig
+        if not extra_widget_attrs:
+            extra_widget_attrs = dict()
         return field_config_class(
             *additional_args,
             name,
@@ -246,6 +252,7 @@ class FormConfig:
             metadata.title,
             metadata.help_text,
             metadata.category,
+            extra_widget_attrs=extra_widget_attrs
         )
 
     def get_properties(self):
@@ -262,7 +269,8 @@ class FormConfig:
 
     def _get_fields(
             self,
-            extra_skip_conditions: list[Callable[[PropertyMetadata], bool]] = None) -> dict:
+            extra_skip_conditions: list[Callable[[PropertyMetadata], bool]] = None,
+            extra_widget_attrs: dict[str, str] = None) -> dict:
         fields = dict()
         for name, metadata in self._properties.items():
             if (metadata.is_pk
@@ -274,7 +282,11 @@ class FormConfig:
                 for check in extra_skip_conditions
             ):
                 continue
-            field_config_instance = self._get_field_config_instance(name, metadata)
+            field_config_instance = self._get_field_config_instance(
+                name,
+                metadata,
+                extra_widget_attrs=extra_widget_attrs
+            )
             fields.update({
                 name: field_config_instance.get_field(),
             })
@@ -294,6 +306,13 @@ class FormConfig:
         return self._get_fields(extra_skip_conditions=[
             lambda metadata: not metadata.is_required,
         ])
+
+    def get_fields_assigned_to_form(self, form_id: str):
+        return self._get_fields(
+            extra_widget_attrs={
+                "form": form_id,
+            }
+        )
 
     def get_field_categories(self) -> list[str]:
         categories = list()
