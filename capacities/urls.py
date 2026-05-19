@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from . import foreign_key_views
+from . import foreign_key_views_new
 
 app_name = "capacities"
 
@@ -23,12 +24,12 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
-        foreign_key_views.CloudCapacityOneToOneFieldEditorSectionView.as_view(),
+        foreign_key_views_new.CloudCapacityEditorForeignKeyFieldView.as_view(),
         name="cloud_capacity_editor_one_to_one_section",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
-        foreign_key_views.CloudCapacityOneToManyFieldEditorSectionView.as_view(),
+        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/<fk_column_name>/",
+        foreign_key_views_new.CloudCapacityEditorForeignKeyFieldView.as_view(),
         name="cloud_capacity_editor_one_to_many_section",
     ),
     path(
@@ -51,6 +52,46 @@ urlpatterns = [
         views.CloudCapacityDeletionFormView.as_view(),
         name="delete_cloud_capacity",
     ),
+    # Frontend
+    # cloud-capacities/<resource_id>/edit/
+    # ---
+    # Gets a pre-filled field with the value for that field from the given
+    # cloud capacity.
+    # ---
+    # cloud-capacities/<resource_id>/editor/fks/fields/<fk_column_name>/
+    # Decides whether a FK field is interpreted as a dialog UI or as a
+    # separate editor UI in a different page.
+    # ---
+    # If the FK-referenced table doesn't make any FK references of its own,
+    # use the dialog UI, else provide a link/links to an editor in a separate page.
+    # ---
+    # postgrest/api/<fk_table_name>/<fk_resource_id>/delete/
+
+    # ---
+    # Gets relevant registrations for the FK-referenced table relating to the
+    # given cloud capacity and creates new, update and delete dialogs.
+    # ---
+    # cloud-capacities/<resource_id>/editor/fks/dialogs/<fk_column_name>/
+    # postgrest/api/<fk_table_name>/new/
+    # postgrest/api/<fk_table_name>/<fk_resource_id>/edit/
+    # postgrest/api/<fk_table_name>/<fk_resource_id>/delete/
+
+    # ---
+    # Gets an editor for a FK-referenced resource from the given cloud capacity.
+    # ---
+    # cloud-capacities/<resource_id>/editor/fks/nested-editors/<fk_column_name>/new/
+    # postgrest/api/<fk_table_name>/new/
+    # cloud-capacities/<resource_id>/editor/fks/nested-editors/<fk_column_name>/<fk_resource_id>/
+    # postgrest/api/<fk_table_name>/<fk_resource_id>/edit/
+
+    # works out if the "fk_column_name" is a one-to-one or one-to-many
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/new/",
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/edit/",
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/delete/",
+    # works out if the "fk_column_name" is a one-to-one or one-to-many
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/<fk_fk_column_name>/new/",
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/<fk_fk_column_name>/edit/",
+    # "cloud-capacities/<resource_id>/<category_name>/<fk_column_name>/<fk_fk_column_name>/delete/",
     path(
         "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/new/",
         foreign_key_views.CloudCapacityNewOneToOneRelationFormView.as_view(),

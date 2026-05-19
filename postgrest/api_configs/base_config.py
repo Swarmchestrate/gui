@@ -4,6 +4,8 @@ import os
 import random
 from datetime import datetime, timezone
 
+from ..table_names import TableNames
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +94,46 @@ class BaseDefinition:
                 "column_name": property_name,
             }
         return None
+
+    def find_references_to_other_tables(self) -> list[str]:
+        table_names = list()
+        for property_name, property_metadata in self.properties.items():
+            if (property_name.endswith("_id")
+                and property_name != self.pk_column_name
+                and property_name != f"{TableNames.APPLICATION}_id"
+                and property_name != f"{TableNames.CAPACITY}_id"):
+                table_names.append(property_name.replace("_id", ""))
+                continue
+            if "description" not in property_metadata:
+                continue
+            description = property_metadata.get("description")
+            is_fk = lxml.html.fromstring(description).xpath("fk")
+            if not is_fk:
+                continue
+            fk_table_name = next(iter(
+                lxml.html.fromstring(description).xpath("fk/@table")
+            ), None)
+            if not fk_table_name:
+                continue
+            table_names.append(fk_table_name)
+        return table_names
+
+    def find_foreign_key_references_to_other_tables(self) -> list[str]:
+        table_names = list()
+        for property_name, property_metadata in self.properties.items():
+            if "description" not in property_metadata:
+                continue
+            description = property_metadata.get("description")
+            is_fk = lxml.html.fromstring(description).xpath("fk")
+            if not is_fk:
+                continue
+            fk_table_name = next(iter(
+                lxml.html.fromstring(description).xpath("fk/@table")
+            ), None)
+            if not fk_table_name:
+                continue
+            table_names.append(fk_table_name)
+        return table_names
 
     def has_column(self, column_name: str) -> bool:
         return column_name in self.properties

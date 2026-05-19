@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from . import new_views
 
 app_name = "applications"
 
@@ -22,12 +23,12 @@ urlpatterns = [
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
-        views.ApplicationOneToOneFieldEditorSectionView.as_view(),
+        new_views.ApplicationEditorForeignKeyFieldView.as_view(),
         name="application_editor_one_to_one_section",
     ),
     path(
-        "applications/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
-        views.ApplicationOneToManyFieldEditorSectionView.as_view(),
+        "applications/api/<resource_id>/editor/one-to-many-section/<fk_column_name>/",
+        new_views.ApplicationEditorForeignKeyFieldView.as_view(),
         name="application_editor_one_to_many_section",
     ),
     path(
