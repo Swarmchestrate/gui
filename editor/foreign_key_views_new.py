@@ -382,6 +382,13 @@ class EditorForeignKeyFieldView(View):
     editor_based_one_to_one_field_view_class: EditorBasedOneToOneFieldView
     editor_based_one_to_many_field_view_class: EditorBasedOneToManyFieldView
 
+    MAIN_TABLE_NAMES = [
+        TableNames.APPLICATION,
+        TableNames.APPLICATION_NEW,
+        TableNames.CAPACITY,
+        TableNames.CAPACITY_NEW,
+    ]
+
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = kwargs["resource_id"]
         self.fk_column_name = kwargs["fk_column_name"]
@@ -400,40 +407,26 @@ class EditorForeignKeyFieldView(View):
                 self.fk_column_name
             )
             fk_table_definition = openapi_spec.get_definition(fk_table_name)
-            is_fk_reference_in_fk_table_definition = len(
-                fk_table_definition.find_references_to_other_tables()
-            ) > 0
-            if is_fk_reference_in_fk_table_definition:
+            table_names = fk_table_definition.find_references_to_other_tables()
+            is_editor_required = any(
+                (table_name not in self.MAIN_TABLE_NAMES
+                and not (table_name == fk_table_name))
+                for table_name in table_names
+            )
+            if is_editor_required:
                 return self.editor_based_one_to_one_field_view_class.as_view()(request, *args, **kwargs)
             return self.dialog_based_one_to_one_field_view_class.as_view()(request, *args, **kwargs)
         # Check if the column name for the FK reference is
         # actually a table name by checking for a definition in
         # the OpenAPI spec.
         fk_table_definition = openapi_spec.get_definition(self.fk_column_name)
-        fk_references_from_fk_table_definition = fk_table_definition.find_references_to_other_tables()
-        is_fk_reference_in_fk_table_definition = len(fk_references_from_fk_table_definition) > 0
+        table_names = fk_table_definition.find_references_to_other_tables()
+        is_editor_required = any(
+            (table_name not in self.MAIN_TABLE_NAMES
+            and not (table_name == self.fk_column_name))
+            for table_name in table_names
+        )
         # If no definition is found, raise Http404()
-        if is_fk_reference_in_fk_table_definition:
-            is_only_fk_reference_to_a_main_table = (
-                (
-                    (f"{TableNames.APPLICATION}_id" in fk_references_from_fk_table_definition
-                    or TableNames.APPLICATION in fk_references_from_fk_table_definition)
-                    and (f"{TableNames.CAPACITY}_id" in fk_references_from_fk_table_definition
-                    or TableNames.CAPACITY in fk_references_from_fk_table_definition)
-                    and len(fk_references_from_fk_table_definition) == 2
-                )
-                or (
-                    (f"{TableNames.APPLICATION}_id" in fk_references_from_fk_table_definition
-                    or TableNames.APPLICATION_NEW in fk_references_from_fk_table_definition)
-                    and len(fk_references_from_fk_table_definition) == 1
-                )
-                or (
-                    (f"{TableNames.CAPACITY}_id" in fk_references_from_fk_table_definition
-                    or TableNames.CAPACITY_NEW in fk_references_from_fk_table_definition)
-                    and len(fk_references_from_fk_table_definition) == 1
-                )
-            )
-            if is_only_fk_reference_to_a_main_table:
-                return self.dialog_based_one_to_many_field_view_class.as_view()(request, *args, **kwargs)
+        if is_editor_required:
             return self.editor_based_one_to_many_field_view_class.as_view()(request, *args, **kwargs)
         return self.dialog_based_one_to_many_field_view_class.as_view()(request, *args, **kwargs)
