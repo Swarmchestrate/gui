@@ -1,5 +1,8 @@
 from .views import ApplicationViewMixin
 
+from editor.foreign_key_editor_views import (
+    NestedForeignKeyResourceEditorView,
+)
 from editor.foreign_key_views_new import (
     DialogBasedOneToManyFieldView,
     DialogBasedOneToOneFieldView,
@@ -39,12 +42,21 @@ class ApplicationEditorBasedOneToManyFieldView(ApplicationViewMixin, EditorBased
     new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
     update_one_to_many_relation_reverse_base = "applications:update_application_one_to_many_relation"
     delete_one_to_many_relation_reverse_base = "applications:delete_application_one_to_many_relation"
+    new_editor_reverse_base = "applications:application_nested_editor"
+    editor_one_to_one_section_reverse_base = "applications:application_editor_one_to_one_section"
+    editor_one_to_many_section_reverse_base = "applications:application_editor_one_to_many_section"
+
+
+class ApplicationNestedEditorView(ApplicationViewMixin, NestedForeignKeyResourceEditorView):
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationEditorForeignKeyFieldView(
         ApplicationViewMixin,
         EditorForeignKeyFieldView):
     table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
     dialog_based_one_to_one_field_view_class = ApplicationDialogBasedOneToOneFieldView
     dialog_based_one_to_many_field_view_class = ApplicationDialogBasedOneToManyFieldView
     editor_based_one_to_one_field_view_class = ApplicationEditorBasedOneToOneFieldView

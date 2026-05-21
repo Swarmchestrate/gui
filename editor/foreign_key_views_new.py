@@ -6,8 +6,12 @@ from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import View
 
-from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.view_helpers import get_form_config_for_table
+from .foreign_key_editor_views import (
+    EditorBasedOneToManyFieldView,
+    EditorBasedOneToOneFieldView,
+)
+from .forms import ForeignKeyFormWithDynamicallyPopulatedFields
+from .view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
@@ -371,20 +375,6 @@ class DialogBasedOneToManyFieldView(View):
         })
 
 
-class EditorBasedOneToOneFieldView(View):
-    view_class: DialogBasedOneToOneFieldView
-
-    def get(self, request, *args, **kwargs):
-        return self.view_class.as_view()(request, *args, **kwargs)
-
-
-class EditorBasedOneToManyFieldView(View):
-    view_class: DialogBasedOneToManyFieldView
-
-    def get(self, request, *args, **kwargs):
-        return self.view_class.as_view()(request, *args, **kwargs)
-
-
 class EditorForeignKeyFieldView(View):
     table_name: str
     dialog_based_one_to_one_field_view_class: DialogBasedOneToOneFieldView
@@ -426,11 +416,20 @@ class EditorForeignKeyFieldView(View):
         if is_fk_reference_in_fk_table_definition:
             is_only_fk_reference_to_a_main_table = (
                 (
-                    f"{TableNames.APPLICATION}_id" in fk_references_from_fk_table_definition
+                    (f"{TableNames.APPLICATION}_id" in fk_references_from_fk_table_definition
+                    or TableNames.APPLICATION in fk_references_from_fk_table_definition)
+                    and (f"{TableNames.CAPACITY}_id" in fk_references_from_fk_table_definition
+                    or TableNames.CAPACITY in fk_references_from_fk_table_definition)
+                    and len(fk_references_from_fk_table_definition) == 2
+                )
+                or (
+                    (f"{TableNames.APPLICATION}_id" in fk_references_from_fk_table_definition
+                    or TableNames.APPLICATION_NEW in fk_references_from_fk_table_definition)
                     and len(fk_references_from_fk_table_definition) == 1
                 )
                 or (
-                    f"{TableNames.CAPACITY}_id" in fk_references_from_fk_table_definition
+                    (f"{TableNames.CAPACITY}_id" in fk_references_from_fk_table_definition
+                    or TableNames.CAPACITY_NEW in fk_references_from_fk_table_definition)
                     and len(fk_references_from_fk_table_definition) == 1
                 )
             )

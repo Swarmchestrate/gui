@@ -32,6 +32,11 @@ urlpatterns = [
         name="application_editor_one_to_many_section",
     ),
     path(
+        "applications/<resource_id>/foreign-key-field/<fk_column_name>/edit/",
+        new_views.ApplicationNestedEditorView.as_view(),
+        name="application_nested_editor",
+    ),
+    path(
         "applications/api/<resource_id>/edit/",
         views.UpdateApplicationByCategoryView.as_view(),
         name="update_application_by_category",

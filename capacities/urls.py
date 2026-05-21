@@ -33,6 +33,11 @@ urlpatterns = [
         name="cloud_capacity_editor_one_to_many_section",
     ),
     path(
+        "cloud-capacities/<resource_id>/foreign-key-field/<fk_column_name>/edit/",
+        foreign_key_views_new.CloudCapacityNestedEditorView.as_view(),
+        name="cloud_capacity_nested_editor",
+    ),
+    path(
         "cloud-capacities/api/<resource_id>/edit/",
         views.UpdateCloudCapacityByCategoryView.as_view(),
         name="update_cloud_capacity_by_category",

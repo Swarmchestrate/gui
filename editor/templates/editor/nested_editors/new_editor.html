@@ -1,0 +1,31 @@
+{% extends 'editor/editor_base.html' %}
+{% load helpers %}
+
+{% block top_section %}
+<a href="#" class="d-inline-block btn btn-light mb-3">
+    <i class="bi bi-chevron-left"></i>
+    Go Back
+</a>
+<hgroup class="d-flex flex-column row-gap-1">
+    <h1 class="mb-0">{{ main_heading }}</h1>
+    <p class="fs-6 text-body-secondary">{{ main_subheading }} {{ resource_id }}</p>
+</hgroup>
+{% endblock top_section %}
+
+{% block toc %}
+{% include 'editor/toc_as_links/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
+<form action="{{ new_resource_url }}" method="POST">
+    {% csrf_token %}
+    {% for category, category_data in nested_toc_list_items.items %}
+    {% with category_id_base=category.lower|kebab_case %}
+    {% include 'editor/nested_editors/editor_section_router.html' %}
+    {% endwith %}
+    {% endfor %}
+    <div class="pt-4">
+        <button class="btn btn-primary fw-semibold" type="submit">Register</button>
+    </div>
+</form>
+{% endblock main_section %}

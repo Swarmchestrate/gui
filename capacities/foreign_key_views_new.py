@@ -1,5 +1,8 @@
 from .view_helpers import CloudCapacityViewMixin
 
+from editor.foreign_key_editor_views import (
+    NestedForeignKeyResourceEditorView
+)
 from editor.foreign_key_views_new import (
     DialogBasedOneToManyFieldView,
     DialogBasedOneToOneFieldView,
@@ -49,3 +52,9 @@ class CloudCapacityEditorForeignKeyFieldView(
     dialog_based_one_to_many_field_view_class = CloudCapacityDialogBasedOneToManyFieldView
     editor_based_one_to_one_field_view_class = CloudCapacityEditorBasedOneToOneFieldView
     editor_based_one_to_many_field_view_class = CloudCapacityEditorBasedOneToManyFieldView
+    new_editor_reverse_base = "capacities:cloud_capacity_nested_editor"
+
+
+class CloudCapacityNestedEditorView(NestedForeignKeyResourceEditorView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
