@@ -1,7 +1,7 @@
 {
-    "required": ["energy_consumption_id"],
+    "required": ["id"],
     "properties": {
-        "energy_consumption_id": {
+        "id": {
             "description": "Note:\nThis is a Primary Key.<pk/>",
             "format": "integer",
             "type": "integer"

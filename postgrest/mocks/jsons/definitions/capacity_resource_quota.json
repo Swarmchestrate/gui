@@ -1,7 +1,7 @@
 {
-    "required": ["resource_quota_id"],
+    "required": ["id"],
     "properties": {
-        "resource_quota_id": {
+        "id": {
             "description": "Note:\nThis is a Primary Key.<pk/>",
             "format": "integer",
             "type": "integer"
