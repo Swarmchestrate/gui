@@ -169,7 +169,7 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "environment_vars",
+        "column_name": "application_environment_var",
         "title": "Environment Variables",
         "category": "Specs:Component",
         "description": "Environment variables in key-value format.",
@@ -209,15 +209,23 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "relationships",
-        "title": "Relationships",
+        "column_name": "application_colocate",
+        "title": "Colocations",
         "category": "Specs",
-        "description": "Relationships such as volumes, other containers, and node selectors.",
+        "description": "",
         "order": null
     },
     {
         "table_name": "application_microservice",
-        "column_name": "behaviour",
+        "column_name": "application_volume",
+        "title": "Volumes",
+        "category": "Specs",
+        "description": "",
+        "order": null
+    },
+    {
+        "table_name": "application_microservice",
+        "column_name": "behaviour_id",
         "title": "Behaviour",
         "category": "Specs",
         "description": "Deployment strategy and orchestration behaviour (type, replicas, restart policy, cron, etc.).",
@@ -225,8 +233,8 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "security_config",
-        "title": "Security Config",
+        "column_name": "application_security_rule",
+        "title": "Security Rules",
         "category": "Specs",
         "description": "Secrets, credentials, keys, and firewall rules.",
         "order": null
@@ -313,7 +321,7 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "location",
+        "column_name": "location_id",
         "title": "Location",
         "category": "QoS Goals",
         "description": "Preferred location of resource (continent, country, city, GPS).",
@@ -345,8 +353,8 @@
     },
     {
         "table_name": "application_microservice",
-        "column_name": "pref_resource_provider",
-        "title": "Preferred Resource Provider",
+        "column_name": "application_pref_resource_provider",
+        "title": "Preferred Resource Providers",
         "category": "QoS Goals",
         "description": "Preferred specific providers with weights (e.g., Amazon 70%, Azure 50%).",
         "order": null
