@@ -48,10 +48,6 @@ class NewOneToOneRelationFormView(FormView):
                 self.fk_column_name: new_fk_resource.pk
             },
         )
-        message = f"Added new {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         resource_data_for_response = new_fk_resource.as_dict()
         # The property name for PKs changes between resource
         # types, so add a "pk" property to make it easier for
@@ -106,14 +102,10 @@ class UpdateOneToOneRelationFormView(FormView):
         resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         fk_resource_id = int(resource.as_dict().get(self.fk_column_name))
         self.api_client.get_endpoint(self.fk_table_name).update(fk_resource_id, form.cleaned_data)
-        message = f"Updated {self.fk_table_name} registration."
         resource = self.api_client.get_endpoint(self.fk_table_name).get(fk_resource_id)
         resource.as_dict().update(
             {"pk": resource.pk}
         )
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         return JsonResponse({"resource": resource.as_dict()})
 
     def form_invalid(self, form):
@@ -172,17 +164,12 @@ class DeleteOneToOneRelationFormView(FormView):
                 self.fk_column_name: None
             }
         )
-        message = f"Deleted {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         return JsonResponse({"result": "success"})
 
 
 # Views for managing one-to-many relations between tables.
 # E.g., A cloud capacity -> capacity instance types (e.g.,
 # referencing a capacity by a "capacity_id" column).
-
 class NewOneToManyRelationFormView(FormView):
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
     table_name: str
@@ -218,10 +205,6 @@ class NewOneToManyRelationFormView(FormView):
         resource_data_for_response.update({
             "pk": new_fk_resource.pk,
         })
-        message = f"Added new {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
@@ -282,7 +265,6 @@ class UpdateOneToManyRelationFormView(FormView):
         self.api_client.get_endpoint(
             self.fk_table_name
         ).update(self.fk_resource_id, update_data)
-        message = f"Updated {self.fk_table_name} registration."
         fk_resource = self.api_client.get_endpoint(
             self.fk_table_name
         ).get(self.fk_resource_id)
@@ -293,9 +275,6 @@ class UpdateOneToManyRelationFormView(FormView):
         resource_data_for_response.update({
             "pk": fk_resource.pk,
         })
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
@@ -354,10 +333,6 @@ class DeleteOneToManyRelationFormView(FormView):
         self.api_client.get_endpoint(
             self.fk_table_name
         ).delete(self.fk_resource_id)
-        message = f"Deleted {self.fk_table_name} registration."
-        if self.request.accepts("text/html"):
-            messages.success(self.request, message)
-            return super().form_valid(form)
         return JsonResponse({"result": "success"})
 
     def form_invalid(self, form):
@@ -370,10 +345,6 @@ class DeleteOneToManyRelationFormView(FormView):
 
 class OneToOneFieldEditorSectionView(View):
     table_name: str
-
-    new_one_to_one_relation_reverse_base: str
-    update_one_to_one_relation_reverse_base: str
-    delete_one_to_one_relation_reverse_base: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = kwargs["resource_id"]
@@ -435,8 +406,9 @@ class OneToOneFieldEditorSectionView(View):
                     id_prefix=f'new_{self.fk_column_name}'
                 ),
                 "new_resource_url": reverse_lazy(
-                    self.new_one_to_one_relation_reverse_base,
+                    "postgrest:new_one_to_one_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_column_name": self.fk_column_name,
                     }
@@ -462,8 +434,9 @@ class OneToOneFieldEditorSectionView(View):
                     initial=initial
                 ),
                 "update_resource_url": reverse_lazy(
-                    self.update_one_to_one_relation_reverse_base,
+                    "postgrest:update_one_to_one_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_column_name": self.fk_column_name,
                     }
@@ -488,8 +461,9 @@ class OneToOneFieldEditorSectionView(View):
                     initial=initial
                 ),
                 "delete_resource_url": reverse_lazy(
-                    self.delete_one_to_one_relation_reverse_base,
+                    "postgrest:delete_one_to_one_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_column_name": self.fk_column_name,
                     }
@@ -514,10 +488,6 @@ class OneToOneFieldEditorSectionView(View):
 class OneToManyFieldEditorSectionView(View):
     table_name: str
     resource_type: str
-
-    new_one_to_many_relation_reverse_base: str
-    update_one_to_many_relation_reverse_base: str
-    delete_one_to_many_relation_reverse_base: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = int(self.kwargs["resource_id"])
@@ -590,8 +560,9 @@ class OneToManyFieldEditorSectionView(View):
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
                 "new_resource_url": reverse_lazy(
-                    self.new_one_to_many_relation_reverse_base,
+                    "postgrest:new_one_to_many_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_table_name": self.fk_table_name,
                     }
@@ -624,8 +595,9 @@ class OneToManyFieldEditorSectionView(View):
                 ),
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
-                    self.update_one_to_many_relation_reverse_base,
+                    "postgrest:update_one_to_many_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_table_name": self.fk_table_name,
                         "fk_resource_id": fk_resource_id,
@@ -655,8 +627,9 @@ class OneToManyFieldEditorSectionView(View):
                 "form": self.get_delete_form(fk_resource_id),
                 "resource_id": fk_resource_id,
                 "delete_resource_url": reverse_lazy(
-                    self.delete_one_to_many_relation_reverse_base,
+                    "postgrest:delete_one_to_many_relation",
                     kwargs={
+                        "table_name": self.table_name,
                         "resource_id": self.resource_id,
                         "fk_table_name": self.fk_table_name,
                         "fk_resource_id": fk_resource_id,

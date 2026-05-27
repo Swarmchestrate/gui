@@ -26,4 +26,5 @@ urlpatterns = [
     path("", include("applications.urls")),
     path("", include("capacities.urls")),
     path("", include("localities.urls")),
+    path("postgrest/api/", include("postgrest.urls")),
 ]
