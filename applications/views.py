@@ -3,14 +3,8 @@ from django.urls import reverse_lazy
 from .tosca import generate_application_description_template
 
 from editor.foreign_key_views import (
-    DeleteOneToManyRelationFormView,
-    DeleteOneToOneRelationFormView,
-    NewOneToManyRelationFormView,
-    NewOneToOneRelationFormView,
     OneToManyFieldEditorSectionView,
     OneToOneFieldEditorSectionView,
-    UpdateOneToManyRelationFormView,
-    UpdateOneToOneRelationFormView,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -102,93 +96,6 @@ class ApplicationEditorOverviewTemplateView(
     template_name = "applications/application_overview.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
-
-
-class ApplicationNewOneToOneRelationFormView(
-        ApplicationViewMixin,
-        NewOneToOneRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-
-class ApplicationUpdateOneToOneRelationFormView(
-        ApplicationViewMixin,
-        UpdateOneToOneRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-
-class ApplicationDeleteOneToOneRelationFormView(
-        ApplicationViewMixin,
-        DeleteOneToOneRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-
-class ApplicationNewOneToManyRelationFormView(
-        ApplicationViewMixin,
-        NewOneToManyRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-    possible_fk_table_column_name = "application_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-
-class ApplicationUpdateOneToManyRelationFormView(
-        ApplicationViewMixin,
-        UpdateOneToManyRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-    possible_fk_table_column_name = "application_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-
-class ApplicationDeleteOneToManyRelationFormView(
-        ApplicationViewMixin,
-        DeleteOneToManyRelationFormView):
-    template_name = "applications/application_editor.html"
-    table_name = TableNames.APPLICATION_NEW
-    possible_fk_table_column_name = "application_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy(
-            "applications:application_editor",
-            kwargs={"resource_id": kwargs["resource_id"]},
-        )
-        return super().dispatch(request, *args, **kwargs)
 
 
 class ApplicationDescriptionTemplateDownloadView(

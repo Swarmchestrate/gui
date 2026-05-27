@@ -52,36 +52,6 @@ urlpatterns = [
         name="delete_cloud_capacity",
     ),
     path(
-        "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/new/",
-        foreign_key_views.CloudCapacityNewOneToOneRelationFormView.as_view(),
-        name="new_cloud_capacity_one_to_one_relation",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/",
-        foreign_key_views.CloudCapacityUpdateOneToOneRelationFormView.as_view(),
-        name="update_cloud_capacity_one_to_one_relation",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/one-to-one-column/<fk_column_name>/delete/",
-        foreign_key_views.CloudCapacityDeleteOneToOneRelationFormView.as_view(),
-        name="delete_cloud_capacity_one_to_one_relation",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/new/",
-        foreign_key_views.CloudCapacityNewOneToManyRelationFormView.as_view(),
-        name="new_cloud_capacity_one_to_many_relation",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/",
-        foreign_key_views.CloudCapacityUpdateOneToManyRelationFormView.as_view(),
-        name="update_cloud_capacity_one_to_many_relation",
-    ),
-    path(
-        "cloud-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
-        foreign_key_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
-        name="delete_cloud_capacity_one_to_many_relation",
-    ),
-    path(
         "cloud-capacities/<resource_id>/download/",
         views.CloudCapacityDescriptionTemplateDownloadView.as_view(),
         name="cloud_cdt_download",
@@ -130,36 +100,6 @@ urlpatterns = [
         "edge-capacities/<resource_id>/delete/",
         views.EdgeCapacityDeletionFormView.as_view(),
         name="delete_edge_capacity",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-one-column/<fk_column_name>/new/",
-        foreign_key_views.CloudCapacityNewOneToOneRelationFormView.as_view(),
-        name="new_edge_capacity_one_to_one_relation",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-one-column/<fk_column_name>/",
-        foreign_key_views.CloudCapacityUpdateOneToOneRelationFormView.as_view(),
-        name="update_edge_capacity_one_to_one_relation",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-one-column/<fk_column_name>/delete/",
-        foreign_key_views.CloudCapacityDeleteOneToOneRelationFormView.as_view(),
-        name="delete_edge_capacity_one_to_one_relation",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-many-column/<fk_table_name>/new/",
-        foreign_key_views.CloudCapacityNewOneToManyRelationFormView.as_view(),
-        name="new_edge_capacity_one_to_many_relation",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/",
-        foreign_key_views.CloudCapacityUpdateOneToManyRelationFormView.as_view(),
-        name="update_edge_capacity_one_to_many_relation",
-    ),
-    path(
-        "edge-capacities/<resource_id>/one-to-many-column/<fk_table_name>/<fk_resource_id>/delete/",
-        foreign_key_views.CloudCapacityDeleteOneToManyRelationFormView.as_view(),
-        name="delete_edge_capacity_one_to_many_relation",
     ),
     path(
         "edge-capacities/<resource_id>/download/",
