@@ -19,12 +19,14 @@
                 title="Edit">
                 <i class="bi bi-pencil-fill"></i>
             </a>
-            <a
-                class="btn btn-outline-danger delete-editor-btn"
+            <button
+                class="btn btn-outline-danger delete-dialog-btn"
+                type="button"
                 aria-label="Delete"
-                title="Delete">
+                title="Delete"
+                data-dialog-id="delete-{{ field_name }}-{{ fk_resource_id }}-dialog">
                 <i class="bi bi-trash3-fill"></i>
-            </a>
+            </button>
         </div>
     </div>
 </li>

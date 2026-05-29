@@ -436,18 +436,27 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             }
         )
 
-    def get_list_item_template(self):
+    def get_delete_dialog_template(self, fk_resource: Resource = None):
+        fk_resource_id = "__resource_id__"
+        if fk_resource:
+            fk_resource_id = fk_resource.pk
         return render_to_string(
-            "editor/foreign_key_fields/non_dialog_based/one_to_many_field_list_item.html",
+            "editor/dialogs/delete_dialog.html",
             {
-                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
-                    id_suffix="__resource_id__",
+                "form": self.get_delete_form(fk_resource_id),
+                "resource_id": fk_resource_id,
+                "delete_resource_url": reverse_lazy(
+                    "postgrest:delete_one_to_many_relation",
+                    kwargs={
+                        "table_name": self.table_name,
+                        "resource_id": self.resource_id,
+                        "fk_table_name": self.fk_table_name,
+                        "fk_resource_id": fk_resource_id,
+                    },
                 ),
-                "resource_id": "__resource_id__",
+                "dialog_id": f"delete-{self.fk_table_name}-{fk_resource_id}-dialog",
+                "dialog_extra_classes": "col-lg-10",
                 "resource_type": self.fk_table_name,
-                "field": {"name": self.fk_table_name},
-                "field_name": self.fk_table_name,
             },
             request=self.request
         )
@@ -461,4 +470,12 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
                 }
                 for fk_resource in fk_resources
             }),
+            "resource_dialogs": {
+                fk_resource.pk: {
+                    "delete_dialog": self.get_delete_dialog_template(
+                        fk_resource
+                    ),
+                }
+                for fk_resource in fk_resources
+            },
         })

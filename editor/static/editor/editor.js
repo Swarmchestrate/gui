@@ -1,7 +1,8 @@
 import { AsyncFormHandler } from "/static/editor/async_forms.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
-import { loadOneToOneFieldSections } from "/static/editor/editor_one_to_one_field_sections.js";
-import { loadOneToManyFieldSections } from "/static/editor/editor_one_to_many_field_sections.js";
+import { loadOneToOneFieldSections } from "/static/editor/one_to_one_field_sections.js";
+import { loadOneToManyFieldSections } from "/static/editor/one_to_many_field_sections.js";
+import { loadNonDialogBasedOneToManyFieldSections } from "/static/editor/non_dialog_based_one_to_many_field_sections.js";
 import { displayToast } from "/static/editor/toasts.js";
 
 function linkEditorTabSwitchingToCurrentPageCategory() {
@@ -59,6 +60,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     setupFormsetTables();
     loadOneToOneFieldSections();
     loadOneToManyFieldSections();
+    loadNonDialogBasedOneToManyFieldSections();
     const tooltipTriggerElements = Array.from(
         document.querySelectorAll("[data-bs-toggle='tooltip']"),
     );

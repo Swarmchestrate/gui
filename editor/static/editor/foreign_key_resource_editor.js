@@ -1,5 +1,5 @@
-import { loadOneToOneFieldSections } from "/static/editor/editor_one_to_one_field_sections.js";
-import { loadOneToManyFieldSections } from "/static/editor/editor_one_to_many_field_sections.js";
+import { loadOneToOneFieldSections } from "/static/editor/one_to_one_field_sections.js";
+import { loadOneToManyFieldSections } from "/static/editor/one_to_many_field_sections.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
     loadOneToOneFieldSections();
