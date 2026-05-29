@@ -148,6 +148,7 @@ class ForeignKeyResourceEditorView(TemplateView):
             "resource_type": self.resource_type,
             "table_name": self.fk_table_name,
             "fk_resource_id": self.fk_resource_id,
+            "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
             "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
