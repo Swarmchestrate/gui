@@ -166,6 +166,7 @@ def get_form_config_for_table(
     properties = Properties(
         table_name,
         openapi_spec.get_definition(table_name),
+        openapi_spec,
         column_metadata,
         column_metadata_table_name=column_metadata_table_name
     )

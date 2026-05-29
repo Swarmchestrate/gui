@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
-        views.ApplicationOneToOneFieldEditorSectionView.as_view(),
+        views.ApplicationNonDialogBasedOneToOneFieldView.as_view(),
         name="application_editor_non_dialog_based_one_to_one_section",
     ),
     path(

@@ -4,6 +4,7 @@ from .tosca import generate_application_description_template
 
 from editor.foreign_key_views import (
     NonDialogBasedOneToManyFieldEditorSectionView,
+    NonDialogBasedOneToOneFieldEditorSectionView,
     OneToManyFieldEditorSectionView,
     OneToOneFieldEditorSectionView,
 )
@@ -112,6 +113,13 @@ class ApplicationDescriptionTemplateDownloadView(
 
     def generate_tosca_template(self):
         return generate_application_description_template(self.resource_id)
+
+
+class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):
+    table_name = TableNames.APPLICATION_NEW
+    possible_fk_table_column_name = "application_id"
+    new_foreign_key_resource_editor_reverse_base = "applications:application_new_foreign_key_resource_editor"
+    foreign_key_resource_update_editor_reverse_base = "applications:application_foreign_key_resource_update_editor"
 
 
 class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):

@@ -22,7 +22,7 @@ class OneToOneFieldEditorSectionView(View):
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self, "table_name"):
             self.table_name = kwargs["table_name"]
-        self.resource_id = kwargs["resource_id"]
+        self.resource_id = int(kwargs["resource_id"])
         self.fk_column_name = self.kwargs["fk_column_name"]
         # API client is instantiated here so it doesn't
         # fetch the OpenAPI spec twice.
@@ -370,6 +370,100 @@ class OneToManyFieldEditorSectionView(View):
                     request=self.request
                 ),
             },
+        })
+
+
+class NonDialogBasedOneToOneFieldEditorSectionView(View):
+    table_name: str
+    
+    new_foreign_key_resource_editor_reverse_base: str
+    foreign_key_resource_update_editor_reverse_base: str
+
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(self, "table_name"):
+            self.table_name = kwargs["table_name"]
+        self.resource_id = int(kwargs["resource_id"])
+        self.fk_column_name = self.kwargs["fk_column_name"]
+        # API client is instantiated here so it doesn't
+        # fetch the OpenAPI spec twice.
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        definition = self.api_client.openapi_spec.get_definition(self.table_name)
+        self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        self.form_config = get_form_config_for_table(
+            self.fk_table_name,
+            self.api_client.openapi_spec,
+            column_metadata,
+            infer_one_to_many_properties=True,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                TableNames.APPLICATION_NEW,
+                TableNames.APPLICATION_MICROSERVICE,
+                TableNames.CAPACITY,
+                TableNames.CAPACITY_NEW,
+            ]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_fk_resource(self):
+        # Get the main resource
+        endpoint = self.api_client.get_endpoint(self.table_name)
+        resource = endpoint.get(self.resource_id)
+        # Get the other resource that is referenced
+        # by the main resource (if any).
+        fk_table_endpoint = self.api_client.get_endpoint(self.fk_table_name)
+        fk_resource_id = resource.as_dict().get(self.fk_column_name)
+        if not fk_resource_id:
+            return None
+        return fk_table_endpoint.get(fk_resource_id)
+
+    def get_section_template(self, fk_resource: Resource):
+        initial = dict()
+        if fk_resource:
+            initial = fk_resource.as_dict()
+        return render_to_string("editor/foreign_key_fields/non_dialog_based/one_to_one_field_section.html", {
+            "field_name": self.fk_column_name,
+            "resource": self.get_fk_resource(),
+            "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                fields=self.form_config.get_fields(),
+                initial=initial
+            ),
+            "resource_type": self.fk_table_name,
+        })
+
+    def get_delete_dialog_template(self, fk_resource: Resource):
+        resource_id = None
+        initial = dict()
+        if fk_resource:
+            resource_id = fk_resource.pk
+            initial = {"resource_id_to_delete": resource_id}
+        return render_to_string(
+            "editor/dialogs/delete_dialog.html",
+            {
+                "form": ResourceDeletionForm(
+                    initial=initial
+                ),
+                "delete_resource_url": reverse_lazy(
+                    "postgrest:delete_one_to_one_relation",
+                    kwargs={
+                        "table_name": self.table_name,
+                        "resource_id": self.resource_id,
+                        "fk_column_name": self.fk_column_name,
+                    }
+                ),
+                "dialog_id": f"delete-{self.fk_column_name}-dialog",
+                "resource_id": resource_id,
+                "resource_type": self.fk_table_name,
+            },
+            request=self.request
+        )
+
+    def get(self, request, *args, **kwargs):
+        fk_resource = self.get_fk_resource()
+        return JsonResponse({
+            "section": self.get_section_template(fk_resource),
+            "delete_dialog": self.get_delete_dialog_template(fk_resource),
         })
 
 

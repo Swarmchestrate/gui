@@ -14,10 +14,22 @@ from .field_config import (
     NumericFieldConfig,
 )
 
-from postgrest.api import Definition, Resource
+from postgrest.api import (
+    Definition,
+    OpenApiSpecification,
+    Resource
+)
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type_plural
+
+
+MAIN_TABLE_NAMES = [
+    TableNames.APPLICATION,
+    TableNames.APPLICATION_NEW,
+    TableNames.CAPACITY,
+    TableNames.CAPACITY_NEW,
+]
 
 
 class ColumnMetadata:
@@ -57,8 +69,10 @@ class Properties:
             self,
             definition_name: str,
             definition: Definition,
+            openapi_spec: OpenApiSpecification,
             column_metadata: ColumnMetadata,
             column_metadata_table_name: str | None = None):
+        self._openapi_spec = openapi_spec
         self._definition = definition
         self._column_metadata_as_dict = column_metadata.as_dict()
         self._column_metadata_table_name = definition_name
@@ -79,11 +93,25 @@ class Properties:
             metadata: dict,
             extra_metadata_for_property: dict,
             is_required: bool):
+        refers_to_table_name = self._get_foreign_key_table_name(metadata.get("description"))
+        is_fk_reference_made_to_secondary_table = False
+        if refers_to_table_name:
+            table_name = self._definition.get_foreign_key_table_name_for_column(
+                name
+            )
+            definition = self._openapi_spec.get_definition(table_name)
+            references_to_other_tables = definition.find_references_to_other_tables()
+            is_fk_reference_made_to_secondary_table = any(
+                (other_table_name not in MAIN_TABLE_NAMES
+                and not (other_table_name == table_name))
+                for other_table_name in references_to_other_tables
+            )
         return PropertyMetadata(
             name=name,
             is_pk=(name == self._definition.pk_column_name),
             is_required=is_required,
-            refers_to_table_name=self._get_foreign_key_table_name(metadata.get("description")),
+            refers_to_table_name=refers_to_table_name,
+            is_fk_reference_made_to_secondary_table=is_fk_reference_made_to_secondary_table,
             format=metadata.get("format"),
             type=metadata.get("type"),
             description=metadata.get("description"),
@@ -123,13 +151,6 @@ class Properties:
     
     
 class OneToManyProperties:
-    MAIN_TABLE_NAMES = [
-        TableNames.APPLICATION,
-        TableNames.APPLICATION_NEW,
-        TableNames.CAPACITY,
-        TableNames.CAPACITY_NEW,
-    ]
-
     def __init__(
             self,
             table_name: str,
@@ -160,7 +181,7 @@ class OneToManyProperties:
             extra_metadata_for_property = column_metadata_for_table.get(table_name, {})
             references_to_other_tables = definition.find_references_to_other_tables()
             is_fk_reference_made_to_secondary_table = any(
-                (other_table_name not in self.MAIN_TABLE_NAMES
+                (other_table_name not in MAIN_TABLE_NAMES
                 and not (other_table_name == table_name))
                 for other_table_name in references_to_other_tables
             )
