@@ -1,0 +1,16 @@
+{% load humanise_terms %}
+<div class="d-flex flex-column align-items-start">
+    <div class="card w-100">
+        <ul class="list-group list-group-flush" placeholder="No {{ resource_type|humanise_resource_type_plural }} added.">{% for fk_resource_id, forms in forms_for_existing_resources.items %}
+            {% with form=forms.update_form resource_type=resource_type %}
+            {% include 'editor/foreign_key_fields/non_dialog_based/one_to_many_field_list_item.html' %}
+            {% endwith %}
+            {% endfor %}</ul>
+        <a
+            href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}"
+            class="btn btn-light new-editor-btn rounded-top-0 w-100 {% if field.value %}d-none{% endif %}">
+            <i class="bi bi-plus"></i>
+            Add {{ resource_type|humanise_resource_type|title }}
+        </a>
+    </div>
+</div>

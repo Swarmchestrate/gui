@@ -163,6 +163,8 @@ class OneToManyFieldEditorSectionView(View):
     resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
+        if not hasattr(self, "table_name"):
+            self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_table_name = self.kwargs["fk_table_name"]
         self.api_client = ApiClient()
@@ -366,4 +368,95 @@ class OneToManyFieldEditorSectionView(View):
                     request=self.request
                 ),
             },
+        })
+
+
+class NonDialogBasedOneToManyFieldEditorSectionView(View):
+    table_name: str
+    resource_type: str
+    
+    new_foreign_key_resource_editor_reverse_base: str
+    foreign_key_resource_update_editor_reverse_base: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = int(self.kwargs["resource_id"])
+        self.fk_table_name = self.kwargs["fk_table_name"]
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        openapi_spec = self.api_client.openapi_spec
+        if not hasattr(self, "possible_fk_table_column_name"):
+            self.possible_fk_table_column_name = f"{self.table_name}_id"
+        referring_tables = openapi_spec.find_references_to_table(
+            self.table_name,
+            possible_column_name=self.possible_fk_table_column_name
+        )
+        self.fk_table_column_name = referring_tables.get(self.fk_table_name)
+        if not self.fk_table_column_name:
+            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        self.form_config = get_form_config_for_table(
+            self.fk_table_name,
+            self.api_client.openapi_spec,
+            column_metadata,
+            infer_one_to_many_properties=True,
+            disabled_properties=[
+                f"{TableNames.APPLICATION}_id",
+                f"{TableNames.APPLICATION_NEW}_id",
+                f"{TableNames.APPLICATION_MICROSERVICE}_id",
+                f"{TableNames.CAPACITY}_id",
+                f"{TableNames.CAPACITY_NEW}_id",
+            ]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_resources(self) -> list[Resource]:
+        # Get resources referring to the main resources.
+        fk_table_endpoint = self.api_client.get_endpoint(self.fk_table_name)
+        return fk_table_endpoint.get_resources_referencing_resource_id(
+            self.fk_table_column_name,
+            self.resource_id
+        )
+
+    def get_section_template(self, forms_for_existing_fk_resources: dict):
+        return render_to_string("editor/foreign_key_fields/non_dialog_based/one_to_many_field_section.html", {
+            "resource_id": self.resource_id,
+            "field_name": self.fk_table_name,
+            "forms_for_existing_resources": forms_for_existing_fk_resources,
+            "resource_type": self.fk_table_name,
+            "new_foreign_key_resource_editor_reverse_base": self.new_foreign_key_resource_editor_reverse_base,
+            "foreign_key_resource_update_editor_reverse_base": self.foreign_key_resource_update_editor_reverse_base,
+        })
+    
+    def get_delete_form(self, fk_resource_id: str | int):
+        return ResourceDeletionForm(
+            initial={
+                "resource_id_to_delete": fk_resource_id
+            }
+        )
+
+    def get_list_item_template(self):
+        return render_to_string(
+            "editor/foreign_key_fields/non_dialog_based/one_to_many_field_list_item.html",
+            {
+                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
+                    fields=self.form_config.get_fields(),
+                    id_suffix="__resource_id__",
+                ),
+                "resource_id": "__resource_id__",
+                "resource_type": self.fk_table_name,
+                "field": {"name": self.fk_table_name},
+                "field_name": self.fk_table_name,
+            },
+            request=self.request
+        )
+
+    def get(self, request, *args, **kwargs):
+        fk_resources = self.get_resources()
+        return JsonResponse({
+            "section": self.get_section_template({
+                fk_resource.pk: {
+                    "delete_form": self.get_delete_form(fk_resource.pk),
+                }
+                for fk_resource in fk_resources
+            }),
         })

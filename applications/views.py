@@ -3,8 +3,13 @@ from django.urls import reverse_lazy
 from .tosca import generate_application_description_template
 
 from editor.foreign_key_views import (
+    NonDialogBasedOneToManyFieldEditorSectionView,
     OneToManyFieldEditorSectionView,
     OneToOneFieldEditorSectionView,
+)
+from editor.foreign_key_editor_views import (
+    ForeignKeyResourceEditorView,
+    NewForeignKeyResourceEditorView,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -107,3 +112,21 @@ class ApplicationDescriptionTemplateDownloadView(
 
     def generate_tosca_template(self):
         return generate_application_description_template(self.resource_id)
+
+
+class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):
+    table_name = TableNames.APPLICATION_NEW
+    possible_fk_table_column_name = "application_id"
+    new_foreign_key_resource_editor_reverse_base = "applications:application_new_foreign_key_resource_editor"
+    foreign_key_resource_update_editor_reverse_base = "applications:application_foreign_key_resource_update_editor"
+
+
+class ApplicationNewForeignKeyResourceEditorView(ApplicationViewMixin, NewForeignKeyResourceEditorView):
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+    success_reverse_base = "applications:application_editor"
+
+
+class ApplicationForeignKeyResourceEditorView(ApplicationViewMixin, ForeignKeyResourceEditorView):
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION

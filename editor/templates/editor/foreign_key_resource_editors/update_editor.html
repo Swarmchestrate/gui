@@ -1,0 +1,34 @@
+{% extends 'editor/editor_base.html' %}
+{% load static %}
+{% block scripts %}
+{{ toast_template|json_script:'toast-template' }}
+<script type="module" src="{% static 'editor/foreign_key_resource_editor.js' %}"></script>
+{% endblock scripts %}
+{% load helpers %}
+
+{% block top_section %}
+<hgroup class="d-flex flex-column row-gap-1">
+    <h1 class="mb-0">{{ main_heading }}</h1>
+    <p class="fs-6 text-body-secondary">{{ main_subheading }} {{ resource_id }}</p>
+</hgroup>
+{% endblock top_section %}
+
+{% block toc %}
+{% include 'editor/toc_as_links/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
+<form action="{{ update_resource_url }}" method="POST">
+    {% csrf_token %}
+    {% for category, category_data in fk_table_toc_list_items.items %}
+    {% with category_id_base=category.lower|kebab_case %}
+    {% include 'editor/foreign_key_resource_editors/editor_section_router.html' %}
+    {% endwith %}
+    {% endfor %}
+    <div class="pt-4">
+        <button class="btn btn-primary fw-semibold" type="submit">Update</button>
+    </div>
+</form>
+<div id="dialogs"></div>
+{% endblock main_section %}
+

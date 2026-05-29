@@ -1,0 +1,30 @@
+{% load humanise_terms %}
+<li class="list-group-item">
+    <div class="row align-items-center gx-4 gy-3">
+        <div class="col-xl-10">
+            {{ resource_type|humanise_resource_type|title }} {{ fk_resource_id }}
+            <div class="form-text text-truncate">
+                {% for field in form %}
+                <span class="{% if not forloop.last %}me-2{% endif %}">
+                    <strong>{{ field.label }}</strong><i class="bi bi-dot"></i><span data-field="{{ field.name }}">{% if field.get_choices_display %}{{ field.get_choices_display }}{% else %}{{ field.value|default:'None' }}{% endif %}</span>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-xl-2 d-flex column-gap-2">
+            <a
+                href="{% url foreign_key_resource_update_editor_reverse_base resource_id field_name fk_resource_id %}"
+                class="btn btn-light update-editor-btn ms-xl-auto"
+                aria-label="Edit"
+                title="Edit">
+                <i class="bi bi-pencil-fill"></i>
+            </a>
+            <a
+                class="btn btn-outline-danger delete-editor-btn"
+                aria-label="Delete"
+                title="Delete">
+                <i class="bi bi-trash3-fill"></i>
+            </a>
+        </div>
+    </div>
+</li>

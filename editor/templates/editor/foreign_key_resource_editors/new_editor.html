@@ -1,0 +1,44 @@
+{% extends 'editor/editor_base.html' %}
+{% load static %}
+{% block scripts %}
+{{ toast_template|json_script:'toast-template' }}
+<script type="module" src="{% static 'editor/foreign_key_resource_editor.js' %}"></script>
+{% endblock scripts %}
+{% load helpers %}
+
+{% block top_section %}
+<p class="fw-semibold">
+    <a href="{% url editor_reverse_base resource_id %}?category={{ initial_category }}">
+        Back to {{ initial_category }}
+    </a>
+</p>
+<hgroup class="d-flex flex-column row-gap-1">
+    <h1 class="mb-0">{{ main_heading }}</h1>
+    <p class="fs-6 text-body-secondary">{{ main_subheading }} {{ resource_id }}</p>
+</hgroup>
+{% endblock top_section %}
+
+{% block toc %}
+{% include 'editor/toc_as_links/toc_base.html' %}
+{% endblock toc %}
+
+{% block main_section %}
+<form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.field.metadata.refers_to_table_name %}
+    {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
+    {% elif field.field.metadata.created_from_table_name %}
+    {% include 'editor/foreign_key_resource_editors/one_to_many_field_placeholder.html' %}
+    {% elif field.field.widget.input_type == 'checkbox' %}
+    {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+    {% else %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endif %}
+    {% endfor %}
+    <div class="pt-4">
+        <button class="btn btn-primary fw-semibold" type="submit">Register</button>
+    </div>
+</form>
+<div id="dialogs"></div>
+{% endblock main_section %}

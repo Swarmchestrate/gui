@@ -37,8 +37,18 @@ urlpatterns = [
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
-        views.ApplicationOneToManyFieldEditorSectionView.as_view(),
+        views.ApplicationNonDialogBasedOneToManyFieldView.as_view(),
         name="application_editor_non_dialog_based_one_to_many_section",
+    ),
+    path(
+        "applications/<resource_id>/one-to-many-field/<fk_table_name>/new/",
+        views.ApplicationNewForeignKeyResourceEditorView.as_view(),
+        name="application_new_foreign_key_resource_editor",
+    ),
+    path(
+        "applications/<resource_id>/one-to-many-field/<fk_table_name>/<fk_resource_id>/edit/",
+        views.ApplicationForeignKeyResourceEditorView.as_view(),
+        name="application_foreign_key_resource_update_editor",
     ),
     path(
         "applications/api/<resource_id>/edit/",
