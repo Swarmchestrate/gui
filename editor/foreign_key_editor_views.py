@@ -161,8 +161,30 @@ class ForeignKeyResourceEditorView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        foreign_key_properties = [
+            property_name
+            for property_name, metadata in self.fk_table_form_config.get_properties().items()
+            if (metadata.refers_to_table_name
+                or metadata.created_from_table_name)
+        ]
+        update_only_form_config = get_form_config_for_table(
+            self.fk_table_name,
+            self.api_client.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name=self.fk_table_name,
+            disabled_categories=self.disabled_categories,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                f"{TableNames.APPLICATION}_id",
+                TableNames.APPLICATION_NEW,
+                TableNames.CAPACITY,
+                f"{TableNames.CAPACITY}_id",
+                TableNames.CAPACITY_NEW,
+                *foreign_key_properties,
+            ]
+        )
         kwargs.update({
-            "fields": self.fk_table_form_config.get_fields(),
+            "fields": update_only_form_config.get_fields(),
         })
         return kwargs
 
