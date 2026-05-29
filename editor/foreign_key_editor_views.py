@@ -25,6 +25,7 @@ class ForeignKeyResourceEditorView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
         self.fk_table_name = self.kwargs["fk_table_name"]
+        self.fk_resource_id = self.kwargs["fk_resource_id"]
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
@@ -141,6 +142,7 @@ class ForeignKeyResourceEditorView(TemplateView):
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
             "table_name": self.fk_table_name,
+            "fk_resource_id": self.fk_resource_id,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
             "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,

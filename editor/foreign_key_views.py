@@ -20,6 +20,8 @@ class OneToOneFieldEditorSectionView(View):
     table_name: str
 
     def dispatch(self, request, *args, **kwargs):
+        if not hasattr(self, "table_name"):
+            self.table_name = kwargs["table_name"]
         self.resource_id = kwargs["resource_id"]
         self.fk_column_name = self.kwargs["fk_column_name"]
         # API client is instantiated here so it doesn't

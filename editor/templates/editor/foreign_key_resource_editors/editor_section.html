@@ -4,7 +4,7 @@
     {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
     {% for field in form %}
     {% if field.field.metadata.refers_to_table_name %}
-    {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
+    {% include 'editor/foreign_key_resource_editors/one_to_one_field_placeholder.html' %}
     {% elif field.field.metadata.created_from_table_name %}
     {% include 'editor/foreign_key_resource_editors/one_to_many_field_placeholder.html' %}
     {% elif field.field.widget.input_type == 'checkbox' %}
