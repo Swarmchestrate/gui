@@ -130,3 +130,4 @@ class ApplicationNewForeignKeyResourceEditorView(ApplicationViewMixin, NewForeig
 class ApplicationForeignKeyResourceEditorView(ApplicationViewMixin, ForeignKeyResourceEditorView):
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
+    success_reverse_base = "applications:application_editor"

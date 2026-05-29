@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
 
 from .forms import FormWithDynamicallyPopulatedFields
 from .view_helpers import EditorTableOfContents, get_form_config_for_table
@@ -11,8 +11,10 @@ from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type
 
 
-class ForeignKeyResourceEditorView(TemplateView):
+class ForeignKeyResourceEditorView(FormView):
+    form_class = FormWithDynamicallyPopulatedFields
     template_name = "editor/foreign_key_resource_editors/update_editor.html"
+    success_reverse_base: str
 
     table_name: str
     column_metadata_table_name: str
@@ -131,6 +133,38 @@ class ForeignKeyResourceEditorView(TemplateView):
                 for field in self.fk_table_form_config.get_fields().values()
             )
         ).as_dict()
+
+    def form_valid(self, form):
+        update_data = form.cleaned_data
+        fk_table_definition = self.openapi_spec.get_definition(self.fk_table_name)
+        fk_table_column_name = fk_table_definition.find_foreign_key_reference_to_table(
+            self.table_name
+        ).get("column_name")
+        update_data.update({
+            fk_table_column_name: int(self.resource_id),
+        })
+        self.api_client.get_endpoint(self.fk_table_name).update(
+            self.fk_resource_id,
+            update_data
+        )
+        self.success_url = f"{reverse_lazy(self.success_reverse_base, kwargs={
+            "resource_id": self.resource_id,
+        })}?category={self.category}"
+        fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(
+            self.fk_resource_id
+        )
+        messages.success(
+            self.request,
+            f"Updated {humanise_resource_type(self.fk_table_name)} {fk_resource.pk}."
+        )
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            "fields": self.fk_table_form_config.get_fields(),
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
