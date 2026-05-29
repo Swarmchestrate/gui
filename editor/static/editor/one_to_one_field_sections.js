@@ -262,7 +262,7 @@ async function getSection(sectionUrl) {
 
 export async function loadOneToOneFieldSections() {
     const oneToOneFieldSections = Array.from(
-        document.querySelectorAll(".one-to-one-field"),
+        document.querySelectorAll(".one-to-one-field:not([data-editor-based])"),
     );
     const sectionUrls = oneToOneFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
     const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));

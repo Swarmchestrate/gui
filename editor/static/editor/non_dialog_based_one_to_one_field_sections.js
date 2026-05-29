@@ -2,55 +2,23 @@ import { FormDialog } from "/static/editor/form_dialog.js";
 import { displayToast } from "/static/editor/toasts.js";
 import { htmlToNode } from "/static/editor/utils.js";
 
-class OneToManyField {
-    constructor(oneToManyField) {
-        this.oneToManyField = oneToManyField;
-        this.list = oneToManyField.querySelector("ul.list-group");
-        this.fieldName = oneToManyField.dataset.field;
-        this.setupClassFields();
-        this.setupExistingListItems();
-    }
-
-    setupClassFields() {
-        // HTML template strings
-        this.resourceType = this.oneToManyField.dataset.resourceType;
-    }
-
-    setupExistingListItems() {
-        const listItems = Array.from(
-            this.list.querySelectorAll("li.list-group-item"),
-        );
-        listItems.forEach((listItem) => {
-            this.setupListItem(listItem);
-        });
-    }
-
-    setupListItem(listItem) {
-        new OneToManyFieldListItem(listItem, this.resourceType);
-    }
-}
-
-class OneToManyFieldListItem {
-    constructor(listItem, resourceType) {
-        this.listItem = listItem;
-        this.resourceType = resourceType;
+class OneToOneField {
+    constructor(oneToOneField) {
+        this.oneToOneField = oneToOneField;
         this.setupClassFields();
         this.setupDeleteDialog();
     }
 
     setupClassFields() {
         // Delete dialog button
-        this.deleteDialogButton = this.listItem.querySelector(
+        this.deleteDialogButton = this.oneToOneField.querySelector(
             "button.delete-dialog-btn[data-dialog-id]",
         );
         this.deleteDialogElement = document.querySelector(
             `#${this.deleteDialogButton.dataset.dialogId}`,
         );
         this.deleteDialogForm = this.deleteDialogElement.querySelector("form");
-    }
-
-    removeListItem() {
-        this.listItem.remove();
+        this.resourceType = this.oneToOneField.dataset.resourceType;
     }
 
     setupDeleteDialog() {
@@ -63,7 +31,32 @@ class OneToManyFieldListItem {
             [this.deleteDialogButton],
             {
                 onFormSuccess: (responseData) => {
-                    this.removeListItem();
+                    this.newDialogButton.classList.remove("d-none");
+                    this.updateDialogButton.classList.add("d-none");
+                    this.deleteDialogButton.classList.add("d-none");
+                    Array.from(
+                        this.updateDialogForm.querySelectorAll(
+                            "input, textarea, select",
+                        ),
+                    ).forEach((field) => {
+                        if (
+                            field.getAttribute("name") == "csrfmiddlewaretoken"
+                        ) {
+                            return;
+                        }
+                        try {
+                            field.defaultValue = "";
+                        } catch (error) {}
+                        try {
+                            field.value = "";
+                        } catch (error) {}
+                    });
+                    this.updateDialogForm.reset();
+                    Array.from(
+                        this.oneToOneField.querySelectorAll("[data-field]"),
+                    ).forEach((element) => {
+                        element.textContent = "None";
+                    });
                     displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']"
                     ).value}.`);
@@ -116,21 +109,17 @@ async function getSection(sectionUrl) {
     );
 }
 
-export async function loadNonDialogBasedOneToManyFieldSections() {
-    const oneToManyFieldSections = Array.from(
-        document.querySelectorAll(".one-to-many-field[data-editor-based"),
+export async function loadNonDialogBasedOneToOneFieldSections() {
+    const oneToOneFieldSections = Array.from(
+        document.querySelectorAll(".one-to-one-field[data-editor-based]"),
     );
-    const sectionUrls = oneToManyFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
+    const sectionUrls = oneToOneFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
     const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
-    const dialogsContainer = document.querySelector("#dialogs");
-    oneToManyFieldSections.forEach((section, i) => {
+    oneToOneFieldSections.forEach((section, i) => {
         const sectionPlaceholder = section.querySelector("[data-section-url]");
         sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
-        const dialogsForResources = htmlForSections[i].resource_dialogs;
-        for (const resourceId in dialogsForResources) {
-            const dialogsForResource = dialogsForResources[resourceId];
-            dialogsContainer.append(htmlToNode(dialogsForResource.delete_dialog.trim()));
-        }
-        new OneToManyField(section);
+        const dialogsSection = document.querySelector("#dialogs");
+        dialogsSection.append(htmlToNode(htmlForSections[i].delete_dialog.trim()));
+        new OneToOneField(section);
     });
 }
