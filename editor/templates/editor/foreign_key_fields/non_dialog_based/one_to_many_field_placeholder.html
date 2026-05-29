@@ -1,0 +1,12 @@
+{% load humanise_terms %}
+<section class="one-to-many-field py-4" data-field="{{ field.name }}" data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}">
+    <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
+    <div data-section-url="{% url editor_non_dialog_based_one_to_many_section_reverse_base resource_id field.field.metadata.created_from_table_name %}">
+        <div class="d-flex flex-column row-gap-5 placeholder-wave">
+            <div class="d-flex flex-column row-gap-3 placeholder-wave">
+                <span class="placeholder col-12 fs-1 bg-secondary-subtle rounded"></span>
+            </div>
+        </div>
+    </div>
+    <p class="form-text">{{ field.help_text }}</p>
+</section>

@@ -41,6 +41,8 @@ class EditorView(TemplateView):
     editor_overview_reverse_base: str
     editor_one_to_one_section_reverse_base: str
     editor_one_to_many_section_reverse_base: str
+    editor_non_dialog_based_one_to_one_section_reverse_base: str
+    editor_non_dialog_based_one_to_many_section_reverse_base: str
     editor_form_reverse: str
     editor_form_url: str
 
@@ -139,6 +141,8 @@ class EditorView(TemplateView):
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
                 "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
                 "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+                "editor_non_dialog_based_one_to_one_section_reverse_base": self.editor_non_dialog_based_one_to_one_section_reverse_base,
+                "editor_non_dialog_based_one_to_many_section_reverse_base": self.editor_non_dialog_based_one_to_many_section_reverse_base,
                 "toc_list_items": self.get_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(),
                 "toast_template": render_to_string("editor/toast_template.html", {}),

@@ -29,14 +29,14 @@
         {% if field.field.metadata.refers_to_table_name %}
         {% if field.field.metadata.is_fk_reference_made_to_secondary_table %}
         References secondary table
-        {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/non_dialog_based/one_to_one_field_placeholder.html' %}
         {% else %}
         {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
         {% endif %}
         {% elif field.field.metadata.created_from_table_name %}
         {% if field.field.metadata.is_fk_reference_made_to_secondary_table %}
         References secondary table
-        {% include 'editor/foreign_key_fields/one_to_many_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/non_dialog_based/one_to_many_field_placeholder.html' %}
         {% else %}
         {% include 'editor/foreign_key_fields/one_to_many_field_placeholder.html' %}
         {% endif %}

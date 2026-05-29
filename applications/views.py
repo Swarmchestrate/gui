@@ -25,6 +25,8 @@ class ApplicationViewMixin:
     editor_reverse_base = "applications:application_editor"
     editor_one_to_one_section_reverse_base = "applications:application_editor_one_to_one_section"
     editor_one_to_many_section_reverse_base = "applications:application_editor_one_to_many_section"
+    editor_non_dialog_based_one_to_one_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_one_section"
+    editor_non_dialog_based_one_to_many_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_many_section"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
     resource_list_reverse = "applications:application_list"
