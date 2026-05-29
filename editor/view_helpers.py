@@ -175,16 +175,20 @@ def get_form_config_for_table(
         if metadata.category not in disabled_categories
     }
     possible_fk_table_column_name = f'{column_metadata_table_name}_id'
-    referring_tables = dict()
+    definitions_by_table_name = dict()
     if infer_one_to_many_properties:
-        referring_tables = openapi_spec.find_references_to_table(
+        references_to_table = openapi_spec.find_references_to_table(
             table_name,
             possible_column_name=possible_fk_table_column_name
         )
-        referring_tables.pop(table_name, None)
+        references_to_table.pop(table_name, None)
+        definitions_by_table_name = {
+            table_name: openapi_spec.get_definition(table_name)
+            for table_name in references_to_table.keys()
+        }
     one_to_many_properties = OneToManyProperties(
         table_name,
-        list(referring_tables.keys()),
+        definitions_by_table_name,
         column_metadata,
         column_metadata_table_name=column_metadata_table_name
     )

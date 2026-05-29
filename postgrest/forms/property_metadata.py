@@ -15,6 +15,7 @@ class PropertyMetadata:
     is_required: bool = False
     refers_to_table_name: str | None = None
     created_from_table_name: str | None = None
+    is_fk_reference_made_to_secondary_table: str | None = None
     # Defined in the PostgREST OpenAPI Specification
     format: str | None = None
     type: str | None = None

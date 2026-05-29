@@ -15,6 +15,7 @@ from .field_config import (
 )
 
 from postgrest.api import Definition, Resource
+from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type_plural
 
@@ -122,14 +123,21 @@ class Properties:
     
     
 class OneToManyProperties:
+    MAIN_TABLE_NAMES = [
+        TableNames.APPLICATION,
+        TableNames.APPLICATION_NEW,
+        TableNames.CAPACITY,
+        TableNames.CAPACITY_NEW,
+    ]
+
     def __init__(
             self,
             table_name: str,
-            fk_table_names: list[str],
+            definitions_by_table_name: dict[str, Definition],
             column_metadata: ColumnMetadata,
             column_metadata_table_name: str = None):
         self._table_name = table_name
-        self._fk_table_names = fk_table_names
+        self._definitions_by_table_name = definitions_by_table_name
         self._column_metadata_as_dict = column_metadata.as_dict()
         self._column_metadata_table_name = column_metadata_table_name
         if not column_metadata_table_name:
@@ -148,13 +156,20 @@ class OneToManyProperties:
             self._column_metadata_table_name,
             {}
         )
-        for table_name in self._fk_table_names:
+        for table_name, definition in self._definitions_by_table_name.items():
             extra_metadata_for_property = column_metadata_for_table.get(table_name, {})
+            references_to_other_tables = definition.find_references_to_other_tables()
+            is_fk_reference_made_to_secondary_table = any(
+                (other_table_name not in self.MAIN_TABLE_NAMES
+                and not (other_table_name == table_name))
+                for other_table_name in references_to_other_tables
+            )
             properties_as_dict.update({
                 table_name: PropertyMetadata(
                     name=table_name,
                     is_pk=False,
                     created_from_table_name=table_name,
+                    is_fk_reference_made_to_secondary_table=is_fk_reference_made_to_secondary_table,
                     is_required=False,
                     format=None,
                     type=None,

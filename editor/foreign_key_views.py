@@ -1,11 +1,10 @@
 import logging
 from http import HTTPStatus
 
-from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.views.generic import FormView, View
+from django.views.generic import View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
@@ -56,7 +55,7 @@ class OneToOneFieldEditorSectionView(View):
         if not fk_resource_id:
             return None
         return fk_table_endpoint.get(fk_resource_id)
-    
+
     def get_section_template(self, fk_resource: Resource):
         initial = dict()
         if fk_resource:
