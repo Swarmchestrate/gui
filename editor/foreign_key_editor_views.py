@@ -64,8 +64,10 @@ class ForeignKeyResourceEditorView(TemplateView):
             disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION,
+                f"{TableNames.APPLICATION}_id",
                 TableNames.APPLICATION_NEW,
                 TableNames.CAPACITY,
+                f"{TableNames.CAPACITY}_id",
                 TableNames.CAPACITY_NEW,
                 *self.disabled_properties,
             ]
@@ -84,14 +86,14 @@ class ForeignKeyResourceEditorView(TemplateView):
                 forms_by_category.update({
                 UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
                         fields=form_config.get_fields_for_category(category),
-                        initial=self.resource.as_dict(),
+                        initial=initial
                     )
                 })
                 continue
             forms_by_category.update({
                 category: FormWithDynamicallyPopulatedFields(
                     fields=form_config.get_fields_for_category(category),
-                    initial=self.resource.as_dict(),
+                    initial=initial,
                 )
             })
         return forms_by_category
@@ -134,10 +136,13 @@ class ForeignKeyResourceEditorView(TemplateView):
         context = super().get_context_data(**kwargs)
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
+        fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(
+            self.fk_resource_id
+        )
         context.update({
             "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
             "main_subheading": humanise_resource_type(self.resource_type).title(),
-            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()}",
+            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()} {self.fk_resource_id}",
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
@@ -148,7 +153,10 @@ class ForeignKeyResourceEditorView(TemplateView):
             "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
             "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
-            "forms_by_category": self.get_forms_by_category(self.fk_table_form_config),
+            "forms_by_category": self.get_forms_by_category(
+                self.fk_table_form_config,
+                initial=fk_resource.as_dict()
+            ),
         })
         return context
 
