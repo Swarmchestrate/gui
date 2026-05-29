@@ -25,7 +25,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("", include("applications.urls")),
     path("", include("capacities.urls")),
-    path("editor/", include("editor.urls")),
+    path("", include("editor.urls")),
     path("", include("localities.urls")),
     path("postgrest/api/", include("postgrest.urls")),
 ]
