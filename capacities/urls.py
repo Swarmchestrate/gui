@@ -42,6 +42,26 @@ urlpatterns = [
         name="cloud_capacity_editor_non_dialog_based_one_to_many_section",
     ),
     path(
+        "cloud-capacities/<resource_id>/one-to-one-field/<fk_column_name>/new/",
+        foreign_key_views.CloudCapacityNewOneToOneForeignKeyResourceEditorView.as_view(),
+        name="cloud_capacity_new_one_to_one_foreign_key_resource_editor",
+    ),
+    path(
+        "cloud-capacities/<resource_id>/one-to-one-field/<fk_column_name>/<fk_resource_id>/edit/",
+        foreign_key_views.CloudCapacityOneToOneForeignKeyResourceEditorView.as_view(),
+        name="cloud_capacity_one_to_one_foreign_key_resource_update_editor",
+    ),
+    path(
+        "cloud-capacities/<resource_id>/one-to-many-field/<fk_table_name>/new/",
+        foreign_key_views.CloudCapacityNewOneToManyForeignKeyResourceEditorView.as_view(),
+        name="cloud_capacity_new_one_to_many_foreign_key_resource_editor",
+    ),
+    path(
+        "cloud-capacities/<resource_id>/one-to-many-field/<fk_table_name>/<fk_resource_id>/edit/",
+        foreign_key_views.CloudCapacityOneToManyForeignKeyResourceEditorView.as_view(),
+        name="cloud_capacity_one_to_many_foreign_key_resource_update_editor",
+    ),
+    path(
         "cloud-capacities/api/<resource_id>/edit/",
         views.UpdateCloudCapacityByCategoryView.as_view(),
         name="update_cloud_capacity_by_category",
@@ -105,6 +125,26 @@ urlpatterns = [
         "edge-capacities/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
         foreign_key_views.EdgeCapacityNonDialogBasedOneToManyFieldView.as_view(),
         name="edge_capacity_editor_non_dialog_based_one_to_many_section",
+    ),
+    path(
+        "edge-capacities/<resource_id>/one-to-one-field/<fk_column_name>/new/",
+        foreign_key_views.EdgeCapacityNewOneToOneForeignKeyResourceEditorView.as_view(),
+        name="edge_capacity_new_one_to_one_foreign_key_resource_editor",
+    ),
+    path(
+        "edge-capacities/<resource_id>/one-to-one-field/<fk_column_name>/<fk_resource_id>/edit/",
+        foreign_key_views.EdgeCapacityOneToOneForeignKeyResourceEditorView.as_view(),
+        name="edge_capacity_one_to_one_foreign_key_resource_update_editor",
+    ),
+    path(
+        "edge-capacities/<resource_id>/one-to-many-field/<fk_table_name>/new/",
+        foreign_key_views.EdgeCapacityNewOneToManyForeignKeyResourceEditorView.as_view(),
+        name="edge_capacity_new_one_to_many_foreign_key_resource_editor",
+    ),
+    path(
+        "edge-capacities/<resource_id>/one-to-many-field/<fk_table_name>/<fk_resource_id>/edit/",
+        foreign_key_views.EdgeCapacityOneToManyForeignKeyResourceEditorView.as_view(),
+        name="edge_capacity_one_to_many_foreign_key_resource_update_editor",
     ),
     path(
         "edge-capacities/api/<resource_id>/edit/",

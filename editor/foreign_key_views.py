@@ -420,16 +420,22 @@ class NonDialogBasedOneToOneFieldEditorSectionView(View):
 
     def get_section_template(self, fk_resource: Resource):
         initial = dict()
+        fk_resource_id = None
         if fk_resource:
             initial = fk_resource.as_dict()
+            fk_resource_id = fk_resource.pk
         return render_to_string("editor/foreign_key_fields/non_dialog_based/one_to_one_field_section.html", {
             "field_name": self.fk_column_name,
-            "resource": self.get_fk_resource(),
+            "resource_id": self.resource_id,
+            "resource": fk_resource,
+            "fk_resource_id": fk_resource_id,
             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
                 fields=self.form_config.get_fields(),
                 initial=initial
             ),
             "resource_type": self.fk_table_name,
+            "new_foreign_key_resource_editor_reverse_base": self.new_foreign_key_resource_editor_reverse_base,
+            "foreign_key_resource_update_editor_reverse_base": self.foreign_key_resource_update_editor_reverse_base,
         })
 
     def get_delete_dialog_template(self, fk_resource: Resource):

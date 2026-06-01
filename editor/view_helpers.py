@@ -118,15 +118,9 @@ class EditorTableOfContents:
                 "next": None,
             }
         last_category = self.category_names[-1]
-        if (last_category
-            and not len(self.category_names) == 1
-            and self.is_unknown_category_needed):
-            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
-            uncategorised_metadata.update({
-                "previous": last_category,
-            })
         if (not last_category and len(self.category_names) == 1):
             self.category_names = []
+            last_category = None
         
         # Add metadata for each category
         for category in self.category_names:
@@ -135,6 +129,13 @@ class EditorTableOfContents:
                 table_of_contents,
                 processed_categories
             )
+        if (last_category
+            and not len(self.category_names) == 1
+            and self.is_unknown_category_needed):
+            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
+            uncategorised_metadata.update({
+                "previous": last_category,
+            })
 
         # Sort categories in hierarchical order
         descendent_categories = set()
@@ -199,6 +200,7 @@ def get_form_config_for_table(
     one_to_many_properties = OneToManyProperties(
         table_name,
         definitions_by_table_name,
+        openapi_spec,
         column_metadata,
         column_metadata_table_name=column_metadata_table_name
     )

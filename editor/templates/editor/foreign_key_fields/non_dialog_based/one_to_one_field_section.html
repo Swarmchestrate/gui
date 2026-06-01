@@ -18,20 +18,19 @@
             {% endfor %}
         </dl>
         <div class="d-flex column-gap-2">
-            <button
-                class="btn btn-light new-dialog-btn {% if resource %}d-none{% endif %}"
-                type="button"
-                data-dialog-id="new-{{ field_name }}-dialog">
+            <a
+                href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}"
+                class="btn btn-light new-editor-btn {% if resource %}d-none{% endif %}">
+                <i class="bi bi-plus"></i>
                 Add {{ resource_type|humanise_resource_type|title }}
-            </button>
-            <button
+            </a>
+            <a
+            href="{% url foreign_key_resource_update_editor_reverse_base resource_id field_name fk_resource_id %}"
                 class="btn btn-light update-dialog-btn {% if not resource %}d-none{% endif %}"
-                data-dialog-id="update-{{ field_name }}-dialog"
-                type="button"
                 aria-label="Edit"
                 title="Edit">
                 <i class="bi bi-pencil-fill"></i>
-            </button>
+            </a>
             <button
                 class="btn btn-outline-danger delete-dialog-btn {% if not resource %}d-none{% endif %}"
                 data-dialog-id="delete-{{ field_name }}-dialog"

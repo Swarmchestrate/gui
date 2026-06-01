@@ -41,14 +41,24 @@ urlpatterns = [
         name="application_editor_non_dialog_based_one_to_many_section",
     ),
     path(
+        "applications/<resource_id>/one-to-one-field/<fk_column_name>/new/",
+        views.ApplicationNewOneToManyForeignKeyResourceEditorView.as_view(),
+        name="application_new_one_to_one_foreign_key_resource_editor",
+    ),
+    path(
+        "applications/<resource_id>/one-to-one-field/<fk_column_name>/<fk_resource_id>/edit/",
+        views.ApplicationOneToManyForeignKeyResourceEditorView.as_view(),
+        name="application_one_to_one_foreign_key_resource_update_editor",
+    ),
+    path(
         "applications/<resource_id>/one-to-many-field/<fk_table_name>/new/",
-        views.ApplicationNewForeignKeyResourceEditorView.as_view(),
-        name="application_new_foreign_key_resource_editor",
+        views.ApplicationNewOneToManyForeignKeyResourceEditorView.as_view(),
+        name="application_new_one_to_many_foreign_key_resource_editor",
     ),
     path(
         "applications/<resource_id>/one-to-many-field/<fk_table_name>/<fk_resource_id>/edit/",
-        views.ApplicationForeignKeyResourceEditorView.as_view(),
-        name="application_foreign_key_resource_update_editor",
+        views.ApplicationOneToManyForeignKeyResourceEditorView.as_view(),
+        name="application_one_to_many_foreign_key_resource_update_editor",
     ),
     path(
         "applications/api/<resource_id>/edit/",

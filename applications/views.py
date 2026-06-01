@@ -9,8 +9,8 @@ from editor.foreign_key_views import (
     OneToOneFieldEditorSectionView,
 )
 from editor.foreign_key_editor_views import (
-    ForeignKeyResourceEditorView,
-    NewForeignKeyResourceEditorView,
+    OneToManyForeignKeyResourceEditorView,
+    NewOneToManyForeignKeyResourceEditorView,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -118,24 +118,24 @@ class ApplicationDescriptionTemplateDownloadView(
 class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
-    new_foreign_key_resource_editor_reverse_base = "applications:application_new_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "applications:application_foreign_key_resource_update_editor"
+    new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
+    foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
 class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
-    new_foreign_key_resource_editor_reverse_base = "applications:application_new_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "applications:application_foreign_key_resource_update_editor"
+    new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
+    foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
-class ApplicationNewForeignKeyResourceEditorView(ApplicationViewMixin, NewForeignKeyResourceEditorView):
+class ApplicationNewOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, NewOneToManyForeignKeyResourceEditorView):
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
-class ApplicationForeignKeyResourceEditorView(ApplicationViewMixin, ForeignKeyResourceEditorView):
+class ApplicationOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, OneToManyForeignKeyResourceEditorView):
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"

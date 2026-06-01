@@ -27,13 +27,13 @@
         {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
         {% for field in form %}
         {% if field.field.metadata.refers_to_table_name %}
-        {% if field.field.metadata.is_fk_reference_made_to_secondary_table %}
+        {% if field.field.metadata.has_fk_relation_to_secondary_table %}
         {% include 'editor/foreign_key_fields/non_dialog_based/one_to_one_field_placeholder.html' %}
         {% else %}
         {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
         {% endif %}
         {% elif field.field.metadata.created_from_table_name %}
-        {% if field.field.metadata.is_fk_reference_made_to_secondary_table %}
+        {% if field.field.metadata.has_fk_relation_to_secondary_table %}
         {% include 'editor/foreign_key_fields/non_dialog_based/one_to_many_field_placeholder.html' %}
         {% else %}
         {% include 'editor/foreign_key_fields/one_to_many_field_placeholder.html' %}

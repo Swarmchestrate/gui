@@ -26,6 +26,7 @@ from utils.humanise import humanise_resource_type_plural
 
 MAIN_TABLE_NAMES = [
     TableNames.APPLICATION,
+    TableNames.APPLICATION_MICROSERVICE,
     TableNames.APPLICATION_NEW,
     TableNames.CAPACITY,
     TableNames.CAPACITY_NEW,
@@ -94,24 +95,28 @@ class Properties:
             extra_metadata_for_property: dict,
             is_required: bool):
         refers_to_table_name = self._get_foreign_key_table_name(metadata.get("description"))
-        is_fk_reference_made_to_secondary_table = False
+        has_fk_relation_to_secondary_table = False
         if refers_to_table_name:
             table_name = self._definition.get_foreign_key_table_name_for_column(
                 name
             )
             definition = self._openapi_spec.get_definition(table_name)
             references_to_other_tables = definition.find_references_to_other_tables()
-            is_fk_reference_made_to_secondary_table = any(
+            is_fk_ref_made_to_secondary_table = any(
                 (other_table_name not in MAIN_TABLE_NAMES
                 and not (other_table_name == table_name))
                 for other_table_name in references_to_other_tables
             )
+            is_fk_ref_made_from_secondary_table = self._openapi_spec.find_references_to_table(
+                table_name
+            )
+            has_fk_relation_to_secondary_table = is_fk_ref_made_to_secondary_table or is_fk_ref_made_from_secondary_table
         return PropertyMetadata(
             name=name,
             is_pk=(name == self._definition.pk_column_name),
             is_required=is_required,
             refers_to_table_name=refers_to_table_name,
-            is_fk_reference_made_to_secondary_table=is_fk_reference_made_to_secondary_table,
+            has_fk_relation_to_secondary_table=has_fk_relation_to_secondary_table,
             format=metadata.get("format"),
             type=metadata.get("type"),
             description=metadata.get("description"),
@@ -155,10 +160,12 @@ class OneToManyProperties:
             self,
             table_name: str,
             definitions_by_table_name: dict[str, Definition],
+            openapi_spec: OpenApiSpecification,
             column_metadata: ColumnMetadata,
             column_metadata_table_name: str = None):
         self._table_name = table_name
         self._definitions_by_table_name = definitions_by_table_name
+        self._openapi_spec = openapi_spec
         self._column_metadata_as_dict = column_metadata.as_dict()
         self._column_metadata_table_name = column_metadata_table_name
         if not column_metadata_table_name:
@@ -180,17 +187,22 @@ class OneToManyProperties:
         for table_name, definition in self._definitions_by_table_name.items():
             extra_metadata_for_property = column_metadata_for_table.get(table_name, {})
             references_to_other_tables = definition.find_references_to_other_tables()
-            is_fk_reference_made_to_secondary_table = any(
+            has_fk_relation_to_secondary_table = False
+            is_fk_ref_made_to_secondary_table = any(
                 (other_table_name not in MAIN_TABLE_NAMES
                 and not (other_table_name == table_name))
                 for other_table_name in references_to_other_tables
             )
+            is_fk_ref_made_from_secondary_table = self._openapi_spec.find_references_to_table(
+                table_name
+            )
+            has_fk_relation_to_secondary_table = is_fk_ref_made_to_secondary_table or is_fk_ref_made_from_secondary_table
             properties_as_dict.update({
                 table_name: PropertyMetadata(
                     name=table_name,
                     is_pk=False,
                     created_from_table_name=table_name,
-                    is_fk_reference_made_to_secondary_table=is_fk_reference_made_to_secondary_table,
+                    has_fk_relation_to_secondary_table=has_fk_relation_to_secondary_table,
                     is_required=False,
                     format=None,
                     type=None,
