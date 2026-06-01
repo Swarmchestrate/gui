@@ -103,6 +103,31 @@ class EditorTableOfContents:
         """
         table_of_contents = dict()
         processed_categories = set()
+
+        # Check if an "uncategorised" category is needed before sorting
+        # categories into descendents, as it will be harder to set
+        # the "next" property of the current last category when it's
+        # nested.
+        uncategorised_metadata = {}
+        if self.is_unknown_category_needed:
+            uncategorised_metadata = {
+                "title": UNKNOWN_ATTRIBUTE_CATEGORY,
+                "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
+                "descendents": dict(),
+                "previous": None,
+                "next": None,
+            }
+        last_category = self.category_names[-1]
+        if (last_category
+            and not len(self.category_names) == 1
+            and self.is_unknown_category_needed):
+            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
+            uncategorised_metadata.update({
+                "previous": last_category,
+            })
+        if (not last_category and len(self.category_names) == 1):
+            self.category_names = []
+        
         # Add metadata for each category
         for category in self.category_names:
             self._add_metadata_for_category(
@@ -110,22 +135,6 @@ class EditorTableOfContents:
                 table_of_contents,
                 processed_categories
             )
-
-        # Check if an "uncategorised" category is needed before sorting
-        # categories into descendents, as it will be harder to set
-        # the "next" property of the current last category when it's
-        # nested.
-        uncategorised_metadata = {}
-        if (self.is_unknown_category_needed):
-            last_category = self.category_names[-1]
-            table_of_contents[last_category].update({"next": UNKNOWN_ATTRIBUTE_CATEGORY})
-            uncategorised_metadata = {
-                "title": UNKNOWN_ATTRIBUTE_CATEGORY,
-                "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
-                "descendents": dict(),
-                "previous": last_category,
-                "next": None,
-            }
 
         # Sort categories in hierarchical order
         descendent_categories = set()
