@@ -52,24 +52,28 @@ class CloudCapacityNewOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixi
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CloudCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityOneToManyForeignKeyResourceEditorView(CloudCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
+    disabled_categories = ["Edge Specific", "Networking"]
 
 
 # Edge Capacity views
@@ -106,21 +110,25 @@ class EdgeCapacityNewOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin,
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(EdgeCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
+    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityOneToManyForeignKeyResourceEditorView(EdgeCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
+    disabled_categories = ["System Specific"]
