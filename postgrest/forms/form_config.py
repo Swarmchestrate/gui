@@ -323,7 +323,7 @@ class FormConfig:
         return self._get_fields(extra_skip_conditions=[
             lambda metadata: not category and metadata.category,
             lambda metadata: category and not metadata.category,
-            lambda metadata: not (category == metadata.category),
+            lambda metadata: category and not (category == metadata.category),
         ])
     
     def get_required_fields(self) -> dict:
