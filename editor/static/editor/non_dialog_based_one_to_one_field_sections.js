@@ -10,6 +10,8 @@ class OneToOneField {
     }
 
     setupClassFields() {
+        this.newEditorButton = this.oneToOneField.querySelector("a.new-editor-btn");
+        this.updateEditorButton = this.oneToOneField.querySelector("a.update-editor-btn");
         // Delete dialog button
         this.deleteDialogButton = this.oneToOneField.querySelector(
             "button.delete-dialog-btn[data-dialog-id]",
@@ -31,27 +33,9 @@ class OneToOneField {
             [this.deleteDialogButton],
             {
                 onFormSuccess: (responseData) => {
-                    this.newDialogButton.classList.remove("d-none");
-                    this.updateDialogButton.classList.add("d-none");
+                    this.newEditorButton.classList.remove("d-none");
+                    this.updateEditorButton.classList.add("d-none");
                     this.deleteDialogButton.classList.add("d-none");
-                    Array.from(
-                        this.updateDialogForm.querySelectorAll(
-                            "input, textarea, select",
-                        ),
-                    ).forEach((field) => {
-                        if (
-                            field.getAttribute("name") == "csrfmiddlewaretoken"
-                        ) {
-                            return;
-                        }
-                        try {
-                            field.defaultValue = "";
-                        } catch (error) {}
-                        try {
-                            field.value = "";
-                        } catch (error) {}
-                    });
-                    this.updateDialogForm.reset();
                     Array.from(
                         this.oneToOneField.querySelectorAll("[data-field]"),
                     ).forEach((element) => {
