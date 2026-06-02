@@ -137,7 +137,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
     def form_valid(self, form):
         update_data = form.cleaned_data
         fk_table_definition = self.openapi_spec.get_definition(self.fk_table_name)
-        fk_table_column_name = fk_table_definition.find_foreign_key_reference_to_table(
+        fk_table_column_name = fk_table_definition.find_reference_to_table(
             self.table_name
         ).get("column_name")
         update_data.update({
@@ -300,7 +300,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
     def form_valid(self, form):
         registration_data = form.cleaned_data
         fk_table_definition = self.openapi_spec.get_definition(self.fk_table_name)
-        fk_table_column_name = fk_table_definition.find_foreign_key_reference_to_table(
+        fk_table_column_name = fk_table_definition.find_reference_to_table(
             self.table_name
         ).get("column_name")
         registration_data.update({

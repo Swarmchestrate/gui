@@ -117,7 +117,11 @@ class EditorTableOfContents:
                 "previous": None,
                 "next": None,
             }
-        last_category = self.category_names[-1]
+        last_category = None
+        try:
+            last_category = self.category_names[-1]
+        except IndexError:
+            pass
         if (not last_category and len(self.category_names) == 1):
             self.category_names = []
             last_category = None

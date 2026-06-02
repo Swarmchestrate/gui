@@ -93,6 +93,22 @@ class BaseDefinition:
             }
         return None
 
+    def find_reference_to_table(self, table_name: str) -> dict | None:
+        possible_column_name = f"{table_name.replace("_new", "")}_id"
+        for property_name in self.properties.keys():
+            table_name_for_property = self.get_foreign_key_table_name_for_column(
+                property_name
+            )
+            if table_name == table_name_for_property:
+                return {
+                    "column_name": property_name,
+                }
+            if property_name == possible_column_name:
+                return {
+                    "column_name": property_name,
+                }
+        return None
+
     def find_references_to_other_tables(self) -> list[str]:
         table_names = list()
         for property_name, property_metadata in self.properties.items():
