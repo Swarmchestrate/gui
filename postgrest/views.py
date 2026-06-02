@@ -9,6 +9,7 @@ from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from resource_management.forms import ResourceDeletionForm
+from utils.humanise import humanise_resource_type
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class NewOneToOneRelationFormView(FormView):
                 self.fk_column_name: new_fk_resource.pk
             },
         )
-        message = f"Added new {self.fk_table_name} registration."
+        message = f"Added new {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -105,7 +106,7 @@ class UpdateOneToOneRelationFormView(FormView):
         resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         fk_resource_id = int(resource.as_dict().get(self.fk_column_name))
         self.api_client.get_endpoint(self.fk_table_name).update(fk_resource_id, form.cleaned_data)
-        message = f"Updated {self.fk_table_name} registration."
+        message = f"Updated {humanise_resource_type(self.fk_table_name).title()} registration."
         resource = self.api_client.get_endpoint(self.fk_table_name).get(fk_resource_id)
         resource.as_dict().update(
             {"pk": resource.pk}
@@ -172,7 +173,7 @@ class DeleteOneToOneRelationFormView(FormView):
                 self.fk_column_name: None
             }
         )
-        message = f"Deleted {self.fk_table_name} registration."
+        message = f"Deleted {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -219,7 +220,7 @@ class NewOneToManyRelationFormView(FormView):
         resource_data_for_response.update({
             "pk": new_fk_resource.pk,
         })
-        message = f"Added new {self.fk_table_name} registration."
+        message = f"Added new {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
@@ -284,7 +285,7 @@ class UpdateOneToManyRelationFormView(FormView):
         self.api_client.get_endpoint(
             self.fk_table_name
         ).update(self.fk_resource_id, update_data)
-        message = f"Updated {self.fk_table_name} registration."
+        message = f"Updated {humanise_resource_type(self.fk_table_name).title()} registration."
         fk_resource = self.api_client.get_endpoint(
             self.fk_table_name
         ).get(self.fk_resource_id)
@@ -357,7 +358,7 @@ class DeleteOneToManyRelationFormView(FormView):
         self.api_client.get_endpoint(
             self.fk_table_name
         ).delete(self.fk_resource_id)
-        message = f"Deleted {self.fk_table_name} registration."
+        message = f"Deleted {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)

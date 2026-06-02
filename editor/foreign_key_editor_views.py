@@ -155,7 +155,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         )
         messages.success(
             self.request,
-            f"Updated {humanise_resource_type(self.fk_table_name)} {fk_resource.pk}."
+            f"Updated {humanise_resource_type(self.fk_table_name).title()} {fk_resource.pk}."
         )
         return super().form_valid(form)
 
@@ -314,7 +314,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         })}?category={self.category}"
         messages.success(
             self.request,
-            f"Registered {humanise_resource_type(self.fk_table_name)} {new_resource.pk}."
+            f"Registered {humanise_resource_type(self.fk_table_name).title()} {new_resource.pk}."
         )
         return super().form_valid(form)
 
@@ -488,7 +488,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         )
         messages.success(
             self.request,
-            f"Updated {humanise_resource_type(self.fk_table_name)} {fk_resource.pk}."
+            f"Updated {humanise_resource_type(self.fk_table_name).title()} {fk_resource.pk}."
         )
         return super().form_valid(form)
 
@@ -648,7 +648,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         })}?category={self.category}"
         messages.success(
             self.request,
-            f"Registered {humanise_resource_type(self.fk_table_name)} {new_resource.pk}."
+            f"Registered {humanise_resource_type(self.fk_table_name).title()} {new_resource.pk}."
         )
         return super().form_valid(form)
 
