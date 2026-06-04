@@ -1,3 +1,4 @@
+{% load helpers %}
 <div
     class="{{ field_wrapper_classes|default:'py-4' }} text-array-field"
     data-field-id="{{ field.auto_id }}"
@@ -6,9 +7,17 @@
     <div class="d-flex flex-column align-items-start">
         <div class="card w-100">
             <ul class="list-group list-group-flush">
+                {% if field.value %}
+                {% for text_value in field.value|parse_json %}
+                {% with field_id=field.auto_id field_name=field.name field_label=field.label counter=forloop.counter|stringformat:'s' initial_value=text_value %}
+                {% include 'editor/field_templates/text_array_field_list_item_template.html' %}
+                {% endwith %}
+                {% endfor %}
+                {% else %}
                 {% with field_id=field.auto_id field_name=field.name field_label=field.label counter='0' %}
                 {% include 'editor/field_templates/text_array_field_list_item_template.html' %}
                 {% endwith %}
+                {% endif %}
             </ul>
             <button
                 class="btn btn-light add-btn rounded-top-0 w-100"

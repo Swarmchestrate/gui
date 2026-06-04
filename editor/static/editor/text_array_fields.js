@@ -18,14 +18,17 @@ class TextArrayField {
         this.listItemTemplate = JSON.parse(document.querySelector("#text-array-field-list-item-template").textContent.trim());
     }
 
+    getRandomString() {
+        return (Math.random() + 1).toString(36).substring(7);
+    }
+
     setupAddListItemButton() {
         this.addListItemButton.addEventListener("click", () => {
-            const numListItems = Array.from(this.list.children).length;
             const listItemTemplateStringFormatted = this.listItemTemplate
             .trim()
             .replaceAll("__field_id__", this.fieldId)
             .replaceAll("__field_label__", this.fieldLabel)
-            .replaceAll("__counter__", numListItems);
+            .replaceAll("__counter__", this.getRandomString());
             const newListItem = htmlToNode(listItemTemplateStringFormatted);
             this.list.append(newListItem);
             this.setupListItem(newListItem);
@@ -53,6 +56,7 @@ class TextArrayField {
         const deleteButton = listItem.querySelector(".delete-btn");
         deleteButton.addEventListener("click", () => {
             listItem.remove();
+            this.exportData();
         });
     }
 }

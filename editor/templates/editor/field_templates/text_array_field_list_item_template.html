@@ -6,7 +6,8 @@
         <input
             type="text"
             id="{{ field.auto_id|default:'__field_id__' }}-{{ counter|default:'__counter__' }}"
-            class="form-control">
+            class="form-control"
+            value="{{ initial_value }}">
         <button
             class="btn btn-outline-danger delete-btn"
             type="button"

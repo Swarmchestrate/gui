@@ -1,4 +1,5 @@
 import casefy
+import json
 from dateutil import parser
 from django import template
 
@@ -62,3 +63,10 @@ def previous(list_, current_index):
         return list_[int(current_index) - 1]  # access the next element
     except Exception:
         return ""  # return empty string in case of exception
+
+
+@register.filter
+def parse_json(json_str):
+    """Parses a JSON string.
+    """
+    return json.loads(json_str)
