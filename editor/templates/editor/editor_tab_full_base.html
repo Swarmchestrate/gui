@@ -2,15 +2,14 @@
 {% load static %}
 {% load helpers %}
 {% load humanise_terms %}
-{% block scripts %}
+{% block extra_scripts %}
 {{ toc_url|json_script:'toc_url' }}
 {{ tabbed_form_url|json_script:'tabbed_form_url' }}
 {{ initial_category|json_script:'initial_category' }}
-{{ toast_template|json_script:'toast-template' }}
 <script type="module" src="{% static 'editor/editor.js' %}"></script>
-{% block extra_scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
 {% endblock extra_scripts %}
-{% endblock scripts %}
 
 {% block top_section %}
 <h1 class="visually-hidden">

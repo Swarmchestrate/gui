@@ -146,6 +146,7 @@ class EditorView(TemplateView):
                 "toc_list_items": self.get_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(),
                 "toast_template": render_to_string("editor/toast_template.html", {}),
+                "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
             }
         )
         return context

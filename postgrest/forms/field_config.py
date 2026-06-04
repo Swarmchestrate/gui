@@ -140,3 +140,11 @@ class GeometryPointFieldConfig(FieldConfig):
             ),
         }
     }
+
+
+class TextArrayFieldConfig(FieldConfig):
+    field_class = forms.JSONField
+    widget_class = forms.HiddenInput
+    extra_widget_attrs = {
+        "data-type": "text[]",
+    }

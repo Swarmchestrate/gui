@@ -1,5 +1,6 @@
-from django.urls import reverse_lazy
 from django.contrib import messages
+from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from django.views.generic import FormView
 
 from .forms import FormWithDynamicallyPopulatedFields
@@ -214,6 +215,8 @@ class OneToManyForeignKeyResourceEditorView(FormView):
                 self.fk_table_form_config,
                 initial=fk_resource.as_dict()
             ),
+            "toast_template": render_to_string("editor/toast_template.html", {}),
+            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
         })
         return context
 
@@ -548,6 +551,8 @@ class OneToOneForeignKeyResourceEditorView(FormView):
                 self.fk_table_form_config,
                 initial=fk_resource.as_dict()
             ),
+            "toast_template": render_to_string("editor/toast_template.html", {}),
+            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
         })
         return context
 

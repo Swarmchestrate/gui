@@ -1,9 +1,8 @@
 {% extends 'editor/editor_base.html' %}
 {% load static %}
-{% block scripts %}
-{{ toast_template|json_script:'toast-template' }}
+{% block extra_scripts %}
 <script type="module" src="{% static 'editor/foreign_key_resource_editor.js' %}"></script>
-{% endblock scripts %}
+{% endblock extra_scripts %}
 {% load helpers %}
 
 {% block top_section %}

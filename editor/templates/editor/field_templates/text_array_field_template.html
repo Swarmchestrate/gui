@@ -1,0 +1,26 @@
+<div
+    class="{{ field_wrapper_classes|default:'py-4' }} text-array-field"
+    data-field-id="{{ field.auto_id }}"
+    data-field-label="{{ field.label }}">
+    <p class="{{ label_classes|default:'fw-semibold' }} mb-0">{{ field.label }}</p>
+    <div class="d-flex flex-column align-items-start">
+        <div class="card w-100">
+            <ul class="list-group list-group-flush">
+                {% with field_id=field.auto_id field_name=field.name field_label=field.label counter='0' %}
+                {% include 'editor/field_templates/text_array_field_list_item_template.html' %}
+                {% endwith %}
+            </ul>
+            <button
+                class="btn btn-light add-btn rounded-top-0 w-100"
+                type="button">
+                <i class="bi bi-plus-lg"></i>
+                Add
+            </button>
+        </div>
+    </div>
+    {# Hidden input #}
+    <label for="{{ field.id_for_label }}" class="visually-hidden" aria-hidden="true"></label>
+    {{ field }}
+    {% include 'editor/field_templates/field_help_text.html' %}
+    {% include 'editor/field_templates/field_invalid_feedback.html' %}
+</div>

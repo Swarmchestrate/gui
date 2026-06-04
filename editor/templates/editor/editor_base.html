@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block scripts %}
+{{ toast_template|json_script:'toast-template' }}
+{{ text_array_field_list_item_template|json_script:'text-array-field-list-item-template' }}
+{% block extra_scripts %}{% endblock extra_scripts %}
 {% endblock scripts %}
 {% block content %}
 <div class="editor-container">

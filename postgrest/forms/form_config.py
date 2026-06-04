@@ -12,6 +12,7 @@ from .field_config import (
     IntegerFieldConfig,
     JsonFieldConfig,
     NumericFieldConfig,
+    TextArrayFieldConfig,
 )
 
 from postgrest.api import (
@@ -268,8 +269,10 @@ class FormConfig:
                 return IntegerFieldConfig
             case OasDefinitionPropertyFormat.NUMERIC | OasDefinitionPropertyFormat.DOUBLE_PRECISION:
                 return NumericFieldConfig
-            case OasDefinitionPropertyFormat.TEXT_ARRAY | OasDefinitionPropertyFormat.JSONB:
+            case OasDefinitionPropertyFormat.JSONB:
                 return JsonFieldConfig
+            case OasDefinitionPropertyFormat.TEXT_ARRAY:
+                return TextArrayFieldConfig
         return DefaultFieldConfig
     
     def _get_field_config_instance(self, name: str, metadata: PropertyMetadata):

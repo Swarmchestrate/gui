@@ -40,6 +40,8 @@
         {% endif %}
         {% elif field.field.widget.input_type == 'checkbox' %}
         {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+        {% elif field.field.metadata.format == 'text[]' %}
+        {% include 'editor/field_templates/text_array_field_template.html' %}
         {% else %}
         {% include 'editor/field_templates/field_template.html' %}
         {% endif %}
