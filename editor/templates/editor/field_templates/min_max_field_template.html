@@ -1,0 +1,12 @@
+<div class="row g-2">
+    <div class="col-sm-6">
+        {% with field=min_field %}
+        {% include 'editor/field_templates/field_template.html' %}
+        {% endwith %}
+    </div>
+    <div class="col-sm-6">
+        {% with field=max_field %}
+        {% include 'editor/field_templates/field_template.html' %}
+        {% endwith %}
+    </div>
+</div>

@@ -28,8 +28,8 @@ def get_key_value_or_blank_string(d: dict, key: str):
 @register.filter
 def get_key_value_or_empty_dict(d: dict, key: str):
     try:
-        return d.get(key, dict())
-    except AttributeError:
+        return d[key]
+    except KeyError:
         return dict()
 
 
@@ -70,3 +70,8 @@ def parse_json(json_str):
     """Parses a JSON string.
     """
     return json.loads(json_str)
+
+
+@register.filter
+def remove_min_max_prefix(field_name: str):
+    return field_name.replace("min_", "").replace("max_", "")

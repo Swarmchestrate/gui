@@ -26,6 +26,7 @@
         {% csrf_token %}
         {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
         {% for field in form %}
+        {% with min_max_base_field_name=field.name|remove_min_max_prefix %}
         {% if field.field.metadata.refers_to_table_name %}
         {% if field.field.metadata.has_fk_relation_to_secondary_table %}
         {% include 'editor/foreign_key_fields/non_dialog_based/one_to_one_field_placeholder.html' %}
@@ -42,9 +43,18 @@
         {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
         {% elif field.field.metadata.format == 'text[]' %}
         {% include 'editor/field_templates/text_array_field_template.html' %}
+        {% elif "min_" in field.name and "max_"|add:min_max_base_field_name in form.fields %}
+        {% with max_field_name="max_"|add:min_max_base_field_name %}
+        {% with min_field=field max_field=form|get_key_value_or_empty_dict:max_field_name %}
+        {% include 'editor/field_templates/min_max_field_template.html' %}
+        {% endwith %}
+        {% endwith %}
+        {% elif "max_" in field.name and "min_"|add:min_max_base_field_name in form.fields %}
+        {# "min_" and "max_" fields handled together in "min_" block. #}
         {% else %}
         {% include 'editor/field_templates/field_template.html' %}
         {% endif %}
+        {% endwith %}
         {% endfor %}
         {% endwith %}
         <div class="d-flex flex-sm-row flex-column justify-content-sm-between align-items-sm-baseline align-items-stretch gap-4 my-4">
