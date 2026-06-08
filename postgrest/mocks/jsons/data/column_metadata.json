@@ -553,6 +553,14 @@
     },
     {
         "table_name": "capacity",
+        "column_name": "name",
+        "title": "Name",
+        "category": "Metadata",
+        "description": "Name of the capacity.",
+        "order": null
+    },
+    {
+        "table_name": "capacity",
         "column_name": "description",
         "title": "Description",
         "category": "Metadata",

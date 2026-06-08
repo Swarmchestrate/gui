@@ -1,6 +1,9 @@
 {
     "description": "Application description table storing all metadata, specs, relationships, behaviours, resource requirements, and QoS goals.",
-    "required": ["application_id", "name"],
+    "required": [
+        "application_id",
+        "name"
+    ],
     "properties": {
         "application_id": {
             "description": "Note:\nThis is a Primary Key.<pk/>",
