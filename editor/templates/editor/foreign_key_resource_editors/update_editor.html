@@ -22,7 +22,7 @@
 {% endblock toc %}
 
 {% block main_section %}
-<form action="{{ update_resource_url }}" method="POST">
+<form action="{{ update_resource_url }}" method="POST" id="fk-resource-form">
     {% csrf_token %}
     {% for category, category_data in fk_table_toc_list_items.items %}
     {% with category_id_base=category.lower|kebab_case %}
