@@ -1,6 +1,14 @@
 {% load breadcrumbs %}
 {% if active %}
 {% breadcrumb_item_active page_title %}
+{% elif resource_id_in_url and fk_column_name_in_url and fk_resource_id_in_url %}
+{% breadcrumb_item page_title url_name resource_id_in_url fk_column_name_in_url fk_resource_id_in_url %}
+{% elif resource_id_in_url and fk_column_name_in_url %}
+{% breadcrumb_item page_title url_name resource_id_in_url fk_column_name_in_url %}
+{% elif resource_id_in_url and fk_table_name_in_url and fk_resource_id_in_url %}
+{% breadcrumb_item page_title url_name resource_id_in_url fk_table_name_in_url fk_resource_id_in_url %}
+{% elif resource_id_in_url and fk_table_name_in_url %}
+{% breadcrumb_item page_title url_name resource_id_in_url fk_table_name_in_url %}
 {% elif resource_id_in_url %}
 {% breadcrumb_item page_title url_name resource_id_in_url %}
 {% else %}

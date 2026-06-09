@@ -42,12 +42,12 @@ urlpatterns = [
     ),
     path(
         "applications/<resource_id>/one-to-one-field/<fk_column_name>/new/",
-        views.ApplicationNewOneToManyForeignKeyResourceEditorView.as_view(),
+        views.ApplicationNewOneToOneForeignKeyResourceEditorView.as_view(),
         name="application_new_one_to_one_foreign_key_resource_editor",
     ),
     path(
         "applications/<resource_id>/one-to-one-field/<fk_column_name>/<fk_resource_id>/edit/",
-        views.ApplicationOneToManyForeignKeyResourceEditorView.as_view(),
+        views.ApplicationOneToOneForeignKeyResourceEditorView.as_view(),
         name="application_one_to_one_foreign_key_resource_update_editor",
     ),
     path(

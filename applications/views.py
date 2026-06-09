@@ -10,7 +10,9 @@ from editor.foreign_key_views import (
 )
 from editor.foreign_key_editor_views import (
     OneToManyForeignKeyResourceEditorView,
+    OneToOneForeignKeyResourceEditorView,
     NewOneToManyForeignKeyResourceEditorView,
+    NewOneToOneForeignKeyResourceEditorView,
 )
 from editor.views import (
     EditorOverviewTemplateView,
@@ -129,13 +131,29 @@ class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialo
     foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
+class ApplicationNewOneToOneForeignKeyResourceEditorView(ApplicationViewMixin, NewOneToOneForeignKeyResourceEditorView):
+    template_name = "applications/application_new_one_to_one_fk_resource_editor.html"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+    success_reverse_base = "applications:application_editor"
+
+
+class ApplicationOneToOneForeignKeyResourceEditorView(ApplicationViewMixin, OneToOneForeignKeyResourceEditorView):
+    template_name = "applications/application_one_to_one_fk_resource_update_editor.html"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+    success_reverse_base = "applications:application_editor"
+
+
 class ApplicationNewOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, NewOneToManyForeignKeyResourceEditorView):
+    template_name = "applications/application_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
 class ApplicationOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, OneToManyForeignKeyResourceEditorView):
+    template_name = "applications/application_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"

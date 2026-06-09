@@ -1,0 +1,7 @@
+{% extends 'editor/foreign_key_resource_editors/new_editor.html' %}
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'applications/breadcrumbs/applications_item.html' %}
+{% include 'applications/breadcrumbs/application_wizard_item.html' %}
+{% include 'applications/breadcrumbs/fk_resource_editor/application_new_one_to_one_fk_resource_wizard_item.html' with active=True %}
+{% endblock breadcrumb_items %}
