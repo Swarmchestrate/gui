@@ -1,0 +1,4 @@
+{% load humanise_terms %}
+{% with page_title=fk_resource_type|humanise_resource_type|title|add:' '|add:fk_resource_id url_name='capacities:edge_capacity_one_to_one_foreign_key_resource_update_editor' resource_id_in_url=resource_id fk_column_name_in_url=fk_column_name fk_resource_id_in_url=fk_resource_id %}
+{% include 'breadcrumbs/item_base.html' %}
+{% endwith %}

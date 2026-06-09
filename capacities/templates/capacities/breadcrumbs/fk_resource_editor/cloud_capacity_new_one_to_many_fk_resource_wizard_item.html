@@ -1,0 +1,6 @@
+{% load humanise_terms %}
+{% with fk_resource_type_humanised=fk_resource_type|humanise_resource_type %}
+{% with page_title='New '|add:fk_resource_type_humanised|title url_name='capacities:cloud_capacity_new_one_to_many_foreign_key_resource_editor' fk_table_name_in_url=fk_table_name resource_id_in_url=resource_id %}
+{% include 'breadcrumbs/item_base.html' %}
+{% endwith %}
+{% endwith %}

@@ -49,6 +49,7 @@ class CloudCapacityNonDialogBasedOneToManyFieldView(CloudCapacityViewMixin, NonD
 
 
 class CloudCapacityNewOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixin, NewOneToOneForeignKeyResourceEditorView):
+    template_name = "capacities/cloud_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
@@ -56,6 +57,7 @@ class CloudCapacityNewOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixi
 
 
 class CloudCapacityOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
+    template_name = "capacities/cloud_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
@@ -63,6 +65,7 @@ class CloudCapacityOneToOneForeignKeyResourceEditorView(CloudCapacityViewMixin, 
 
 
 class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CloudCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
+    template_name = "capacities/cloud_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
@@ -70,6 +73,7 @@ class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CloudCapacityViewMix
 
 
 class CloudCapacityOneToManyForeignKeyResourceEditorView(CloudCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
+    template_name = "capacities/cloud_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
@@ -107,6 +111,7 @@ class EdgeCapacityNonDialogBasedOneToManyFieldView(EdgeCapacityViewMixin, NonDia
 
 
 class EdgeCapacityNewOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin, NewOneToOneForeignKeyResourceEditorView):
+    template_name = "capacities/edge_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
@@ -114,6 +119,7 @@ class EdgeCapacityNewOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin,
 
 
 class EdgeCapacityOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
+    template_name = "capacities/edge_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
@@ -121,6 +127,7 @@ class EdgeCapacityOneToOneForeignKeyResourceEditorView(EdgeCapacityViewMixin, On
 
 
 class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(EdgeCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
+    template_name = "capacities/edge_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
@@ -128,6 +135,7 @@ class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(EdgeCapacityViewMixin
 
 
 class EdgeCapacityOneToManyForeignKeyResourceEditorView(EdgeCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
+    template_name = "capacities/edge_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
