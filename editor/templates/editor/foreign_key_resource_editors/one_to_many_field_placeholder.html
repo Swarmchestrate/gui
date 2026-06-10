@@ -1,4 +1,4 @@
-{% load humanise_terms %}
+{% load humanise_swch %}
 <section class="one-to-many-field py-4" data-field="{{ field.name }}" data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}">
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
     <div data-section-url="{% url 'editor:one_to_many_field_section' table_name resource_id field.field.metadata.created_from_table_name %}">

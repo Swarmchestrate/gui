@@ -85,7 +85,7 @@ TEMPLATES = [
             "libraries": {
                 "breadcrumbs": "utils.templatetags.breadcrumbs",
                 "helpers": "utils.templatetags.helpers",
-                "humanise_terms": "utils.templatetags.humanise_terms",
+                "humanise_swch": "utils.templatetags.humanise_swch",
             },
         },
     },

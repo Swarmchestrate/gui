@@ -1,5 +1,5 @@
 {% load helpers %}
-{% load humanise_terms %}
+{% load humanise_swch %}
 <div
     class="tab-pane {% if category == initial_category %}show active{% elif not initial_category and not category_data.previous %}show active{% endif %}"
     id="{{ category_id_base }}-tab-pane"

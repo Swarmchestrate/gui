@@ -1,4 +1,4 @@
-{% load humanise_terms %}
+{% load humanise_swch %}
 <div class="d-flex flex-column align-items-start">
     <div class="card w-100">
         <ul class="list-group list-group-flush" placeholder="No {{ resource_type|humanise_resource_type_plural }} added.">{% for fk_resource_id, forms in forms_for_existing_resources.items %}
