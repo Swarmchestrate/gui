@@ -1,3 +1,6 @@
+{% if not toc_list_items.items %}
+<span class="text-body-secondary">Categories are listed here.</span>
+{% else %}
 <ul class="nav nav-pills flex-column list-unstyled editor-toc sticky-top pb-4" id="editor-tab" role="tablist">
     {% for list_item, list_item_data in toc_list_items.items %}
     {% block list_item %}
@@ -5,3 +8,4 @@
     {% endblock list_item %}
     {% endfor %}
 </ul>
+{% endif %}
