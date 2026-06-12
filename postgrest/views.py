@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.generic import FormView
+from django.views.generic import FormView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
@@ -370,3 +370,25 @@ class DeleteOneToManyRelationFormView(FormView):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
         return JsonResponse({"feedback": form.errors})
+
+
+class GetTableColumnsView(View):
+    def dispatch(self, request, *args, **kwargs):
+        self.table_name = kwargs["table_name"]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        if self.table_name not in api_client.openapi_spec.get_definitions():
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST)
+        form_config = get_form_config_for_table(
+            self.table_name,
+            api_client.openapi_spec,
+            list()
+        )
+        return JsonResponse({
+            "columns": sorted(list(
+                form_config.get_properties().keys()
+            ))
+        })

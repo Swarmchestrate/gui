@@ -6,6 +6,11 @@ app_name = "postgrest"
 
 urlpatterns = [
     path(
+        "<table_name>/columns/",
+        views.GetTableColumnsView.as_view(),
+        name="get_table_columns"
+    ),
+    path(
         "<table_name>/<resource_id>/one-to-one-relation/<fk_column_name>/new/",
         views.NewOneToOneRelationFormView.as_view(),
         name="new_one_to_one_relation",

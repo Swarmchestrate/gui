@@ -4,10 +4,10 @@
 <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
 {% endblock styles %}
 {% block scripts %}
+{{ get_columns_url_template|json_script:"get-columns-url-template" }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/column_metadata_list.js' %}" type="module"></script>
-<script src="{% static 'resource_management/basic_resource_list.js' %}" type="module"></script>
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
@@ -64,8 +64,9 @@
                 <thead>
                     <tr>
                         <th class="align-middle p-3"></th>
-                        <th class="align-middle p-3">Table Name</th>
                         <th class="align-middle p-3">Column Name</th>
+                        <th class="align-middle p-3">Table Name</th>
+                        <th class="align-middle p-3">Title</th>
                         <th class="align-middle p-3">Created At</th>
                         <th class="align-middle p-3">Updated At</th>
                         <th
@@ -84,11 +85,14 @@
                         <td class="align-middle px-3"></td>
                         <td class="font-monospace align-middle px-3">
                             <button class="btn btn-link edit-btn" data-dialog-id="update-{{ resource_id }}-dialog" type="button">
-                                {{ resource.as_dict.table_name }}
+                                {{ resource.as_dict.column_name }}
                             </button>
                         </td>
                         <td>
-                            {{ resource.as_dict.column_name }}
+                            {{ resource.as_dict.table_name }}
+                        </td>
+                        <td>
+                            {{ resource.as_dict.title }}
                         </td>
                         <td class="text-body-secondary align-middle px-3">
                             {% if 'created_at' in resource %}

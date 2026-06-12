@@ -9,6 +9,7 @@ from django.views.generic.base import ContextMixin
 
 from .forms import (
     ColumnMetadataDeletionForm,
+    NewColumnMetadataEditorForm,
     MultiResourceDeletionForm,
     ResourceDeletionForm,
 )
@@ -244,7 +245,8 @@ class ColumnMetadataManagementView(TemplateView):
         context.update({
             "title": humanise_resource_type_plural(self.resource_type).title(),
             "new_resource_reverse": self.new_resource_reverse,
-            "new_resource_form": FormWithDynamicallyPopulatedFields(
+            "new_resource_form": NewColumnMetadataEditorForm(
+                table_names=self.openapi_spec.get_definitions().keys(),
                 fields=form_config.get_fields(include_pk_fields=True)
             ),
             "resource_update_forms": {
@@ -277,12 +279,16 @@ class ColumnMetadataManagementView(TemplateView):
                 for resource in self.resource_list
             },
             "resource_type": self.resource_type,
+            "get_columns_url_template": reverse_lazy(
+                "postgrest:get_table_columns",
+                kwargs={"table_name": "__table_name__"}
+            ),
         })
         return context
 
 
 class NewColumnMetadataFormView(FormView):
-    form_class = FormWithDynamicallyPopulatedFields
+    form_class = NewColumnMetadataEditorForm
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
 
@@ -321,6 +327,7 @@ class NewColumnMetadataFormView(FormView):
             self.column_metadata,
         )
         kwargs.update({
+            "table_names": self.openapi_spec.get_definitions().keys(),
             "fields": form_config.get_fields(include_pk_fields=True)
         })
         return kwargs

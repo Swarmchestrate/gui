@@ -17,6 +17,7 @@ def humanise_resource_type(resource_type):
         "capacity_energy_consumption": "energy consumption",
         "capacity_price": "price",
         "cloud_capacity": "cloud capacity",
+        "column_metadata": "column metadata",
         "edge_capacity": "edge capacity",
         "locality": "locality",
     }
@@ -45,6 +46,7 @@ def humanise_resource_type_plural(resource_type):
         "capacity_energy_consumption": "energy consumptions",
         "capacity_price": "prices",
         "cloud_capacity": "cloud capacities",
+        "column_metadata": "column metadata",
         "edge_capacity": "edge capacities",
         "locality": "localities",
     }
