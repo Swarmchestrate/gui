@@ -9,7 +9,8 @@ class FormWithIdAttributeSuffix(forms.Form):
 
 class ResourceDeletionForm(FormWithIdAttributeSuffix):
     resource_id_to_delete = forms.IntegerField(
-        required=True, widget=forms.HiddenInput()
+        required=True,
+        widget=forms.HiddenInput()
     )
 
 
@@ -28,4 +29,11 @@ class MultiResourceDeletionForm(forms.Form):
                 "aria-label": "Select row",
             }
         ),
+    )
+
+
+class ColumnMetadataDeletionForm(FormWithIdAttributeSuffix):
+    resource_id_to_delete = forms.CharField(
+        required=True,
+        widget=forms.HiddenInput()
     )

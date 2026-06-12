@@ -89,6 +89,16 @@ class Properties:
             lxml.html.fromstring(description).xpath("fk/@table")
         ), None)
 
+    def _is_primary_key(self, description: str):
+        if not description:
+            return None
+        pk_element = next(iter(
+            lxml.html.fromstring(description).xpath("pk")
+        ), None)
+        if pk_element is not None:
+            return True
+        return False
+
     def _get_property_metadata_instance(
             self,
             name: str,
@@ -114,7 +124,7 @@ class Properties:
             has_fk_relation_to_secondary_table = is_fk_ref_made_to_secondary_table or is_fk_ref_made_from_secondary_table
         return PropertyMetadata(
             name=name,
-            is_pk=(name == self._definition.pk_column_name),
+            is_pk=self._is_primary_key(metadata.get("description")),
             is_required=is_required,
             refers_to_table_name=refers_to_table_name,
             has_fk_relation_to_secondary_table=has_fk_relation_to_secondary_table,
@@ -313,11 +323,13 @@ class FormConfig:
 
     def _get_fields(
             self,
+            include_pk_fields: bool = False,
             extra_skip_conditions: list[Callable[[PropertyMetadata], bool]] = None) -> dict:
         fields = dict()
         for name, metadata in self._properties.items():
-            if (metadata.is_pk
-                or name in self._default_disabled_properties
+            if (metadata.is_pk and not include_pk_fields):
+                continue
+            if (name in self._default_disabled_properties
                 or name in self.extra_disabled_properties):
                 continue
             if extra_skip_conditions and any(
@@ -331,8 +343,8 @@ class FormConfig:
             })
         return fields
 
-    def get_fields(self) -> dict:
-        return self._get_fields()
+    def get_fields(self, include_pk_fields: bool = False) -> dict:
+        return self._get_fields(include_pk_fields=include_pk_fields)
     
     def get_fields_for_category(self, category) -> dict:
         return self._get_fields(extra_skip_conditions=[

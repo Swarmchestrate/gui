@@ -28,4 +28,5 @@ urlpatterns = [
     path("", include("editor.urls")),
     path("", include("localities.urls")),
     path("postgrest/api/", include("postgrest.urls")),
+    path("", include("resource_management.urls")),
 ]

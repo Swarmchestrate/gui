@@ -13,7 +13,10 @@ Delete {{ resource_type|humanise_resource_type_plural|title }}
             <button class="btn btn-light w-100" value="cancel" formmethod="dialog">Cancel</button>
         </div>
         <div class="d-flex flex-column col-sm-6 row-gap-2">
-            <button class="btn btn-danger fw-semibold" type="submit">Delete selected (<span class="num-to-delete"></span>)</button>
+            <button
+                class="btn btn-danger fw-semibold"
+                type="submit"
+                value="confirm">Delete selected (<span class="num-to-delete"></span>)</button>
             <div class="form-text text-danger text-center">This action cannot be undone.</div>
         </div>
     </div>

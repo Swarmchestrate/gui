@@ -52,6 +52,14 @@ class LiveEndpoint(BaseEndpoint):
             self.definition.pk_column_name
         )
 
+    def get_by_composite_key(self, composite_key: dict) -> BaseResource:
+        params = {
+            property_name: f"eq.{value}"
+            for property_name, value in composite_key.items()
+        }
+        response = requests.get(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+
     def get_resources(self, params: dict | None = None) -> list[BaseResource]:
         if not params:
             params = dict()
@@ -118,6 +126,16 @@ class LiveEndpoint(BaseEndpoint):
         new_resource = self.get(new_id)
         return new_resource
 
+    def register_with_composite_key(
+            self,
+            composite_key: dict,
+            data: dict) -> BaseResource:
+        cleaned_data = self._clean_data(data)
+        response = requests.post(self.endpoint_url, json=cleaned_data)
+        self.log_and_raise_response_status_if_error(response)
+        new_resource = self.get_by_composite_key(composite_key)
+        return new_resource
+
     def update(
             self,
             resource_id: int,
@@ -135,6 +153,14 @@ class LiveEndpoint(BaseEndpoint):
         response = requests.patch(self.endpoint_url, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
+    def update_by_composite_key(self, composite_key: dict, data: dict):
+        params = {
+            property_name: f"eq.{value}"
+            for property_name, value in composite_key.items()
+        }
+        response = requests.patch(self.endpoint_url, params=params, json=data)
+        self.log_and_raise_response_status_if_error(response)
+
     def delete(self, resource_id: int, params: dict | None = None):
         if not params:
             params = dict()
@@ -147,6 +173,29 @@ class LiveEndpoint(BaseEndpoint):
     def delete_many(self, resource_ids: list[int]):
         params = {
             self.definition.pk_column_name: f"in.({','.join(map(str, resource_ids))})",
+        }
+        response = requests.delete(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+
+    def delete_by_composite_key(self, composite_key: dict):
+        params = {
+            property_name: f"eq.{value}"
+            for property_name, value in composite_key.items()
+        }
+        response = requests.delete(self.endpoint_url, params=params)
+        self.log_and_raise_response_status_if_error(response)
+
+    def delete_many_by_composite_key(self, composite_key_list: list[dict]):
+        or_args = []
+        for composite_key in composite_key_list:
+            and_args = []
+            for property_name, value in composite_key.items():
+                and_args.append(
+                    f"{property_name}.eq.{value}"
+                )
+            or_args.append(f"and({",".join(and_args)})")
+        params = {
+            "or": f"({",".join(or_args)})"
         }
         response = requests.delete(self.endpoint_url, params=params)
         self.log_and_raise_response_status_if_error(response)

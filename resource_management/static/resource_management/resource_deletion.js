@@ -1,7 +1,5 @@
 import { setupDialog } from "/static/dialog.js";
 
-const deleteDialog = document.querySelector("#delete-dialog");
-
 export function setupIndividualResourceDeletion(dataTable) {
     // Delete buttons update delete dialog content when clicked.
     const dataTableRows = dataTable.rows().nodes().toArray();

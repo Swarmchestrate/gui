@@ -43,7 +43,18 @@
     </div>
     <footer class="footer mt-5">
         <div class="container-xxl gx-sm-5 gx-4">
-            <small>© 2024-2026 Swarmchestrate Project</small>
+            <div class="row">
+                <div class="col-auto">
+                    <small>© 2024-2026 Swarmchestrate Project</small>
+                </div>
+                <div class="col-auto ms-sm-auto ms-0">
+                    <a
+                        href="{% url 'resource_management:manage_column_metadata' %}" 
+                        class="link-light link-underline link-underline-opacity-0 link-underline-opacity-100-hover ms-auto">
+                        <small>Admin Tools</small>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 </body>

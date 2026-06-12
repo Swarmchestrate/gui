@@ -210,6 +210,9 @@ class BaseEndpoint:
     def get(self, resource_id: int, params: dict | None = None) -> BaseResource:
         pass
 
+    def get_by_composite_key(self, composite_key: dict) -> BaseResource:
+        pass
+
     def get_resources(self, params: dict | None = None) -> list[BaseResource]:
         pass
 
@@ -226,6 +229,12 @@ class BaseEndpoint:
     def register(self, data: dict) -> BaseResource:
         pass
 
+    def register_with_composite_key(
+            self,
+            composite_key: dict,
+            data: dict) -> BaseResource:
+        pass
+
     def update(
             self,
             resource_id: int,
@@ -233,10 +242,19 @@ class BaseEndpoint:
             set_updated_at_to_now: bool = False):
         pass
 
+    def update_by_composite_key(self, composite_key: dict, data: dict):
+        pass
+
     def delete(self, resource_id: int, params: dict | None = None):
         pass
 
     def delete_many(self, resource_ids: list[int]):
+        pass
+
+    def delete_by_composite_key(self, composite_key: dict):
+        pass
+
+    def delete_many_by_composite_key(self, composite_key_list: list[dict]):
         pass
 
 

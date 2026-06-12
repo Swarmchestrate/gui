@@ -76,6 +76,26 @@ class MockEndpoint(BaseEndpoint):
             self.definition.pk_column_name
         )
 
+    def get_by_composite_key(self, composite_key: dict) -> BaseResource:
+        all_resources = self._get_temp_data_and_create_if_not_exists()
+        resource_unformatted = None
+        for r in all_resources:
+            r_id = r.get(self.definition.pk_column_name)
+            if not r_id:
+                continue
+            if not all(
+                r.get(column_name) == value
+                for column_name, value in composite_key.items()
+            ):
+                continue
+            resource_unformatted = r
+            break
+        return BaseResource(
+            resource_unformatted,
+            self.resource_type,
+            self.definition.pk_column_name
+        )
+
     def get_resources(self, params: dict | None = None) -> list[BaseResource]:
         all_resources = self._get_temp_data_and_create_if_not_exists()
         return [
@@ -135,6 +155,28 @@ class MockEndpoint(BaseEndpoint):
             self.definition.pk_column_name
         )
 
+    def register_with_composite_key(
+            self,
+            composite_key: dict,
+            data: dict) -> BaseResource:
+        cleaned_data = self._clean_data(data)
+        resources = self._get_temp_data_and_create_if_not_exists()
+        if any(
+            all(
+                r.get(property_name) == value
+                for property_name, value in composite_key.items()
+            )
+            for r in resources
+        ):
+            return {}
+        resources.append(cleaned_data)
+        self._update_temp_data(resources)
+        return BaseResource(
+            cleaned_data,
+            self.resource_type,
+            self.definition.pk_column_name
+        )
+
     def update(
             self,
             resource_id: int,
@@ -160,6 +202,24 @@ class MockEndpoint(BaseEndpoint):
         updated_resources.append(resource_to_update_as_dict)
         return self._update_temp_data(updated_resources)
 
+    def update_by_composite_key(self, composite_key: dict, data: dict):
+        cleaned_data = self._clean_data(data)
+        resource_to_update_as_dict = self.get_by_composite_key(
+            composite_key
+        ).as_dict()
+        resource_to_update_as_dict.update(cleaned_data)
+        resources = self._get_temp_data_and_create_if_not_exists()
+        updated_resources = [
+            r
+            for r in resources
+            if not (all(
+                r.get(column_name) == value
+                for column_name, value in composite_key.items()
+            ))
+        ]
+        updated_resources.append(resource_to_update_as_dict)
+        return self._update_temp_data(updated_resources)
+
     def delete(self, resource_id: int, params: dict | None = None):
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = [
@@ -178,6 +238,35 @@ class MockEndpoint(BaseEndpoint):
             for r in resources
             if int(r.get(self.definition.pk_column_name)) not in resource_ids
         ]
+        return self._update_temp_data(updated_resources)
+
+    def delete_by_composite_key(self, composite_key: dict):
+        resources = self._get_temp_data_and_create_if_not_exists()
+        updated_resources = [
+            r
+            for r in resources
+            if all(
+                r.get(property_name == value)
+                for property_name, value in composite_key.items()
+            )
+        ]
+        return self._update_temp_data(updated_resources)
+
+    def delete_many_by_composite_key(self, composite_key_list: list[dict]):
+        resources = self._get_temp_data_and_create_if_not_exists()
+        updated_resources = list()
+        for resource in resources:
+            is_matching_with_any_properties = False
+            for composite_key in composite_key_list:
+                for property_name, value in composite_key.items():
+                    is_matching_properties = all(
+                        resource.get(property_name == value)
+                    )
+                    if is_matching_properties:
+                        is_matching_with_any_properties = True
+            if is_matching_with_any_properties:
+                continue
+            updated_resources.append(resource)
         return self._update_temp_data(updated_resources)
 
 

@@ -7,3 +7,4 @@ class TableNames(StrEnum):
     APPLICATION_NEW = "application_new"
     CAPACITY = "capacity"
     CAPACITY_NEW = "capacity_new"
+    COLUMN_METADATA = "column_metadata"
