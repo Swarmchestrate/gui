@@ -4,7 +4,7 @@ A GUI for registering capacities and applications in Swarmchestrate.
 ## Prerequisites
 The following prerequisites should be installed before getting started:
 - **Git**: for cloning the repository
-- **Python**: version 3.10 or later
+- **Python**: version 3.13
 - **pip**: Python package manager
 - **[Dart Sass](https://sass-lang.com/install/)**: to allow styles to work in the browser.
 - **[Node.js](https://nodejs.org/en/download)**: for Bootstrap Sass files.
