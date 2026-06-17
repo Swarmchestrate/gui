@@ -85,19 +85,17 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         for category in form_config.get_field_categories():
             if category in self.disabled_categories:
                 continue
+            form_for_category = FormWithDynamicallyPopulatedFields(
+                fields=form_config.get_fields_for_category(category),
+                initial=initial
+            )
             if not category:
                 forms_by_category.update({
-                UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
-                        fields=form_config.get_fields_for_category(category),
-                        initial=initial
-                    )
+                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
                 })
                 continue
             forms_by_category.update({
-                category: FormWithDynamicallyPopulatedFields(
-                    fields=form_config.get_fields_for_category(category),
-                    initial=initial,
-                )
+                category: form_for_category,
             })
         return forms_by_category
 
@@ -148,9 +146,12 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.fk_resource_id,
             update_data
         )
-        self.success_url = f"{reverse_lazy(self.success_reverse_base, kwargs={
-            "resource_id": self.resource_id,
-        })}?category={self.category}"
+        self.success_url = "%s?category=%s" % (
+            reverse_lazy(self.success_reverse_base, kwargs={
+                "resource_id": self.resource_id,
+            }),
+            self.category
+        )
         fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(
             self.fk_resource_id
         )
@@ -314,9 +315,12 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         new_resource = self.api_client.get_endpoint(self.fk_table_name).register(
             registration_data
         )
-        self.success_url = f"{reverse_lazy(self.success_reverse_base, kwargs={
-            "resource_id": self.resource_id,
-        })}?category={self.category}"
+        self.success_url = "%s?category=%s" % (
+            reverse_lazy(self.success_reverse_base, kwargs={
+                "resource_id": self.resource_id,
+            }),
+            self.category
+        )
         messages.success(
             self.request,
             f"Registered {humanise_resource_type(self.fk_table_name).title()} {new_resource.pk}."
@@ -428,19 +432,17 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         for category in form_config.get_field_categories():
             if category in self.disabled_categories:
                 continue
+            form_for_category = FormWithDynamicallyPopulatedFields(
+                fields=form_config.get_fields_for_category(category),
+                initial=initial
+            )
             if not category:
                 forms_by_category.update({
-                UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
-                        fields=form_config.get_fields_for_category(category),
-                        initial=initial
-                    )
+                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
                 })
                 continue
             forms_by_category.update({
-                category: FormWithDynamicallyPopulatedFields(
-                    fields=form_config.get_fields_for_category(category),
-                    initial=initial,
-                )
+                category: form_for_category,
             })
         return forms_by_category
 
@@ -487,9 +489,12 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         self.api_client.get_endpoint(self.table_name).update(self.resource_id, {
             self.fk_column_name: self.fk_resource_id,
         })
-        self.success_url = f"{reverse_lazy(self.success_reverse_base, kwargs={
-            "resource_id": self.resource_id,
-        })}?category={self.category}"
+        self.success_url = "%s?category=%s" % (
+            reverse_lazy(self.success_reverse_base, kwargs={
+                "resource_id": self.resource_id,
+            }),
+            self.category
+        )
         fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(
             self.fk_resource_id
         )
@@ -654,9 +659,12 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         self.api_client.get_endpoint(self.table_name).update(self.resource_id, {
             self.fk_column_name: new_resource.pk,
         })
-        self.success_url = f"{reverse_lazy(self.success_reverse_base, kwargs={
-            "resource_id": self.resource_id,
-        })}?category={self.category}"
+        self.success_url = "%s?category=%s" % (
+            reverse_lazy(self.success_reverse_base, kwargs={
+                "resource_id": self.resource_id,
+            }),
+            self.category
+        )
         messages.success(
             self.request,
             f"Registered {humanise_resource_type(self.fk_table_name).title()} {new_resource.pk}."
