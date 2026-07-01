@@ -1,7 +1,7 @@
 
 from django.test import SimpleTestCase
 
-from .tosca import generate_application_description_template
+from .tosca import generate_adt_yaml
 
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
@@ -91,5 +91,5 @@ class ApplicationDescriptionTemplateTestCase(
             "container_image": "https://hub.docker.com/myorg/weather-analytics:latest",
         })
         self.resource_ids_added_during_tests.append(new_resource.pk)
-        adt = generate_application_description_template(new_resource.pk)
+        adt = generate_adt_yaml(new_resource.pk)
         self.assertIsInstance(adt, str)

@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .tosca import generate_application_description_template
+from .tosca import generate_adt_yaml
 
 from editor.foreign_key_views import (
     NonDialogBasedOneToManyFieldEditorSectionView,
@@ -113,8 +113,8 @@ class ApplicationDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.APPLICATION_NEW
 
-    def generate_tosca_template(self):
-        return generate_application_description_template(self.resource_id)
+    def generate_sat_yaml(self):
+        return generate_adt_yaml(self.resource_id)
 
 
 class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):

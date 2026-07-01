@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .tosca import generate_capacity_description_template
+from .tosca import generate_cdt_yaml
 from .view_helpers import (
     CloudCapacityViewMixin,
     EdgeCapacityViewMixin,
@@ -89,8 +89,8 @@ class CloudCapacityDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.CAPACITY_NEW
 
-    def generate_tosca_template(self):
-        return generate_capacity_description_template(self.resource_id)
+    def generate_sat_yaml(self):
+        return generate_cdt_yaml(self.resource_id)
 
 
 # Edge Capacity views (EC)
@@ -160,5 +160,5 @@ class EdgeCapacityDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.CAPACITY_NEW
 
-    def generate_tosca_template(self):
-        return generate_capacity_description_template(self.resource_id)
+    def generate_sat_yaml(self):
+        return generate_cdt_yaml(self.resource_id)

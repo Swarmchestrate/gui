@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
+from http import HTTPStatus
 
 from .forms import (
     ColumnMetadataDeletionForm,
@@ -22,6 +23,7 @@ from utils.humanise import (
     humanise_resource_type_plural,
 )
 from postgrest.api import ApiClient, Resource
+
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +182,8 @@ class ToscaTemplateDownloadView(View):
     table_name: str
     resource_type: str
     
-    def generate_tosca_template(self) -> str:
+    def generate_sat_yaml(self) -> str:
+        # Overridden in view subclasses
         pass
 
     def dispatch(self, request, *args, **kwargs):
@@ -190,12 +193,20 @@ class ToscaTemplateDownloadView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        tosca_template = self.generate_tosca_template()
-        response = HttpResponse(
-            tosca_template,
-            content_type="application/yaml"
-        )
-        response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
+        try:
+            sat_yaml = self.generate_sat_yaml()
+            response = HttpResponse(
+                sat_yaml,
+                content_type="application/yaml"
+            )
+            response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
+        except Exception:
+            error_msg = "Encountered an error whilst generating the SAT."
+            logger.exception(error_msg)
+            response = HttpResponse(
+                error_msg,
+                status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
         return response
 
 

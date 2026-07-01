@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from .tosca import generate_capacity_description_template
+from .tosca import generate_cdt_yaml
 
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
@@ -80,5 +80,5 @@ class CapacityDescriptionTemplateTestCase(
         endpoint = api_client.get_endpoint(self.table_name)
         new_resource = endpoint.register({})
         self.resource_ids_added_during_tests.append(new_resource.pk)
-        cdt = generate_capacity_description_template(new_resource.pk)
+        cdt = generate_cdt_yaml(new_resource.pk)
         self.assertIsInstance(cdt, str)
