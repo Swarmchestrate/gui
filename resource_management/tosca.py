@@ -9,12 +9,6 @@ def generate_sat(
     headers = {
         "Content-Type": "application/json",
     }
-    params = {
-        "response_type": "json",
-        "template_version": "003",
-        "definitions_version": "tosca_3_1",
-        "description": "test"
-    }
     response = requests.post(
         "%s%s" % (
             os.environ.get("SAT_BUILDER_API_URL"),

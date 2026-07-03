@@ -8,6 +8,7 @@ from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 from http import HTTPStatus
 
+from .exceptions import DescriptionMissingException
 from .forms import (
     ColumnMetadataDeletionForm,
     NewColumnMetadataEditorForm,
@@ -181,6 +182,7 @@ class ToscaTemplateDownloadView(View):
     resource_id: int
     table_name: str
     resource_type: str
+    resource_list_reverse: str
     
     def generate_sat_yaml(self) -> str:
         # Overridden in view subclasses
@@ -200,13 +202,15 @@ class ToscaTemplateDownloadView(View):
                 content_type="application/yaml"
             )
             response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
+        except DescriptionMissingException as err:
+            logger.exception(str(err))
+            messages.error(request, str(err))
+            return redirect(self.resource_list_reverse)
         except Exception:
             error_msg = "Encountered an error whilst generating the SAT."
             logger.exception(error_msg)
-            response = HttpResponse(
-                error_msg,
-                status=HTTPStatus.INTERNAL_SERVER_ERROR
-            )
+            messages.error(request, error_msg)
+            return redirect(self.resource_list_reverse)
         return response
 
 

@@ -1,0 +1,2 @@
+class DescriptionMissingException(Exception):
+    pass
