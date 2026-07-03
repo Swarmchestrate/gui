@@ -38,6 +38,13 @@ class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceBy
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
 
+    def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        data = super().apply_changes_to_update_data_before_save(data)
+        data.update({
+            "resource_type": "Cloud",
+        })
+        return data
+
 
 class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
@@ -45,8 +52,8 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
 
-    def get_registration_data(self, form) -> dict:
-        registration_data = super().get_registration_data(form)
+    def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
+        registration_data = super().apply_changes_to_registration_data_before_save(data)
         registration_data.update({
             "resource_type": "Cloud",
         })
@@ -109,6 +116,13 @@ class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCa
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
 
+    def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        data = super().apply_changes_to_update_data_before_save(data)
+        data.update({
+            "resource_type": "Edge",
+        })
+        return data
+
 
 class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
@@ -116,8 +130,8 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
 
-    def get_registration_data(self, form) -> dict:
-        registration_data = super().get_registration_data(form)
+    def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
+        registration_data = super().apply_changes_to_registration_data_before_save(data)
         registration_data.update({
             "resource_type": "Edge",
         })

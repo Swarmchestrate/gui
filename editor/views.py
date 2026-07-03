@@ -186,8 +186,11 @@ class UpdateResourceByCategoryView(FormView):
         self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
         return super().dispatch(request, *args, **kwargs)
 
+    def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        return data
+
     def form_valid(self, form):
-        update_data = form.cleaned_data
+        update_data = self.apply_changes_to_update_data_before_save(form.cleaned_data)
         try:
             self.api_client.get_endpoint(self.table_name).update(
                 self.resource_id,
@@ -267,13 +270,13 @@ class EditorStartFormView(FormView):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
-    def get_registration_data(self, form) -> dict:
-        return form.cleaned_data
+    def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
+        return data
 
     def form_valid(self, form):
         new_resource = self.api_client.get_endpoint(
             self.table_name
-        ).register(self.get_registration_data(form))
+        ).register(self.apply_changes_to_registration_data_before_save(form.cleaned_data))
         messages.success(
             self.request,
             f"New {humanise_resource_type(self.resource_type)} registered.",
