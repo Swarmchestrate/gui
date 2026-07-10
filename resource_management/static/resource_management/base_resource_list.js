@@ -17,10 +17,7 @@ function initialiseDataTable(columnNames) {
             style: "os",
             selector: "td:first-child",
         },
-        order: {
-            name: "date_updated",
-            dir: "desc",
-        },
+        order: [[3, "desc"]],
     });
     return dataTable;
 }
