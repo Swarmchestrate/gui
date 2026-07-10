@@ -115,6 +115,23 @@ class LiveEndpoint(BaseEndpoint):
             for resource_unformatted in response.json()
         ]
 
+    def get_resources_by_params(self, params):
+        response = requests.get(self.endpoint_url, params=params)
+        try:
+            self.log_and_raise_response_status_if_error(response)
+        except Exception:
+            # Return an empty list so the wizard can continue
+            # rendering.
+            return []
+        return [
+            BaseResource(
+                resource_unformatted,
+                self.resource_type,
+                self.definition.pk_column_name
+            )
+            for resource_unformatted in response.json()
+        ]
+
     def register(self, data: dict) -> BaseResource:
         new_id = self._generate_random_id()
         cleaned_data = self._clean_data(data)

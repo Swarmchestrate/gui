@@ -135,6 +135,24 @@ class MockEndpoint(BaseEndpoint):
             if resource_unformatted.get(column_name) == int(resource_id)
         ]
 
+    def get_resources_by_params(self, params):
+        all_resources = self._get_temp_data_and_create_if_not_exists()
+        resources_filtered = list()
+        for r in all_resources:
+            if not all(
+                r.get(column_name) == value
+                for column_name, value in params.items()):
+                continue
+            resources_filtered.append(r)
+        return [
+            BaseResource(
+                resource_unformatted,
+                self.resource_type,
+                self.definition.pk_column_name
+            )
+            for resource_unformatted in resources_filtered
+        ]
+
     def register(self, data: dict) -> BaseResource:
         new_id = self._generate_random_id()
         cleaned_data = self._clean_data(data)

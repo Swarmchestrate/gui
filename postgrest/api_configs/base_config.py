@@ -226,6 +226,11 @@ class BaseEndpoint:
             params: dict | None = None) -> list[BaseResource]:
         pass
 
+    def get_resources_by_params(
+            self,
+            params: dict) -> list[BaseResource]:
+        pass
+
     def register(self, data: dict) -> BaseResource:
         pass
 

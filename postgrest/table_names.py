@@ -14,3 +14,4 @@ class TableNames(StrEnum):
     CAPACITY = "capacity"
     CAPACITY_NEW = "capacity_new"
     COLUMN_METADATA = "column_metadata"
+    LOCALITY = "locality"

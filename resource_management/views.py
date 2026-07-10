@@ -8,7 +8,7 @@ from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 from http import HTTPStatus
 
-from .exceptions import DescriptionMissingException
+from .exceptions import NameMissingException
 from .forms import (
     ColumnMetadataDeletionForm,
     NewColumnMetadataEditorForm,
@@ -202,7 +202,7 @@ class ToscaTemplateDownloadView(View):
                 content_type="application/yaml"
             )
             response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
-        except DescriptionMissingException as err:
+        except NameMissingException as err:
             logger.exception(str(err))
             messages.error(request, str(err))
             return redirect(self.resource_list_reverse)
