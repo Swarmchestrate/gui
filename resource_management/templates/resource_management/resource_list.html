@@ -90,15 +90,15 @@
                             {% endblock td_name_content %}
                         </td>
                         <td class="text-body-secondary align-middle px-3">
-                            {% if 'created_at' in resource %}
-                            {{ resource.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                            {% if 'created_at' in resource.as_dict %}
+                            {{ resource.as_dict.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
                             {% else %}
                             -
                             {% endif %}
                         </td>
                         <td class="text-body-secondary align-middle px-3">
-                            {% if 'updated_at' in resource %}
-                            {{ resource.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
+                            {% if 'updated_at' in resource.as_dict %}
+                            {{ resource.as_dict.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
                             {% else %}
                             -
                             {% endif %}
