@@ -486,9 +486,13 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.fk_resource_id,
             update_data
         )
-        self.api_client.get_endpoint(self.table_name).update(self.resource_id, {
-            self.fk_column_name: self.fk_resource_id,
-        })
+        self.api_client.get_endpoint(self.table_name).update(
+            self.resource_id,
+            {
+                self.fk_column_name: self.fk_resource_id,
+            },
+            set_updated_at_to_now=True
+        )
         self.success_url = "%s?category=%s" % (
             reverse_lazy(self.success_reverse_base, kwargs={
                 "resource_id": self.resource_id,
@@ -656,9 +660,13 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         new_resource = self.api_client.get_endpoint(self.fk_table_name).register(
             registration_data
         )
-        self.api_client.get_endpoint(self.table_name).update(self.resource_id, {
-            self.fk_column_name: new_resource.pk,
-        })
+        self.api_client.get_endpoint(self.table_name).update(
+            self.resource_id,
+            {
+                self.fk_column_name: new_resource.pk,
+            },
+            set_updated_at_to_now=True
+        )
         self.success_url = "%s?category=%s" % (
             reverse_lazy(self.success_reverse_base, kwargs={
                 "resource_id": self.resource_id,

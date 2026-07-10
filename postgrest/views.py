@@ -46,6 +46,7 @@ class NewOneToOneRelationFormView(FormView):
             {
                 self.fk_column_name: new_fk_resource.pk
             },
+            set_updated_at_to_now=True
         )
         message = f"Added new {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):
@@ -171,7 +172,8 @@ class DeleteOneToOneRelationFormView(FormView):
             self.resource_id,
             {
                 self.fk_column_name: None
-            }
+            },
+            set_updated_at_to_now=True
         )
         message = f"Deleted {humanise_resource_type(self.fk_table_name).title()} registration."
         if self.request.accepts("text/html"):

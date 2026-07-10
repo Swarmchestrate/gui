@@ -194,7 +194,8 @@ class UpdateResourceByCategoryView(FormView):
         try:
             self.api_client.get_endpoint(self.table_name).update(
                 self.resource_id,
-                update_data
+                update_data,
+                set_updated_at_to_now=True
             )
         except Exception:
             error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
