@@ -14,6 +14,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 def get_data_for_cdt(capacity_id: int) -> dict:
+    capacity_id = int(capacity_id)
     # Set up API client
     api_client = ApiClient()
     api_client.initialise_openapi_spec()
@@ -59,21 +60,23 @@ def generate_cdt_yaml(capacity_id: int) -> str | None:
     cdt_template_path = os.path.join(
         BASE_DIR,
         "capacities",
-        "cdt_template.json.djt"
+        "cdt_template.yaml.djt"
     )
     cdt_template_string = ""
     with open(cdt_template_path, "r") as cdt_template_file:
         cdt_template_string = cdt_template_file.read()
     template = Template(cdt_template_string)
     context = Context(data)
-    data_json = template.render(context)
+    data_yaml = template.render(context)
+    yaml_as_dict = yaml.safe_load(data_yaml)
+    data_json = json.dumps(yaml_as_dict, indent=4, default=str)
     capacity_description = "This Capacity Description Template was generated using the Swarmchestrate GUI."
     if data.get("capacity").get("description"):
         capacity_description = data.get("capacity").get("description")
     params = {
-        "response_type": "json",
-        "template_version": "003",
-        "definitions_version": "tosca_3_1",
+        # "response_type": "yaml_and_json",
+        "template_version": "latest",
+        # "definitions_version": "tosca_3_1",
         "description": capacity_description,
     }
     cdt = generate_sat(

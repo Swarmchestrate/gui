@@ -1,0 +1,93 @@
+{% if capacity.name or capacity.author or capacity.version %}
+metadata:
+  {% if capacity.name %}
+  name: {{ capacity.name }}
+  {% endif %}
+  {% if capacity.author %}
+  created_by: {{ capacity.author }}
+  {% endif %}
+  {% if capacity.version %}
+  version: {{ capacity.version }}
+  {% endif %}
+{% endif %}
+service_template:
+  node_templates:
+    {% if not capacity_instance_types %}
+    {}
+    {% else %}
+    {% for capacity_instance_type in capacity_instance_types %}
+    instance-type-{{ forloop.counter }}:
+      type: swch:CloudCapacity
+      capabilities:
+        {% if capacity_instance_type.storage_gb or capacity.bandwidth_mbps %}
+        host:
+          properties:
+            {% if capacity_instance_type.storage_gb %}
+            disk-size:
+              default: {{ capacity_instance_type.storage_gb }}
+            {% endif %}
+            {% if capacity.bandwidth_mbps %}
+            bandwidth:
+              default: {{ capacity.bandwidth_mbps }}
+            {% endif %}
+        {% endif %}
+        {% if capacity_operating_systems %}
+        os:
+          properties:
+            {% with capacity_operating_system=capacity_operating_systems.0 %}
+            {% if capacity_operating_systems.architecture %}
+            type:
+              default: {{ capacity_operating_systems.architecture }}
+            {% endif %}
+            {% if capacity_operating_systems.uuid %}
+            version:
+              default: {{ capacity_operating_systems.uuid }}
+            {% endif %}
+            {% if capacity_operating_systems.name %}
+            distribution:
+              default: {{ capacity_operating_systems.name }}
+            {% endif %}
+            {% endwith %}
+        {% endif %}
+        {% if capacity.connectivity_type %}
+        network:
+          properties:
+            type:
+              default: {{ capacity.connectivity_type }}
+        {% endif %}
+        {% if capacity_instance_type.price_per_hr %}
+        pricing:
+          properties:
+            cost:
+              default: {{ capacity_instance_type.price_per_hr }}
+        {% endif %}
+        {% if locality %}
+        locality:
+          properties:
+            {% if locality.continent %}
+            continent:
+              default: {{ locality.continent }}
+            {% endif %}
+            {% if locality.country %}
+            country:
+              default: {{ locality.country }}
+            {% endif %}
+            {% if locality.city %}
+            city:
+              default: {{ locality.city }}
+            {% endif %}
+        {% endif %}
+        {% if capacity.powered_type or capacity.energy_type %}
+        energy:
+          properties:
+            {% if capacity.powered_type %}
+            powered-type:
+              default: {{ capacity.powered_type }}
+            {% endif %}
+            {% if capacity.energy_type %}
+            energy-type:
+              default: {{ capacity.energy_type }}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% endif %}
