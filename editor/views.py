@@ -12,7 +12,10 @@ from django.views.generic import (
 )
 
 from .forms import FormWithDynamicallyPopulatedFields
-from .view_helpers import EditorTableOfContents
+from .view_helpers import (
+    EditorTableOfContents,
+    get_forms_for_editor_by_category,
+)
 
 from editor.view_helpers import get_form_config_for_table
 from postgrest.api import (
@@ -104,25 +107,11 @@ class EditorView(TemplateView):
         ).as_dict()
 
     def get_forms_by_category(self):
-        forms_by_category = dict()
-        for category in self.form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
-            if not category:
-                forms_by_category.update({
-                UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
-                        fields=self.form_config.get_fields_for_category(category),
-                        initial=self.resource.as_dict(),
-                    )
-                })
-                continue
-            forms_by_category.update({
-                category: FormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields_for_category(category),
-                    initial=self.resource.as_dict(),
-                )
-            })
-        return forms_by_category
+        return get_forms_for_editor_by_category(
+            self.form_config,
+            self.resource.as_dict(),
+            self.disabled_categories
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

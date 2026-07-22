@@ -1,3 +1,5 @@
+from .forms import FormWithDynamicallyPopulatedFields
+
 from postgrest.forms.form_config import (
     ColumnMetadata,
     FormConfig,
@@ -213,3 +215,29 @@ def get_form_config_for_table(
         one_to_many_properties=one_to_many_properties.as_dict(),
         extra_disabled_properties=disabled_properties
     )
+
+
+# Django forms
+def get_forms_for_editor_by_category(
+        form_config: FormConfig,
+        initial: dict | None = None,
+        disabled_categories: list[str] = None) -> dict[str, FormWithDynamicallyPopulatedFields]:
+    if not disabled_categories:
+        disabled_categories = list()
+    forms_by_category = dict()
+    for category in form_config.get_field_categories():
+        if category in disabled_categories:
+            continue
+        form_for_category = FormWithDynamicallyPopulatedFields(
+            fields=form_config.get_fields_for_category(category),
+            initial=initial
+        )
+        if not category:
+            forms_by_category.update({
+                UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
+            })
+            continue
+        forms_by_category.update({
+            category: form_for_category,
+        })
+    return forms_by_category

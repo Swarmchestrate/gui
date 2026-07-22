@@ -4,7 +4,11 @@ from django.template.loader import render_to_string
 from django.views.generic import FormView
 
 from .forms import FormWithDynamicallyPopulatedFields
-from .view_helpers import EditorTableOfContents, get_form_config_for_table
+from .view_helpers import (
+    EditorTableOfContents,
+    get_form_config_for_table,
+    get_forms_for_editor_by_category,
+)
 from postgrest.api import ApiClient
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
@@ -81,23 +85,11 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self,
             form_config: FormConfig,
             initial: dict | None = None):
-        forms_by_category = dict()
-        for category in form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
-            form_for_category = FormWithDynamicallyPopulatedFields(
-                fields=form_config.get_fields_for_category(category),
-                initial=initial
-            )
-            if not category:
-                forms_by_category.update({
-                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
-                })
-                continue
-            forms_by_category.update({
-                category: form_for_category,
-            })
-        return forms_by_category
+        return get_forms_for_editor_by_category(
+            form_config,
+            initial,
+            self.disabled_categories
+        )
 
     def get_toc_list_items(self):
         category_names = list(set(
@@ -428,23 +420,11 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self,
             form_config: FormConfig,
             initial: dict | None = None):
-        forms_by_category = dict()
-        for category in form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
-            form_for_category = FormWithDynamicallyPopulatedFields(
-                fields=form_config.get_fields_for_category(category),
-                initial=initial
-            )
-            if not category:
-                forms_by_category.update({
-                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
-                })
-                continue
-            forms_by_category.update({
-                category: form_for_category,
-            })
-        return forms_by_category
+        return get_forms_for_editor_by_category(
+            form_config,
+            initial,
+            self.disabled_categories
+        )
 
     def get_toc_list_items(self):
         category_names = list(set(
