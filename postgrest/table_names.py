@@ -12,6 +12,8 @@ class TableNames(StrEnum):
     APPLICATION_MICROSERVICE = "application_microservice"
     APPLICATION_NEW = "application_new"
     CAPACITY = "capacity"
+    CAPACITY_INSTANCE_TYPE = "capacity_instance_type"
     CAPACITY_NEW = "capacity_new"
+    CAPACITY_OPERATING_SYSTEM = "capacity_operating_system"
     COLUMN_METADATA = "column_metadata"
     LOCALITY = "locality"

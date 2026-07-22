@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .tosca import generate_cdt_yaml
+from .tosca_template import generate_cdt_yaml
 from .view_helpers import (
     CloudCapacityViewMixin,
     EdgeCapacityViewMixin,

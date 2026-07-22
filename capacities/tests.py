@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from .tosca import generate_cdt_yaml
+from .tosca_template import generate_cdt_yaml
 
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
