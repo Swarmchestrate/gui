@@ -35,7 +35,22 @@ RUN npm ci
 
 COPY . .
 
-RUN mkdir -p staticfiles
+RUN SECRET_KEY=build-only-secret \
+    DEBUG=False \
+    ALLOWED_HOSTS=localhost \
+    DATABASE_ENGINE=django.db.backends.sqlite3 \
+    DATABASE_NAME=/tmp/gui-build.sqlite3 \
+    API_URL=http://127.0.0.1 \
+    USE_MOCK_API=True \
+    python manage.py compilescss && \
+    SECRET_KEY=build-only-secret \
+    DEBUG=False \
+    ALLOWED_HOSTS=localhost \
+    DATABASE_ENGINE=django.db.backends.sqlite3 \
+    DATABASE_NAME=/tmp/gui-build.sqlite3 \
+    API_URL=http://127.0.0.1 \
+    USE_MOCK_API=True \
+    python manage.py collectstatic --noinput
 
 EXPOSE 8080
 

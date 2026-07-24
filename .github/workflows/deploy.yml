@@ -58,7 +58,36 @@ jobs:
             set -e
             DEPLOY_DIR=/opt/gui
             mkdir -p "$DEPLOY_DIR"
-            printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$DEPLOY_DIR/.env"
+            TMP_ENV="$(mktemp)"
+            trap 'rm -f "$TMP_ENV"' EXIT
+            printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$TMP_ENV"
+
+            for required_var in \
+              SECRET_KEY \
+              DEBUG \
+              ALLOWED_HOSTS \
+              DATABASE_ENGINE \
+              DATABASE_NAME \
+              API_URL \
+              USE_MOCK_API \
+              DOCKER_NAMESPACE \
+              GUI_SERVICE_ID \
+              GUI_NAME \
+              GUI_VERSION \
+              GUI_PORT
+            do
+              if ! grep -q "^${required_var}=" "$TMP_ENV"; then
+                echo "Missing required env var: ${required_var}"
+                exit 1
+              fi
+            done
+
+            if grep -q '^SECRET_KEY=#your_secret_key_here$' "$TMP_ENV"; then
+              echo "SECRET_KEY is still the placeholder value"
+              exit 1
+            fi
+
+            mv "$TMP_ENV" "$DEPLOY_DIR/.env"
             chmod 600 "$DEPLOY_DIR/.env"
             cd "$DEPLOY_DIR"
             if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
