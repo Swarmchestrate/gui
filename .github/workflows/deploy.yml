@@ -53,7 +53,7 @@ jobs:
           username: ${{ secrets.GUI_USER }}
           key: ${{ secrets.GUI_KEY }}
           envs: GUI_ENV_PRODUCTION_B64
-          script_stop: true
+          script_stop: false
           script: |
             set -e
             DEPLOY_DIR=/opt/gui
