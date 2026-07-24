@@ -115,6 +115,26 @@ class LiveEndpoint(BaseEndpoint):
             for resource_unformatted in response.json()
         ]
 
+    def get_resources_referencing_any_resource_id(self, column_name, resource_ids, params = None):
+        if not params:
+            params = dict()
+        params.update({column_name: f"in.({",".join(resource_ids)})"})
+        response = requests.get(self.endpoint_url, params=params)
+        try:
+            self.log_and_raise_response_status_if_error(response)
+        except Exception:
+            # Return an empty list so the wizard can continue
+            # rendering.
+            return []
+        return [
+            BaseResource(
+                resource_unformatted,
+                self.resource_type,
+                self.definition.pk_column_name
+            )
+            for resource_unformatted in response.json()
+        ]
+
     def get_resources_by_params(self, params):
         response = requests.get(self.endpoint_url, params=params)
         try:

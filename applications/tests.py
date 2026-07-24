@@ -1,7 +1,7 @@
 
 from django.test import SimpleTestCase
 
-from .tosca import generate_adt_yaml
+from .tosca_template import generate_adt_yaml
 
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
@@ -82,7 +82,7 @@ class ApplicationDescriptionTemplateTestCase(
         self.delete_resources_added_during_test()
         return super().tearDown()
 
-    def test_capacity_description_template_generation(self):
+    def test_swarmchestrate_application_template_generation(self):
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
         endpoint = api_client.get_endpoint(self.table_name)

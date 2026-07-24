@@ -135,6 +135,18 @@ class MockEndpoint(BaseEndpoint):
             if resource_unformatted.get(column_name) == int(resource_id)
         ]
 
+    def get_resources_referencing_any_resource_id(self, column_name, resource_ids, params = None):
+        all_resources = self._get_temp_data_and_create_if_not_exists()
+        return [
+            BaseResource(
+                resource_unformatted,
+                self.resource_type,
+                self.definition.pk_column_name
+            )
+            for resource_unformatted in all_resources
+            if resource_unformatted.get(column_name) in resource_ids
+        ]
+
     def get_resources_by_params(self, params):
         all_resources = self._get_temp_data_and_create_if_not_exists()
         resources_filtered = list()

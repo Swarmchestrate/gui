@@ -1,0 +1,51 @@
+{% load helpers %}
+{% with application_dict=application.as_dict %}
+{% if application_dict.name or application_dict.author or application_dict.version %}
+metadata:
+  {% if application_dict.name %}
+  name: Swarmchestrate Application Template
+  {% endif %}
+  {% if application_dict.version %}
+  version: 1.0.0
+  {% endif %}
+  {% if application_dict.author %}
+  created_by: Swarmchestrate Project
+  {% endif %}
+{% endif %}
+{% endwith %}
+service_template:
+  node_templates:
+    {% if not application_microservices and not application_resources and not application_volumes %}
+    {}
+    {% else %}
+    {% for application_microservice in application_microservices %}
+    {% with application_microservice_dict=application_microservice.as_dict %}
+    application-{{ forloop.counter }}:
+      type: swch:Application
+      {% if application_microservice_dict.container_image %}
+      properties:
+        {% if application_microservice_dict.container_image %}
+        image: {{ application_microservice_dict.container_image }}
+        {% endif %}
+      {% endif %}
+      {% if application_microservice.pk in application_volumes %}
+      requirements:
+        {% if application_microservice.pk in application_volumes %}
+        volume: {{ application_volumes|get_key_value_or_empty_dict:application_microservice.pk|get_key_value_or_empty_dict:"__name__" }}
+        {% endif %}
+      {% endif %}
+    {% endwith %}
+    {% endfor %}
+    {% for application_microservice_id, application_volume_metadata in application_volumes.items %}
+    {{ application_volume_metadata|get_key_value_or_empty_dict:'__name__' }}:
+      {% with application_volume_dict=application_volume_metadata.application_volume.as_dict %}
+      {% if application_volume_dict.volume_type %}
+      type: Volume.{{ application_volume_dict.volume_type }}
+      {% endif %}
+      {% if application_volume_dict.volume_path %}
+      properties:
+        path: {{ application_volume_dict.volume_path }}
+      {% endif %}
+      {% endwith %}
+    {% endfor %}
+    {% endif %}

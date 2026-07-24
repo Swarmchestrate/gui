@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .tosca import generate_adt_yaml
+from .tosca_template import generate_adt_yaml
 
 from editor.foreign_key_views import (
     NonDialogBasedOneToManyFieldEditorSectionView,

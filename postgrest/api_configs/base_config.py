@@ -226,6 +226,13 @@ class BaseEndpoint:
             params: dict | None = None) -> list[BaseResource]:
         pass
 
+    def get_resources_referencing_any_resource_id(
+            self,
+            column_name: str,
+            resource_ids: list[int],
+            params: dict | None = None) -> list[BaseResource]:
+        pass
+
     def get_resources_by_params(
             self,
             params: dict) -> list[BaseResource]:
