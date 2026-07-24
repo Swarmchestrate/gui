@@ -47,18 +47,18 @@ jobs:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
-          GUI_ENV_PRODUCTION: ${{ secrets.GUI_ENV_PRODUCTION }}
+          GUI_ENV_PRODUCTION_B64: ${{ secrets.GUI_ENV_PRODUCTION_B64 }}
         with:
           host: ${{ secrets.GUI_SERVER }}
           username: ${{ secrets.GUI_USER }}
           key: ${{ secrets.GUI_KEY }}
-          envs: GUI_ENV_PRODUCTION
+          envs: GUI_ENV_PRODUCTION_B64
           script_stop: true
           script: |
             set -e
             DEPLOY_DIR=/opt/gui
             mkdir -p "$DEPLOY_DIR"
-            printf '%s\n' "$GUI_ENV_PRODUCTION" > "$DEPLOY_DIR/.env"
+            printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$DEPLOY_DIR/.env"
             chmod 600 "$DEPLOY_DIR/.env"
             cd "$DEPLOY_DIR"
             if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
