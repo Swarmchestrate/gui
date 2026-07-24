@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "application_id": 1,
+        "application_microservice_id": 1,
         "volume_type": "Exists",
         "volume_path": "/path/to/volume",
         "mount_path": "/path/to/mount",
