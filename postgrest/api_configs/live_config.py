@@ -10,6 +10,7 @@ from .base_config import (
     BaseEndpoint,
     BaseOpenApiSpecification,
     BaseResource,
+    build_api_url,
 )
 
 
@@ -20,7 +21,7 @@ class LiveEndpoint(BaseEndpoint):
     def __init__(self, table_name: str, definition: BaseDefinition):
         super().__init__(table_name, definition)
         self.api_url = os.environ.get("API_URL")
-        self.endpoint_url = f"{self.api_url}{table_name}"
+        self.endpoint_url = build_api_url(self.api_url, table_name)
 
     # Error handling
     def log_and_raise_response_status_if_error(self, response: requests.Response):
