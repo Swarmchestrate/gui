@@ -1,5 +1,9 @@
+import logging
 import os
 import requests
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_sat(
@@ -18,6 +22,8 @@ def generate_sat(
         params=params,
         data=data
     )
-    sat = None
-    sat = response.json()
-    return sat
+    try:
+        response.raise_for_status()
+    except Exception as err:
+        raise err
+    return response.json()
