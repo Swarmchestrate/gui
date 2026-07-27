@@ -26,7 +26,7 @@ class BaseResource:
     def pk(self) -> int:
         return self._data.get(self.pk_column_name)
 
-    def as_dict(self):
+    def as_dict(self, include_pk: bool = False):
         data_as_dict = self._data
         # Transform GPS location property value to something
         # easier to work with (if it exists).
@@ -40,6 +40,11 @@ class BaseResource:
                 coordinates = gps_location.get("coordinates", [])
             lat, long = coordinates[0], coordinates[1]
             data_as_dict.update({gps_location_property_name: [lat, long]})
+        if not include_pk:
+            return data_as_dict
+        data_as_dict.update({
+            "__pk__": self.pk,
+        })
         return data_as_dict
 
 

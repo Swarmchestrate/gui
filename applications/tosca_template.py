@@ -18,14 +18,22 @@ def get_data_for_sat(application_id: int) -> dict:
     # Set up API client
     api_client = ApiClient()
     api_client.initialise_openapi_spec()
+
     # Application
     endpoint = api_client.get_endpoint(TableNames.APPLICATION_NEW)
     application = endpoint.get(application_id)
+    application_dict = application.as_dict(include_pk=True)
+
     # Application - Microservices
     application_microservice_endpoint = api_client.get_endpoint(TableNames.APPLICATION_MICROSERVICE)
     application_microservices = application_microservice_endpoint.get_resources_by_params({
         "application_id": application_id,
     })
+    application_microservice_dicts = [
+        application_microservice.as_dict(include_pk=True)
+        for application_microservice in application_microservices
+    ]
+
     # Application - Volumes
     application_volume_endpoint = api_client.get_endpoint(TableNames.APPLICATION_VOLUME)
     application_volumes = application_volume_endpoint.get_resources_referencing_any_resource_id(
@@ -35,34 +43,38 @@ def get_data_for_sat(application_id: int) -> dict:
             for application_microservice in application_microservices
         ]
     )
-    application_volumes_by_application_microservice = {}
+    application_volume_dicts_by_application_microservice = {}
     for i, application_volume in enumerate(application_volumes):
         application_microservice_id = application_volume.as_dict().get("application_microservice_id")
-        application_volumes_by_application_microservice.update({
-            application_microservice_id: {
-                "__name__": f"volume-{i + 1}",
-                "application_volume": application_volume,
-            },
+        application_volume_dict = application_volume.as_dict(include_pk=True)
+        application_volume_dict.update({
+            "__name__": f"volume-{i + 1}",
         })
+        application_volume_dicts_by_application_microservice.update({
+            application_microservice_id: application_volume_dict,
+        })
+
     # Application - Behaviour
     application_behaviour_endpoint = api_client.get_endpoint(TableNames.APPLICATION_BEHAVIOUR)
     application_behaviour_id = application.as_dict().get("behaviour_id")
     application_behaviour_dict = None
     if application_behaviour_id:
         application_behaviour = application_behaviour_endpoint.get(application_behaviour_id)
-        application_behaviour_dict = application_behaviour.as_dict()
+        application_behaviour_dict = application_behaviour.as_dict(include_pk=True)
+
     # Locality
     locality_endpoint = api_client.get_endpoint(TableNames.LOCALITY)
     locality_id = application.as_dict().get("locality_id")
-    locality = None
+    locality_dict = None
     if locality_id:
         locality = locality_endpoint.get(locality_id)
+        locality_dict = locality.as_dict(include_pk=True)
     return {
-        "application": application,
+        "application": application_dict,
         "application_behaviour": application_behaviour_dict,
-        "application_microservices": application_microservices,
-        "application_volumes": application_volumes_by_application_microservice,
-        "locality": locality,
+        "application_microservices": application_microservice_dicts,
+        "application_volumes": application_volume_dicts_by_application_microservice,
+        "locality": locality_dict,
     }
 
 
@@ -82,7 +94,7 @@ def generate_adt_yaml(application_id: int) -> str | None:
     yaml_as_dict = yaml.safe_load(data_yaml)
     data_json = json.dumps(yaml_as_dict, indent=4, default=str)
     application_description = "This Swarmchestrate Application Template was generated using the Swarmchestrate GUI."
-    if data.get("application").as_dict().get("description"):
+    if data.get("application").get("description"):
         application_description = data.get("application").get("description")
     params = {
         # "response_type": "yaml_and_json",
