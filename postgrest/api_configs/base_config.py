@@ -9,9 +9,12 @@ from urllib.parse import urljoin
 logger = logging.getLogger(__name__)
 
 
-def build_api_url(base_url: str | None, *path_parts: str) -> str:
+def build_api_url(
+        base_url: str | None,
+        *path_parts: str,
+        env_var_name: str = "API_URL") -> str:
     if not base_url:
-        raise ValueError("API_URL is not set")
+        raise ValueError(f"{env_var_name} is not set")
     url = base_url
     for path_part in path_parts:
         url = urljoin(url.rstrip("/") + "/", path_part.lstrip("/"))

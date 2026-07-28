@@ -14,7 +14,8 @@ def generate_sat(
     response = requests.post(
         build_api_url(
             os.environ.get("SAT_BUILDER_API_URL"),
-            endpoint_path
+            endpoint_path,
+            env_var_name="SAT_BUILDER_API_URL"
         ),
         headers=headers,
         params=params,
