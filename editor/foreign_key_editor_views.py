@@ -332,18 +332,50 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         )
         return super().form_valid(form)
 
+    def get_copy_source(self) -> dict:
+        """The row being copied, when ?copy_from=<id> is given."""
+        copy_from = self.request.GET.get("copy_from")
+        if not copy_from:
+            return {}
+        endpoint = self.api_client.get_endpoint(self.fk_table_name)
+        source = endpoint.get(copy_from)
+        if source is None or source.as_dict() is None:
+            raise Http404(f"No {self.fk_table_name} with id {copy_from} to copy")
+        row = dict(source.as_dict())
+        # Identity and parentage belong to the new row, not the copied one.
+        for key in (endpoint.definition.pk_column_name, "created_at", "updated_at"):
+            row.pop(key, None)
+        return row
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update(self.get_copy_source())
+        return initial
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        fields = dict(self.fk_table_form_config.get_required_fields())
-        # Some columns are nullable because a sibling subtype uses a different
-        # one, but are still needed to create a usable row. Views name them in
-        # extra_new_fields; anything hidden for this subtype stays hidden.
         available = self.fk_table_form_config.get_fields()
-        for name in getattr(self, "extra_new_fields", []):
-            if name in self.disabled_properties:
-                continue
-            if name in available:
-                fields[name] = available[name]
+        if self.request.GET.get("copy_from"):
+            # Copying shows every field, so the values carried over are visible
+            # and adjustable rather than silently submitted or dropped. Foreign
+            # keys are excluded: they render as relational sections, which need
+            # a row that does not exist yet.
+            relational = {
+                name
+                for name, metadata in self.fk_table_form_config.get_properties().items()
+                if metadata.refers_to_table_name or metadata.created_from_table_name
+            }
+            fields = {n: f for n, f in available.items() if n not in relational}
+        else:
+            fields = dict(self.fk_table_form_config.get_required_fields())
+            # Some columns are nullable because a sibling subtype uses a
+            # different one, but are still needed to create a usable row. Views
+            # name them in extra_new_fields; anything hidden stays hidden.
+            for name in getattr(self, "extra_new_fields", []):
+                if name in self.disabled_properties:
+                    continue
+                if name in available:
+                    fields[name] = available[name]
         kwargs.update({"fields": fields})
         return kwargs
 
