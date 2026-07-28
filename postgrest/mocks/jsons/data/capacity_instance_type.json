@@ -2,8 +2,7 @@
     {
         "id": 1,
         "capacity_id": 1,
-        "instance_type_uuid": null,
-        "instance_type": "General",
+        "instance_type": null,
         "name": "m2-medium",
         "cpu": 4,
         "ram_gb": 8,
@@ -12,13 +11,13 @@
         "bandwidth": 1000,
         "energy_consumption": 0.1,
         "price_per_hr": 0.0139,
-        "quota": 4
+        "quota": 4,
+        "flavor_name": "m2.medium"
     },
     {
         "id": 2,
         "capacity_id": 1,
-        "instance_type_uuid": null,
-        "instance_type": "General",
+        "instance_type": null,
         "name": "m2-small",
         "cpu": 2,
         "ram_gb": 4,
@@ -27,13 +26,13 @@
         "bandwidth": 1000,
         "energy_consumption": 0.08,
         "price_per_hr": 0.007,
-        "quota": 10
+        "quota": 10,
+        "flavor_name": "m2.small"
     },
     {
         "id": 3,
         "capacity_id": 2,
-        "instance_type_uuid": null,
-        "instance_type": "Optimised_CPU",
+        "instance_type": null,
         "name": "rpi-4b",
         "cpu": 4,
         "ram_gb": 8,
@@ -42,6 +41,22 @@
         "bandwidth": 100,
         "energy_consumption": 0.006,
         "price_per_hr": 0.0,
-        "quota": 1
+        "quota": 1,
+        "flavor_name": null
+    },
+    {
+        "id": 4,
+        "capacity_id": 3,
+        "name": "t3-micro",
+        "instance_type": "t3.micro",
+        "flavor_name": null,
+        "cpu": 2,
+        "ram_gb": 1,
+        "storage_gb": 20,
+        "architecture": "x86",
+        "bandwidth": 100,
+        "energy_consumption": 13.0,
+        "price_per_hr": 0.0139,
+        "quota": 40
     }
 ]

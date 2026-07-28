@@ -1,12 +1,12 @@
 {
     "required": [
         "id",
-        "instance_type",
         "cpu",
         "ram_gb",
         "storage_gb",
         "architecture",
         "price_per_hr",
+        "name",
         "bandwidth",
         "energy_consumption"
     ],
@@ -24,17 +24,6 @@
         "instance_type_uuid": {
             "format": "integer",
             "type": "integer"
-        },
-        "instance_type": {
-            "enum": [
-                "General",
-                "Optimised_CPU",
-                "Optimised_RAM",
-                "Optimised_Storage",
-                "Optimised_GPU"
-            ],
-            "format": "public.instance_type_enum",
-            "type": "string"
         },
         "cpu": {
             "format": "integer",
@@ -76,6 +65,16 @@
         "energy_consumption": {
             "format": "numeric",
             "type": "number"
+        },
+        "instance_type": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "flavor_name": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
         }
     },
     "type": "object"

@@ -31,7 +31,16 @@
         "ssh_key_name": "fuelics",
         "ssh_auth_method": "key",
         "credentials": null,
-        "cloud": "openstack"
+        "cloud": "openstack",
+        "image_id": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
+        "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
+        "project_id": "facbcbb71bab40c0a8934b3eda67d389",
+        "use_block_device": true,
+        "security_group": "0eb63f2b-b656",
+        "security_groups": [
+            "0eb63f2b-b656"
+        ],
+        "ami": null
     },
     {
         "capacity_id": 2,
@@ -66,5 +75,48 @@
         "ssh_auth_method": "key",
         "credentials": null,
         "cloud": null
+    },
+    {
+        "capacity_id": 3,
+        "created_at": "2026-02-05T09:00:00",
+        "updated_at": "2026-02-05T09:00:00",
+        "name": "cap-aws-uow",
+        "description": "UoW AWS capacity",
+        "resource_provider": "AWS",
+        "capacity_provider": "UoW",
+        "resource_type": "Cloud",
+        "energy_type": "Brown",
+        "powered_type": "Mains",
+        "connectivity_type": "Ethernet",
+        "locality_id": 2,
+        "resource_quota_id": 2,
+        "energy_consumption_id": null,
+        "price_id": null,
+        "ssh_port": 22,
+        "ssh_user": "ec2-user",
+        "ipv4_enabled": true,
+        "ipv6_enabled": false,
+        "subnet": null,
+        "explicit_tcp_allow": [
+            "ALL"
+        ],
+        "explicit_udp_allow": [
+            "ALL"
+        ],
+        "edge_ip": null,
+        "edge_local_ip": null,
+        "ssh_key_name": "uow-aws",
+        "ssh_auth_method": "key",
+        "credentials": null,
+        "cloud": "aws",
+        "image_id": null,
+        "network_id": null,
+        "project_id": null,
+        "use_block_device": null,
+        "security_group": "0eb63f2b-b656",
+        "security_groups": [
+            "0eb63f2b-b656"
+        ],
+        "ami": "ami-19237951"
     }
 ]

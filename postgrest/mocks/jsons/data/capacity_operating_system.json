@@ -14,5 +14,13 @@
         "architecture": "ARM",
         "os_version": "12",
         "os_distribution": "debian"
+    },
+    {
+        "id": 3,
+        "capacity_id": 3,
+        "os_name": "linux",
+        "architecture": "x86",
+        "os_version": "2023",
+        "os_distribution": "amazon-linux"
     }
 ]

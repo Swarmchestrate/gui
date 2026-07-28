@@ -1,10 +1,12 @@
 {
     "required": [
         "capacity_id",
+        "description",
         "resource_provider",
         "capacity_provider",
         "resource_type",
         "connectivity_type",
+        "name",
         "ipv4_enabled",
         "ipv6_enabled"
     ],
@@ -162,6 +164,42 @@
             "format": "character varying",
             "maxLength": 50,
             "type": "string"
+        },
+        "ami": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "image_id": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "network_id": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "project_id": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "use_block_device": {
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "security_group": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "security_groups": {
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
         }
     },
     "type": "object"

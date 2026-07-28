@@ -24,12 +24,17 @@ REFERENCED_TABLES = {
     "resource_quota_id": TableNames.CAPACITY_RESOURCE_QUOTA,
 }
 
-# Which node types SAT Builder should instantiate. The totals node is always
-# requested and is omitted automatically when the payload has no quota data.
-RESOURCE_TYPE_TO_NODE_TYPE = {
-    "cloud": "CloudCapacity",
-    "edge": "EdgeCapacity",
+# Which node types SAT Builder should instantiate. A capacity's node type is
+# decided by two columns: resource_type separates cloud from edge, and cloud
+# picks the platform. Each platform is a distinct TOSCA type with its own
+# properties, so adding one means a new value here plus its columns.
+EDGE_NODE_TYPE = "EdgeCapacity"
+CLOUD_TO_NODE_TYPE = {
+    "aws": "EC2Capacity",
+    "openstack": "OpenStackCapacity",
 }
+
+# Always requested; SAT Builder omits it when the payload has no quota data.
 TOTALS_NODE_TYPE = "OverallCapacity"
 
 
@@ -60,16 +65,28 @@ def build_capacity_payload(capacity_id: int) -> dict:
 
 
 def node_types_for(capacity: dict) -> list[str]:
-    """Pick the node type from the capacity's resource type."""
+    """Pick the node type from the capacity's resource type and cloud platform."""
     resource_type = (capacity.get("resource_type") or "").strip().lower()
-    node_type = RESOURCE_TYPE_TO_NODE_TYPE.get(resource_type)
-    if not node_type:
-        supported = ", ".join(sorted(RESOURCE_TYPE_TO_NODE_TYPE))
-        raise ValueError(
-            f"Capacity has resource type '{capacity.get('resource_type')}', "
-            f"which has no TOSCA node type. Expected one of: {supported}."
-        )
-    return [node_type, TOTALS_NODE_TYPE]
+
+    if resource_type == "edge":
+        return [EDGE_NODE_TYPE, TOTALS_NODE_TYPE]
+
+    if resource_type == "cloud":
+        cloud = (capacity.get("cloud") or "").strip().lower()
+        node_type = CLOUD_TO_NODE_TYPE.get(cloud)
+        if not node_type:
+            supported = ", ".join(sorted(CLOUD_TO_NODE_TYPE))
+            raise ValueError(
+                f"Cloud capacity '{capacity.get('name')}' has cloud "
+                f"'{capacity.get('cloud')}', which has no TOSCA node type. "
+                f"Expected one of: {supported}."
+            )
+        return [node_type, TOTALS_NODE_TYPE]
+
+    raise ValueError(
+        f"Capacity '{capacity.get('name')}' has resource type "
+        f"'{capacity.get('resource_type')}'. Expected Cloud or Edge."
+    )
 
 
 def generate_cdt_yaml(capacity_id: int) -> str:
