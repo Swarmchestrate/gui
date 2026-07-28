@@ -12,7 +12,14 @@
         "energy_consumption": 0.1,
         "price_per_hr": 0.0139,
         "quota": 4,
-        "flavor_name": "m2.medium"
+        "flavor_name": "m2.medium",
+        "os_name": "linux",
+        "os_version": "22.04",
+        "os_distribution": "ubuntu",
+        "os_uuid": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
+        "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
+        "project_id": "facbcbb71bab40c0a8934b3eda67d389",
+        "use_block_device": true
     },
     {
         "id": 2,
@@ -27,7 +34,14 @@
         "energy_consumption": 0.08,
         "price_per_hr": 0.007,
         "quota": 10,
-        "flavor_name": "m2.small"
+        "flavor_name": "m2.small",
+        "os_name": "linux",
+        "os_version": "22.04",
+        "os_distribution": "ubuntu",
+        "os_uuid": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
+        "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
+        "project_id": "facbcbb71bab40c0a8934b3eda67d389",
+        "use_block_device": true
     },
     {
         "id": 3,
@@ -42,7 +56,14 @@
         "energy_consumption": 0.006,
         "price_per_hr": 0.0,
         "quota": 1,
-        "flavor_name": null
+        "flavor_name": null,
+        "os_name": "linux",
+        "os_version": "12",
+        "os_distribution": "debian",
+        "os_uuid": null,
+        "network_id": null,
+        "project_id": null,
+        "use_block_device": null
     },
     {
         "id": 4,
@@ -57,6 +78,13 @@
         "bandwidth": 100,
         "energy_consumption": 13.0,
         "price_per_hr": 0.0139,
-        "quota": 40
+        "quota": 40,
+        "os_name": "linux",
+        "os_version": "2023",
+        "os_distribution": "amazon-linux",
+        "os_uuid": "ami-19237951",
+        "network_id": null,
+        "project_id": null,
+        "use_block_device": null
     }
 ]

@@ -13,8 +13,6 @@
         "connectivity_type": "Ethernet",
         "locality_id": 1,
         "resource_quota_id": 1,
-        "energy_consumption_id": null,
-        "price_id": null,
         "ssh_port": 22,
         "ssh_user": "ubuntu",
         "ipv4_enabled": true,
@@ -32,15 +30,10 @@
         "ssh_auth_method": "key",
         "credentials": null,
         "cloud": "openstack",
-        "image_id": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
-        "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
-        "project_id": "facbcbb71bab40c0a8934b3eda67d389",
-        "use_block_device": true,
         "security_group": "0eb63f2b-b656",
         "security_groups": [
             "0eb63f2b-b656"
-        ],
-        "ami": null
+        ]
     },
     {
         "capacity_id": 2,
@@ -56,8 +49,6 @@
         "connectivity_type": "5G",
         "locality_id": 2,
         "resource_quota_id": 2,
-        "energy_consumption_id": null,
-        "price_id": null,
         "ssh_port": 22,
         "ssh_user": "pi",
         "ipv4_enabled": true,
@@ -74,7 +65,11 @@
         "ssh_key_name": "uow-edge",
         "ssh_auth_method": "key",
         "credentials": null,
-        "cloud": null
+        "cloud": null,
+        "security_groups": [
+            "sg-0eb63f2b"
+        ],
+        "security_group": "sg-0eb63f2b"
     },
     {
         "capacity_id": 3,
@@ -90,8 +85,6 @@
         "connectivity_type": "Ethernet",
         "locality_id": 2,
         "resource_quota_id": 2,
-        "energy_consumption_id": null,
-        "price_id": null,
         "ssh_port": 22,
         "ssh_user": "ec2-user",
         "ipv4_enabled": true,
@@ -109,14 +102,9 @@
         "ssh_auth_method": "key",
         "credentials": null,
         "cloud": "aws",
-        "image_id": null,
-        "network_id": null,
-        "project_id": null,
-        "use_block_device": null,
         "security_group": "0eb63f2b-b656",
         "security_groups": [
             "0eb63f2b-b656"
-        ],
-        "ami": "ami-19237951"
+        ]
     }
 ]

@@ -14,7 +14,6 @@ from resource_management.tosca import generate_sat
 # capacity, keyed by their foreign key back to the capacity.
 CHILD_TABLES = {
     TableNames.CAPACITY_INSTANCE_TYPE: "capacity_id",
-    TableNames.CAPACITY_OPERATING_SYSTEM: "capacity_id",
     TableNames.CAPACITY_PORT_RULE: "capacity_id",
 }
 

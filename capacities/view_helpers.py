@@ -32,6 +32,7 @@ CLOUD_ONLY_PROPERTIES = [
     "security_group",
     "security_groups",
     "ssh_key_name",
+    "os_uuid",
 ]
 
 # Set when the capacity is created and not editable afterwards.
@@ -79,7 +80,7 @@ class CapacitySubtypeFieldsMixin:
     # Nullable because each platform names its instance differently, but a
     # flavour is not usable without one. The subtype filter hides whichever
     # does not apply.
-    extra_new_fields = ["instance_type", "flavor_name"]
+    extra_new_fields = ["instance_type", "flavor_name", "os_uuid"]
 
     @property
     def disabled_properties(self) -> list[str]:

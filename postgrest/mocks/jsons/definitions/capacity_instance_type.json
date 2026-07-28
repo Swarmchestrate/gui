@@ -75,6 +75,40 @@
             "format": "character varying",
             "maxLength": 64,
             "type": "string"
+        },
+        "os_name": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "os_version": {
+            "format": "character varying",
+            "maxLength": 32,
+            "type": "string"
+        },
+        "os_distribution": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "os_uuid": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "network_id": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "project_id": {
+            "format": "character varying",
+            "maxLength": 128,
+            "type": "string"
+        },
+        "use_block_device": {
+            "format": "boolean",
+            "type": "boolean"
         }
     },
     "type": "object"

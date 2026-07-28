@@ -49,46 +49,6 @@
     },
     {
         "table_name": "capacity",
-        "column_name": "ami",
-        "title": "AMI",
-        "category": "Platform",
-        "description": "Amazon Machine Image used to launch instances.",
-        "order": 10
-    },
-    {
-        "table_name": "capacity",
-        "column_name": "image_id",
-        "title": "Image ID",
-        "category": "Platform",
-        "description": "OpenStack image used to launch instances.",
-        "order": 20
-    },
-    {
-        "table_name": "capacity",
-        "column_name": "network_id",
-        "title": "Network ID",
-        "category": "Platform",
-        "description": "OpenStack network instances are attached to.",
-        "order": 30
-    },
-    {
-        "table_name": "capacity",
-        "column_name": "project_id",
-        "title": "Project ID",
-        "category": "Platform",
-        "description": "OpenStack project instances belong to.",
-        "order": 40
-    },
-    {
-        "table_name": "capacity",
-        "column_name": "use_block_device",
-        "title": "Use Block Device",
-        "category": "Platform",
-        "description": "Whether instances boot from a block device.",
-        "order": 50
-    },
-    {
-        "table_name": "capacity",
         "column_name": "locality_id",
         "title": "Locality",
         "category": "Location",
@@ -233,14 +193,6 @@
     },
     {
         "table_name": "capacity",
-        "column_name": "capacity_operating_system",
-        "title": "Operating Systems",
-        "category": "Operating Systems",
-        "description": "Operating systems available on these instances.",
-        "order": 10
-    },
-    {
-        "table_name": "capacity",
         "column_name": "capacity_port_rule",
         "title": "Port Rules",
         "category": "Port Rules",
@@ -285,6 +237,62 @@
         "title": "Flavour",
         "category": "Instance",
         "description": "OpenStack flavour, e.g. m2.medium.",
+        "order": 30
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "os_name",
+        "title": "OS",
+        "category": "Operating System",
+        "description": "Operating system type, e.g. linux.",
+        "order": 10
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "os_distribution",
+        "title": "Distribution",
+        "category": "Operating System",
+        "description": "e.g. ubuntu, debian.",
+        "order": 20
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "os_version",
+        "title": "Version",
+        "category": "Operating System",
+        "description": "e.g. 22.04.",
+        "order": 30
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "os_uuid",
+        "title": "OS Image ID",
+        "category": "Operating System",
+        "description": "The image this flavour boots: an AMI on AWS, an image ID on OpenStack.",
+        "order": 40
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "network_id",
+        "title": "Network ID",
+        "category": "Platform",
+        "description": "OpenStack network instances are attached to.",
+        "order": 10
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "project_id",
+        "title": "Project ID",
+        "category": "Platform",
+        "description": "OpenStack project instances belong to.",
+        "order": 20
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "use_block_device",
+        "title": "Use Block Device",
+        "category": "Platform",
+        "description": "Whether instances boot from a block device.",
         "order": 30
     },
     {
@@ -413,38 +421,6 @@
         "title": "Total Bandwidth (Mbps)",
         "category": "Capacity",
         "description": "",
-        "order": 40
-    },
-    {
-        "table_name": "capacity_operating_system",
-        "column_name": "os_name",
-        "title": "OS",
-        "category": "Operating System",
-        "description": "Operating system type, e.g. linux.",
-        "order": 10
-    },
-    {
-        "table_name": "capacity_operating_system",
-        "column_name": "os_distribution",
-        "title": "Distribution",
-        "category": "Operating System",
-        "description": "e.g. ubuntu, debian.",
-        "order": 20
-    },
-    {
-        "table_name": "capacity_operating_system",
-        "column_name": "os_version",
-        "title": "Version",
-        "category": "Operating System",
-        "description": "e.g. 22.04.",
-        "order": 30
-    },
-    {
-        "table_name": "capacity_operating_system",
-        "column_name": "architecture",
-        "title": "Architecture",
-        "category": "Operating System",
-        "description": "CPU architecture this image targets.",
         "order": 40
     },
     {
