@@ -54,3 +54,19 @@ def humanise_resource_type_plural(resource_type):
         resource_type,
         f"{' '.join(resource_type.split('_'))} registrations"
     )
+
+def humanise_enum_value(value):
+    """Label an enum value for display.
+
+    Stored values follow the TOSCA profile - a capacity's cloud is 'aws' or
+    'openstack' because that is what ends up in the generated template - but
+    those are not what a provider recognises in a dropdown.
+    """
+    enum_values_humanised = {
+        "aws": "Amazon EC2",
+        "openstack": "OpenStack Nova",
+    }
+    return enum_values_humanised.get(
+        value,
+        f"{' '.join(str(value).split('_'))}"
+    )

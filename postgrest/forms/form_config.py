@@ -22,7 +22,7 @@ from postgrest.api import (
 )
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.humanise import humanise_resource_type_plural
+from utils.humanise import humanise_enum_value, humanise_resource_type_plural
 
 
 MAIN_TABLE_NAMES = [
@@ -290,7 +290,7 @@ class FormConfig:
         additional_args = []
         if metadata.enum:
             choices = [
-                (field_enum, field_enum.replace("_", " "))
+                (field_enum, humanise_enum_value(field_enum))
                 for field_enum in metadata.enum
             ]
             # Fields with choices are optional, so
