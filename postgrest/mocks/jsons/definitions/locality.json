@@ -1,5 +1,10 @@
 {
-    "required": ["locality_id", "continent"],
+    "required": [
+        "locality_id",
+        "continent",
+        "country",
+        "city"
+    ],
     "properties": {
         "locality_id": {
             "description": "Note:\nThis is a Primary Key.<pk/>",
@@ -19,8 +24,14 @@
             "format": "public.continent_enum",
             "type": "string"
         },
-        "country": { "format": "text", "type": "string" },
-        "city": { "format": "text", "type": "string" },
+        "country": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "city": {
+            "format": "character varying",
+            "type": "string"
+        },
         "gps_location": {
             "format": "public.geometry",
             "type": "string"

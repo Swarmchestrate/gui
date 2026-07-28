@@ -2,8 +2,17 @@
     {
         "id": 1,
         "capacity_id": 1,
-        "os_name": "Linux",
-        "os_uuid": "123",
-        "architecture": "ARM"
+        "os_name": "linux",
+        "architecture": "x86",
+        "os_version": "22.04",
+        "os_distribution": "ubuntu"
+    },
+    {
+        "id": 2,
+        "capacity_id": 2,
+        "os_name": "linux",
+        "architecture": "ARM",
+        "os_version": "12",
+        "os_distribution": "debian"
     }
 ]

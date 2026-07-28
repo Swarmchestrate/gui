@@ -1,10 +1,11 @@
 {
     "required": [
         "id",
-        "os_name",
-        "architecture",
-        "os_version",
-        "os_distribution"
+        "capacity_id",
+        "direction",
+        "port_from",
+        "port_to",
+        "protocol"
     ],
     "properties": {
         "id": {
@@ -17,26 +18,27 @@
             "format": "integer",
             "type": "integer"
         },
-        "os_name": {
+        "direction": {
             "format": "character varying",
+            "maxLength": 8,
             "type": "string"
         },
-        "architecture": {
-            "enum": [
-                "x86",
-                "ARM"
-            ],
-            "format": "public.arch_enum",
+        "port_from": {
+            "format": "integer",
+            "type": "integer"
+        },
+        "port_to": {
+            "format": "integer",
+            "type": "integer"
+        },
+        "protocol": {
+            "format": "character varying",
+            "maxLength": 16,
             "type": "string"
         },
-        "os_version": {
+        "source": {
             "format": "character varying",
-            "maxLength": 50,
-            "type": "string"
-        },
-        "os_distribution": {
-            "format": "character varying",
-            "maxLength": 100,
+            "maxLength": 64,
             "type": "string"
         }
     },

@@ -1,6 +1,12 @@
 {
     "required": [
-        "capacity_id"
+        "capacity_id",
+        "resource_provider",
+        "capacity_provider",
+        "resource_type",
+        "connectivity_type",
+        "ipv4_enabled",
+        "ipv6_enabled"
     ],
     "properties": {
         "capacity_id": {
@@ -16,12 +22,6 @@
         "updated_at": {
             "default": "now()",
             "format": "timestamp without time zone",
-            "type": "string"
-        },
-        "name": {
-            "description": "Name of the application.",
-            "format": "character varying",
-            "maxLength": 255,
             "type": "string"
         },
         "description": {
@@ -46,15 +46,6 @@
             "format": "public.resource_type_enum",
             "type": "string"
         },
-        "resource_provider_type": {
-            "enum": [
-                "Public",
-                "Private",
-                "Hybrid"
-            ],
-            "format": "public.provider_type_enum",
-            "type": "string"
-        },
         "energy_type": {
             "enum": [
                 "Green",
@@ -72,26 +63,6 @@
             "format": "public.power_type_enum",
             "type": "string"
         },
-        "mobility": {
-            "format": "boolean",
-            "type": "boolean"
-        },
-        "trust": {
-            "format": "text",
-            "type": "string"
-        },
-        "access_credentials": {
-            "format": "text",
-            "type": "string"
-        },
-        "access_endpoints": {
-            "format": "text",
-            "type": "string"
-        },
-        "bandwidth_mbps": {
-            "format": "numeric",
-            "type": "number"
-        },
         "connectivity_type": {
             "enum": [
                 "Ethernet",
@@ -103,56 +74,94 @@
             "format": "public.connectivity_type_enum",
             "type": "string"
         },
-        "network_stability": {
-            "format": "text",
-            "type": "string"
-        },
-        "network_access": {
-            "enum": [
-                "Public",
-                "Private",
-                "Restricted"
-            ],
-            "format": "public.network_access_enum",
-            "type": "string"
-        },
-        "accessible_sensors": {
-            "format": "text[]",
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        },
-        "security_ports": {
-            "format": "text[]",
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        },
         "locality_id": {
             "description": "Note:\nThis is a Foreign Key to `locality.locality_id`.<fk table='locality' column='locality_id'/>",
             "format": "integer",
-            "type": "integer",
-            "unique": true
+            "type": "integer"
         },
         "resource_quota_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_resource_quota.resource_quota_id`.<fk table='capacity_resource_quota' column='resource_quota_id'/>",
             "format": "integer",
-            "type": "integer",
-            "unique": true
+            "type": "integer"
         },
         "energy_consumption_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_energy_consumption.energy_consumption_id`.<fk table='capacity_energy_consumption' column='energy_consumption_id'/>",
             "format": "integer",
-            "type": "integer",
-            "unique": true
+            "type": "integer"
         },
         "price_id": {
             "description": "Note:\nThis is a Foreign Key to `capacity_price.price_id`.<fk table='capacity_price' column='price_id'/>",
             "format": "integer",
-            "type": "integer",
-            "unique": true
+            "type": "integer"
+        },
+        "name": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "ssh_port": {
+            "default": 22,
+            "format": "integer",
+            "type": "integer"
+        },
+        "ssh_user": {
+            "format": "character varying",
+            "maxLength": 100,
+            "type": "string"
+        },
+        "ipv4_enabled": {
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "ipv6_enabled": {
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "subnet": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "explicit_tcp_allow": {
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "explicit_udp_allow": {
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "edge_ip": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "edge_local_ip": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "ssh_key_name": {
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "ssh_auth_method": {
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "credentials": {
+            "format": "jsonb"
+        },
+        "cloud": {
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
         }
     },
     "type": "object"

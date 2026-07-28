@@ -1,8 +1,16 @@
 [
     {
         "resource_quota_id": 1,
-        "cpu": 8,
-        "ram_gb": 32,
-        "storage_gb": 2000
+        "cpu": 40,
+        "ram_gb": 1000,
+        "storage_gb": 2000,
+        "bandwidth": 1000
+    },
+    {
+        "resource_quota_id": 2,
+        "cpu": 4,
+        "ram_gb": 8,
+        "storage_gb": 64,
+        "bandwidth": 100
     }
 ]
