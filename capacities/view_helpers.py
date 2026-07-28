@@ -40,6 +40,12 @@ FIXED_AT_CREATION = [
     "cloud",
 ]
 
+# Identifiers the system owns. Nothing in the profile binds them, and a user
+# has no way to know a correct value, so they are never offered on a form.
+SYSTEM_MANAGED = [
+    "instance_type_uuid",
+]
+
 
 def subtype_of(capacity: dict) -> str | None:
     """Which set of properties a capacity uses: 'edge', 'aws' or 'openstack'."""
@@ -79,7 +85,7 @@ class CapacitySubtypeFieldsMixin:
     def disabled_properties(self) -> list[str]:
         resource = getattr(self, "resource", None)
         capacity = resource.as_dict() if resource is not None else {}
-        return [*FIXED_AT_CREATION, *hidden_capacity_properties(capacity)]
+        return [*FIXED_AT_CREATION, *SYSTEM_MANAGED, *hidden_capacity_properties(capacity)]
 
 
 @dataclass
