@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class CloudCapacityViewMixin:
-    table_name = 'cloud_capacity'
+    # No table_name default: views set their own, and a missing one should fail
+    # loudly rather than silently querying a table that does not exist.
     editor_reverse_base = "capacities:cloud_capacity_editor"
     editor_one_to_one_section_reverse_base = "capacities:cloud_capacity_editor_one_to_one_section"
     editor_one_to_many_section_reverse_base = "capacities:cloud_capacity_editor_one_to_many_section"
