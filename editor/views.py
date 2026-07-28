@@ -3,7 +3,7 @@ import logging
 from http import HTTPStatus
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -58,6 +58,8 @@ class EditorView(TemplateView):
         resource_endpoint = self.api_client.get_endpoint(self.table_name)
         column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
         self.resource = resource_endpoint.get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.title_base = f"{resource_endpoint.resource_type.title()} {self.resource_id}"
         self.editor_form_url = reverse_lazy(
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
@@ -335,6 +337,8 @@ class EditorOverviewTemplateView(TemplateView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name

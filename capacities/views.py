@@ -28,7 +28,6 @@ class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["Edge Specific", "Networking"]
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
 
@@ -36,7 +35,6 @@ class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin
 class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["Edge Specific", "Networking"]
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -50,7 +48,6 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["Edge Specific", "Networking"]
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -59,12 +56,25 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
         })
         return registration_data
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # The column is nullable because edge capacities have no cloud, so it
+        # is not in the required set. A cloud capacity's node type depends on
+        # it, though, and it cannot be changed later - so it has to be chosen
+        # here, and chosen for real.
+        fields = dict(kwargs.get("fields") or {})
+        cloud_field = self.form_config.get_fields().get("cloud")
+        if cloud_field is not None:
+            cloud_field.required = True
+            fields["cloud"] = cloud_field
+        kwargs["fields"] = fields
+        return kwargs
+
 
 class CloudCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["Edge Specific", "Networking"]
 
 
 # Resource management views (CC)
@@ -104,7 +114,6 @@ class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, 
     template_name = "capacities/edge_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["System Specific"]
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
 
@@ -112,7 +121,6 @@ class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, 
 class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["System Specific"]
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -126,7 +134,6 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["System Specific"]
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -140,7 +147,6 @@ class EdgeCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, EdgeCap
     template_name = "capacities/edge_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
-    disabled_categories = ["System Specific"]
 
 
 # Resource management views (EC)
