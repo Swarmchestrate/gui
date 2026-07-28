@@ -13,13 +13,13 @@ SUBTYPE_ONLY_PROPERTIES = {
         "edge_local_ip",
         "credentials",
         "ssh_auth_method",
+        "ssh_port",
+        "ssh_user",
     ],
     "aws": [
-        "ami",
         "instance_type",   # capacity_instance_type, e.g. t3.micro
     ],
     "openstack": [
-        "image_id",
         "network_id",
         "project_id",
         "use_block_device",
@@ -31,6 +31,7 @@ SUBTYPE_ONLY_PROPERTIES = {
 CLOUD_ONLY_PROPERTIES = [
     "security_group",
     "security_groups",
+    "ssh_key_name",
 ]
 
 # Set when the capacity is created and not editable afterwards.
@@ -68,6 +69,11 @@ def hidden_capacity_properties(capacity: dict) -> list[str]:
 
 class CapacitySubtypeFieldsMixin:
     """Restricts the form to the properties of the capacity's own subtype."""
+
+    # Nullable because each platform names its instance differently, but a
+    # flavour is not usable without one. The subtype filter hides whichever
+    # does not apply.
+    extra_new_fields = ["instance_type", "flavor_name"]
 
     @property
     def disabled_properties(self) -> list[str]:

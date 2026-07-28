@@ -334,9 +334,17 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({
-            "fields": self.fk_table_form_config.get_required_fields(),
-        })
+        fields = dict(self.fk_table_form_config.get_required_fields())
+        # Some columns are nullable because a sibling subtype uses a different
+        # one, but are still needed to create a usable row. Views name them in
+        # extra_new_fields; anything hidden for this subtype stays hidden.
+        available = self.fk_table_form_config.get_fields()
+        for name in getattr(self, "extra_new_fields", []):
+            if name in self.disabled_properties:
+                continue
+            if name in available:
+                fields[name] = available[name]
+        kwargs.update({"fields": fields})
         return kwargs
 
     def get_context_data(self, **kwargs):

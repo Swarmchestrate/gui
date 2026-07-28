@@ -226,8 +226,8 @@
     {
         "table_name": "capacity",
         "column_name": "capacity_instance_type",
-        "title": "Instance Types",
-        "category": "Instance Types",
+        "title": "Instance Flavours",
+        "category": "Instance Flavours",
         "description": "The instance flavours this capacity offers. Each becomes a node template.",
         "order": 10
     },
