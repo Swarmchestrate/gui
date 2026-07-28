@@ -74,6 +74,15 @@ def hidden_capacity_properties(capacity: dict) -> list[str]:
     return hidden
 
 
+# One column holds the OS image for every platform, so column_metadata can
+# carry only one title for it. Each platform has its own name for the thing,
+# and that is what a provider will be looking for.
+SUBTYPE_FIELD_LABELS = {
+    "aws": {"os_uuid": "AMI"},
+    "openstack": {"os_uuid": "Image ID"},
+}
+
+
 class CapacitySubtypeFieldsMixin:
     """Restricts the form to the properties of the capacity's own subtype."""
 
@@ -84,9 +93,21 @@ class CapacitySubtypeFieldsMixin:
 
     @property
     def disabled_properties(self) -> list[str]:
+        return [*FIXED_AT_CREATION, *SYSTEM_MANAGED,
+                *hidden_capacity_properties(self._capacity())]
+
+    def _capacity(self) -> dict:
         resource = getattr(self, "resource", None)
-        capacity = resource.as_dict() if resource is not None else {}
-        return [*FIXED_AT_CREATION, *SYSTEM_MANAGED, *hidden_capacity_properties(capacity)]
+        return resource.as_dict() if resource is not None else {}
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        labels = SUBTYPE_FIELD_LABELS.get(subtype_of(self._capacity()) or "", {})
+        for name, label in labels.items():
+            field = (kwargs.get("fields") or {}).get(name)
+            if field is not None:
+                field.label = label
+        return kwargs
 
 
 @dataclass
