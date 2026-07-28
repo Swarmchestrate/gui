@@ -1,6 +1,77 @@
 from dataclasses import dataclass
 
 
+# Cloud and edge capacities share the capacity_new table, but each is a distinct
+# TOSCA node type with its own properties. A capacity is one subtype, so the
+# others' properties are hidden rather than shown empty.
+# Keyed by the value of capacity_new.cloud, or "edge" for edge capacities.
+SUBTYPE_ONLY_PROPERTIES = {
+    "edge": [
+        "edge_ip",
+        "edge_local_ip",
+        "credentials",
+        "ssh_auth_method",
+    ],
+    "aws": [
+        "ami",
+    ],
+    "openstack": [
+        "image_id",
+        "network_id",
+        "project_id",
+        "use_block_device",
+    ],
+}
+
+# Declared by both cloud subtypes but not by EdgeCapacity.
+CLOUD_ONLY_PROPERTIES = [
+    "security_group",
+    "security_groups",
+]
+
+# Set when the capacity is created and not editable afterwards.
+FIXED_AT_CREATION = [
+    "resource_type",
+    "cloud",
+]
+
+
+def subtype_of(capacity: dict) -> str | None:
+    """Which set of properties a capacity uses: 'edge', 'aws' or 'openstack'."""
+    if (capacity.get("resource_type") or "").strip().lower() == "edge":
+        return "edge"
+    cloud = (capacity.get("cloud") or "").strip().lower()
+    return cloud or None
+
+
+def hidden_capacity_properties(capacity: dict) -> list[str]:
+    """Properties belonging to a subtype other than this capacity's."""
+    subtype = subtype_of(capacity)
+    if subtype not in SUBTYPE_ONLY_PROPERTIES:
+        # Unknown subtype: hide nothing rather than guess.
+        return []
+
+    hidden = [
+        name
+        for other, names in SUBTYPE_ONLY_PROPERTIES.items()
+        if other != subtype
+        for name in names
+    ]
+    if subtype == "edge":
+        hidden.extend(CLOUD_ONLY_PROPERTIES)
+    return hidden
+
+
+class CapacitySubtypeFieldsMixin:
+    """Restricts the form to the properties of the capacity's own subtype."""
+
+    @property
+    def disabled_properties(self) -> list[str]:
+        resource = getattr(self, "resource", None)
+        capacity = resource.as_dict() if resource is not None else {}
+        return [*FIXED_AT_CREATION, *hidden_capacity_properties(capacity)]
+
+
 @dataclass
 class CloudCapacityViewMixin:
     # No table_name default: views set their own, and a missing one should fail

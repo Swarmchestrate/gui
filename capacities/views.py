@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 
 from .tosca import generate_cdt_yaml
 from .view_helpers import (
+    CapacitySubtypeFieldsMixin,
     CloudCapacityViewMixin,
     EdgeCapacityViewMixin,
 )
@@ -23,12 +24,11 @@ from resource_management.views import (
 
 
 # Cloud Capacity (CC)
-class CloudCapacityEditorView(CloudCapacityViewMixin, EditorView):
+class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorView):
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
-    disabled_properties = ["resource_type"]
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
 
@@ -60,12 +60,11 @@ class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormVi
         return registration_data
 
 
-class CloudCapacityEditorOverviewTemplateView(CloudCapacityViewMixin, EditorOverviewTemplateView):
+class CloudCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["Edge Specific", "Networking"]
-    disabled_properties = ["resource_type"]
 
 
 # Resource management views (CC)
@@ -101,12 +100,11 @@ class CloudCapacityDescriptionTemplateDownloadView(
 
 
 # Edge Capacity views (EC)
-class EdgeCapacityEditorView(EdgeCapacityViewMixin, EditorView):
+class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorView):
     template_name = "capacities/edge_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
-    disabled_properties = ["resource_type"]
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
 
@@ -138,12 +136,11 @@ class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView
         return registration_data
 
 
-class EdgeCapacityEditorOverviewTemplateView(EdgeCapacityViewMixin, EditorOverviewTemplateView):
+class EdgeCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/edge_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     disabled_categories = ["System Specific"]
-    disabled_properties = ["resource_type"]
 
 
 # Resource management views (EC)
