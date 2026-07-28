@@ -1,6 +1,8 @@
 import os
 import requests
 
+from postgrest.api_configs.base_config import build_api_url
+
 
 def generate_sat(
         data: str,
@@ -10,7 +12,7 @@ def generate_sat(
         "Content-Type": "application/json",
     }
     response = requests.post(
-        "%s%s" % (
+        build_api_url(
             os.environ.get("SAT_BUILDER_API_URL"),
             endpoint_path
         ),
