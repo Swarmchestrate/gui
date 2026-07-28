@@ -5,6 +5,8 @@ from dataclasses import dataclass
 # TOSCA node type with its own properties. A capacity is one subtype, so the
 # others' properties are hidden rather than shown empty.
 # Keyed by the value of capacity_new.cloud, or "edge" for edge capacities.
+# Covers capacity_new and capacity_instance_type: a flavour names its instance
+# differently per platform, and an edge capacity names it at all.
 SUBTYPE_ONLY_PROPERTIES = {
     "edge": [
         "edge_ip",
@@ -14,12 +16,14 @@ SUBTYPE_ONLY_PROPERTIES = {
     ],
     "aws": [
         "ami",
+        "instance_type",   # capacity_instance_type, e.g. t3.micro
     ],
     "openstack": [
         "image_id",
         "network_id",
         "project_id",
         "use_block_device",
+        "flavor_name",     # capacity_instance_type, e.g. m2.medium
     ],
 }
 
