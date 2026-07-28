@@ -7,9 +7,12 @@ chardet==7.4.3
 charset-normalizer==3.4.7
 Django==6.0.6
 django-appconf==1.2.0
+django-compressor==4.6.0
 django-environ==0.13.0
 django-sass-processor==1.4.2
 geonamescache==3.0.1
+gunicorn==23.0.0
+whitenoise==6.12.0
 idna==3.18
 jsonschema==4.26.0
 jsonschema-path==0.5.0

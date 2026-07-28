@@ -1,0 +1,38 @@
+# Docker Compose configuration for GUI
+# Uses a published Docker image in production
+#
+# Required env vars:
+#   DOCKER_NAMESPACE=huankaichen
+#   GUI_VERSION=latest
+#   GUI_PORT=8080
+#
+# Runtime env vars are loaded from .env on the server:
+#   SECRET_KEY
+#   DEBUG
+#   ALLOWED_HOSTS
+#   DATABASE_ENGINE
+#   DATABASE_NAME
+#   API_URL
+#   USE_MOCK_API
+
+services:
+  gui:
+    image: ${DOCKER_NAMESPACE:-huankaichen}/${GUI_SERVICE_ID:-gui}:${GUI_VERSION:-latest}
+    container_name: ${GUI_NAME:-GUI}
+    env_file:
+      - .env
+    ports:
+      - "${GUI_PORT:-8080}:8080"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/')"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

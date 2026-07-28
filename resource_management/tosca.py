@@ -2,6 +2,8 @@ import logging
 import os
 import requests
 
+from postgrest.api_configs.base_config import build_api_url
+
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +16,10 @@ def generate_sat(
         "Content-Type": "application/json",
     }
     response = requests.post(
-        "%s%s" % (
+        build_api_url(
             os.environ.get("SAT_BUILDER_API_URL"),
-            endpoint_path
+            endpoint_path,
+            env_var_name="SAT_BUILDER_API_URL"
         ),
         headers=headers,
         params=params,

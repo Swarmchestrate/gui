@@ -36,7 +36,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(",")
+ALLOWED_HOSTS = [host.strip() for host in os.environ["ALLOWED_HOSTS"].split(",") if host.strip()]
 
 
 # Application definition
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -139,20 +140,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     os.path.join(BASE_DIR, "node_modules"),
 ]
 
-STATIC_ROOT = "staticfiles/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "sass_processor.finders.CssFinder",
 )
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

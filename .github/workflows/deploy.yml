@@ -1,0 +1,99 @@
+name: GUI CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        run: |
+          set -e
+          printf '%s' '${{ secrets.DOCKERHUB_TOKEN }}' | tr -d '\r\n' | docker login \
+            --username '${{ secrets.DOCKERHUB_USERNAME }}' \
+            --password-stdin
+
+      - name: Extract metadata
+        id: meta
+        run: |
+          echo "image=${{ secrets.DOCKERHUB_USERNAME }}/gui" >> "$GITHUB_OUTPUT"
+          echo "tag_sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "tag_latest=latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag_latest }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag_sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GUI_ENV_PRODUCTION_B64: ${{ secrets.GUI_ENV_PRODUCTION_B64 }}
+        with:
+          host: ${{ secrets.GUI_SERVER }}
+          username: ${{ secrets.GUI_USER }}
+          key: ${{ secrets.GUI_KEY }}
+          envs: GUI_ENV_PRODUCTION_B64
+          script_stop: false
+          script: |
+            set -e
+            DEPLOY_DIR=/opt/gui
+            mkdir -p "$DEPLOY_DIR"
+            TMP_ENV="$(mktemp)"
+            trap 'rm -f "$TMP_ENV"' EXIT
+            printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$TMP_ENV"
+
+            for required_var in \
+              SECRET_KEY \
+              DEBUG \
+              ALLOWED_HOSTS \
+              DATABASE_ENGINE \
+              DATABASE_NAME \
+              API_URL \
+              USE_MOCK_API \
+              DOCKER_NAMESPACE \
+              GUI_SERVICE_ID \
+              GUI_NAME \
+              GUI_VERSION \
+              GUI_PORT
+            do
+              if ! grep -q "^${required_var}=" "$TMP_ENV"; then
+                echo "Missing required env var: ${required_var}"
+                exit 1
+              fi
+            done
+
+            if grep -q '^SECRET_KEY=#your_secret_key_here$' "$TMP_ENV"; then
+              echo "SECRET_KEY is still the placeholder value"
+              exit 1
+            fi
+
+            mv "$TMP_ENV" "$DEPLOY_DIR/.env"
+            chmod 600 "$DEPLOY_DIR/.env"
+            cd "$DEPLOY_DIR"
+            if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
+              sudo docker compose pull
+              sudo docker compose up -d
+            else
+              docker compose pull
+              docker compose up -d
+            fi
