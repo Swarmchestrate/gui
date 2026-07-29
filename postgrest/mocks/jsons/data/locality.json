@@ -2,8 +2,15 @@
     {
         "locality_id": 1,
         "continent": "Europe",
-        "country": "United Kingdom",
+        "country": "Hungary",
+        "city": "Budapest",
+        "gps_location": null
+    },
+    {
+        "locality_id": 2,
+        "continent": "Europe",
+        "country": "UK",
         "city": "London",
-        "gps_location": "51.509865, -0.118092"
+        "gps_location": null
     }
 ]

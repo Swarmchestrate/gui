@@ -1,9 +1,119 @@
 from dataclasses import dataclass
 
 
+# Cloud and edge capacities share the capacity_new table, but each is a distinct
+# TOSCA node type with its own properties. A capacity is one subtype, so the
+# others' properties are hidden rather than shown empty.
+# Keyed by the value of capacity_new.cloud, or "edge" for edge capacities.
+# Covers capacity_new and capacity_instance_type: a flavour names its instance
+# differently per platform, and an edge capacity names it at all.
+SUBTYPE_ONLY_PROPERTIES = {
+    "edge": [
+        "edge_ip",
+        "edge_local_ip",
+        "credentials",
+        "ssh_auth_method",
+        "ssh_port",
+        "ssh_user",
+    ],
+    "aws": [
+        "instance_type",   # capacity_instance_type, e.g. t3.micro
+    ],
+    "openstack": [
+        "network_id",
+        "project_id",
+        "use_block_device",
+        "flavor_name",     # capacity_instance_type, e.g. m2.medium
+    ],
+}
+
+# Declared by both cloud subtypes but not by EdgeCapacity.
+CLOUD_ONLY_PROPERTIES = [
+    "security_group",
+    "security_groups",
+    "ssh_key_name",
+    "os_uuid",
+]
+
+# Set when the capacity is created and not editable afterwards.
+FIXED_AT_CREATION = [
+    "resource_type",
+    "cloud",
+]
+
+# Identifiers the system owns. Nothing in the profile binds them, and a user
+# has no way to know a correct value, so they are never offered on a form.
+SYSTEM_MANAGED = [
+    "instance_type_uuid",
+]
+
+
+def subtype_of(capacity: dict) -> str | None:
+    """Which set of properties a capacity uses: 'edge', 'aws' or 'openstack'."""
+    if (capacity.get("resource_type") or "").strip().lower() == "edge":
+        return "edge"
+    cloud = (capacity.get("cloud") or "").strip().lower()
+    return cloud or None
+
+
+def hidden_capacity_properties(capacity: dict) -> list[str]:
+    """Properties belonging to a subtype other than this capacity's."""
+    subtype = subtype_of(capacity)
+    if subtype not in SUBTYPE_ONLY_PROPERTIES:
+        # Unknown subtype: hide nothing rather than guess.
+        return []
+
+    hidden = [
+        name
+        for other, names in SUBTYPE_ONLY_PROPERTIES.items()
+        if other != subtype
+        for name in names
+    ]
+    if subtype == "edge":
+        hidden.extend(CLOUD_ONLY_PROPERTIES)
+    return hidden
+
+
+# One column holds the OS image for every platform, so column_metadata can
+# carry only one title for it. Each platform has its own name for the thing,
+# and that is what a provider will be looking for.
+SUBTYPE_FIELD_LABELS = {
+    "aws": {"os_uuid": "AMI"},
+    "openstack": {"os_uuid": "Image ID"},
+}
+
+
+class CapacitySubtypeFieldsMixin:
+    """Restricts the form to the properties of the capacity's own subtype."""
+
+    # Nullable because each platform names its instance differently, but a
+    # flavour is not usable without one. The subtype filter hides whichever
+    # does not apply.
+    extra_new_fields = ["instance_type", "flavor_name", "os_uuid"]
+
+    @property
+    def disabled_properties(self) -> list[str]:
+        return [*FIXED_AT_CREATION, *SYSTEM_MANAGED,
+                *hidden_capacity_properties(self._capacity())]
+
+    def _capacity(self) -> dict:
+        resource = getattr(self, "resource", None)
+        return resource.as_dict() if resource is not None else {}
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        labels = SUBTYPE_FIELD_LABELS.get(subtype_of(self._capacity()) or "", {})
+        for name, label in labels.items():
+            field = (kwargs.get("fields") or {}).get(name)
+            if field is not None:
+                field.label = label
+        return kwargs
+
+
 @dataclass
 class CloudCapacityViewMixin:
-    table_name = 'cloud_capacity'
+    # No table_name default: views set their own, and a missing one should fail
+    # loudly rather than silently querying a table that does not exist.
     editor_reverse_base = "capacities:cloud_capacity_editor"
     editor_one_to_one_section_reverse_base = "capacities:cloud_capacity_editor_one_to_one_section"
     editor_one_to_many_section_reverse_base = "capacities:cloud_capacity_editor_one_to_many_section"

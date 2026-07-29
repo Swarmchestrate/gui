@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import Http404
 from django.urls import reverse_lazy
 from django.template.loader import render_to_string
 from django.views.generic import FormView
@@ -13,7 +14,7 @@ from postgrest.api import ApiClient
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.humanise import humanise_resource_type
+from utils.humanise import humanise_resource_type, resource_label
 
 
 class OneToManyForeignKeyResourceEditorView(FormView):
@@ -37,6 +38,8 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
@@ -190,9 +193,13 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.fk_resource_id
         )
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
-            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()} {self.fk_resource_id}",
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "main_heading": resource_label(
+                fk_resource.as_dict(), self.fk_table_name, self.fk_resource_id
+            ),
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
@@ -236,6 +243,8 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
@@ -319,11 +328,43 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         )
         return super().form_valid(form)
 
+    def get_copy_source(self) -> dict:
+        """The row being copied, when ?copy_from=<id> is given."""
+        copy_from = self.request.GET.get("copy_from")
+        if not copy_from:
+            return {}
+        endpoint = self.api_client.get_endpoint(self.fk_table_name)
+        source = endpoint.get(copy_from)
+        if source is None or source.as_dict() is None:
+            raise Http404(f"No {self.fk_table_name} with id {copy_from} to copy")
+        row = dict(source.as_dict())
+        # Identity and parentage belong to the new row, not the copied one.
+        for key in (endpoint.definition.pk_column_name, "created_at", "updated_at"):
+            row.pop(key, None)
+        return row
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update(self.get_copy_source())
+        return initial
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({
-            "fields": self.fk_table_form_config.get_required_fields(),
-        })
+        # Everything the row has, so it can be filled in one pass rather than
+        # created and then immediately edited. Foreign keys are excluded: they
+        # render as relational sections, which need a row that does not exist
+        # yet. Required fields are still marked, so what is needed stays clear.
+        relational = {
+            name
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
+        fields = {
+            name: field
+            for name, field in self.fk_table_form_config.get_fields().items()
+            if name not in relational
+        }
+        kwargs.update({"fields": fields})
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -331,8 +372,10 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
@@ -370,6 +413,8 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         definition = self.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
@@ -526,9 +571,13 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.fk_resource_id
         )
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
-            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()} {self.fk_resource_id}",
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "main_heading": resource_label(
+                fk_resource.as_dict(), self.fk_table_name, self.fk_resource_id
+            ),
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
@@ -574,6 +623,8 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         definition = self.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if self.resource is None or self.resource.as_dict() is None:
+            raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
@@ -671,8 +722,10 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,

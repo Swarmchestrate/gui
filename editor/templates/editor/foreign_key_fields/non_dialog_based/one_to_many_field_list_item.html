@@ -1,8 +1,8 @@
 {% load humanise_swch %}
 <li class="list-group-item">
     <div class="row align-items-center gx-4 gy-3">
-        <div class="col-xl-10">
-            {{ resource_type|humanise_resource_type|title }} {{ fk_resource_id }}
+        <div class="col-xl-9">
+            {{ label|default:fk_resource_id }}
             <div class="form-text text-truncate">
                 {% for field in form %}
                 <span class="{% if not forloop.last %}me-2{% endif %}">
@@ -11,13 +11,20 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="col-xl-2 d-flex column-gap-2">
+        <div class="col-xl-3 d-flex column-gap-2">
             <a
                 href="{% url foreign_key_resource_update_editor_reverse_base resource_id field_name fk_resource_id %}"
                 class="btn btn-light update-editor-btn ms-xl-auto"
                 aria-label="Edit"
                 title="Edit">
                 <i class="bi bi-pencil-fill"></i>
+            </a>
+            <a
+                href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}?copy_from={{ fk_resource_id }}"
+                class="btn btn-light new-editor-btn"
+                aria-label="Copy"
+                title="Copy">
+                <i class="bi bi-copy"></i>
             </a>
             <button
                 class="btn btn-outline-danger delete-dialog-btn"

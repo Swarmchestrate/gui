@@ -6,6 +6,11 @@ app_name = "applications"
 
 urlpatterns = [
     path(
+        "applications/api/node-filter/operators/",
+        views.NodeFilterOperatorsView.as_view(),
+        name="node_filter_operators",
+    ),
+    path(
         "applications/",
         views.ApplicationListFormView.as_view(),
         name="application_list",

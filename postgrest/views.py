@@ -229,11 +229,16 @@ class NewOneToManyRelationFormView(FormView):
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        logger.error("Invalid %s form: %s", self.fk_table_name, form.errors.as_json())
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return super().form_invalid(form)
+        # The caller asked for JSON and this view has no template to fall back
+        # on, so rendering one turns a validation failure into a 500.
+        return JsonResponse(
+            {"feedback": form.errors, "message": "The form submitted was not valid."},
+            status=HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -242,7 +247,13 @@ class NewOneToManyRelationFormView(FormView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False
+            infer_one_to_many_properties=False,
+            # The choices offered must match what the dialog rendered.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
+            # The column tying the row to its parent is set by this view rather
+            # than by the user, so the dialog never renders it. Asking the form
+            # for it rejects every submission where the column is NOT NULL.
+            disabled_properties=[self.fk_table_column_name],
         )
         kwargs.update({
             "fields": form_config.get_fields(),
@@ -304,11 +315,16 @@ class UpdateOneToManyRelationFormView(FormView):
         return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
-        logger.exception("form.errors", form.errors)
+        logger.error("Invalid %s form: %s", self.fk_table_name, form.errors.as_json())
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return super().form_invalid(form)
+        # The caller asked for JSON and this view has no template to fall back
+        # on, so rendering one turns a validation failure into a 500.
+        return JsonResponse(
+            {"feedback": form.errors, "message": "The form submitted was not valid."},
+            status=HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -317,7 +333,13 @@ class UpdateOneToManyRelationFormView(FormView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False
+            infer_one_to_many_properties=False,
+            # The choices offered must match what the dialog rendered.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
+            # The column tying the row to its parent is set by this view rather
+            # than by the user, so the dialog never renders it. Asking the form
+            # for it rejects every submission where the column is NOT NULL.
+            disabled_properties=[self.fk_table_column_name],
         )
         kwargs.update({
             "fields": form_config.get_fields(),

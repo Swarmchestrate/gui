@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanise_swch %}
 {% block styles %}
 <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
 {% endblock styles %}
@@ -67,7 +68,7 @@
                 <thead>
                     <tr>
                         <th class="align-middle p-3"></th>
-                        <th class="align-middle p-3">ID</th>
+                        <th class="align-middle p-3">Name</th>
                         <th class="align-middle p-3">Created At</th>
                         <th class="align-middle p-3">Updated At</th>
                         <th
@@ -84,9 +85,9 @@
                     {% if resource %}
                     <tr data-resource-id="{{ resource_id }}">
                         <td class="align-middle px-3"></td>
-                        <td class="font-monospace align-middle px-3">
+                        <td class="align-middle px-3">
                             {% block td_name_content %}
-                            <a href="{% url editor_overview_reverse_base resource_id %}">{{ resource_id }}</a>
+                            <a href="{% url editor_overview_reverse_base resource_id %}">{% label_for resource.as_dict resource_type resource_id %}</a>
                             {% endblock td_name_content %}
                         </td>
                         <td class="text-body-secondary align-middle px-3">

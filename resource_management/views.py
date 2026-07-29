@@ -8,7 +8,7 @@ from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 from http import HTTPStatus
 
-from .exceptions import NameMissingException
+from .exceptions import NameMissingException, SatBuilderException
 from .forms import (
     ColumnMetadataDeletionForm,
     NewColumnMetadataEditorForm,
@@ -202,7 +202,8 @@ class ToscaTemplateDownloadView(View):
                 content_type="application/yaml"
             )
             response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
-        except NameMissingException as err:
+        except (NameMissingException, SatBuilderException, ValueError) as err:
+            # These carry a message naming what the wizard still needs.
             logger.exception(str(err))
             messages.error(request, str(err))
             return redirect(self.resource_list_reverse)

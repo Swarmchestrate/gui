@@ -11,6 +11,7 @@ from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
+from utils.humanise import resource_label
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,8 @@ class OneToOneFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 TableNames.APPLICATION,
                 TableNames.APPLICATION_NEW,
@@ -187,6 +190,8 @@ class OneToManyFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 f"{TableNames.APPLICATION}_id",
                 f"{TableNames.APPLICATION_NEW}_id",
@@ -329,6 +334,9 @@ class OneToManyFieldEditorSectionView(View):
                         fk_resource.as_dict()
                     ),
                     "delete_form": self.get_delete_form(fk_resource.pk),
+                    "label": resource_label(
+                        fk_resource.as_dict(), self.fk_table_name, fk_resource.pk
+                    ),
                 }
                 for fk_resource in fk_resources
             }),
@@ -396,6 +404,8 @@ class NonDialogBasedOneToOneFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 TableNames.APPLICATION,
                 TableNames.APPLICATION_NEW,
@@ -501,6 +511,8 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 f"{TableNames.APPLICATION}_id",
                 f"{TableNames.APPLICATION_NEW}_id",
@@ -567,6 +579,9 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             "section": self.get_section_template({
                 fk_resource.pk: {
                     "delete_form": self.get_delete_form(fk_resource.pk),
+                    "label": resource_label(
+                        fk_resource.as_dict(), self.fk_table_name, fk_resource.pk
+                    ),
                 }
                 for fk_resource in fk_resources
             }),

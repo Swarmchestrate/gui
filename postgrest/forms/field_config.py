@@ -80,6 +80,14 @@ class BooleanFieldConfig(FieldConfig):
     field_class = forms.BooleanField
     css_classes = ["form-check-input"]
 
+    def _setup_field_kwargs(self) -> dict:
+        kwargs = super()._setup_field_kwargs()
+        # A required BooleanField in Django means "must be ticked", but a
+        # non-null boolean column only means "must have a value" - and an
+        # unchecked box already submits a valid False.
+        kwargs["required"] = False
+        return kwargs
+
 
 class ChoiceFieldConfig(FieldConfig):
     CHOICES_NOT_SPECIFIED = "Choices have not been specified."

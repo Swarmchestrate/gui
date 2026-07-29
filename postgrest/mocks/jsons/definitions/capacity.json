@@ -1,10 +1,141 @@
 {
-    "required": ["capacity_id"],
+    "description": "Capacity description table storing all attributes defined in orchestration capacity model.",
+    "required": [
+        "capacity_id"
+    ],
     "properties": {
         "capacity_id": {
             "description": "Note:\nThis is a Primary Key.<pk/>",
             "format": "integer",
             "type": "integer"
+        },
+        "resource_provider": {
+            "description": "The provider of the resources, where they run (e.g., Amazon, Azure, UoW, Sztaki, edge provider).",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "capacity_provider": {
+            "description": "The provider of the capacity (e.g., ACME Corporation).",
+            "format": "character varying",
+            "maxLength": 255,
+            "type": "string"
+        },
+        "resource_type": {
+            "description": "The type of resource: Cloud or Edge.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "instance_types": {
+            "description": "Supported instance types and specifications (CPU, RAM, storage).",
+            "format": "jsonb"
+        },
+        "resource_quota": {
+            "description": "Available capacity as CPU/RAM/Memory quota. Either use resource_quota or instance_quota.",
+            "format": "jsonb"
+        },
+        "instance_quota": {
+            "description": "Available capacity as number of instances. Either use resource_quota or instance_quota.",
+            "format": "jsonb"
+        },
+        "price": {
+            "description": "Price for resource usage (based on instance type, utilisation, or entire edge device).",
+            "format": "jsonb"
+        },
+        "locality": {
+            "description": "Geographic location(s) of resources: continent, country, city, GPS. Multiple values possible.",
+            "format": "jsonb"
+        },
+        "operating_system": {
+            "description": "Supported operating systems with IDs (limited to Debian, Ubuntu, CentOS).",
+            "format": "jsonb"
+        },
+        "architecture": {
+            "description": "Supported architecture types (e.g., x86, ARM).",
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "energy_type": {
+            "description": "Type of energy used: Green, Brown, Mix.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "powered_type": {
+            "description": "Power source type: Battery powered or Mains powered.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "energy_consumption": {
+            "description": "Energy demand based on instance type, CPU/memory usage, or edge device.",
+            "format": "jsonb"
+        },
+        "accessible_sensors": {
+            "description": "Sensors accessible through local network from edge machine.",
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "devices": {
+            "description": "Details of additional devices (e.g., Hardware: GPU, Software: CUDA).",
+            "format": "jsonb"
+        },
+        "mobility": {
+            "description": "Indicates whether the device is mobile (true/false).",
+            "format": "boolean",
+            "type": "boolean"
+        },
+        "security_ports": {
+            "description": "List of ports that the resource allows to be opened.",
+            "format": "text[]",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "trust": {
+            "description": "Trust level of the resource (definition TBD).",
+            "format": "text",
+            "type": "string"
+        },
+        "access_credentials": {
+            "description": "Credentials for accessing the resource (e.g., SSH keys).",
+            "format": "text",
+            "type": "string"
+        },
+        "access_endpoints": {
+            "description": "Endpoints for accessing the resource.",
+            "format": "text",
+            "type": "string"
+        },
+        "bandwidth_mbps": {
+            "description": "Capacity of data transfer supported (Mbps).",
+            "format": "numeric",
+            "type": "number"
+        },
+        "connectivity_type": {
+            "description": "Connectivity type: wired, wifi, 4G, 5G.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
+        },
+        "network_stability": {
+            "description": "Network stability (TBD definition).",
+            "format": "text",
+            "type": "string"
+        },
+        "network_access": {
+            "description": "Network access type: Public / Private / Community.",
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
         },
         "created_at": {
             "default": "now()",
@@ -16,86 +147,10 @@
             "format": "timestamp without time zone",
             "type": "string"
         },
-        "description": { "format": "text", "type": "string" },
-        "resource_provider": {
-            "format": "character varying",
-            "maxLength": 255,
+        "description": {
+            "description": "The description of the capacity",
+            "format": "text",
             "type": "string"
-        },
-        "capacity_provider": {
-            "format": "character varying",
-            "maxLength": 255,
-            "type": "string"
-        },
-        "resource_type": {
-            "enum": ["Cloud", "Edge"],
-            "format": "public.resource_type_enum",
-            "type": "string"
-        },
-        "resource_provider_type": {
-            "enum": ["Public", "Private", "Hybrid"],
-            "format": "public.provider_type_enum",
-            "type": "string"
-        },
-        "energy_type": {
-            "enum": ["Green", "Brown", "Mix"],
-            "format": "public.energy_type_enum",
-            "type": "string"
-        },
-        "powered_type": {
-            "enum": ["Mains", "Battery"],
-            "format": "public.power_type_enum",
-            "type": "string"
-        },
-        "mobility": { "format": "boolean", "type": "boolean" },
-        "trust": { "format": "text", "type": "string" },
-        "access_credentials": { "format": "text", "type": "string" },
-        "access_endpoints": { "format": "text", "type": "string" },
-        "bandwidth_mbps": { "format": "numeric", "type": "number" },
-        "connectivity_type": {
-            "enum": ["Ethernet", "WiFi", "4G", "5G", "Satellite"],
-            "format": "public.connectivity_type_enum",
-            "type": "string"
-        },
-        "network_stability": { "format": "text", "type": "string" },
-        "network_access": {
-            "enum": ["Public", "Private", "Restricted"],
-            "format": "public.network_access_enum",
-            "type": "string"
-        },
-        "accessible_sensors": {
-            "format": "text[]",
-            "items": { "type": "string" },
-            "type": "array"
-        },
-        "security_ports": {
-            "format": "text[]",
-            "items": { "type": "string" },
-            "type": "array"
-        },
-        "locality_id": {
-            "description": "Note:\nThis is a Foreign Key to `locality.locality_id`.<fk table='locality' column='locality_id'/>",
-            "format": "integer",
-            "type": "integer",
-            "unique": true
-        },
-        "resource_quota_id": {
-            "description": "Note:\nThis is a Foreign Key to `capacity_resource_quota.resource_quota_id`.<fk table='capacity_resource_quota' column='resource_quota_id'/>",
-            "format": "integer",
-            "type": "integer",
-            "unique": true
-        },
-        "energy_consumption_id": {
-            "description": "Note:\nThis is a Foreign Key to `capacity_energy_consumption.energy_consumption_id`.<fk table='capacity_energy_consumption' column='energy_consumption_id'/>",
-            "format": "integer",
-            "type": "integer",
-            "unique": true
-        },
-        "price_id": {
-            "description": "Note:\nThis is a Foreign Key to `capacity_price.price_id`.<fk table='capacity_price' column='price_id'/>",
-            "format": "integer",
-            "type": "integer",
-            "unique": true
         }
     },
     "type": "object"
