@@ -314,9 +314,13 @@ class EditorStartFormView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({
-            "fields": self.form_config.get_required_fields(),
-        })
+        fields = self.form_config.get_required_fields()
+        # A field the page itself determines is not the user's to choose. The
+        # view sets it in apply_changes_to_registration_data_before_save, so
+        # offering it would let a choice be made and then silently overruled.
+        for name in getattr(self, "disabled_properties", []):
+            fields.pop(name, None)
+        kwargs.update({"fields": fields})
         return kwargs
 
 

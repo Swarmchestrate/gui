@@ -44,7 +44,7 @@ class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceBy
         return data
 
 
-class CloudCapacityEditorStartFormView(CloudCapacityViewMixin, EditorStartFormView):
+class CloudCapacityEditorStartFormView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
@@ -130,7 +130,7 @@ class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCa
         return data
 
 
-class EdgeCapacityEditorStartFormView(EdgeCapacityViewMixin, EditorStartFormView):
+class EdgeCapacityEditorStartFormView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
