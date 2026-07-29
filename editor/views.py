@@ -166,6 +166,9 @@ class UpdateResourceByCategoryView(FormView):
     table_name: str
     column_metadata_table_name: str
     disabled_categories: list[str]
+    # Sync properties disabled when the form is first loaded
+    # with properties allowed to be sent through an update.
+    disabled_properties: list[str]
     
     editor_overview_reverse_base: str
     resource_type: str
@@ -180,8 +183,11 @@ class UpdateResourceByCategoryView(FormView):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
+        self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         if not hasattr(self, "disabled_categories"):
             self.disabled_categories = list()
+        if not hasattr(self, "disabled_properties"):
+            self.disabled_properties = list()
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -239,7 +245,14 @@ class UpdateResourceByCategoryView(FormView):
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories
+            disabled_categories=self.disabled_categories,
+            disabled_properties=[
+                TableNames.APPLICATION,
+                TableNames.APPLICATION_NEW,
+                TableNames.CAPACITY,
+                TableNames.CAPACITY_NEW,
+                *self.disabled_properties,
+            ]
         )
         if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
             kwargs.update({

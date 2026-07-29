@@ -32,7 +32,7 @@ class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin
     editor_form_reverse = "capacities:update_cloud_capacity_by_category"
 
 
-class UpdateCloudCapacityByCategoryView(CloudCapacityViewMixin, UpdateResourceByCategoryView):
+class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
 
@@ -118,7 +118,7 @@ class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, 
     editor_form_reverse = "capacities:update_edge_capacity_by_category"
 
 
-class UpdateEdgeCapacityByCategoryView(EdgeCapacityViewMixin, UpdateResourceByCategoryView):
+class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
 
