@@ -136,7 +136,9 @@ class EditorView(TemplateView):
         context.update(
             {
                 "title": self.title_base,
-                "main_subheading": humanise_resource_type(self.resource_type).title(),
+                "main_subheading": resource_label(
+                    self.resource.as_dict(), self.resource_type, self.resource_id
+                ),
                 "main_heading": self.title_base,
                 "resource": self.resource,
                 "resource_id": self.resource_id,
