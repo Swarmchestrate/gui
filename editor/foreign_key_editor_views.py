@@ -10,7 +10,7 @@ from postgrest.api import ApiClient
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.humanise import humanise_resource_type
+from utils.humanise import humanise_resource_type, resource_label
 
 
 class OneToManyForeignKeyResourceEditorView(FormView):
@@ -201,9 +201,13 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.fk_resource_id
         )
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
-            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()} {self.fk_resource_id}",
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "main_heading": resource_label(
+                fk_resource.as_dict(), self.fk_table_name, self.fk_resource_id
+            ),
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
@@ -376,8 +380,10 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
@@ -585,9 +591,13 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.fk_resource_id
         )
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
-            "main_heading": f"{humanise_resource_type(self.fk_table_name).title()} {self.fk_resource_id}",
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "main_heading": resource_label(
+                fk_resource.as_dict(), self.fk_table_name, self.fk_resource_id
+            ),
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,
             "resource_type": self.resource_type,
@@ -732,8 +742,10 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         context.update({
-            "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
-            "main_subheading": humanise_resource_type(self.resource_type).title(),
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_subheading": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
             "resource": self.resource.as_dict(),
             "resource_id": self.resource_id,

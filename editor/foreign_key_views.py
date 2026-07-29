@@ -11,6 +11,7 @@ from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
+from utils.humanise import resource_label
 
 
 logger = logging.getLogger(__name__)
@@ -329,6 +330,9 @@ class OneToManyFieldEditorSectionView(View):
                         fk_resource.as_dict()
                     ),
                     "delete_form": self.get_delete_form(fk_resource.pk),
+                    "label": resource_label(
+                        fk_resource.as_dict(), self.fk_table_name, fk_resource.pk
+                    ),
                 }
                 for fk_resource in fk_resources
             }),
@@ -567,6 +571,9 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             "section": self.get_section_template({
                 fk_resource.pk: {
                     "delete_form": self.get_delete_form(fk_resource.pk),
+                    "label": resource_label(
+                        fk_resource.as_dict(), self.fk_table_name, fk_resource.pk
+                    ),
                 }
                 for fk_resource in fk_resources
             }),

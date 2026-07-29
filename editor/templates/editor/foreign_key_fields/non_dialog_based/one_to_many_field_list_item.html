@@ -2,7 +2,7 @@
 <li class="list-group-item">
     <div class="row align-items-center gx-4 gy-3">
         <div class="col-xl-9">
-            {{ resource_type|humanise_resource_type|title }} {{ fk_resource_id }}
+            {{ label|default:fk_resource_id }}
             <div class="form-text text-truncate">
                 {% for field in form %}
                 <span class="{% if not forloop.last %}me-2{% endif %}">

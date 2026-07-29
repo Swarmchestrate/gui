@@ -22,7 +22,7 @@ from postgrest.api import (
 )
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.humanise import humanise_resource_type
+from utils.humanise import humanise_resource_type, resource_label
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,10 @@ class EditorView(TemplateView):
                 *self.disabled_properties,
             ]
         )
-        self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
+        # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
+        self.title_base = resource_label(
+            self.resource.as_dict(), self.resource_type, self.resource_id
+        )
         return super().dispatch(request, *args, **kwargs)
     
     def get_toc_list_items(self):
@@ -185,7 +188,10 @@ class UpdateResourceByCategoryView(FormView):
         )
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        self.title_base = f"{humanise_resource_type(self.resource_type).title()} {self.resource_id}"
+        # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
+        self.title_base = resource_label(
+            self.resource.as_dict(), self.resource_type, self.resource_id
+        )
         return super().dispatch(request, *args, **kwargs)
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
@@ -413,9 +419,11 @@ class EditorOverviewTemplateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "title": f"{humanise_resource_type(self.resource_type).title()} {self.resource_id} | Overview",
+                "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
                 "main_heading": "Overview",
-                "main_subheading": f"{humanise_resource_type(self.resource_type).title()}",
+                "main_subheading": resource_label(
+                    self.resource.as_dict(), self.resource_type, self.resource_id
+                ),
                 "resource_data_by_category": self.format_resource_data_for_template(),
                 "resource": self.resource.as_dict(),
                 "toc_list_items": self.get_toc(),

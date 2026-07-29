@@ -1,3 +1,22 @@
+# Columns that name a row, in the order they are worth trying. A row is shown
+# by whichever it has, because "mymedium" tells a provider what they are looking
+# at and "Instance Flavour 472246" does not.
+NAMING_COLUMNS = ("name", "property_name", "target")
+
+
+def resource_label(resource, resource_type, resource_id):
+    """Label a row the way the person who created it would recognise it.
+
+    Falls back to the type and id, so a row with nothing to name it by is still
+    identifiable rather than blank.
+    """
+    for column in NAMING_COLUMNS:
+        value = (resource or {}).get(column)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return f"{humanise_resource_type(resource_type).title()} {resource_id}"
+
+
 def humanise_resource_type(resource_type):
     resource_types_humanised = {
         "application": "application",
