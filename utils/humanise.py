@@ -8,6 +8,9 @@ def humanise_resource_type(resource_type):
         "application_colocate": "colocation",
         "application_environment_var": "environment variable",
         "application_microservice": "microservice",
+        # Named for what a user is doing, not for the TOSCA construct behind it.
+        "application_node_filter": "resource requirement",
+        "application_property": "additional Kubernetes property",
         "application_security_rule": "security rule",
         "capacity": "capacity",
         "capacity_new": "capacity",
@@ -37,6 +40,8 @@ def humanise_resource_type_plural(resource_type):
         "application_colocate": "colocations",
         "application_environment_var": "environment variables",
         "application_microservice": "microservices",
+        "application_node_filter": "resource requirements",
+        "application_property": "additional Kubernetes properties",
         "application_security_rule": "security rules",
         "capacity": "capacities",
         "capacity_new": "capacities",

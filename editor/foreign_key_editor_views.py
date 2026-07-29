@@ -354,28 +354,20 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        available = self.fk_table_form_config.get_fields()
-        if self.request.GET.get("copy_from"):
-            # Copying shows every field, so the values carried over are visible
-            # and adjustable rather than silently submitted or dropped. Foreign
-            # keys are excluded: they render as relational sections, which need
-            # a row that does not exist yet.
-            relational = {
-                name
-                for name, metadata in self.fk_table_form_config.get_properties().items()
-                if metadata.refers_to_table_name or metadata.created_from_table_name
-            }
-            fields = {n: f for n, f in available.items() if n not in relational}
-        else:
-            fields = dict(self.fk_table_form_config.get_required_fields())
-            # Some columns are nullable because a sibling subtype uses a
-            # different one, but are still needed to create a usable row. Views
-            # name them in extra_new_fields; anything hidden stays hidden.
-            for name in getattr(self, "extra_new_fields", []):
-                if name in self.disabled_properties:
-                    continue
-                if name in available:
-                    fields[name] = available[name]
+        # Everything the row has, so it can be filled in one pass rather than
+        # created and then immediately edited. Foreign keys are excluded: they
+        # render as relational sections, which need a row that does not exist
+        # yet. Required fields are still marked, so what is needed stays clear.
+        relational = {
+            name
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
+        fields = {
+            name: field
+            for name, field in self.fk_table_form_config.get_fields().items()
+            if name not in relational
+        }
         kwargs.update({"fields": fields})
         return kwargs
 
