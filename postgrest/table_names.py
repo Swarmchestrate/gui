@@ -12,6 +12,7 @@ class TableNames(StrEnum):
     APPLICATION_ENVIRONMENT_VAR = "application_environment_var"
     APPLICATION_MICROSERVICE = "application_microservice"
     APPLICATION_NEW = "application_new"
+    APPLICATION_NODE_FILTER = "application_node_filter"
     APPLICATION_PROPERTY = "application_property"
     APPLICATION_SECURITY_RULE = "application_security_rule"
     CAPACITY = "capacity"
