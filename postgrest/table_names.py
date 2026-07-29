@@ -9,6 +9,7 @@ class PostGisTableNames(StrEnum):
 
 class TableNames(StrEnum):
     APPLICATION = "application"
+    APPLICATION_COLOCATE = "application_colocate"
     APPLICATION_ENVIRONMENT_VAR = "application_environment_var"
     APPLICATION_MICROSERVICE = "application_microservice"
     APPLICATION_NEW = "application_new"

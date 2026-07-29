@@ -37,6 +37,8 @@ class OneToOneFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 TableNames.APPLICATION,
                 TableNames.APPLICATION_NEW,
@@ -188,6 +190,8 @@ class OneToManyFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 f"{TableNames.APPLICATION}_id",
                 f"{TableNames.APPLICATION_NEW}_id",
@@ -400,6 +404,8 @@ class NonDialogBasedOneToOneFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 TableNames.APPLICATION,
                 TableNames.APPLICATION_NEW,
@@ -505,6 +511,8 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             self.api_client.openapi_spec,
             column_metadata,
             infer_one_to_many_properties=True,
+            # Some choices depend on the row this one hangs off.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             disabled_properties=[
                 f"{TableNames.APPLICATION}_id",
                 f"{TableNames.APPLICATION_NEW}_id",

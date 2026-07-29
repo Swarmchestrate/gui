@@ -13,6 +13,7 @@ import requests
 from django.core.cache import cache
 
 from editor.field_choices import register_field_choices
+from postgrest.api import ApiClient
 from postgrest.api_configs.base_config import build_api_url
 from postgrest.table_names import TableNames
 
@@ -57,7 +58,7 @@ def fetch_targets() -> List[Dict[str, Any]]:
     return targets
 
 
-def target_choices() -> List[Tuple[str, str]]:
+def target_choices(context: dict) -> List[Tuple[str, str]]:
     """Capability properties, labelled so the capability is obvious."""
     return [
         (target["target"], _target_label(target))
@@ -65,7 +66,36 @@ def target_choices() -> List[Tuple[str, str]]:
     ]
 
 
-def operator_choices() -> List[Tuple[str, str]]:
+def colocation_target_choices(context: dict) -> List[Tuple[str, str]]:
+    """The other microservices of the same application.
+
+    A colocation says "run this beside that one", so the only sensible answers
+    are the siblings of the microservice being edited. Stored by name, because
+    that is what names the node template a policy targets.
+    """
+    microservice_id = context.get("parent_id")
+    if not microservice_id:
+        return []
+
+    api_client = ApiClient()
+    api_client.initialise_openapi_spec()
+    endpoint = api_client.get_endpoint(TableNames.APPLICATION_MICROSERVICE)
+
+    microservice = endpoint.get(microservice_id)
+    application_id = (microservice.as_dict() or {}).get("application_id")
+    if not application_id:
+        return []
+
+    siblings = endpoint.get_resources_referencing_resource_id("application_id", application_id)
+    return [
+        (name, name)
+        for sibling in siblings
+        if str(sibling.pk) != str(microservice_id)
+        and (name := (sibling.as_dict() or {}).get("name"))
+    ]
+
+
+def operator_choices(context: dict) -> List[Tuple[str, str]]:
     """Every operator any target accepts.
 
     Which ones apply to the chosen target is narrowed in the browser, from the
@@ -93,3 +123,4 @@ def register() -> None:
     """Wire the requirement columns up to the profile's answers."""
     register_field_choices(TableNames.APPLICATION_NODE_FILTER, "target", target_choices)
     register_field_choices(TableNames.APPLICATION_NODE_FILTER, "operator", operator_choices)
+    register_field_choices(TableNames.APPLICATION_COLOCATE, "target", colocation_target_choices)

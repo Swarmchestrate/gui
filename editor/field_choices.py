@@ -14,19 +14,27 @@ from typing import Callable, List, Tuple
 logger = logging.getLogger(__name__)
 
 Choices = List[Tuple[str, str]]
+# A provider is given the row's context: which table the parent row is in and
+# its id. Some choices depend on it - the microservices a colocation may name
+# are the siblings of the one being edited, not every microservice there is.
+Context = dict
+Provider = Callable[[Context], Choices]
 
-_providers: dict[tuple[str, str], Callable[[], Choices]] = {}
+_providers: dict[tuple[str, str], Provider] = {}
 
 
 def register_field_choices(
         table_name: str,
         column_name: str,
-        provider: Callable[[], Choices]) -> None:
+        provider: Provider) -> None:
     """Say where one column's choices come from."""
     _providers[(str(table_name), column_name)] = provider
 
 
-def choices_for(table_name: str, column_name: str) -> Choices | None:
+def choices_for(
+        table_name: str,
+        column_name: str,
+        context: Context | None = None) -> Choices | None:
     """The choices for a column, or None when it is ordinary free text.
 
     A provider that fails is treated as having none, so a form still renders
@@ -36,7 +44,7 @@ def choices_for(table_name: str, column_name: str) -> Choices | None:
     if not provider:
         return None
     try:
-        return provider() or None
+        return provider(context or {}) or None
     except Exception:
         logger.exception(
             "Could not load choices for %s.%s; leaving it as free text",

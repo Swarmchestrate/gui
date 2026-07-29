@@ -248,6 +248,8 @@ class NewOneToManyRelationFormView(FormView):
             self.api_client.openapi_spec,
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
+            # The choices offered must match what the dialog rendered.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             # The column tying the row to its parent is set by this view rather
             # than by the user, so the dialog never renders it. Asking the form
             # for it rejects every submission where the column is NOT NULL.
@@ -332,6 +334,8 @@ class UpdateOneToManyRelationFormView(FormView):
             self.api_client.openapi_spec,
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
+            # The choices offered must match what the dialog rendered.
+            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
             # The column tying the row to its parent is set by this view rather
             # than by the user, so the dialog never renders it. Asking the form
             # for it rejects every submission where the column is NOT NULL.
