@@ -288,7 +288,13 @@ class FormConfig:
     def _get_field_config_instance(self, name: str, metadata: PropertyMetadata):
         field_config_class = self._get_field_config_class_from_format(metadata.format)
         additional_args = []
-        if metadata.enum:
+        if metadata.choices:
+            choices = list(metadata.choices)
+            if not metadata.is_required:
+                choices.insert(0, ("", "None"))
+            additional_args.append(choices)
+            field_config_class = ChoiceFieldConfig
+        elif metadata.enum:
             choices = [
                 (field_enum, humanise_enum_value(field_enum))
                 for field_enum in metadata.enum

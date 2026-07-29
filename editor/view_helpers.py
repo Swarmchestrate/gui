@@ -6,6 +6,7 @@ from postgrest.forms.form_config import (
 )
 from postgrest.api import OpenApiSpecification, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from .field_choices import choices_for
 
 
 class EditorTableOfContents:
@@ -189,6 +190,10 @@ def get_form_config_for_table(
         for property_name, metadata in properties.as_dict().items()
         if metadata.category not in disabled_categories
     }
+    for property_name, metadata in properties_as_dict.items():
+        choices = choices_for(table_name, property_name)
+        if choices:
+            metadata.choices = choices
     possible_fk_table_column_name = f'{column_metadata_table_name}_id'
     definitions_by_table_name = dict()
     if infer_one_to_many_properties:
