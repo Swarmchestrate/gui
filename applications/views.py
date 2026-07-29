@@ -1,4 +1,6 @@
+from django.http import JsonResponse
 from django.urls import reverse_lazy
+from django.views.generic import View
 
 from .tosca import generate_adt_yaml
 
@@ -157,3 +159,17 @@ class ApplicationOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, One
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
+
+
+class NodeFilterOperatorsView(View):
+    """Which operators each resource requirement target accepts.
+
+    The form offers every operator, because a field's choices are fixed when it
+    is built. Which of them make sense depends on the target the user picks, so
+    the browser narrows the list from this.
+    """
+
+    def get(self, request, *args, **kwargs):
+        from .field_choices import operators_by_target
+
+        return JsonResponse({"operatorsByTarget": operators_by_target()})
