@@ -217,5 +217,5 @@ def get_form_config_for_table(
     return FormConfig(
         properties_as_dict,
         one_to_many_properties=one_to_many_properties.as_dict(),
-        extra_disabled_properties=disabled_properties
+        additional_disabled_properties=disabled_properties
     )

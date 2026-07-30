@@ -103,7 +103,7 @@ class Properties:
             self,
             name: str,
             metadata: dict,
-            extra_metadata_for_property: dict,
+            column_metadata_for_property: dict,
             is_required: bool):
         refers_to_table_name = self._get_foreign_key_table_name(metadata.get("description"))
         has_fk_relation_to_secondary_table = False
@@ -132,9 +132,9 @@ class Properties:
             type=metadata.get("type"),
             description=metadata.get("description"),
             enum=metadata.get("enum"),
-            title=extra_metadata_for_property.get("title"),
-            category=extra_metadata_for_property.get("category"),
-            help_text=extra_metadata_for_property.get("description")
+            title=column_metadata_for_property.get("title"),
+            category=column_metadata_for_property.get("category"),
+            help_text=column_metadata_for_property.get("description")
         )
     
     def as_dict(self) -> dict[str, PropertyMetadata]:
@@ -154,12 +154,12 @@ class Properties:
         )
         for name, metadata in properties_from_definition.items():
             is_required = name in names_of_required_properties
-            extra_metadata_for_property = column_metadata_for_table.get(name, {})
+            column_metadata_for_property = column_metadata_for_table.get(name, {})
             properties_as_dict.update({
                 name: self._get_property_metadata_instance(
                     name,
                     metadata,
-                    extra_metadata_for_property,
+                    column_metadata_for_property,
                     is_required
                 )
             })
@@ -196,7 +196,7 @@ class OneToManyProperties:
             {}
         )
         for table_name, definition in self._definitions_by_table_name.items():
-            extra_metadata_for_property = column_metadata_for_table.get(table_name, {})
+            column_metadata_for_property = column_metadata_for_table.get(table_name, {})
             references_to_other_tables = definition.find_references_to_other_tables()
             has_fk_relation_to_secondary_table = False
             is_fk_ref_made_to_secondary_table = any(
@@ -219,9 +219,9 @@ class OneToManyProperties:
                     type=None,
                     description=None,
                     enum=None,
-                    title=extra_metadata_for_property.get("title") or humanise_resource_type_plural(table_name).title(),
-                    category=extra_metadata_for_property.get("category"),
-                    help_text=extra_metadata_for_property.get("description")
+                    title=column_metadata_for_property.get("title") or humanise_resource_type_plural(table_name).title(),
+                    category=column_metadata_for_property.get("category"),
+                    help_text=column_metadata_for_property.get("description")
                 )
             })
         return properties_as_dict
@@ -241,25 +241,49 @@ class OasDefinitionPropertyFormat(Enum):
 
 
 class FormConfig:
-    extra_disabled_properties: list[str]
     initial = None
+    # Properties that can't be anticipated in advance -
+    # see postgrest.views.XOneToManyRelationFormView for
+    # examples.
+    _additional_disabled_properties: list[str]
     _properties: dict[str, PropertyMetadata]
-    _default_disabled_properties = [
+    PROPERTIES_SET_AT_SAVE_TIME = [
         "created_at",
         "updated_at",
+    ]
+    PROPERTIES_SET_THROUGH_URL = [
+        TableNames.APPLICATION,
+        TableNames.APPLICATION_NEW,
+        TableNames.CAPACITY,
+        TableNames.CAPACITY_NEW,
+        f"{TableNames.APPLICATION}_id",
+        f"{TableNames.CAPACITY}_id",
     ]
     
     def __init__(
             self,
             properties: dict[str, PropertyMetadata],
             one_to_many_properties: dict[str, PropertyMetadata] = None,
-            extra_disabled_properties: list[str] = None):
+            additional_disabled_properties: list[str] = None):
         self._properties = properties
         if one_to_many_properties:
             self._properties.update(one_to_many_properties)
-        self.extra_disabled_properties = extra_disabled_properties
-        if not extra_disabled_properties:
-            self.extra_disabled_properties = list()
+        if not additional_disabled_properties:
+            additional_disabled_properties = list()
+        self._additional_disabled_properties = additional_disabled_properties
+
+    @property
+    def disabled_properties(self):
+        # Override this to sync disabled properties across
+        # views (e.g., the wizard fields which are restricted
+        # in the view that renders the wizard should match the
+        # fields which are restricted when an update from that
+        # wizard is received by another view).
+        return [
+            *self.PROPERTIES_SET_AT_SAVE_TIME,
+            *self.PROPERTIES_SET_THROUGH_URL,
+            *self._additional_disabled_properties,
+        ]
         
     def _get_field_config_class_from_format(self, format: str):
         format_enum = None
@@ -319,8 +343,7 @@ class FormConfig:
         properties = dict()
         for name, metadata in self._properties.items():
             if (metadata.is_pk
-                or name in self._default_disabled_properties
-                or name in self.extra_disabled_properties):
+                or name in self.disabled_properties):
                 continue
             properties.update({
                 name: metadata,
@@ -335,8 +358,7 @@ class FormConfig:
         for name, metadata in self._properties.items():
             if (metadata.is_pk and not include_pk_fields):
                 continue
-            if (name in self._default_disabled_properties
-                or name in self.extra_disabled_properties):
+            if (name in self.disabled_properties):
                 continue
             if extra_skip_conditions and any(
                 check(metadata)
