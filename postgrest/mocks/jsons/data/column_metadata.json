@@ -1,5 +1,189 @@
 [
     {
+        "table_name": "application_property",
+        "column_name": "property_name",
+        "title": "Property",
+        "category": "Advanced",
+        "description": "Name of a property declared by the Microservice type.",
+        "order": 10
+    },
+    {
+        "table_name": "application_property",
+        "column_name": "property_value",
+        "title": "Value",
+        "category": "Advanced",
+        "description": "Value for that property, checked against the type the profile declares.",
+        "order": 20
+    },
+    {
+        "table_name": "application",
+        "column_name": "name",
+        "title": "Name",
+        "category": "Identity",
+        "description": "Name of this application, used to name the generated template.",
+        "order": 10
+    },
+    {
+        "table_name": "application",
+        "column_name": "description",
+        "title": "Description",
+        "category": "Identity",
+        "description": "A short description of what this application does.",
+        "order": 20
+    },
+    {
+        "table_name": "application",
+        "column_name": "author",
+        "title": "Author",
+        "category": "Identity",
+        "description": "Who wrote this application description.",
+        "order": 30
+    },
+    {
+        "table_name": "column_metadata",
+        "column_name": "description",
+        "title": "Help Text",
+        "category": "",
+        "description": "",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "version",
+        "title": "Version",
+        "category": "Identity",
+        "description": "Version of this application description.",
+        "order": 40
+    },
+    {
+        "table_name": "application",
+        "column_name": "creation_date",
+        "title": "Creation date",
+        "category": "Identity",
+        "description": "When this application description was written.",
+        "order": 50
+    },
+    {
+        "table_name": "application",
+        "column_name": "energy_priority",
+        "title": "Energy priority",
+        "category": "Quality of Service",
+        "description": "How much energy use matters, 0 to 1, where 1 is highest.",
+        "order": 60
+    },
+    {
+        "table_name": "application",
+        "column_name": "energy_target",
+        "title": "Energy budget",
+        "category": "Quality of Service",
+        "description": "Watts per hour.",
+        "order": 70
+    },
+    {
+        "table_name": "application",
+        "column_name": "cost_priority",
+        "title": "Cost priority",
+        "category": "Quality of Service",
+        "description": "How much cost matters, 0 to 1, where 1 is highest.",
+        "order": 80
+    },
+    {
+        "table_name": "application",
+        "column_name": "cost_target",
+        "title": "Cost budget",
+        "category": "Quality of Service",
+        "description": "Currency per hour.",
+        "order": 90
+    },
+    {
+        "table_name": "column_metadata",
+        "column_name": "title",
+        "title": "Title",
+        "category": "",
+        "description": "",
+        "order": null
+    },
+    {
+        "table_name": "application",
+        "column_name": "bandwidth_priority",
+        "title": "Bandwidth priority",
+        "category": "Quality of Service",
+        "description": "How much bandwidth matters, 0 to 1, where 1 is highest.",
+        "order": 100
+    },
+    {
+        "table_name": "application",
+        "column_name": "bandwidth_target",
+        "title": "Bandwidth target",
+        "category": "Quality of Service",
+        "description": "Mbps.",
+        "order": 110
+    },
+    {
+        "table_name": "application",
+        "column_name": "latency_priority",
+        "title": "Latency priority",
+        "category": "Quality of Service",
+        "description": "How much latency matters, 0 to 1, where 1 is highest.",
+        "order": 120
+    },
+    {
+        "table_name": "application",
+        "column_name": "latency_target",
+        "title": "Latency target",
+        "category": "Quality of Service",
+        "description": "Milliseconds.",
+        "order": 130
+    },
+    {
+        "table_name": "application_microservice",
+        "column_name": "num_instances",
+        "title": "Instances wanted",
+        "category": "Resource Requirements",
+        "description": "How many hosts this microservice needs. Becomes the requirement's count.",
+        "order": 10
+    },
+    {
+        "table_name": "application_node_filter",
+        "column_name": "target",
+        "title": "Requirement",
+        "category": "Placement",
+        "description": "Capability property of a capacity to constrain, e.g. host.num-cpus.",
+        "order": 10
+    },
+    {
+        "table_name": "application_node_filter",
+        "column_name": "operator",
+        "title": "Comparison",
+        "category": "Placement",
+        "description": "How to compare: $greater_or_equal, $less_or_equal, $in_range, $equal or $has_any_entry.",
+        "order": 20
+    },
+    {
+        "table_name": "application_node_filter",
+        "column_name": "value",
+        "title": "Value",
+        "category": "Placement",
+        "description": "The value to compare against, or the lower bound of a range.",
+        "order": 30
+    },
+    {
+        "table_name": "application_node_filter",
+        "column_name": "value_max",
+        "title": "Upper bound",
+        "category": "Placement",
+        "description": "Only used by $in_range.",
+        "order": 40
+    },
+    {
+        "table_name": "application",
+        "column_name": "classification",
+        "title": "Classification",
+        "category": "Identity",
+        "description": "How this application is classified. Carried through to the template metadata.",
+        "order": 60
+    },
+    {
         "table_name": "capacity",
         "column_name": "name",
         "title": "Name",
@@ -462,5 +646,13 @@
         "category": "Port Rules",
         "description": "Source IP or CIDR the rule applies to.",
         "order": 50
+    },
+    {
+        "table_name": "application",
+        "column_name": "application_microservice",
+        "title": "Microservices",
+        "category": "Microservices",
+        "description": "The microservices this application is made of. Each becomes a node template.",
+        "order": 200
     }
 ]
