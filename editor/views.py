@@ -75,13 +75,7 @@ class EditorView(TemplateView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
         self.title_base = resource_label(
@@ -246,13 +240,7 @@ class UpdateResourceByCategoryView(FormView):
             infer_one_to_many_properties=False,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
             kwargs.update({
@@ -377,13 +365,7 @@ class EditorOverviewTemplateView(TemplateView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         self.properties_as_dict = form_config.get_properties()
         self.form_fields = form_config.get_fields()

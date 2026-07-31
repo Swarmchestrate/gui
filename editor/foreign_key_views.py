@@ -39,13 +39,7 @@ class OneToOneFieldEditorSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-            ]
+            disabled_properties=[TableNames.APPLICATION_MICROSERVICE]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -192,13 +186,7 @@ class OneToManyFieldEditorSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                f"{TableNames.APPLICATION}_id",
-                f"{TableNames.APPLICATION_NEW}_id",
-                f"{TableNames.APPLICATION_MICROSERVICE}_id",
-                f"{TableNames.CAPACITY}_id",
-                f"{TableNames.CAPACITY_NEW}_id",
-            ]
+            disabled_properties=[f"{TableNames.APPLICATION_MICROSERVICE}_id"]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -406,13 +394,7 @@ class NonDialogBasedOneToOneFieldEditorSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-            ]
+            disabled_properties=[TableNames.APPLICATION_MICROSERVICE]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -513,13 +495,7 @@ class NonDialogBasedOneToManyFieldEditorSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                f"{TableNames.APPLICATION}_id",
-                f"{TableNames.APPLICATION_NEW}_id",
-                f"{TableNames.APPLICATION_MICROSERVICE}_id",
-                f"{TableNames.CAPACITY}_id",
-                f"{TableNames.CAPACITY_NEW}_id",
-            ]
+            disabled_properties=[f"{TableNames.APPLICATION_MICROSERVICE}_id"]
         )
         return super().dispatch(request, *args, **kwargs)
 

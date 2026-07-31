@@ -51,13 +51,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
             self.fk_table_name
@@ -68,15 +62,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                f"{TableNames.APPLICATION}_id",
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                f"{TableNames.CAPACITY}_id",
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -178,15 +164,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                f"{TableNames.APPLICATION}_id",
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                f"{TableNames.CAPACITY}_id",
-                TableNames.CAPACITY_NEW,
-                *foreign_key_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         kwargs.update({
             "fields": update_only_form_config.get_fields(),
@@ -268,13 +246,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
             self.fk_table_name
@@ -285,13 +257,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
-            disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
-                *self.disabled_properties,
-            ]
+            disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -439,11 +405,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
             disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
                 TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
                 *self.disabled_properties,
             ]
         )
@@ -457,13 +419,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
             disabled_properties=[
-                TableNames.APPLICATION,
-                f"{TableNames.APPLICATION}_id",
-                TableNames.APPLICATION_NEW,
                 TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                f"{TableNames.CAPACITY}_id",
-                TableNames.CAPACITY_NEW,
                 *self.disabled_properties,
             ]
         )
@@ -568,13 +524,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
             disabled_properties=[
-                TableNames.APPLICATION,
-                f"{TableNames.APPLICATION}_id",
-                TableNames.APPLICATION_NEW,
                 TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                f"{TableNames.CAPACITY}_id",
-                TableNames.CAPACITY_NEW,
                 *foreign_key_properties,
             ]
         )
@@ -661,11 +611,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             column_metadata_table_name=self.column_metadata_table_name,
             disabled_categories=self.disabled_categories,
             disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
                 TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
                 *self.disabled_properties,
             ]
         )
@@ -679,11 +625,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             column_metadata_table_name=self.fk_table_name,
             disabled_categories=self.disabled_categories,
             disabled_properties=[
-                TableNames.APPLICATION,
-                TableNames.APPLICATION_NEW,
                 TableNames.APPLICATION_MICROSERVICE,
-                TableNames.CAPACITY,
-                TableNames.CAPACITY_NEW,
                 *self.disabled_properties,
             ]
         )
