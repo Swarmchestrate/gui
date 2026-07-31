@@ -169,13 +169,10 @@ def get_form_config_for_table(
         column_metadata_as_list: list[Resource],
         infer_one_to_many_properties: bool = True,
         column_metadata_table_name: str = None,
-        disabled_categories: list[str] = None,
         disabled_properties: list[str] = None,
         choices_context: dict = None) -> FormConfig:
     if not column_metadata_table_name:
         column_metadata_table_name = table_name
-    if not disabled_categories:
-        disabled_categories = list()
     if not disabled_properties:
         disabled_properties = list()
     column_metadata = ColumnMetadata(column_metadata_as_list)
@@ -186,12 +183,7 @@ def get_form_config_for_table(
         column_metadata,
         column_metadata_table_name=column_metadata_table_name
     )
-    properties_as_dict = {
-        property_name: metadata
-        for property_name, metadata in properties.as_dict().items()
-        if metadata.category not in disabled_categories
-    }
-    for property_name, metadata in properties_as_dict.items():
+    for property_name, metadata in properties.as_dict().items():
         choices = choices_for(table_name, property_name, choices_context)
         if choices:
             metadata.choices = choices
@@ -215,7 +207,7 @@ def get_form_config_for_table(
         column_metadata_table_name=column_metadata_table_name
     )
     return FormConfig(
-        properties_as_dict,
+        properties.as_dict(),
         one_to_many_properties=one_to_many_properties.as_dict(),
         additional_disabled_properties=disabled_properties
     )

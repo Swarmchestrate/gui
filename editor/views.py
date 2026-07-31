@@ -34,7 +34,6 @@ class EditorView(TemplateView):
     openapi_spec: OpenApiSpecification
     column_metadata: list[Resource]
     referring_tables: dict[str, str]
-    disabled_categories: list[str]
     disabled_properties: list[str]
     resource_type: str
 
@@ -65,8 +64,6 @@ class EditorView(TemplateView):
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
         self.column_metadata = column_metadata_endpoint.get_resources()
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         self.form_config = get_form_config_for_table(
@@ -74,7 +71,6 @@ class EditorView(TemplateView):
             self.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
@@ -89,7 +85,7 @@ class EditorView(TemplateView):
             resource.as_dict().get("category", "")
             for resource in column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         form_fields = self.form_config.get_fields()
@@ -105,8 +101,6 @@ class EditorView(TemplateView):
     def get_forms_by_category(self):
         forms_by_category = dict()
         for category in self.form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
             if not category:
                 forms_by_category.update({
                 UNKNOWN_ATTRIBUTE_CATEGORY: FormWithDynamicallyPopulatedFields(
@@ -159,7 +153,6 @@ class UpdateResourceByCategoryView(FormView):
     openapi_spec: OpenApiSpecification
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     # Sync properties disabled when the form is first loaded
     # with properties allowed to be sent through an update.
     disabled_properties: list[str]
@@ -178,8 +171,6 @@ class UpdateResourceByCategoryView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         self.success_url = reverse_lazy(
@@ -239,7 +230,6 @@ class UpdateResourceByCategoryView(FormView):
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
@@ -259,7 +249,6 @@ class EditorStartFormView(FormView):
     table_name: str
     column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
-    disabled_categories: list[str]
 
     editor_reverse_base: str
     resource_type: str
@@ -269,14 +258,11 @@ class EditorStartFormView(FormView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         self.form_config = get_form_config_for_table(
             self.table_name,
             self.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories
         )
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
@@ -307,7 +293,7 @@ class EditorStartFormView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         categories = EditorTableOfContents(
@@ -338,7 +324,6 @@ class EditorOverviewTemplateView(TemplateView):
 
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -355,8 +340,6 @@ class EditorOverviewTemplateView(TemplateView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         form_config = get_form_config_for_table(
@@ -364,7 +347,6 @@ class EditorOverviewTemplateView(TemplateView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         self.properties_as_dict = form_config.get_properties()
@@ -378,7 +360,7 @@ class EditorOverviewTemplateView(TemplateView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(

@@ -20,7 +20,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
 
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -39,8 +38,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -50,7 +47,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
@@ -61,7 +57,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
@@ -72,8 +67,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             initial: dict | None = None):
         forms_by_category = dict()
         for category in form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
             form_for_category = FormWithDynamicallyPopulatedFields(
                 fields=form_config.get_fields_for_category(category),
                 initial=initial
@@ -93,7 +86,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(
@@ -110,7 +103,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.fk_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(
@@ -163,7 +156,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         kwargs.update({
@@ -216,7 +208,6 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
 
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -234,8 +225,6 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -245,7 +234,6 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
@@ -256,7 +244,6 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
@@ -266,7 +253,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(
@@ -371,7 +358,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
 
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -392,8 +378,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -403,7 +387,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -417,7 +400,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -431,8 +413,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             initial: dict | None = None):
         forms_by_category = dict()
         for category in form_config.get_field_categories():
-            if category in self.disabled_categories:
-                continue
             form_for_category = FormWithDynamicallyPopulatedFields(
                 fields=form_config.get_fields_for_category(category),
                 initial=initial
@@ -452,7 +432,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(
@@ -469,7 +449,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.fk_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(
@@ -522,7 +502,6 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *foreign_key_properties,
@@ -578,7 +557,6 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
 
     table_name: str
     column_metadata_table_name: str
-    disabled_categories: list[str]
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -598,8 +576,6 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        if not hasattr(self, "disabled_categories"):
-            self.disabled_categories = list()
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -609,7 +585,6 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.column_metadata_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -623,7 +598,6 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             self.api_client.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=self.fk_table_name,
-            disabled_categories=self.disabled_categories,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -636,7 +610,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             resource.as_dict().get("category", "")
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
-                and resource.as_dict().get("category", "") not in self.disabled_categories)
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         ))
         category_names.sort()
         return EditorTableOfContents(

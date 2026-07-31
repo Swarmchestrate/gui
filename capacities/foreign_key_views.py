@@ -54,7 +54,6 @@ class CloudCapacityNewOneToOneForeignKeyResourceEditorView(CapacitySubtypeFields
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
-    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
@@ -62,7 +61,6 @@ class CloudCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMix
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
-    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
@@ -70,7 +68,6 @@ class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeField
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
-    disabled_categories = ["Edge Specific", "Networking"]
 
 
 class CloudCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
@@ -78,7 +75,6 @@ class CloudCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMi
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
-    disabled_categories = ["Edge Specific", "Networking"]
 
 
 # Edge Capacity views
@@ -116,7 +112,6 @@ class EdgeCapacityNewOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsM
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
-    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
@@ -124,7 +119,6 @@ class EdgeCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixi
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
-    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
@@ -132,7 +126,6 @@ class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeFields
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
-    disabled_categories = ["System Specific"]
 
 
 class EdgeCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
@@ -140,4 +133,3 @@ class EdgeCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMix
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
-    disabled_categories = ["System Specific"]
