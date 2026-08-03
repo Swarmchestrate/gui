@@ -22,18 +22,15 @@ def _send_request_to_postgrest_api(
         method: HTTPMethod,
         url: str,
         **kwargs) -> requests.Response:
-    try:
-        return requests.request(
-            method,
-            url,
-            **kwargs
-        )
-    except Exception as err:
-        pass
+    headers = dict(kwargs.pop("headers", {}))
+    token = os.environ.get("POSTGREST_API_TOKEN")
+    if not token:
+        raise RuntimeError("POSTGREST_API_TOKEN is not configured")
+    headers["Authorization"] = f"Bearer {token}"
     return requests.request(
         method,
         url,
-        {"Authorization": "Bearer {os.environ.get('POSTGREST_API_TOKEN')}"},
+        headers=headers,
         **kwargs
     )
 

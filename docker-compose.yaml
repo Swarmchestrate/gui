@@ -13,6 +13,7 @@
 #   DATABASE_ENGINE
 #   DATABASE_NAME
 #   API_URL
+#   SAT_BUILDER_API_URL
 #   USE_MOCK_API
 
 services:
@@ -23,6 +24,8 @@ services:
       - .env
     ports:
       - "${GUI_PORT:-8080}:8080"
+    networks:
+      - sat-builder-network
     restart: unless-stopped
     healthcheck:
       test:
@@ -36,3 +39,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+networks:
+  sat-builder-network:
+    external: true
+    name: sat-builder-network

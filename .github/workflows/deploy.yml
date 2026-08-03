@@ -48,11 +48,12 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           GUI_ENV_PRODUCTION_B64: ${{ secrets.GUI_ENV_PRODUCTION_B64 }}
+          POSTGREST_API_TOKEN: ${{ secrets.POSTGREST_API_TOKEN }}
         with:
           host: ${{ secrets.GUI_SERVER }}
           username: ${{ secrets.GUI_USER }}
           key: ${{ secrets.GUI_KEY }}
-          envs: GUI_ENV_PRODUCTION_B64
+          envs: GUI_ENV_PRODUCTION_B64,POSTGREST_API_TOKEN
           script_stop: false
           script: |
             set -e
@@ -61,6 +62,11 @@ jobs:
             TMP_ENV="$(mktemp)"
             trap 'rm -f "$TMP_ENV"' EXIT
             printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$TMP_ENV"
+            printf '\nPOSTGREST_API_TOKEN=%s\n' "$POSTGREST_API_TOKEN" >> "$TMP_ENV"
+
+            if ! grep -q '^SAT_BUILDER_API_URL=' "$TMP_ENV"; then
+              printf 'SAT_BUILDER_API_URL=http://sat-builder:8000\n' >> "$TMP_ENV"
+            fi
 
             for required_var in \
               SECRET_KEY \
@@ -90,6 +96,13 @@ jobs:
             mv "$TMP_ENV" "$DEPLOY_DIR/.env"
             chmod 600 "$DEPLOY_DIR/.env"
             cd "$DEPLOY_DIR"
+            if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
+              sudo docker network inspect sat-builder-network >/dev/null 2>&1 || \
+                sudo docker network create --driver bridge sat-builder-network
+            else
+              docker network inspect sat-builder-network >/dev/null 2>&1 || \
+                docker network create --driver bridge sat-builder-network
+            fi
             if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
               sudo docker compose pull
               sudo docker compose up -d
