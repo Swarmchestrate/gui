@@ -64,7 +64,9 @@ jobs:
             printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$TMP_ENV"
             printf '\nPOSTGREST_API_TOKEN=%s\n' "$POSTGREST_API_TOKEN" >> "$TMP_ENV"
 
-            if ! grep -q '^SAT_BUILDER_API_URL=' "$TMP_ENV"; then
+            if grep -q '^SAT_BUILDER_API_URL=' "$TMP_ENV"; then
+              sed -i 's#^SAT_BUILDER_API_URL=.*#SAT_BUILDER_API_URL=http://sat-builder:8000#' "$TMP_ENV"
+            else
               printf 'SAT_BUILDER_API_URL=http://sat-builder:8000\n' >> "$TMP_ENV"
             fi
 
