@@ -59,6 +59,8 @@ jobs:
             set -e
             DEPLOY_DIR=/opt/gui
             mkdir -p "$DEPLOY_DIR"
+            curl -fsSL "https://raw.githubusercontent.com/Swarmchestrate/gui/${{ github.sha }}/docker-compose.yaml" \
+              -o "$DEPLOY_DIR/docker-compose.yaml"
             TMP_ENV="$(mktemp)"
             trap 'rm -f "$TMP_ENV"' EXIT
             printf '%s' "$GUI_ENV_PRODUCTION_B64" | tr -d '\r\n' | base64 -d > "$TMP_ENV"
