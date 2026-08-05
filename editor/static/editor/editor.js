@@ -1,4 +1,4 @@
-import { AsyncFormHandler } from "/static/editor/async_forms.js";
+import { AsyncFormHandler } from "/static/editor/autosave.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
 import { loadOneToOneFieldSections } from "/static/editor/one_to_one_field_sections.js";
 import { loadOneToManyFieldSections } from "/static/editor/one_to_many_field_sections.js";
@@ -50,13 +50,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                 nextTabInstance.show();
             });
         }
-        new AsyncFormHandler(form, {
-            onSuccess: (responseData) => {
-                const responseMessage =
-                    responseData.message || "Applied changes.";
-                displayToast(responseMessage);
-            },
-        });
+        new AsyncFormHandler(form);
     });
     linkEditorTabSwitchingToCurrentPageCategory();
     setupFormsetTables();

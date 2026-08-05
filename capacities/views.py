@@ -8,6 +8,7 @@ from .view_helpers import (
 )
 
 from editor.views import (
+    EditorAutosaveView,
     EditorOverviewTemplateView,
     EditorStartFormView,
     EditorView,
@@ -37,6 +38,18 @@ class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacit
     column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        data = super().apply_changes_to_update_data_before_save(data)
+        data.update({
+            "resource_type": "Cloud",
+        })
+        return data
+
+
+class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorAutosaveView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
+
+    def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
         data.update({
             "resource_type": "Cloud",

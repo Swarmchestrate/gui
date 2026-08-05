@@ -63,7 +63,7 @@ urlpatterns = [
     ),
     path(
         "cloud-capacities/api/<resource_id>/edit/",
-        views.UpdateCloudCapacityByCategoryView.as_view(),
+        views.CloudCapacityEditorAutosaveView.as_view(),
         name="update_cloud_capacity_by_category",
     ),
     path(

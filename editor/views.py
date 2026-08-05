@@ -243,6 +243,100 @@ class UpdateResourceByCategoryView(FormView):
         return kwargs
 
 
+class EditorAutosaveView(FormView):
+    form_class = FormWithDynamicallyPopulatedFields
+    
+    openapi_spec: OpenApiSpecification
+    table_name: str
+    column_metadata_table_name: str
+    # Sync properties disabled when the form is first loaded
+    # with properties allowed to be sent through an update.
+    disabled_properties: list[str]
+    
+    editor_overview_reverse_base: str
+    resource_type: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.resource_id = self.kwargs["resource_id"]
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        if not hasattr(self, "disabled_properties"):
+            self.disabled_properties = list()
+        self.success_url = reverse_lazy(
+            self.editor_overview_reverse_base,
+            kwargs={
+                "resource_id": self.resource_id,
+            },
+        )
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
+        self.title_base = resource_label(
+            self.resource.as_dict(), self.resource_type, self.resource_id
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        return data
+
+    def form_valid(self, form):
+        update_data = self.apply_changes_to_update_data_before_save(form.cleaned_data)
+        try:
+            self.api_client.get_endpoint(self.table_name).update(
+                self.resource_id,
+                update_data,
+                set_updated_at_to_now=True
+            )
+        except Exception:
+            error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
+            logger.exception(error_msg)
+            return self.api_invalid()
+
+        message = f"Saved changes to {humanise_resource_type(self.table_name)}."
+        return JsonResponse({"message": message})
+
+    def form_invalid(self, form):
+        error_msg = "Some fields were invalid. Please apply fixes for the highlighted fields."
+        return JsonResponse(
+            {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def api_invalid(self):
+        return JsonResponse(
+            {
+                "message": f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied.",
+            },
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
+        form_config = get_form_config_for_table(
+            self.table_name,
+            self.openapi_spec,
+            column_metadata_endpoint.get_resources(),
+            infer_one_to_many_properties=False,
+            column_metadata_table_name=self.column_metadata_table_name,
+            disabled_properties=self.disabled_properties
+        )
+        submitted_fields = dict(self.request.POST)
+        submitted_fields.pop("csrfmiddlewaretoken")
+        submitted_field_name = next(iter(submitted_fields.keys()))
+        field = form_config.get_fields().get(submitted_field_name)
+        if not field:
+            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        kwargs.update({
+            "fields": {submitted_field_name: field},
+        })
+        return kwargs
+
+
 class EditorStartFormView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
 

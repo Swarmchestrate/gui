@@ -22,7 +22,7 @@
         {% endblock top_section %}
     </div>
     <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-    <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST">
+    <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST" data-category-id-base="{{ category_id_base }}">
         {% csrf_token %}
         {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
         {% for field in form %}
