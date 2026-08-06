@@ -245,6 +245,10 @@ label:has(~ :required)::after,
     color: var(--bs-secondary-color);
 }
 
+.status-indicator .spinner-border-sm {
+    border-width: 0.1em;
+}
+
 /* Formset tables */
 .formset-table.delete-disabled tr th:last-child,
 .formset-table.delete-disabled tr td:last-child {

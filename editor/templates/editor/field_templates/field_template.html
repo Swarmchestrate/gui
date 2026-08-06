@@ -4,7 +4,7 @@
 <div class="{{ field_wrapper_classes|default:'py-4' }}">
     <div class="label-wrapper pb-1">
         <label for="{{ field.auto_id }}" class="{{ label_classes|default:'fw-semibold' }}">{{ field.label }}</label>
-        <span class="status-indicator ms-2" data-for="{{ field.auto_id }}"></span>
+        <span class="status-indicator ms-1" data-for="{{ field.auto_id }}"></span>
     </div>
     {{ field }}
     {% include 'editor/field_templates/field_help_text.html' %}

@@ -1,12 +1,10 @@
 {% extends 'editor/field_templates/field_wrapper_template.html' %}
 {% block content %}
 {{ field }}
-<div class="label-wrapper pb-1">
-    <label class="form-check-label" for="{{ field.auto_id }}">
-        {{ field.label }}
-    </label>
-    <span class="status-indicator ms-2" data-for="{{ field.auto_id }}"></span>
-</div>
+<label class="form-check-label" for="{{ field.auto_id }}">
+    {{ field.label }}
+</label>
+<span class="status-indicator ms-1" data-for="{{ field.auto_id }}"></span>
 {% include 'editor/field_templates/field_help_text.html' %}
 {% include 'editor/field_templates/field_invalid_feedback.html' %}
 {% endblock content %}

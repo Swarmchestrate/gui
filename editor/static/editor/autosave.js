@@ -19,7 +19,7 @@ class StatusIndicator {
         this.statusIndicatorElement = statusIndicatorElement;
         this.defaultInnerHtml = statusIndicatorElement.innerHTML;
         this.loadingHtml = '<span class="spinner-border spinner-border-sm text-body-tertiary" role="status"></span>';
-        this.successHtml = '<i class="bi bi-check-lg text-success"></i>';
+        this.successHtml = '<i class="bi bi-check-circle text-success"></i>';
         this.errorHtml = '<i class="bi bi-x-lg text-danger"></i>';
     }
 
