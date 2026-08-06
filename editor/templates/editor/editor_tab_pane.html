@@ -10,7 +10,12 @@
     <div class="editor-layout__header">
         {% block top_section %}
         <div class="d-flex flex-column align-items-baseline row-gap-1">
-            <h2 class="fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="d-inline-block fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
+                <button class="btn btn-light btn-status-indicator status-indicator global-status-indicator">
+                    <i class="bi bi-cloud-check fs-5"></i>
+                </button>
+            </div>
             {% url editor_overview_reverse_base resource_id as overview_url %}
             <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
                 {{ main_subheading }}
