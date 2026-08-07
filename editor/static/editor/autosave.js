@@ -46,8 +46,15 @@ class StatusIndicator {
 class GlobalStatusIndicator extends StatusIndicator {
     constructor(statusIndicatorElement) {
         super(statusIndicatorElement);
-        this.successHtml = '<i class="bi bi-cloud-check" aria-hidden="true"></i>';
-        this.errorHtml = '<i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry';
+        this.successHtml = '<i class="bi bi-database-check" aria-hidden="true"></i>';
+        this.errorHtml = '<i class="bi bi-database-exclamation" aria-hidden="true"></i>';
+        this.popover = new bootstrap.Popover(statusIndicatorElement, {
+            title: `<span class="lh-1 fs-5">${this.successHtml}</span> Status`,
+            content: "Content",
+            html: true,
+            trigger: "focus"
+        });
+        this.showSuccessState();
     }
 
     updateState(failedSaves) {
@@ -55,8 +62,53 @@ class GlobalStatusIndicator extends StatusIndicator {
             this.statusIndicatorElement.removeAttribute("data-status");
             return this.showSuccessState();
         }
-        this.statusIndicatorElement.dataset.status = "serverError";
-        return this.showErrorState();
+        return this.showNetworkErrorState();
+    }
+
+    showSuccessState() {
+        super.showSuccessState();
+        this.popover.setContent({
+            ".popover-header": "All changes saved",
+            ".popover-body": "Changes are automatically saved to the database.",
+        });
+    }
+
+    showLoadingState() {
+        super.showLoadingState();
+        this.popover.setContent({
+            ".popover-header": "Saving...",
+            ".popover-body": "Changes are currently being saved to the database.",
+        });
+    }
+
+    showNetworkErrorState() {
+        super.showErrorState();
+        this.popover.setContent({
+            ".popover-header": "Some changes may not have been saved",
+            ".popover-body": "An error with the network may have caused some changes to not be saved. Try saving them again using the \"Retry\" button.",
+        });
+    }
+
+    showErrorState() {
+        super.showErrorState();
+        this.popover.setContent({
+            ".popover-header": "Something happened",
+            ".popover-body": "The latest changes may not have been saved.",
+        });
+    }
+}
+
+class RetrySaveButton {
+    constructor(buttonElement, onClickAction) {
+        this.buttonElement = buttonElement;
+    }
+
+    show() {
+        this.buttonElement.classList.remove("d-none");
+    }
+
+    hide() {
+        this.buttonElement.classList.add("d-none");
     }
 }
 
@@ -84,12 +136,14 @@ export class AsyncFormHandler {
             event.preventDefault();
             return false;
         });
-        globalStatusIndicatorButton.addEventListener("click", async () => {
-            if (!globalStatusIndicatorButton.hasAttribute("data-status")) {
-                return;
-            }
+        const retrySaveButtonElement = document.querySelector(
+            `#${this.form.dataset.categoryIdBase}-tab-pane .btn-retry-save`
+        );
+        retrySaveButtonElement.addEventListener("click", async () => {
+            this.globalStatusIndicator.showLoadingState();
             await this.retrySaves();
         });
+        this.retrySaveButton = new RetrySaveButton(retrySaveButtonElement);
         const fields = Array.from(this.form.querySelectorAll("input, select, textarea"));
         fields.forEach(field => {
             // Get the status indicator element for the field
@@ -123,11 +177,17 @@ export class AsyncFormHandler {
                     this.onSuccess(responseData);
                     statusIndicator.showSuccessState();
                     this.globalStatusIndicator.updateState(this.failedSaves);
+                    this.retrySaveButton.hide();
                 },
-                onServerError: () => {
+                onNetworkError: () => {
                     this.failedSaves.push(field.id);
                     statusIndicator.showErrorState();
                     this.globalStatusIndicator.updateState(this.failedSaves);
+                    this.retrySaveButton.show();
+                },
+                onServerError: () => {
+                    statusIndicator.showErrorState();
+                    this.globalStatusIndicator.showErrorState();
                 },
                 onValidationError: () => {
                     statusIndicator.showErrorState();
@@ -157,9 +217,14 @@ export class AsyncFormHandler {
                     statusIndicator.showSuccessState();
                 });
                 this.globalStatusIndicator.updateState(this.failedSaves);
+                this.retrySaveButton.hide();
+            },
+            onNetworkError: () => {
+                this.globalStatusIndicator.updateState(this.failedSaves);
+                this.retrySaveButton.show();
             },
             onServerError: () => {
-                this.globalStatusIndicator.updateState(this.failedSaves);
+                this.globalStatusIndicator.showErrorState();
             },
         });
     }
@@ -189,6 +254,9 @@ export class AsyncFormHandler {
         if (!("onSuccess" in options)) {
             options.onSuccess = () => {};
         }
+        if (!("onNetworkError" in options)) {
+            options.onNetworkError = () => {};
+        }
         if (!("onServerError" in options)) {
             options.onServerError = () => {};
         }
@@ -199,11 +267,21 @@ export class AsyncFormHandler {
         const headers = new Headers();
         headers.append("Accept", "application/json");
 
-        const response = await fetch(this.form.action, {
-            method: "POST",
-            headers: headers,
-            body: body,
-        });
+        let response;
+        try {
+            response = await fetch(this.form.action, {
+                method: "POST",
+                headers: headers,
+                body: body,
+            });
+        } catch (error) {
+            console.error(error);
+            const isNetworkError = error.message.startsWith("NetworkError");
+            if (error instanceof TypeError && isNetworkError) {
+                return options.onNetworkError();
+            }
+            return options.onServerError();
+        }
 
         let responseText;
         let responseData;

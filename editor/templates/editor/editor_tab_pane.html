@@ -12,8 +12,14 @@
         <div class="d-flex flex-column align-items-baseline row-gap-1">
             <div class="d-flex align-items-center gap-2">
                 <h2 class="d-inline-block fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
-                <button class="btn btn-light btn-status-indicator status-indicator global-status-indicator">
-                    <i class="bi bi-cloud-check fs-5"></i>
+                <button
+                    class="btn btn-light btn-status-indicator status-indicator global-status-indicator"
+                    data-bs-toggle="popover">
+                    <i class="bi bi-database-check" aria-hidden="true"></i>
+                </button>
+                <button
+                    class="d-none btn btn-light btn-retry-save">
+                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
                 </button>
             </div>
             {% url editor_overview_reverse_base resource_id as overview_url %}
@@ -64,9 +70,6 @@
         {% endwith %}
         <div class="d-flex flex-sm-row flex-column justify-content-sm-between align-items-sm-baseline align-items-stretch gap-4 my-4">
             <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
-                <button class="btn btn-outline-primary" type="submit">
-                    Save Changes
-                </button>
                 <div>
                     {% include 'editor/util_templates/form_errors_list.html' %}
                 </div>

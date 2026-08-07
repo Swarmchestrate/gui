@@ -27,6 +27,7 @@ $primary: #0455bf;
 @import "../../node_modules/bootstrap/scss/navbar";
 @import "../../node_modules/bootstrap/scss/pagination";
 @import "../../node_modules/bootstrap/scss/placeholders";
+@import "../../node_modules/bootstrap/scss/popover";
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/spinners";
 @import "../../node_modules/bootstrap/scss/tables";
@@ -250,19 +251,8 @@ label:has(~ :required)::after,
     --bs-btn-padding-y: 0.25rem;
     --bs-btn-padding-x: 0.5rem;
     color: $secondary;
-    vertical-align: baseline;
-    line-height: 1;
-}
-
-.btn-status-indicator i {
     font-size: $h5-font-size;
-}
-
-.btn-status-indicator i::before {
-    vertical-align: -0.175em;
-}
-
-.btn-status-indicator:not([data-status="serverError"]) {
+    line-height: 1;
     aspect-ratio: 1 / 1;
     border-radius: 50%;
 }

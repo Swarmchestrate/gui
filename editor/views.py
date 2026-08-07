@@ -294,7 +294,10 @@ class EditorAutosaveView(FormView):
         except Exception:
             error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
-            return self.api_invalid()
+            return JsonResponse(
+                {},
+                status=HTTPStatus.BAD_REQUEST,
+            )
 
         message = f"Saved changes to {humanise_resource_type(self.table_name)}."
         return JsonResponse({"message": message})
@@ -303,14 +306,6 @@ class EditorAutosaveView(FormView):
         error_msg = "Some fields were invalid. Please apply fixes for the highlighted fields."
         return JsonResponse(
             {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
-            status=HTTPStatus.BAD_REQUEST,
-        )
-
-    def api_invalid(self):
-        return JsonResponse(
-            {
-                "message": f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied.",
-            },
             status=HTTPStatus.BAD_REQUEST,
         )
 
