@@ -27,6 +27,22 @@ function linkEditorTabSwitchingToCurrentPageCategory() {
 
 window.addEventListener("DOMContentLoaded", async () => {
     const bsEditorTab = new bootstrap.Tab("#editor-tab");
+    linkEditorTabSwitchingToCurrentPageCategory();
+    setupFormsetTables();
+    loadOneToOneFieldSections();
+    loadOneToManyFieldSections();
+    loadNonDialogBasedOneToOneFieldSections();
+    loadNonDialogBasedOneToManyFieldSections();
+    setupTextArrayFields();
+    const tooltipTriggerElements = Array.from(
+        document.querySelectorAll("[data-bs-toggle='tooltip']"),
+    );
+    tooltipTriggerElements.forEach((tooltipTriggerElement) => {
+        new bootstrap.Tooltip(tooltipTriggerElement);
+    });
+    // Implement autosave last to ensure any final preparations are
+    // complete before form data is sent to the server (e.g., when
+    // text array fields are exported as JSON to hidden inputs).
     const editorTabForms = Array.from(
         document.querySelectorAll("#editor-tab-content form"),
     );
@@ -51,18 +67,5 @@ window.addEventListener("DOMContentLoaded", async () => {
             });
         }
         new AsyncFormHandler(form);
-    });
-    linkEditorTabSwitchingToCurrentPageCategory();
-    setupFormsetTables();
-    loadOneToOneFieldSections();
-    loadOneToManyFieldSections();
-    loadNonDialogBasedOneToOneFieldSections();
-    loadNonDialogBasedOneToManyFieldSections();
-    setupTextArrayFields();
-    const tooltipTriggerElements = Array.from(
-        document.querySelectorAll("[data-bs-toggle='tooltip']"),
-    );
-    tooltipTriggerElements.forEach((tooltipTriggerElement) => {
-        new bootstrap.Tooltip(tooltipTriggerElement);
     });
 });

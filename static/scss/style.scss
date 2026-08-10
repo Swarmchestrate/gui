@@ -204,9 +204,15 @@ dialog .btn-close {
 label:has(~ :required)::after,
 :required ~ label::after,
 .label-wrapper:has(~ :required) label::after,
-:required ~ .label-wrapper label::after {
+:required ~ .label-wrapper label::after,
+.label-wrapper:has(~ :required) .label::after,
+:required ~ .label-wrapper .label::after {
     content: " *";
     color: var(--bs-danger);
+}
+
+.label-wrapper .label {
+    display: inline-block;
 }
 
 .editor-container {
@@ -312,6 +318,10 @@ label:has(~ :required)::after,
 .btn-check + .delete-btn:hover i,
 .btn-check:focus + .delete-btn i {
     color: var(--bs-danger);
+}
+
+.editor-container button[data-maps-to] i {
+    pointer-events: none;
 }
 
 /* Bootstrap */

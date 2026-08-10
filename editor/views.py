@@ -323,13 +323,19 @@ class EditorAutosaveView(FormView):
         submitted_form = dict(self.request.POST)
         submitted_form.pop("csrfmiddlewaretoken", None)
         allowed_fields = form_config.get_fields()
-        if not allowed_fields.keys() & submitted_form.keys():
-            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
+        # If no valid properties were submitted, nothing can be done.
+        if not (allowed_fields.keys() & submitted_form.keys()):
+            kwargs.update({
+                "fields": {},
+            })
+            return kwargs
+        fields = {
+            field_name: allowed_fields.get(field_name)
+            for field_name in submitted_form.keys()
+            if field_name in allowed_fields
+        }
         kwargs.update({
-            "fields": {
-                field_name: allowed_fields.get(field_name)
-                for field_name in submitted_form.keys()
-            },
+            "fields": fields,
         })
         return kwargs
 

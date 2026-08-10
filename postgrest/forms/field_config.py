@@ -116,6 +116,9 @@ class IntegerFieldConfig(FieldConfig):
 
 class JsonFieldConfig(FieldConfig):
     widget_class = forms.Textarea
+    extra_widget_attrs = {
+        "autocomplete": "off",
+    }
 
 
 class NumericFieldConfig(FieldConfig):

@@ -87,6 +87,7 @@ class GlobalStatusIndicator extends StatusIndicator {
             ".popover-header": "Some changes may not have been saved",
             ".popover-body": "An error with the network may have caused some changes to not be saved. Try saving them again using the \"Retry\" button.",
         });
+        this.popover.show();
     }
 
     showErrorState() {
@@ -95,6 +96,7 @@ class GlobalStatusIndicator extends StatusIndicator {
             ".popover-header": "Something happened",
             ".popover-body": "The latest changes may not have been saved.",
         });
+        this.popover.show();
     }
 }
 
@@ -144,14 +146,31 @@ export class AsyncFormHandler {
             await this.retrySaves();
         });
         this.retrySaveButton = new RetrySaveButton(retrySaveButtonElement);
-        const fields = Array.from(this.form.querySelectorAll("input, select, textarea"));
-        fields.forEach(field => {
+        this.form.addEventListener("input", (event) => {
+            const field = event.target;
+            if (field.matches(
+                "input[data-maps-to], select[data-maps-to], textarea[data-maps-to]"
+            )) {
+                // E.g., text array fields map to a hidden input which gets
+                // submitted instead of the individual inputs/selects/textareas.
+                const hiddenInputId = event.target.dataset.mapsTo;
+                const hiddenInput = this.form.querySelector(`#${hiddenInputId}`);
+                const statusIndicator = this.getStatusIndicatorForField(hiddenInput);
+                return this.scheduleSave(hiddenInput, statusIndicator);
+            }
             // Get the status indicator element for the field
             // that has been edited.
             const statusIndicator = this.getStatusIndicatorForField(field);
-            field.addEventListener("input", () => {
-                this.scheduleSave(field, statusIndicator);
-            });
+            return this.scheduleSave(field, statusIndicator);
+        });
+        this.form.addEventListener("click", (event) => {
+            if (!event.target.matches("button[data-maps-to]")) {
+                return;
+            }
+            const hiddenInputId = event.target.dataset.mapsTo;
+            const field = this.form.querySelector(`#${hiddenInputId}`);
+            const statusIndicator = this.getStatusIndicatorForField(field)
+            return this.scheduleSave(field, statusIndicator);
         });
     }
 

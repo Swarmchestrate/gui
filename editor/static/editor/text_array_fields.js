@@ -32,6 +32,7 @@ class TextArrayField {
             const newListItem = htmlToNode(listItemTemplateStringFormatted);
             this.list.append(newListItem);
             this.setupListItem(newListItem);
+            this.exportData();
         });
     }
 
