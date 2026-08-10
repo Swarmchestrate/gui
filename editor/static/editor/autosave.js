@@ -83,20 +83,66 @@ class GlobalStatusIndicator extends StatusIndicator {
 
     showNetworkErrorState() {
         super.showErrorState();
+        const retryButtonIcon = `
+            <span class="d-inline-block bg-light rounded px-2 py-1">
+                <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
+            </span>
+        `;
         this.popover.setContent({
             ".popover-header": "Some changes may not have been saved",
-            ".popover-body": "An error with the network may have caused some changes to not be saved. Try saving them again using the \"Retry\" button.",
+            ".popover-body": `An error with the network may have caused some changes to not be saved. Try saving them again using the ${retryButtonIcon} button.`,
         });
-        this.popover.show();
+        this.statusIndicatorElement.focus();
+    }
+
+    #generateJumpToList(fieldNames) {
+        const listElement = document.createElement("UL");
+        listElement.classList.add("mb-0");
+        fieldNames.forEach(fieldName => {
+            const listItemElement = document.createElement("LI");
+            const field = document.querySelector(`[name=${fieldName}]`);
+            if (!field) {
+                listItemElement.textContent = fieldName;
+                return listElement.appendChild(listItemElement);
+            }
+            const fieldLabel = document.querySelector(
+                `label[for="${field.id}"], .label[for="${field.id}"]`
+            );
+            if (!fieldLabel) {
+                listItemElement.textContent = fieldName;
+                return listElement.appendChild(listItemElement);
+            }
+            const anchorElement = document.createElement("A");
+            anchorElement.textContent = fieldLabel.textContent.trim();
+            anchorElement.setAttribute("href", `#${field.id}`);
+            if (fieldLabel.hasAttribute("id")) {
+                anchorElement.setAttribute("href", `#${fieldLabel.id}`);
+            }
+            listItemElement.appendChild(anchorElement);
+            return listElement.appendChild(listItemElement);
+        });
+        return listElement.outerHTML;
+    }
+
+    showValidationErrorState(responseData) {
+        super.showErrorState();
+        const jumpToListHtml = this.#generateJumpToList(Object.keys(
+            responseData.feedback
+        ));
+        this.popover.setContent({
+            ".popover-header": "Some fields need some adjustments",
+            ".popover-body": `<p>See the feedback displayed by relevant fields on what to change.</p> Go to a field: ${jumpToListHtml}`,
+        });
+        this.statusIndicatorElement.focus();
     }
 
     showErrorState() {
         super.showErrorState();
         this.popover.setContent({
             ".popover-header": "Something happened",
-            ".popover-body": "The latest changes may not have been saved.",
+            ".popover-body": "The latest changes may not have been saved. Please make a report of the problem at the Swarmchestrate GUI issue tracker.",
         });
-        this.popover.show();
+        this.statusIndicatorElement.focus();
     }
 }
 
@@ -204,13 +250,13 @@ export class AsyncFormHandler {
                     this.globalStatusIndicator.updateState(this.failedSaves);
                     this.retrySaveButton.show();
                 },
+                onValidationError: (responseData) => {
+                    statusIndicator.showErrorState();
+                    this.globalStatusIndicator.showValidationErrorState(responseData);
+                },
                 onServerError: () => {
                     statusIndicator.showErrorState();
                     this.globalStatusIndicator.showErrorState();
-                },
-                onValidationError: () => {
-                    statusIndicator.showErrorState();
-                    this.globalStatusIndicator.updateState(this.failedSaves);
                 },
             });
         }, 500);
@@ -241,6 +287,9 @@ export class AsyncFormHandler {
             onNetworkError: () => {
                 this.globalStatusIndicator.updateState(this.failedSaves);
                 this.retrySaveButton.show();
+            },
+            onValidationError: (responseData) => {
+                this.globalStatusIndicator.showValidationErrorState(responseData);
             },
             onServerError: () => {
                 this.globalStatusIndicator.showErrorState();
@@ -334,6 +383,7 @@ export class AsyncFormHandler {
 
         const validationMessages = responseData.feedback || {};
         this.validator.displayValidationMessages(validationMessages);
+        options.onValidationError(responseData);
         return false;
     }
 
