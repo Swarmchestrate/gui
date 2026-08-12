@@ -17,6 +17,7 @@ from editor.foreign_key_editor_views import (
     NewOneToOneForeignKeyResourceEditorView,
 )
 from editor.views import (
+    EditorAutosaveView,
     EditorOverviewTemplateView,
     EditorStartFormView,
     EditorView,
@@ -51,7 +52,7 @@ class ApplicationEditorView(ApplicationViewMixin, EditorView):
     template_name = "applications/application_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
-    editor_form_reverse = "applications:update_application_by_category"
+    editor_form_reverse = "applications:application_autosave"
 
 
 class ApplicationOneToOneFieldEditorSectionView(ApplicationViewMixin, OneToOneFieldEditorSectionView):
@@ -72,6 +73,11 @@ class ApplicationOneToManyFieldEditorSectionView(ApplicationViewMixin, OneToMany
 class UpdateApplicationByCategoryView(
         ApplicationViewMixin,
         UpdateResourceByCategoryView):
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+
+
+class ApplicationEditorAutosaveView(ApplicationViewMixin, EditorAutosaveView):
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
 

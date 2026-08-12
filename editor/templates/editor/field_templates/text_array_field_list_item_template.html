@@ -7,12 +7,15 @@
             type="text"
             id="{{ field.auto_id|default:'__field_id__' }}-{{ counter|default:'__counter__' }}"
             class="form-control"
-            value="{{ initial_value }}">
+            value="{{ initial_value }}"
+            data-maps-to="{{ field.auto_id|default:'__field_id__' }}"
+            autocomplete="off">
         <button
             class="btn btn-outline-danger delete-btn"
             type="button"
             aria-label="Delete"
-            title="Delete">
+            title="Delete"
+            data-maps-to="{{ field.auto_id|default:'__field_id__' }}">
             <i class="bi bi-trash3-fill"></i>
         </button>
     </div>

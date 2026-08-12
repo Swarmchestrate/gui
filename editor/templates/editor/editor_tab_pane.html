@@ -10,7 +10,18 @@
     <div class="editor-layout__header">
         {% block top_section %}
         <div class="d-flex flex-column align-items-baseline row-gap-1">
-            <h2 class="fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="d-inline-block fs-1 mb-0">{{ category_data.title|split_by_colon|join:': ' }}</h2>
+                <button
+                    class="btn btn-light btn-status-indicator status-indicator global-status-indicator"
+                    data-bs-toggle="popover">
+                    <i class="bi bi-database-check" aria-hidden="true"></i>
+                </button>
+                <button
+                    class="d-none btn btn-light btn-retry-save">
+                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
+                </button>
+            </div>
             {% url editor_overview_reverse_base resource_id as overview_url %}
             <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
                 {{ main_subheading }}
@@ -22,7 +33,7 @@
         {% endblock top_section %}
     </div>
     <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
-    <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST">
+    <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST" data-category-id-base="{{ category_id_base }}">
         {% csrf_token %}
         {% with form=forms_by_category|get_key_value_or_empty_dict:category %}
         {% for field in form %}
@@ -59,9 +70,6 @@
         {% endwith %}
         <div class="d-flex flex-sm-row flex-column justify-content-sm-between align-items-sm-baseline align-items-stretch gap-4 my-4">
             <div class="d-flex flex-column align-items-sm-start align-items-stretch row-gap-2">
-                <button class="btn btn-outline-primary" type="submit">
-                    Save Changes
-                </button>
                 <div>
                     {% include 'editor/util_templates/form_errors_list.html' %}
                 </div>

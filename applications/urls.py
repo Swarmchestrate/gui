@@ -66,9 +66,9 @@ urlpatterns = [
         name="application_one_to_many_foreign_key_resource_update_editor",
     ),
     path(
-        "applications/api/<resource_id>/edit/",
-        views.UpdateApplicationByCategoryView.as_view(),
-        name="update_application_by_category",
+        "edge-capacities/api/<resource_id>/edit/",
+        views.ApplicationEditorAutosaveView.as_view(),
+        name="application_autosave",
     ),
     path(
         "applications/<resource_id>/overview/",

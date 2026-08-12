@@ -27,6 +27,7 @@ $primary: #0455bf;
 @import "../../node_modules/bootstrap/scss/navbar";
 @import "../../node_modules/bootstrap/scss/pagination";
 @import "../../node_modules/bootstrap/scss/placeholders";
+@import "../../node_modules/bootstrap/scss/popover";
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/spinners";
 @import "../../node_modules/bootstrap/scss/tables";
@@ -201,9 +202,17 @@ dialog .btn-close {
 
 /* || Wizard */
 label:has(~ :required)::after,
-:required ~ label::after {
+:required ~ label::after,
+.label-wrapper:has(~ :required) label::after,
+:required ~ .label-wrapper label::after,
+.label-wrapper:has(~ :required) .label::after,
+:required ~ .label-wrapper .label::after {
     content: " *";
     color: var(--bs-danger);
+}
+
+.label-wrapper .label {
+    display: inline-block;
 }
 
 .editor-container {
@@ -238,9 +247,20 @@ label:has(~ :required)::after,
     grid-area: body;
 }
 
-#instance-types-list:empty::after {
-    content: "No instance types have been specified.";
-    color: var(--bs-secondary-color);
+.status-indicator .spinner-border-sm {
+    border-width: 0.1em;
+}
+
+.btn-status-indicator {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    color: $secondary;
+    font-size: $h5-font-size;
+    line-height: 1;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
 }
 
 /* Formset tables */
@@ -260,106 +280,6 @@ label:has(~ :required)::after,
 .formset-should-delete-rows:checked + label {
     color: var(--bs-danger) !important;
     /* transition: $btn-transition; */
-}
-
-#instance-types-list .list-group-item-action a {
-    color: var(--bs-list-group-action-color);
-    text-decoration: none;
-}
-
-#instance-types-list .list-group-item-action:not(.active):hover a,
-#instance-types-list .list-group-item-action:not(.active):focus a {
-    color: var(--bs-list-group-action-hover-color);
-}
-
-#instance-types-list .list-group-item-action .list-item-toolbar {
-    display: flex;
-    column-gap: 0.25rem;
-}
-
-#instance-types-list
-    .list-group-item-action
-    .list-item-toolbar
-    .form-check:has(input.delete-list-item) {
-    display: none;
-}
-
-#instance-types-list
-    .list-group-item-action:hover
-    .list-item-toolbar
-    .form-check:has(input.delete-list-item),
-#instance-types-list
-    .list-group-item-action:has(a:focus)
-    .list-item-toolbar
-    .form-check:has(input.delete-list-item),
-#instance-types-list
-    .list-group-item-action
-    .list-item-toolbar
-    .form-check:has(input.delete-list-item:focus),
-#instance-types-list
-    .list-group-item-action
-    .list-item-toolbar
-    .form-check:has(input.delete-list-item:checked) {
-    display: block;
-}
-
-#instance-types-list
-    .list-group-item-action
-    .list-item-toolbar
-    .form-check
-    .form-check-label
-    i::before {
-    vertical-align: -0.25em;
-}
-
-#instance-types-list .list-group-item-action .edit-text {
-    display: none;
-}
-
-#instance-types-list .list-group-item-action:hover .edit-text,
-#instance-types-list .list-group-item-action:has(a:focus) .edit-text {
-    display: inline;
-}
-
-#instance-types-list
-    .list-group-item-action:hover
-    .list-item-toolbar
-    button:hover
-    i,
-#instance-types-list
-    .list-group-item-action:has(a:focus)
-    .list-item-toolbar
-    button:hover
-    i {
-    color: #000;
-}
-
-#instance-types-list
-    .list-group-item-action:has(input.delete-list-item:checked) {
-    color: var(--bs-danger-text-emphasis);
-    background-color: var(--bs-danger-bg-subtle);
-    --bs-list-group-border-color: var(--bs-danger-border-subtle);
-}
-
-#instance-types-list .list-group-item-action .unsaved-alert {
-    display: none;
-}
-
-#instance-types-list
-    .list-group-item-action.list-group-item-light
-    .unsaved-alert {
-    display: inline;
-}
-
-#instance-types-list .property:has(.property-value:empty) {
-    display: none;
-}
-
-#instance-types-list .property:not(:first-child)::before {
-    content: "•";
-    font-size: 0.75em;
-    vertical-align: middle;
-    margin-inline: 0.25em;
 }
 
 .card:has(.list-group:empty) {
@@ -400,6 +320,10 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+.editor-container button[data-maps-to] i {
+    pointer-events: none;
+}
+
 /* Bootstrap */
 .tooltip .tooltip-arrow {
     display: none;
@@ -435,14 +359,5 @@ label:has(~ :required)::after,
             "toc header"
             "toc body";
         grid-template-columns: 1.5fr minmax(0, 3fr);
-    }
-}
-
-@media (pointer: coarse) {
-    #instance-types-list
-        .list-group-item-action
-        .list-item-toolbar
-        .form-check:has(input.delete-list-item) {
-        display: block;
     }
 }
