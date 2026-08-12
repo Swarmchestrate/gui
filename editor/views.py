@@ -202,9 +202,9 @@ class UpdateResourceByCategoryView(FormView):
             error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
             return self.api_invalid()
-
-        message = f"Saved changes to {self.category.replace(':', ': ')}."
-        return JsonResponse({"message": message})
+        return JsonResponse({
+            "message": f"Saved changes to {self.category.replace(':', ': ')}."
+        })
 
     def form_invalid(self, form):
         error_msg = "Some fields were invalid. Please apply fixes for the highlighted fields."
@@ -284,6 +284,11 @@ class EditorAutosaveView(FormView):
         return data
 
     def form_valid(self, form):
+        if not form.fields:
+            # If the form is empty, it means nothing will be processed. It's better
+            # to signal this than to be misleading about what's happening. This could
+            # happen if the PostgreSQL database schema changed whilst using the wizard.
+            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_CONTENT)
         update_data = self.apply_changes_to_update_data_before_save(form.cleaned_data)
         try:
             self.api_client.get_endpoint(self.table_name).update(
@@ -294,18 +299,18 @@ class EditorAutosaveView(FormView):
         except Exception:
             error_msg = f"An error occurred whilst updating {humanise_resource_type(self.resource_type)} {self.resource_id}. The update may not have been applied."
             logger.exception(error_msg)
+            # Return 500 as the wizard should limit what fields can be edited - if the
+            # PostgREST API can't process the request, it's more likely an issue with
+            # how the wizard was implemented.
             return JsonResponse(
                 {},
-                status=HTTPStatus.BAD_REQUEST,
+                status=HTTPStatus.INTERNAL_SERVER_ERROR,
             )
-
-        message = f"Saved changes to {humanise_resource_type(self.table_name)}."
-        return JsonResponse({"message": message})
+        return JsonResponse({})
 
     def form_invalid(self, form):
-        error_msg = "Some fields were invalid. Please apply fixes for the highlighted fields."
         return JsonResponse(
-            {"message": error_msg, "feedback": json.loads(form.errors.as_json())},
+            {"feedback": json.loads(form.errors.as_json())},
             status=HTTPStatus.BAD_REQUEST,
         )
 

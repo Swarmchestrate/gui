@@ -54,15 +54,73 @@ class GlobalStatusIndicator extends StatusIndicator {
             html: true,
             trigger: "focus"
         });
+        this.savesToRetry = [];
+        this.unavailableFields = [];
+        this.invalidFields = [];
         this.showSuccessState();
     }
 
-    updateState(failedSaves) {
-        if (failedSaves.length === 0) {
-            this.statusIndicatorElement.removeAttribute("data-status");
-            return this.showSuccessState();
+    #getSummaryOfFailedSaves() {
+        if (this.savesToRetry.length === 0) {
+            return "";
         }
-        return this.showNetworkErrorState();
+        const retryButtonIcon = `
+            <span class="d-inline-block bg-light rounded px-2 py-1">
+                <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
+            </span>
+        `;
+        return `<p>
+            <strong>Some saves may not have been saved.</strong>
+            Try saving them again using the ${retryButtonIcon} button.
+        </p>`;
+    }
+
+    #generateJumpToList() {
+        const listElement = document.createElement("UL");
+        listElement.classList.add("mb-0");
+        this.invalidFields.forEach(fieldId => {
+            const listItemElement = document.createElement("LI");
+            const field = document.querySelector(`#${fieldId}`);
+            if (!field) {
+                listItemElement.textContent = fieldId;
+                return listElement.appendChild(listItemElement);
+            }
+            const anchorElement = document.createElement("A");
+            anchorElement.textContent = field.getAttribute("name").trim();
+            anchorElement.setAttribute("href", `#${field.id}`);
+            const fieldLabel = document.querySelector(
+                `label[for="${field.id}"], .label[for="${field.id}"]`
+            );
+            if (!fieldLabel) {
+                listItemElement.appendChild(anchorElement);
+                return listElement.appendChild(listItemElement);
+            }
+            anchorElement.textContent = fieldLabel.textContent.trim();
+            if (fieldLabel.hasAttribute("id")) {
+                anchorElement.setAttribute("href", `#${fieldLabel.id}`);
+            }
+            listItemElement.appendChild(anchorElement);
+            return listElement.appendChild(listItemElement);
+        });
+        return listElement.outerHTML;
+    }
+
+    #getSummaryOfInvalidFields() {
+        if (this.invalidFields.length === 0) {
+            return "";
+        }
+        const jumpToListHtml = this.#generateJumpToList(this.invalidFields);
+        return `<div>
+            <strong>Some fields require changes:</strong>
+            ${jumpToListHtml}
+        </div>`;
+    }
+
+    #generateSummaryForPopoverBody() {
+        let summary = "";
+        summary += this.#getSummaryOfFailedSaves();
+        summary += this.#getSummaryOfInvalidFields();
+        return summary;
     }
 
     showSuccessState() {
@@ -81,68 +139,24 @@ class GlobalStatusIndicator extends StatusIndicator {
         });
     }
 
-    showNetworkErrorState() {
-        super.showErrorState();
-        const retryButtonIcon = `
-            <span class="d-inline-block bg-light rounded px-2 py-1">
-                <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
-            </span>
-        `;
-        this.popover.setContent({
-            ".popover-header": "Some changes may not have been saved",
-            ".popover-body": `An error with the network may have caused some changes to not be saved. Try saving them again using the ${retryButtonIcon} button.`,
-        });
-        this.statusIndicatorElement.focus();
-    }
-
-    #generateJumpToList(fieldNames) {
-        const listElement = document.createElement("UL");
-        listElement.classList.add("mb-0");
-        fieldNames.forEach(fieldName => {
-            const listItemElement = document.createElement("LI");
-            const field = document.querySelector(`[name=${fieldName}]`);
-            if (!field) {
-                listItemElement.textContent = fieldName;
-                return listElement.appendChild(listItemElement);
-            }
-            const fieldLabel = document.querySelector(
-                `label[for="${field.id}"], .label[for="${field.id}"]`
-            );
-            if (!fieldLabel) {
-                listItemElement.textContent = fieldName;
-                return listElement.appendChild(listItemElement);
-            }
-            const anchorElement = document.createElement("A");
-            anchorElement.textContent = fieldLabel.textContent.trim();
-            anchorElement.setAttribute("href", `#${field.id}`);
-            if (fieldLabel.hasAttribute("id")) {
-                anchorElement.setAttribute("href", `#${fieldLabel.id}`);
-            }
-            listItemElement.appendChild(anchorElement);
-            return listElement.appendChild(listItemElement);
-        });
-        return listElement.outerHTML;
-    }
-
-    showValidationErrorState(responseData) {
-        super.showErrorState();
-        const jumpToListHtml = this.#generateJumpToList(Object.keys(
-            responseData.feedback
-        ));
-        this.popover.setContent({
-            ".popover-header": "Some fields need some adjustments",
-            ".popover-body": `<p>See the feedback displayed by relevant fields on what to change.</p> Go to a field: ${jumpToListHtml}`,
-        });
-        this.statusIndicatorElement.focus();
-    }
-
     showErrorState() {
         super.showErrorState();
         this.popover.setContent({
-            ".popover-header": "Something happened",
-            ".popover-body": "The latest changes may not have been saved. Please make a report of the problem at the Swarmchestrate GUI issue tracker.",
+            ".popover-header": "Some things need attention",
+            ".popover-body": this.#generateSummaryForPopoverBody(),
         });
         this.statusIndicatorElement.focus();
+    }
+
+    updateState() {
+        if (
+            this.invalidFields.length === 0
+            && this.unavailableFields.length === 0
+            && this.savesToRetry.length === 0
+        ) {
+            return this.showSuccessState();
+        }
+        this.showErrorState();
     }
 }
 
@@ -172,18 +186,22 @@ export class AsyncFormHandler {
         this.onSuccess = options.onSuccess;
         this.validator = new EditorValidator(this.form);
         this.validator.setupInlineValidation();
-        const globalStatusIndicatorButton = document.querySelector(
-            `#${this.form.dataset.categoryIdBase}-tab-pane .global-status-indicator`
-        );
-        this.globalStatusIndicator = new GlobalStatusIndicator(globalStatusIndicatorButton);
-        this.scheduledSaves = {};
-        this.failedSaves = [];
+        // Fields are saved individually, so no need to submit
+        // the actual form.
         this.form.addEventListener("submit", (event) => {
             // Disable default form submission - fields are sent
             // individually.
             event.preventDefault();
             return false;
         });
+        // Global status indicator
+        const globalStatusIndicatorButton = document.querySelector(
+            `#${this.form.dataset.categoryIdBase}-tab-pane .global-status-indicator`
+        );
+        this.globalStatusIndicator = new GlobalStatusIndicator(globalStatusIndicatorButton);
+        this.scheduledSaves = {};
+        // Retry button - when there are saves that didn't manage to go/may not have
+        // gone through.
         const retrySaveButtonElement = document.querySelector(
             `#${this.form.dataset.categoryIdBase}-tab-pane .btn-retry-save`
         );
@@ -192,6 +210,7 @@ export class AsyncFormHandler {
             await this.retrySaves();
         });
         this.retrySaveButton = new RetrySaveButton(retrySaveButtonElement);
+        // Setting up individual saves.
         this.form.addEventListener("input", (event) => {
             const field = event.target;
             if (field.matches(
@@ -209,6 +228,7 @@ export class AsyncFormHandler {
             const statusIndicator = this.getStatusIndicatorForField(field);
             return this.scheduleSave(field, statusIndicator);
         });
+        // Setting up text array fields.
         this.form.addEventListener("click", (event) => {
             if (!event.target.matches("button[data-maps-to]")) {
                 return;
@@ -235,26 +255,29 @@ export class AsyncFormHandler {
             const body = this.generateRequestBody([field]);
             await this.sendFieldChanges(body, {
                 onSuccess: (responseData) => {
-                    // Remove field from scheduled saves so it doesn't
-                    // get re-saved if we need to retry saving some fields.
-                    this.failedSaves = this.failedSaves.filter(fieldId => fieldId != field.id);
+                    // The field just saved successfully, so remove it from invalid
+                    // field lists.
+                    this.globalStatusIndicator.invalidFields = this.globalStatusIndicator.invalidFields.filter(fieldId => fieldId != field.id);
+                    this.globalStatusIndicator.savesToRetry = this.globalStatusIndicator.savesToRetry.filter(fieldId => fieldId != field.id);
+                    this.retrySaveButton.hide();
                     delete this.scheduledSaves[field.id];
                     this.onSuccess(responseData);
                     statusIndicator.showSuccessState();
-                    this.globalStatusIndicator.updateState(this.failedSaves);
-                    this.retrySaveButton.hide();
+                    this.globalStatusIndicator.updateState();
                 },
                 onNetworkError: () => {
-                    this.failedSaves.push(field.id);
-                    statusIndicator.showErrorState();
-                    this.globalStatusIndicator.updateState(this.failedSaves);
+                    this.globalStatusIndicator.savesToRetry.push(field.id);
                     this.retrySaveButton.show();
+                    statusIndicator.showErrorState();
+                    this.globalStatusIndicator.updateState();
                 },
                 onValidationError: (responseData) => {
+                    this.globalStatusIndicator.invalidFields.push(field.id);
                     statusIndicator.showErrorState();
-                    this.globalStatusIndicator.showValidationErrorState(responseData);
+                    this.globalStatusIndicator.updateState(responseData);
                 },
                 onServerError: () => {
+                    this.globalStatusIndicator.savesToRetry.push(field.id);
                     statusIndicator.showErrorState();
                     this.globalStatusIndicator.showErrorState();
                 },
@@ -266,7 +289,7 @@ export class AsyncFormHandler {
         const fieldIdsRetried = [];
         const fieldsToSave = [];
         const statusIndicators = [];
-        this.failedSaves.forEach(fieldId => {
+        this.globalStatusIndicator.savesToRetry.forEach(fieldId => {
             const field = document.querySelector(`#${fieldId}`);
             if (!field) return;
             const statusIndicator = this.getStatusIndicatorForField(field);
@@ -277,19 +300,29 @@ export class AsyncFormHandler {
         const body = this.generateRequestBody(fieldsToSave);
         this.sendFieldChanges(body, {
             onSuccess: () => {
-                this.failedSaves = this.failedSaves.filter(fieldId => !fieldIdsRetried.includes(fieldId));
+                this.globalStatusIndicator.invalidFields = this.globalStatusIndicator.invalidFields.filter(fieldId => !fieldIdsRetried.includes(fieldId));
+                this.globalStatusIndicator.savesToRetry = this.globalStatusIndicator.savesToRetry.filter(fieldId => !fieldIdsRetried.includes(fieldId));
+                this.retrySaveButton.hide();
                 statusIndicators.forEach(statusIndicator => {
                     statusIndicator.showSuccessState();
                 });
-                this.globalStatusIndicator.updateState(this.failedSaves);
-                this.retrySaveButton.hide();
+                this.globalStatusIndicator.updateState();
             },
             onNetworkError: () => {
-                this.globalStatusIndicator.updateState(this.failedSaves);
                 this.retrySaveButton.show();
+                this.globalStatusIndicator.updateState();
             },
             onValidationError: (responseData) => {
-                this.globalStatusIndicator.showValidationErrorState(responseData);
+                const invalidFieldNames = Object.keys(responseData);
+                const invalidFieldIds = [];
+                fieldsToSave.forEach(field => {
+                    if (!invalidFieldNames.includes(field.getAttribute("name"))) {
+                        return;
+                    }
+                    invalidFieldIds.push(field.id);
+                });
+                this.globalStatusIndicator.invalidFields.push(...invalidFieldIds);
+                this.globalStatusIndicator.updateState(responseData);
             },
             onServerError: () => {
                 this.globalStatusIndicator.showErrorState();
