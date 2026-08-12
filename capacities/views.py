@@ -30,7 +30,7 @@ class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     resource_type = "cloud_capacity"
-    editor_form_reverse = "capacities:update_cloud_capacity_by_category"
+    editor_form_reverse = "capacities:cloud_capacity_autosave"
 
 
 class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, UpdateResourceByCategoryView):
@@ -128,7 +128,7 @@ class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, 
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     resource_type = "edge_capacity"
-    editor_form_reverse = "capacities:update_edge_capacity_by_category"
+    editor_form_reverse = "capacities:edge_capacity_autosave"
 
 
 class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, UpdateResourceByCategoryView):
@@ -136,6 +136,18 @@ class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityV
     column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
+        data = super().apply_changes_to_update_data_before_save(data)
+        data.update({
+            "resource_type": "Edge",
+        })
+        return data
+
+
+class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorAutosaveView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
+
+    def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
         data.update({
             "resource_type": "Edge",

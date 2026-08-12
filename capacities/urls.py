@@ -64,7 +64,7 @@ urlpatterns = [
     path(
         "cloud-capacities/api/<resource_id>/edit/",
         views.CloudCapacityEditorAutosaveView.as_view(),
-        name="update_cloud_capacity_by_category",
+        name="cloud_capacity_autosave",
     ),
     path(
         "cloud-capacities/<resource_id>/overview/",
@@ -148,8 +148,8 @@ urlpatterns = [
     ),
     path(
         "edge-capacities/api/<resource_id>/edit/",
-        views.UpdateEdgeCapacityByCategoryView.as_view(),
-        name="update_edge_capacity_by_category",
+        views.EdgeCapacityEditorAutosaveView.as_view(),
+        name="edge_capacity_autosave",
     ),
     path(
         "edge-capacities/<resource_id>/edit/",
