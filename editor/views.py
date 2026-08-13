@@ -288,7 +288,12 @@ class EditorAutosaveView(FormView):
             # If the form is empty, it means nothing will be processed. It's better
             # to signal this than to be misleading about what's happening. This could
             # happen if the PostgreSQL database schema changed whilst using the wizard.
-            return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_CONTENT)
+            response_content = {}
+            if self.unavailable_fields:
+                response_content.update({
+                    "unavailable_fields": list(self.unavailable_fields),
+                })
+            return JsonResponse(response_content, status=HTTPStatus.UNPROCESSABLE_ENTITY)
         update_data = self.apply_changes_to_update_data_before_save(form.cleaned_data)
         try:
             self.api_client.get_endpoint(self.table_name).update(
@@ -306,11 +311,22 @@ class EditorAutosaveView(FormView):
                 {},
                 status=HTTPStatus.INTERNAL_SERVER_ERROR,
             )
-        return JsonResponse({})
+        response_content = {}
+        if self.unavailable_fields:
+            response_content.update({
+                "unavailable_fields": list(self.unavailable_fields),
+            })
+        return JsonResponse(response_content)
 
     def form_invalid(self, form):
+        logger.exception(form.errors.as_json())
+        response_content = {"feedback": json.loads(form.errors.as_json())}
+        if self.unavailable_fields:
+            response_content.update({
+                "unavailable_fields": list(self.unavailable_fields),
+            })
         return JsonResponse(
-            {"feedback": json.loads(form.errors.as_json())},
+            response_content,
             status=HTTPStatus.BAD_REQUEST,
         )
 
@@ -328,6 +344,10 @@ class EditorAutosaveView(FormView):
         submitted_form = dict(self.request.POST)
         submitted_form.pop("csrfmiddlewaretoken", None)
         allowed_fields = form_config.get_fields()
+        # Notify whether any fields are no longer part of the database schema.
+        submitted_field_names_set = set(submitted_form.keys())
+        allowed_field_names_set = set(allowed_fields.keys())
+        self.unavailable_fields = submitted_field_names_set.difference(allowed_field_names_set)
         # If no valid properties were submitted, nothing can be done.
         if not (allowed_fields.keys() & submitted_form.keys()):
             kwargs.update({

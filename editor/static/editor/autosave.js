@@ -52,7 +52,7 @@ class GlobalStatusIndicator extends StatusIndicator {
             title: `<span class="lh-1 fs-5">${this.successHtml}</span> Status`,
             content: "Content",
             html: true,
-            trigger: "focus"
+            trigger: "focus",
         });
         this.savesToRetry = [];
         this.unavailableFields = [];
@@ -60,7 +60,7 @@ class GlobalStatusIndicator extends StatusIndicator {
         this.showSuccessState();
     }
 
-    #getSummaryOfFailedSaves() {
+    #getFailedSavesErrorSummary() {
         if (this.savesToRetry.length === 0) {
             return "";
         }
@@ -69,16 +69,16 @@ class GlobalStatusIndicator extends StatusIndicator {
                 <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
             </span>
         `;
-        return `<p>
+        return `<div>
             <strong>Some changes may not have been saved.</strong>
             Try saving them again using the ${retryButtonIcon} button.
-        </p>`;
+        </div>`;
     }
 
-    #generateJumpToList() {
+    #generateJumpToList(fieldIds) {
         const listElement = document.createElement("UL");
         listElement.classList.add("mb-0");
-        this.invalidFields.forEach(fieldId => {
+        fieldIds.forEach(fieldId => {
             const listItemElement = document.createElement("LI");
             const field = document.querySelector(`#${fieldId}`);
             if (!field) {
@@ -105,7 +105,7 @@ class GlobalStatusIndicator extends StatusIndicator {
         return listElement.outerHTML;
     }
 
-    #getSummaryOfInvalidFields() {
+    #getInvalidFieldsErrorSummary() {
         if (this.invalidFields.length === 0) {
             return "";
         }
@@ -116,10 +116,25 @@ class GlobalStatusIndicator extends StatusIndicator {
         </div>`;
     }
 
+    #getUnavailableFieldsErrorSummary() {
+        if (this.unavailableFields.length === 0) {
+            return "";
+        }
+        const jumpToListHtml = this.#generateJumpToList(this.unavailableFields.map(fieldName => `id_${fieldName}`));
+        return `<div>
+            <strong>Some fields appear to have been removed from the database schema:</strong>
+            ${jumpToListHtml}
+        </div>`;
+    }
+
     #generateSummaryForPopoverBody() {
-        let summary = "";
-        summary += this.#getSummaryOfFailedSaves();
-        summary += this.#getSummaryOfInvalidFields();
+        let summary = document.createElement("div");
+        summary.classList.add("d-flex", "flex-column", "row-gap-2");
+        summary.innerHTML = `
+            ${this.#getFailedSavesErrorSummary()}
+            ${this.#getInvalidFieldsErrorSummary()}
+            ${this.#getUnavailableFieldsErrorSummary()}
+        `;
         return summary;
     }
 
@@ -158,6 +173,42 @@ class GlobalStatusIndicator extends StatusIndicator {
         }
         this.showErrorState();
     }
+
+    // Utility methods
+    addSavesToRetry(fieldIds) {
+        this.savesToRetry.push(...fieldIds);
+        this.savesToRetry = [...new Set(this.savesToRetry)];
+    }
+
+    addInvalidFields(fieldIds) {
+        this.invalidFields.push(...fieldIds);
+        this.invalidFields = [...new Set(this.invalidFields)];
+    }
+
+    addUnavailableFields(fieldNames) {
+        this.unavailableFields.push(...fieldNames);
+        this.unavailableFields = [...new Set(this.unavailableFields)];
+    }
+
+    removeFieldsFromFailedSavesErrorSummary(fieldIds) {
+        this.savesToRetry = this.savesToRetry.filter(fieldId => !fieldIds.includes(fieldId));
+    }
+
+    removeFieldsFromInvalidFieldsErrorSummary(fieldIds) {
+        this.invalidFields = this.invalidFields.filter(fieldId => !fieldIds.includes(fieldId));
+    }
+    
+    removeFieldsFromUnavailableFieldsErrorSummary(fieldNames) {
+        this.unavailableFields = this.unavailableFields.filter(fieldName => !fieldNames.includes(fieldName));
+    }
+
+    removeFieldsFromErrorSummary(fieldsToRemove) {
+        const fieldIdsToRemove = fieldsToRemove.map(field => field.id);
+        const fieldNamesToRemove = fieldsToRemove.map(field => field.getAttribute("name"));
+        this.removeFieldsFromFailedSavesErrorSummary(fieldIdsToRemove);
+        this.removeFieldsFromInvalidFieldsErrorSummary(fieldIdsToRemove);
+        this.removeFieldsFromUnavailableFieldsErrorSummary(fieldNamesToRemove);
+    }
 }
 
 class RetrySaveButton {
@@ -171,6 +222,13 @@ class RetrySaveButton {
 
     hide() {
         this.buttonElement.classList.add("d-none");
+    }
+
+    updateVisibility(savesToRetry) {
+        if (savesToRetry.length > 0) {
+            return this.show();
+        }
+        return this.hide();
     }
 }
 
@@ -255,29 +313,42 @@ export class AsyncFormHandler {
             const body = this.generateRequestBody([field]);
             await this.sendFieldChanges(body, {
                 onSuccess: (responseData) => {
-                    // The field just saved successfully, so remove it from invalid
-                    // field lists.
-                    this.globalStatusIndicator.invalidFields = this.globalStatusIndicator.invalidFields.filter(fieldId => fieldId != field.id);
-                    this.globalStatusIndicator.savesToRetry = this.globalStatusIndicator.savesToRetry.filter(fieldId => fieldId != field.id);
-                    this.retrySaveButton.hide();
+                    // The field just saved successfully, so remove it from the global status
+                    // indicator's error summary. We don't need to worry if the field was removed
+                    // from the database schema, as the generated form would be empty and would be
+                    // handled in onUnavailableFieldsError().
+                    this.globalStatusIndicator.removeFieldsFromErrorSummary([field]);
+                    this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                     delete this.scheduledSaves[field.id];
                     this.onSuccess(responseData);
                     statusIndicator.showSuccessState();
                     this.globalStatusIndicator.updateState();
                 },
                 onNetworkError: () => {
-                    this.globalStatusIndicator.savesToRetry.push(field.id);
-                    this.retrySaveButton.show();
+                    this.globalStatusIndicator.addSavesToRetry([field.id]);
+                    this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                     statusIndicator.showErrorState();
                     this.globalStatusIndicator.updateState();
                 },
                 onValidationError: (responseData) => {
-                    this.globalStatusIndicator.invalidFields.push(field.id);
+                    this.globalStatusIndicator.addInvalidFields([field.id]);
                     statusIndicator.showErrorState();
-                    this.globalStatusIndicator.updateState(responseData);
+                    this.globalStatusIndicator.updateState();
+                },
+                onUnavailableFieldsError: (responseData) => {
+                    this.globalStatusIndicator.addUnavailableFields(
+                        responseData.unavailable_fields
+                    );
+                    this.validator.displayValidationMessagesForField(
+                        field,
+                        ["This field appears to have been removed from the database schema."]
+                    );
+                    statusIndicator.showErrorState();
+                    this.globalStatusIndicator.updateState();
                 },
                 onServerError: () => {
-                    this.globalStatusIndicator.savesToRetry.push(field.id);
+                    this.globalStatusIndicator.addSavesToRetry([field.id]);
+                    this.retrySaveButton.updateVisibility();
                     statusIndicator.showErrorState();
                     this.globalStatusIndicator.showErrorState();
                 },
@@ -286,34 +357,48 @@ export class AsyncFormHandler {
     }
 
     async retrySaves() {
-        const fieldIdsRetried = [];
         const fieldsToSave = [];
         const statusIndicators = [];
         this.globalStatusIndicator.savesToRetry.forEach(fieldId => {
             const field = document.querySelector(`#${fieldId}`);
             if (!field) return;
             const statusIndicator = this.getStatusIndicatorForField(field);
-            fieldIdsRetried.push(fieldId);
             fieldsToSave.push(field);
             statusIndicators.push(statusIndicator);
         });
         const body = this.generateRequestBody(fieldsToSave);
         this.sendFieldChanges(body, {
-            onSuccess: () => {
-                this.globalStatusIndicator.invalidFields = this.globalStatusIndicator.invalidFields.filter(fieldId => !fieldIdsRetried.includes(fieldId));
-                this.globalStatusIndicator.savesToRetry = this.globalStatusIndicator.savesToRetry.filter(fieldId => !fieldIdsRetried.includes(fieldId));
-                this.retrySaveButton.hide();
-                statusIndicators.forEach(statusIndicator => {
+            onSuccess: (responseData) => {
+                // As multiple fields are sent to be saved, it's possible that a field
+                // may be removed from the database schema, which are under "unavailable_fields"
+                // - we don't want to show these fields as having been saved successfully.
+                if (!Object.hasOwn(responseData, "unavailable_fields")) {
+                    this.globalStatusIndicator.removeFieldsFromErrorSummary(fieldsToSave);
+                    this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
+                    statusIndicators.forEach(statusIndicator => {
+                        statusIndicator.showSuccessState();
+                    });
+                    return this.globalStatusIndicator.updateState();
+                }
+                const fieldsSavedSuccessfully = fieldsToSave.filter(
+                    field => !responseData.unavailable_fields.includes(field.getAttribute("name"))
+                );
+                this.globalStatusIndicator.removeFieldsFromErrorSummary(fieldsSavedSuccessfully);
+                this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
+                const successfulStatusIndicators = fieldsSavedSuccessfully.map(
+                    field => this.getStatusIndicatorForField(field)
+                ).filter(Boolean);
+                successfulStatusIndicators.forEach(statusIndicator => {
                     statusIndicator.showSuccessState();
                 });
-                this.globalStatusIndicator.updateState();
+                return this.globalStatusIndicator.updateState();
             },
             onNetworkError: () => {
-                this.retrySaveButton.show();
+                this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                 this.globalStatusIndicator.updateState();
             },
             onValidationError: (responseData) => {
-                const invalidFieldNames = Object.keys(responseData);
+                const invalidFieldNames = Object.keys(responseData.feedback);
                 const invalidFieldIds = [];
                 fieldsToSave.forEach(field => {
                     if (!invalidFieldNames.includes(field.getAttribute("name"))) {
@@ -321,10 +406,42 @@ export class AsyncFormHandler {
                     }
                     invalidFieldIds.push(field.id);
                 });
-                this.globalStatusIndicator.invalidFields.push(...invalidFieldIds);
-                this.globalStatusIndicator.updateState(responseData);
+                this.globalStatusIndicator.addInvalidFields(invalidFieldIds);
+                this.globalStatusIndicator.updateState();
+            },
+            onUnavailableFieldsError: (responseData) => {
+                // Unavailable fields are passed as field names, so need to
+                // get the IDs of the corresponding fields before getting the
+                // status indicator.
+                this.globalStatusIndicator.addUnavailableFields(
+                    responseData.unavailable_fields
+                );
+                const affectedFieldsQuerySelectorParts = [];
+                responseData.unavailable_fields.forEach(fieldName => {
+                    affectedFieldsQuerySelectorParts.push(`[name="${fieldName}"]`);
+                });
+                const affectedFields = Array.from(this.form.querySelectorAll(
+                    affectedFieldsQuerySelectorParts.join(",")
+                ));
+                this.globalStatusIndicator.removeFieldsFromErrorSummary(
+                    affectedFields
+                );
+                const affectedStatusIndicators = [];
+                affectedFields.forEach(field => {
+                    this.validator.displayValidationMessagesForField(
+                        field,
+                        ["This field appears to have been removed from the database schema."]
+                    );
+                    const affectedStatusIndicator = this.getStatusIndicatorForField(field);
+                    affectedStatusIndicators.push(affectedStatusIndicator);
+                });
+                affectedStatusIndicators.forEach(statusIndicator => {
+                    statusIndicator.showErrorState();
+                });
+                this.globalStatusIndicator.updateState();
             },
             onServerError: () => {
+                this.retrySaveButton.updateVisibility();
                 this.globalStatusIndicator.showErrorState();
             },
         });
@@ -364,6 +481,9 @@ export class AsyncFormHandler {
         if (!("onValidationError" in options)) {
             options.onValidationError = () => {};
         }
+        if (!("onUnavailableFieldsError" in options)) {
+            options.onUnavailableFieldsError = () => {};
+        }
         // Request headers
         const headers = new Headers();
         headers.append("Accept", "application/json");
@@ -389,7 +509,7 @@ export class AsyncFormHandler {
         try {
             responseText = await response.text();
         } catch (error) {
-            console.error("Did not receive expected JSON response.");
+            console.error(error);
             this.validator.displayFormErrors([
                 "Encountered a problem whilst checking server validation results. Please try again.",
             ]);
@@ -400,7 +520,7 @@ export class AsyncFormHandler {
         try {
             responseData = JSON.parse(responseText);
         } catch (error) {
-            console.error(error);
+            console.error("Did not receive expected JSON response.");
             console.error(response.status, response.statusText);
             this.validator.displayFormErrors([
                 "Encountered a problem whilst checking server validation results. Please try again.",
@@ -409,9 +529,17 @@ export class AsyncFormHandler {
             return false;
         }
 
+        if (Object.hasOwn(responseData, "unavailable_fields")) {
+            options.onUnavailableFieldsError(responseData);
+        }
+
         if (response.ok) {
             options.onSuccess(responseData);
             return responseData;
+        }
+
+        if (response.status === 422) {
+            return false;
         }
 
         const validationMessages = responseData.feedback || {};
