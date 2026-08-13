@@ -70,7 +70,7 @@ class GlobalStatusIndicator extends StatusIndicator {
             </span>
         `;
         return `<p>
-            <strong>Some saves may not have been saved.</strong>
+            <strong>Some changes may not have been saved.</strong>
             Try saving them again using the ${retryButtonIcon} button.
         </p>`;
     }
