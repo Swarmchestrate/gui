@@ -345,8 +345,8 @@ export class AsyncFormHandler {
                     responseData.unavailable_fields
                 );
                 this.validator.displayValidationMessagesForField(
-                    field,
-                    ["This field appears to have been removed from the database schema."]
+                    field.getAttribute("name"),
+                    [{ message: "This field appears to have been removed from the database schema." }]
                 );
                 statusIndicator.showErrorState();
                 this.globalStatusIndicator.updateState();
