@@ -315,6 +315,7 @@ export class AsyncFormHandler {
     }
 
     async sendFieldChangeIndividually(field, statusIndicator) {
+        this.validator.clearFieldValidationMessages(field);
         const body = this.generateRequestBody([field]);
         await this.sendFieldChanges(body, {
             onSuccess: (responseData) => {

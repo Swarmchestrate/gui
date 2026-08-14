@@ -118,6 +118,12 @@ export class EditorValidator {
         this.formMessagesList.replaceChildren();
     }
 
+    clearFieldValidationMessages(fieldElement) {
+        const invalidFeedbackElement = document.querySelector(`#${fieldElement.id} ~ .invalid-feedback`);
+        if (!invalidFeedbackElement) return;
+        invalidFeedbackElement.replaceChildren();
+    }
+
     clearFormAndFieldValidationMessages() {
         this.clearFormMessagesList();
         const allNotEmptyInvalidFeedbackElements = this.form.querySelectorAll(
