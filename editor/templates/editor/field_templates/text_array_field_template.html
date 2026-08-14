@@ -35,7 +35,7 @@
     </div>
     {# Hidden input #}
     {# The multiple values of text array fields are summarised as JSON in hidden inputs. #}
-    <label for="{{ field.id_for_label }}" class="visually-hidden" aria-hidden="true"></label>
+    <label for="{{ field.id_for_label }}" class="visually-hidden" aria-hidden="true">{{ field.label }}</label>
     {{ field }}
     {% include 'editor/field_templates/field_help_text.html' %}
     {% include 'editor/field_templates/field_invalid_feedback.html' %}
