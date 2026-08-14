@@ -122,7 +122,7 @@ class GlobalStatusIndicator extends StatusIndicator {
         }
         const jumpToListHtml = this.#generateJumpToList(this.unavailableFields.map(fieldName => `id_${fieldName}`));
         return `<div>
-            <strong>Some fields appear to have been removed from the database schema:</strong>
+            <strong>Some fields appear to have been removed from the SAT/CDT specification:</strong>
             ${jumpToListHtml}
         </div>`;
     }
@@ -347,7 +347,7 @@ export class AsyncFormHandler {
                 );
                 this.validator.displayValidationMessagesForField(
                     field.getAttribute("name"),
-                    [{ message: "This field appears to have been removed from the database schema." }]
+                    [{ message: "This field appears to have been removed from the SAT/CDT specification. Changes won't be saved unless the field is re-added." }]
                 );
                 statusIndicator.showErrorState();
                 this.globalStatusIndicator.updateState();
