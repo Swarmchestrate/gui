@@ -187,7 +187,7 @@ export class ErrorSummary {
         }
         const jumpToListHtml = this.#generateJumpToList(this.invalidFields);
         return `<div class="alert alert-warning m-0">
-            <strong>Some fields don't comply with the SAT/CDT specification:</strong>
+            <strong>Changes to these fields won't be saved until the highlighted issues are addressed:</strong>
             ${jumpToListHtml}
         </div>`;
     }
