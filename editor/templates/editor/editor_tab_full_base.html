@@ -18,11 +18,15 @@
 {% endblock top_section %}
 
 {% block toc %}
-{% include 'editor/toc_as_tab_buttons/toc_base.html' %}
+<div class="bg-light h-100 rounded p-4">
+    {% include 'editor/toc_as_tab_buttons/toc_base.html' %}
+</div>
 {% endblock toc %}
 
 {% block main_section %}
-{% include 'editor/editor_tab.html' %}
+<div class="py-4">
+    {% include 'editor/editor_tab.html' %}
+</div>
 {% endblock main_section %}
 
 {% block extra_section %}
