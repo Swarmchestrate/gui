@@ -29,10 +29,13 @@
                     <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
                 </svg>
             </a>
+            <details class="d-none error-details">
+                <summary class="btn btn-outline-danger btn-sm"></summary>
+            </details>
+            <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
         </div>
         {% endblock top_section %}
     </div>
-    <p class="form-text">Required fields are marked with <span class="text-danger">*</span></p>
     <form action="{{ editor_form_url }}?category={{ category|urlencode }}" method="POST" data-category-id-base="{{ category_id_base }}">
         {% csrf_token %}
         {% with form=forms_by_category|get_key_value_or_empty_dict:category %}

@@ -1,236 +1,11 @@
+import {
+    EmptyStatusIndicator,
+    ErrorSummary,
+    GlobalStatusIndicator,
+    RetrySaveButton,
+    StatusIndicator,
+} from "/static/editor/autosave_utils.js";
 import { EditorValidator } from "/static/editor/validation.js";
-
-class EmptyStatusIndicator {
-    showLoadingState() {
-    }
-
-    showSuccessState() {
-    }
-
-    showErrorState() {
-    }
-
-    showDefaultState() {
-    }
-}
-
-class StatusIndicator {
-    constructor(statusIndicatorElement) {
-        this.statusIndicatorElement = statusIndicatorElement;
-        this.defaultInnerHtml = statusIndicatorElement.innerHTML;
-        this.loadingHtml = '<span class="spinner-border spinner-border-sm text-body-tertiary" role="status"></span>';
-        this.successHtml = '<i class="bi bi-check2 text-success" aria-hidden="true"></i>';
-        this.errorHtml = '<i class="bi bi-x-lg text-danger" aria-hidden="true"></i>';
-    }
-
-    showLoadingState() {
-        if (this.statusIndicatorElement.innerHTML === this.loadingHtml) {
-            return;
-        }
-        this.statusIndicatorElement.innerHTML = this.loadingHtml;
-    }
-
-    showSuccessState() {
-        this.statusIndicatorElement.innerHTML = this.successHtml;
-    }
-
-    showErrorState() {
-        this.statusIndicatorElement.innerHTML = this.errorHtml;
-    }
-
-    showDefaultState() {
-        this.statusIndicatorElement.innerHTML = this.defaultInnerHtml;
-    }
-}
-
-class GlobalStatusIndicator extends StatusIndicator {
-    constructor(statusIndicatorElement) {
-        super(statusIndicatorElement);
-        this.successHtml = '<i class="bi bi-database-check" aria-hidden="true"></i>';
-        this.errorHtml = '<i class="bi bi-database-exclamation" aria-hidden="true"></i>';
-        this.popover = new bootstrap.Popover(statusIndicatorElement, {
-            title: `<span class="lh-1 fs-5">${this.successHtml}</span> Status`,
-            content: "Content",
-            html: true,
-            trigger: "focus",
-        });
-        this.savesToRetry = [];
-        this.unavailableFields = [];
-        this.invalidFields = [];
-        this.showSuccessState();
-    }
-
-    #getFailedSavesErrorSummary() {
-        if (this.savesToRetry.length === 0) {
-            return "";
-        }
-        const retryButtonIcon = `
-            <span class="d-inline-block bg-light rounded px-2 py-1">
-                <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
-            </span>
-        `;
-        return `<div>
-            <strong>Some changes may not have been saved.</strong>
-            Try saving them again using the ${retryButtonIcon} button.
-        </div>`;
-    }
-
-    #generateJumpToList(fieldIds) {
-        const listElement = document.createElement("UL");
-        listElement.classList.add("mb-0");
-        fieldIds.forEach(fieldId => {
-            const listItemElement = document.createElement("LI");
-            const field = document.querySelector(`#${fieldId}`);
-            if (!field) {
-                listItemElement.textContent = fieldId;
-                return listElement.appendChild(listItemElement);
-            }
-            const anchorElement = document.createElement("A");
-            anchorElement.textContent = field.getAttribute("name").trim();
-            anchorElement.setAttribute("href", `#${field.id}`);
-            const fieldLabel = document.querySelector(
-                `label[for="${field.id}"], .label[for="${field.id}"]`
-            );
-            if (!fieldLabel) {
-                listItemElement.appendChild(anchorElement);
-                return listElement.appendChild(listItemElement);
-            }
-            anchorElement.textContent = fieldLabel.textContent.trim();
-            if (fieldLabel.hasAttribute("id")) {
-                anchorElement.setAttribute("href", `#${fieldLabel.id}`);
-            }
-            listItemElement.appendChild(anchorElement);
-            return listElement.appendChild(listItemElement);
-        });
-        return listElement.outerHTML;
-    }
-
-    #getInvalidFieldsErrorSummary() {
-        if (this.invalidFields.length === 0) {
-            return "";
-        }
-        const jumpToListHtml = this.#generateJumpToList(this.invalidFields);
-        return `<div>
-            <strong>Some fields require changes:</strong>
-            ${jumpToListHtml}
-        </div>`;
-    }
-
-    #getUnavailableFieldsErrorSummary() {
-        if (this.unavailableFields.length === 0) {
-            return "";
-        }
-        const jumpToListHtml = this.#generateJumpToList(this.unavailableFields.map(fieldName => `id_${fieldName}`));
-        return `<div>
-            <strong>Some fields appear to have been removed from the SAT/CDT specification:</strong>
-            ${jumpToListHtml}
-        </div>`;
-    }
-
-    #generateSummaryForPopoverBody() {
-        let summary = document.createElement("div");
-        summary.classList.add("d-flex", "flex-column", "row-gap-2");
-        summary.innerHTML = `
-            ${this.#getFailedSavesErrorSummary()}
-            ${this.#getInvalidFieldsErrorSummary()}
-            ${this.#getUnavailableFieldsErrorSummary()}
-        `;
-        return summary;
-    }
-
-    showSuccessState() {
-        super.showSuccessState();
-        this.popover.setContent({
-            ".popover-header": "All changes saved",
-            ".popover-body": "Changes are automatically saved to the database.",
-        });
-    }
-
-    showLoadingState() {
-        super.showLoadingState();
-        this.popover.setContent({
-            ".popover-header": "Saving...",
-            ".popover-body": "Changes are currently being saved to the database.",
-        });
-    }
-
-    showErrorState() {
-        super.showErrorState();
-        this.popover.setContent({
-            ".popover-header": "Some things need attention",
-            ".popover-body": this.#generateSummaryForPopoverBody(),
-        });
-        this.statusIndicatorElement.focus();
-    }
-
-    updateState() {
-        if (
-            this.invalidFields.length === 0
-            && this.unavailableFields.length === 0
-            && this.savesToRetry.length === 0
-        ) {
-            return this.showSuccessState();
-        }
-        this.showErrorState();
-    }
-
-    // Utility methods
-    addSavesToRetry(fieldIds) {
-        this.savesToRetry.push(...fieldIds);
-        this.savesToRetry = [...new Set(this.savesToRetry)];
-    }
-
-    addInvalidFields(fieldIds) {
-        this.invalidFields.push(...fieldIds);
-        this.invalidFields = [...new Set(this.invalidFields)];
-    }
-
-    addUnavailableFields(fieldNames) {
-        this.unavailableFields.push(...fieldNames);
-        this.unavailableFields = [...new Set(this.unavailableFields)];
-    }
-
-    removeFieldsFromFailedSavesErrorSummary(fieldIds) {
-        this.savesToRetry = this.savesToRetry.filter(fieldId => !fieldIds.includes(fieldId));
-    }
-
-    removeFieldsFromInvalidFieldsErrorSummary(fieldIds) {
-        this.invalidFields = this.invalidFields.filter(fieldId => !fieldIds.includes(fieldId));
-    }
-    
-    removeFieldsFromUnavailableFieldsErrorSummary(fieldNames) {
-        this.unavailableFields = this.unavailableFields.filter(fieldName => !fieldNames.includes(fieldName));
-    }
-
-    removeFieldsFromErrorSummary(fieldsToRemove) {
-        const fieldIdsToRemove = fieldsToRemove.map(field => field.id);
-        const fieldNamesToRemove = fieldsToRemove.map(field => field.getAttribute("name"));
-        this.removeFieldsFromFailedSavesErrorSummary(fieldIdsToRemove);
-        this.removeFieldsFromInvalidFieldsErrorSummary(fieldIdsToRemove);
-        this.removeFieldsFromUnavailableFieldsErrorSummary(fieldNamesToRemove);
-    }
-}
-
-class RetrySaveButton {
-    constructor(buttonElement, onClickAction) {
-        this.buttonElement = buttonElement;
-    }
-
-    show() {
-        this.buttonElement.classList.remove("d-none");
-    }
-
-    hide() {
-        this.buttonElement.classList.add("d-none");
-    }
-
-    updateVisibility(savesToRetry) {
-        if (savesToRetry.length > 0) {
-            return this.show();
-        }
-        return this.hide();
-    }
-}
 
 export class AsyncFormHandler {
     constructor(form, options) {
@@ -257,6 +32,11 @@ export class AsyncFormHandler {
             `#${this.form.dataset.categoryIdBase}-tab-pane .global-status-indicator`
         );
         this.globalStatusIndicator = new GlobalStatusIndicator(globalStatusIndicatorButton);
+        // Error summary
+        const errorSummaryElement = document.querySelector(
+            `#${this.form.dataset.categoryIdBase}-tab-pane .error-details`
+        );
+        this.errorSummary = new ErrorSummary(errorSummaryElement);
         this.scheduledSaves = {};
         // Retry button - when there are saves that didn't manage to go/may not have
         // gone through.
@@ -323,40 +103,54 @@ export class AsyncFormHandler {
                 // indicator's error summary. We don't need to worry if the field was removed
                 // from the database schema, as the generated form would be empty and shouldn't
                 // reach onSuccess().
-                this.globalStatusIndicator.removeFieldsFromErrorSummary([field]);
+                this.globalStatusIndicator.clearIssuesForField(field);
+                this.errorSummary.clearIssuesForField(field);
                 this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                 delete this.scheduledSaves[field.id];
                 this.onSuccess(responseData);
                 statusIndicator.showSuccessState();
                 this.globalStatusIndicator.updateState();
+                this.errorSummary.updateState();
             },
             onNetworkError: () => {
-                this.globalStatusIndicator.addSavesToRetry([field.id]);
+                this.globalStatusIndicator.savesToRetry.add(field.id);
+                this.errorSummary.savesToRetry.add(field.id);
                 this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                 statusIndicator.showErrorState();
-                this.globalStatusIndicator.updateState();
+                this.globalStatusIndicator.updateState({ focusOnError: true });
+                this.errorSummary.updateState();
             },
             onValidationError: (responseData) => {
-                this.globalStatusIndicator.addInvalidFields([field.id]);
+                this.globalStatusIndicator.invalidFields.add(field.id);
+                this.errorSummary.invalidFields.add(field.id);
                 statusIndicator.showErrorState();
                 this.globalStatusIndicator.updateState();
+                this.errorSummary.updateState();
             },
             onUnavailableFieldsError: (responseData) => {
-                this.globalStatusIndicator.addUnavailableFields(
-                    responseData.unavailable_fields
-                );
+                responseData.unavailable_fields.forEach(fieldName => {
+                    this.globalStatusIndicator.unavailableFields.add(
+                        fieldName
+                    );
+                    this.errorSummary.unavailableFields.add(
+                        fieldName
+                    );
+                });
                 this.validator.displayValidationMessagesForField(
                     field.getAttribute("name"),
                     [{ message: "This field appears to have been removed from the SAT/CDT specification. Changes won't be saved unless the field is re-added." }]
                 );
                 statusIndicator.showErrorState();
-                this.globalStatusIndicator.updateState();
+                this.globalStatusIndicator.updateState({ focusOnError: true });
+                this.errorSummary.updateState();
             },
             onServerError: () => {
-                this.globalStatusIndicator.addSavesToRetry([field.id]);
+                this.globalStatusIndicator.savesToRetry.add(field.id);
+                this.errorSummary.savesToRetry.add(field.id);
                 this.retrySaveButton.updateVisibility();
                 statusIndicator.showErrorState();
-                this.globalStatusIndicator.showErrorState();
+                this.globalStatusIndicator.updateState({ focusOnError: true });
+                this.errorSummary.updateState();
             },
         });
     }
