@@ -4,7 +4,11 @@
         <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.non_toc_title }}</h{{ heading_level }}>
         <a
             href="{% url editor_reverse_base resource_id %}?category={{ list_item|urlencode }}"
-            class="btn btn-success">Edit</a>
+            class="btn btn-success icon-link icon-link-hover">
+            Edit 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+            </svg></a>
     </div>
     <div class="bg-body-tertiary rounded p-3">
         {% if list_item in resource_data_by_category %}
