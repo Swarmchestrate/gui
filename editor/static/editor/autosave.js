@@ -147,7 +147,7 @@ export class AsyncFormHandler {
             onServerError: () => {
                 this.globalStatusIndicator.savesToRetry.add(field.id);
                 this.errorSummary.savesToRetry.add(field.id);
-                this.retrySaveButton.updateVisibility();
+                this.retrySaveButton.updateVisibility(this.globalStatusIndicator.savesToRetry);
                 statusIndicator.showErrorState();
                 this.globalStatusIndicator.updateState({ focusOnError: true });
                 this.errorSummary.updateState();
