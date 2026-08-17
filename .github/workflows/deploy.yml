@@ -72,6 +72,12 @@ jobs:
               printf 'SAT_BUILDER_API_URL=http://sat-builder:8000\n' >> "$TMP_ENV"
             fi
 
+            if grep -q '^GUI_VERSION=' "$TMP_ENV"; then
+              sed -i 's#^GUI_VERSION=.*#GUI_VERSION=${{ github.sha }}#' "$TMP_ENV"
+            else
+              printf 'GUI_VERSION=${{ github.sha }}\n' >> "$TMP_ENV"
+            fi
+
             for required_var in \
               SECRET_KEY \
               DEBUG \
@@ -101,16 +107,22 @@ jobs:
             chmod 600 "$DEPLOY_DIR/.env"
             cd "$DEPLOY_DIR"
             if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
-              sudo docker network inspect sat-builder-network >/dev/null 2>&1 || \
-                sudo docker network create --driver bridge sat-builder-network
+              SUDO="sudo -n"
             else
-              docker network inspect sat-builder-network >/dev/null 2>&1 || \
-                docker network create --driver bridge sat-builder-network
+              SUDO=""
             fi
-            if [ "${{ secrets.GUI_SUDO }}" = "true" ]; then
-              sudo docker compose pull
-              sudo docker compose up -d
-            else
-              docker compose pull
-              docker compose up -d
-            fi
+            $SUDO docker network inspect sat-builder-network >/dev/null 2>&1 || \
+              $SUDO docker network create --driver bridge sat-builder-network
+            $SUDO docker compose pull
+            $SUDO docker compose up -d --wait
+
+            IMAGE_REPO="$($SUDO docker compose config --images | head -n 1)"
+            IMAGE_REPO="${IMAGE_REPO%:*}"
+            KEEP_IMAGES=5
+            $SUDO docker image rm "$IMAGE_REPO:latest" >/dev/null 2>&1 || true
+            $SUDO docker image ls "$IMAGE_REPO" \
+              --format '{{.ID}}\t{{.CreatedAt}}\t{{.Tag}}' | \
+              awk -F '\t' '$3 != "latest"' | \
+              sort -k2,3r | tail -n +$((KEEP_IMAGES + 1)) | \
+              cut -f1 | sort -u | \
+              xargs -r -n1 $SUDO docker image rm || true
