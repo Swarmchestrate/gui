@@ -164,6 +164,28 @@ dialog .btn-close {
     max-height: 53px;
 }
 
+/* Breadcrumb */
+nav[aria-label="breadcrumb"] {
+    --bs-breadcrumb-divider: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16"%3E%3Cpath fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/%3E%3C/svg%3E');
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    transform: translateY(0.125em);
+}
+
+// Breadcrumb acts like a back button on smaller screen sizes.
+.breadcrumb-item:not(:nth-last-child(2)) {
+    display: none;
+}
+
+.breadcrumb-item:nth-last-child(2)::before {
+    display: none;
+}
+
+.breadcrumb-item:nth-last-child(2) {
+    font-size: $font-size-lg;
+}
+
 /* Site-wide messages */
 .messages-container {
     display: flex;
@@ -360,5 +382,20 @@ details.error-details {
             "toc header"
             "toc body";
         grid-template-columns: 1.5fr minmax(0, 3fr);
+    }
+}
+
+@media (min-width: 576px) {
+    .breadcrumb-item:not(:nth-last-child(2)) {
+        display: inline;
+    }
+
+    .breadcrumb-item:nth-last-child(2)::before {
+        display: inline;
+    }
+
+    .breadcrumb-item:nth-last-child(2) {
+        font-size: inherit;
+        color: inherit;
     }
 }
