@@ -398,4 +398,12 @@ details.error-details {
         font-size: inherit;
         color: inherit;
     }
+
+    button[data-bs-target="#toc-collapse"] {
+        display: none;
+    }
+
+    #toc-collapse {
+        display: block !important;
+    }
 }
