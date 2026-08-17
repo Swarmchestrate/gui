@@ -12,19 +12,31 @@
 {% endblock extra_scripts %}
 
 {% block top_section %}
-<h1 class="visually-hidden">
-    {{ main_heading }}
-</h1>
 {% endblock top_section %}
 
 {% block toc %}
-<div class="bg-light h-100 rounded p-4">
-    {% include 'editor/toc_as_tab_buttons/toc_base.html' %}
+<div class="bg-light rounded h-100 px-4">
+    <div class="sticky-top py-4">
+        <div class="px-3">
+            <h1 class="fs-6">
+                {{ main_heading }}
+            </h1>
+            {% url editor_overview_reverse_base resource_id as overview_url %}
+            <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover">
+                Overview
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                </svg>
+            </a>
+        </div>
+        <hr>
+        {% include 'editor/toc_as_tab_buttons/toc_base.html' %}
+    </div>
 </div>
 {% endblock toc %}
 
 {% block main_section %}
-<div class="py-4">
+<div class="py-3">
     {% include 'editor/editor_tab.html' %}
 </div>
 {% endblock main_section %}

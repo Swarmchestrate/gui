@@ -22,13 +22,6 @@
                     <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Retry
                 </button>
             </div>
-            {% url editor_overview_reverse_base resource_id as overview_url %}
-            <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover mb-3">
-                {{ main_subheading }}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-                </svg>
-            </a>
             <details class="d-none error-details">
                 <summary class="btn btn-outline-danger btn-sm"></summary>
             </details>
