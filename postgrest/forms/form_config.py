@@ -315,7 +315,7 @@ class FormConfig:
         if metadata.choices:
             choices = list(metadata.choices)
             if not metadata.is_required:
-                choices.insert(0, ("", "None"))
+                choices.insert(0, ("", "Not Set"))
             additional_args.append(choices)
             field_config_class = ChoiceFieldConfig
         elif metadata.enum:
@@ -326,7 +326,7 @@ class FormConfig:
             # Fields with choices are optional, so
             # a blank choice is added so an actual
             # choice isn't set by default.
-            choices.insert(0, ("", "None"))
+            choices.insert(0, ("", "Not Set"))
             additional_args.append(choices)
             field_config_class = ChoiceFieldConfig
         return field_config_class(
