@@ -15,7 +15,7 @@ from utils.humanise import humanise_resource_type, resource_label
 
 class OneToManyForeignKeyResourceEditorView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
-    template_name = "editor/foreign_key_resource_editors/update_editor.html"
+    template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
 
     table_name: str
@@ -197,7 +197,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
 
 
 class NewOneToManyForeignKeyResourceEditorView(FormView):
-    template_name = "editor/foreign_key_resource_editors/new_editor.html"
+    template_name = "editor/editor_for_foreign_key_fields/new_fk_editor.html"
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
 
@@ -403,7 +403,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
 
 class OneToOneForeignKeyResourceEditorView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
-    template_name = "editor/foreign_key_resource_editors/update_editor.html"
+    template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
 
     table_name: str
@@ -602,7 +602,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
 
 
 class NewOneToOneForeignKeyResourceEditorView(FormView):
-    template_name = "editor/foreign_key_resource_editors/new_editor.html"
+    template_name = "editor/editor_for_foreign_key_fields/new_fk_editor.html"
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
 

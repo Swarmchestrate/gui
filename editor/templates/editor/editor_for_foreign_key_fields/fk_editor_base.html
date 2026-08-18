@@ -33,7 +33,7 @@
     {% csrf_token %}
     {% for category, category_data in fk_table_toc_list_items.items %}
     {% with category_id_base=category.lower|kebab_case %}
-    {% include 'editor/foreign_key_resource_editors/editor_section_router.html' %}
+    {% include 'editor/editor_for_foreign_key_fields/fk_editor_section_router.html' %}
     {% endwith %}
     {% endfor %}
     <div class="pt-4">
