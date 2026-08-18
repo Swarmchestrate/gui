@@ -1,45 +1,12 @@
-{% extends 'editor/editor_base.html' %}
-{% load static %}
-{% block extra_scripts %}
-<script type="module" src="{% static 'editor/foreign_key_resource_editor.js' %}"></script>
-{% endblock extra_scripts %}
-{% load helpers %}
+{% extends 'editor/foreign_key_resource_editors/fk_editor_base.html' %}
 
-{% block top_section %}
-<div class="d-flex flex-column align-items-start row-gap-2 border rounded px-2 py-3">
-    <a
-        href="{% url editor_reverse_base resource_id %}?category={{ initial_category }}"
-        class="icon-link icon-link-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
-        style="--bs-icon-link-transform: translate3d(-.125rem, 0, 0);">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-        </svg>
-        Back to {{ initial_category }}
-    </a>
-    <h2 class="fs-6 px-4 mb-0">{{ main_heading }}</h2>
-</div>
-{% endblock top_section %}
+{# form "action" attribute #}
+{% block form_action %}
+action="{{ update_resource_url }}"
+{% endblock form_action %}
 
-{% block toc %}
-{% include 'editor/toc_links/active_sidebar_toc_links.html' %}
-{% endblock toc %}
-
-{% block main_section %}
-<form action="{{ update_resource_url }}" method="POST" id="fk-resource-form" class="pt-4">
-    {% csrf_token %}
-    {% for category, category_data in fk_table_toc_list_items.items %}
-    {% with category_id_base=category.lower|kebab_case %}
-    {% include 'editor/foreign_key_resource_editors/editor_section_router.html' %}
-    {% endwith %}
-    {% endfor %}
-    <div class="pt-4">
-        <button class="btn btn-primary fw-semibold" type="submit">Update</button>
-    </div>
-</form>
-<div id="dialogs"></div>
-{% endblock main_section %}
-
-{% block extra_section %}
-<div id="toast-container" class="toast-container position-fixed top-0 start-0 end-0 p-3 mx-auto"></div>
-{% endblock extra_section %}]
+{# text for the form submit button #}
+{% block form_submit_button_text %}
+Update
+{% endblock form_submit_button_text %}
 

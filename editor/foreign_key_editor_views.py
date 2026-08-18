@@ -145,12 +145,6 @@ class OneToManyForeignKeyResourceEditorView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        foreign_key_properties = [
-            property_name
-            for property_name, metadata in self.fk_table_form_config.get_properties().items()
-            if (metadata.refers_to_table_name
-                or metadata.created_from_table_name)
-        ]
         update_only_form_config = get_form_config_for_table(
             self.fk_table_name,
             self.api_client.openapi_spec,
@@ -266,6 +260,23 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             )
         ).as_dict()
 
+    def get_fk_table_toc_list_items(self):
+        category_names = list(set(
+            resource.as_dict().get("category", "")
+            for resource in self.column_metadata
+            if (resource.as_dict().get("table_name", "") == self.fk_table_name
+                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
+        ))
+        category_names.sort()
+        return EditorTableOfContents(
+            self.fk_table_name,
+            category_names,
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self.fk_table_form_config.get_fields().values()
+            )
+        ).as_dict()
+
     def form_valid(self, form):
         registration_data = form.cleaned_data
         fk_table_definition = self.openapi_spec.get_definition(self.fk_table_name)
@@ -305,6 +316,36 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             row.pop(key, None)
         return row
 
+    def get_forms_by_category(
+            self,
+            form_config: FormConfig,
+            initial: dict | None = None):
+        forms_by_category = dict()
+        for category in form_config.get_field_categories():
+            relational = {
+                name
+                for name, metadata in self.fk_table_form_config.get_properties().items()
+                if metadata.refers_to_table_name or metadata.created_from_table_name
+            }
+            fields = {
+                name: field
+                for name, field in form_config.get_fields_for_category(category).items()
+                if name not in relational
+            }
+            form_for_category = FormWithDynamicallyPopulatedFields(
+                fields=fields,
+                initial=initial
+            )
+            if not category:
+                forms_by_category.update({
+                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
+                })
+                continue
+            forms_by_category.update({
+                category: form_for_category,
+            })
+        return forms_by_category
+
     def get_initial(self):
         initial = super().get_initial()
         initial.update(self.get_copy_source())
@@ -312,6 +353,8 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        # NOTE: only handles the fields processed at form submission - the form fields
+        # which are displayed in the wizard are handled in self.get_forms_by_category().
         # Everything the row has, so it can be filled in one pass rather than
         # created and then immediately edited. Foreign keys are excluded: they
         # render as relational sections, which need a row that does not exist
@@ -349,6 +392,11 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
+            "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
+            "forms_by_category": self.get_forms_by_category(
+                self.fk_table_form_config,
+                initial=self.get_initial()
+            ),
         })
         return context
 
