@@ -115,8 +115,8 @@ class CloudCapacityViewMixin:
     # No table_name default: views set their own, and a missing one should fail
     # loudly rather than silently querying a table that does not exist.
     editor_reverse_base = "capacities:cloud_capacity_editor"
-    editor_one_to_one_section_reverse_base = "capacities:cloud_capacity_editor_one_to_one_section"
-    editor_one_to_many_section_reverse_base = "capacities:cloud_capacity_editor_one_to_many_section"
+    one_to_one_field_popup_section_reverse_base = "capacities:cloud_capacity_one_to_one_field_popup_section"
+    one_to_many_field_popup_section_reverse_base = "capacities:cloud_capacity_one_to_many_field_popup_section"
     editor_non_dialog_based_one_to_one_section_reverse_base = "capacities:cloud_capacity_editor_non_dialog_based_one_to_one_section"
     editor_non_dialog_based_one_to_many_section_reverse_base = "capacities:cloud_capacity_editor_non_dialog_based_one_to_many_section"
     editor_start_reverse_base = "capacities:new_cloud_capacity"
@@ -132,8 +132,8 @@ class CloudCapacityViewMixin:
 @dataclass
 class EdgeCapacityViewMixin:
     editor_reverse_base = "capacities:edge_capacity_editor"
-    editor_one_to_one_section_reverse_base = "capacities:edge_capacity_editor_one_to_one_section"
-    editor_one_to_many_section_reverse_base = "capacities:edge_capacity_editor_one_to_many_section"
+    one_to_one_field_popup_section_reverse_base = "capacities:edge_capacity_one_to_one_field_popup_section"
+    one_to_many_field_popup_section_reverse_base = "capacities:edge_capacity_one_to_many_field_popup_section"
     editor_non_dialog_based_one_to_one_section_reverse_base = "capacities:edge_capacity_editor_non_dialog_based_one_to_one_section"
     editor_non_dialog_based_one_to_many_section_reverse_base = "capacities:edge_capacity_editor_non_dialog_based_one_to_many_section"
     editor_start_reverse_base = "capacities:new_edge_capacity"

@@ -260,13 +260,13 @@ async function getSection(sectionUrl) {
     );
 }
 
-export async function loadOneToOneFieldSections() {
-    const oneToOneFieldSections = Array.from(
+export async function loadOneToOneFieldPopupSections() {
+    const oneToOneFieldPopupSections = Array.from(
         document.querySelectorAll(".one-to-one-field:not([data-editor-based])"),
     );
-    const sectionUrls = oneToOneFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
+    const sectionUrls = oneToOneFieldPopupSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
     const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
-    oneToOneFieldSections.forEach((section, i) => {
+    oneToOneFieldPopupSections.forEach((section, i) => {
         const sectionPlaceholder = section.querySelector("[data-section-url]");
         sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
         const dialogsSection = document.querySelector("#dialogs");

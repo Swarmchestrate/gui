@@ -182,8 +182,8 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
-            "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
-            "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+            "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
+            "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
             "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
             "forms_by_category": self.get_forms_by_category(
@@ -587,8 +587,8 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
-            "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
-            "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+            "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
+            "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
             "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
             "forms_by_category": self.get_forms_by_category(

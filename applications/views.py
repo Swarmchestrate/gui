@@ -5,10 +5,10 @@ from django.views.generic import View
 from .tosca import generate_adt_yaml
 
 from editor.foreign_key_views import (
-    NonDialogBasedOneToManyFieldEditorSectionView,
-    NonDialogBasedOneToOneFieldEditorSectionView,
-    OneToManyFieldEditorSectionView,
-    OneToOneFieldEditorSectionView,
+    NonDialogBasedOneToManyFieldSectionView,
+    NonDialogBasedOneToOneFieldSectionView,
+    OneToManyFieldPopupSectionView,
+    OneToOneFieldPopupSectionView,
 )
 from editor.foreign_key_editor_views import (
     OneToManyForeignKeyResourceEditorView,
@@ -34,8 +34,8 @@ from resource_management.views import (
 
 class ApplicationViewMixin:
     editor_reverse_base = "applications:application_editor"
-    editor_one_to_one_section_reverse_base = "applications:application_editor_one_to_one_section"
-    editor_one_to_many_section_reverse_base = "applications:application_editor_one_to_many_section"
+    one_to_one_field_popup_section_reverse_base = "applications:application_one_to_one_field_popup_section"
+    one_to_many_field_popup_section_reverse_base = "applications:application_one_to_many_field_popup_section"
     editor_non_dialog_based_one_to_one_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_one_section"
     editor_non_dialog_based_one_to_many_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_many_section"
     editor_start_reverse_base = "applications:new_application"
@@ -55,14 +55,14 @@ class ApplicationEditorView(ApplicationViewMixin, EditorView):
     editor_form_reverse = "applications:application_autosave"
 
 
-class ApplicationOneToOneFieldEditorSectionView(ApplicationViewMixin, OneToOneFieldEditorSectionView):
+class ApplicationOneToOneFieldPopupSectionView(ApplicationViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.APPLICATION_NEW
     new_one_to_one_relation_reverse_base = "applications:new_application_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "applications:update_application_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "applications:delete_application_one_to_one_relation"
 
 
-class ApplicationOneToManyFieldEditorSectionView(ApplicationViewMixin, OneToManyFieldEditorSectionView):
+class ApplicationOneToManyFieldPopupSectionView(ApplicationViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
@@ -125,14 +125,14 @@ class ApplicationDescriptionTemplateDownloadView(
         return generate_adt_yaml(self.resource_id)
 
 
-class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):
+class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
-class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):
+class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"

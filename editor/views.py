@@ -38,8 +38,8 @@ class EditorView(TemplateView):
     resource_type: str
 
     editor_overview_reverse_base: str
-    editor_one_to_one_section_reverse_base: str
-    editor_one_to_many_section_reverse_base: str
+    one_to_one_field_popup_section_reverse_base: str
+    one_to_many_field_popup_section_reverse_base: str
     editor_non_dialog_based_one_to_one_section_reverse_base: str
     editor_non_dialog_based_one_to_many_section_reverse_base: str
     editor_form_reverse: str
@@ -134,8 +134,8 @@ class EditorView(TemplateView):
                 "resource_type": self.resource_type,
                 "editor_form_url": self.editor_form_url,
                 "editor_overview_reverse_base": self.editor_overview_reverse_base,
-                "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
-                "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+                "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
+                "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
                 "editor_non_dialog_based_one_to_one_section_reverse_base": self.editor_non_dialog_based_one_to_one_section_reverse_base,
                 "editor_non_dialog_based_one_to_many_section_reverse_base": self.editor_non_dialog_based_one_to_many_section_reverse_base,
                 "toc_list_items": self.get_toc_list_items(),

@@ -11,23 +11,23 @@ from editor.foreign_key_editor_views import (
     OneToOneForeignKeyResourceEditorView,
 )
 from editor.foreign_key_views import (
-    NonDialogBasedOneToManyFieldEditorSectionView,
-    NonDialogBasedOneToOneFieldEditorSectionView,
-    OneToManyFieldEditorSectionView,
-    OneToOneFieldEditorSectionView,
+    NonDialogBasedOneToManyFieldSectionView,
+    NonDialogBasedOneToOneFieldSectionView,
+    OneToManyFieldPopupSectionView,
+    OneToOneFieldPopupSectionView,
 )
 from postgrest.table_names import TableNames
 
 
 # Cloud Capacity views
-class CloudCapacityOneToOneFieldEditorSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneFieldEditorSectionView):
+class CloudCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
 
 
-class CloudCapacityOneToManyFieldEditorSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyFieldEditorSectionView):
+class CloudCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_one_to_many_relation_reverse_base = "capacities:new_cloud_capacity_one_to_many_relation"
@@ -35,14 +35,14 @@ class CloudCapacityOneToManyFieldEditorSectionView(CapacitySubtypeFieldsMixin, C
     delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
 
 
-class CloudCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):
+class CloudCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_one_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "capacities:cloud_capacity_one_to_one_foreign_key_resource_update_editor"
 
 
-class CloudCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):
+class CloudCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_many_foreign_key_resource_editor"
@@ -78,14 +78,14 @@ class CloudCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMi
 
 
 # Edge Capacity views
-class EdgeCapacityOneToOneFieldEditorSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneFieldEditorSectionView):
+class EdgeCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
     update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "capacities:delete_edge_capacity_one_to_one_relation"
 
 
-class EdgeCapacityOneToManyFieldEditorSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyFieldEditorSectionView):
+class EdgeCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_one_to_many_relation_reverse_base = "capacities:new_edge_capacity_one_to_many_relation"
@@ -93,14 +93,14 @@ class EdgeCapacityOneToManyFieldEditorSectionView(CapacitySubtypeFieldsMixin, Ed
     delete_one_to_many_relation_reverse_base = "capacities:delete_edge_capacity_one_to_many_relation"
 
 
-class EdgeCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToOneFieldEditorSectionView):
+class EdgeCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_one_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "capacities:edge_capacity_one_to_one_foreign_key_resource_update_editor"
 
 
-class EdgeCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToManyFieldEditorSectionView):
+class EdgeCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_many_foreign_key_resource_editor"

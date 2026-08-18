@@ -17,7 +17,7 @@ from utils.humanise import resource_label
 logger = logging.getLogger(__name__)
 
 
-class OneToOneFieldEditorSectionView(View):
+class OneToOneFieldPopupSectionView(View):
     table_name: str
 
     def dispatch(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class OneToOneFieldEditorSectionView(View):
         initial = dict()
         if fk_resource:
             initial = fk_resource.as_dict()
-        return render_to_string("editor/foreign_key_fields/one_to_one_field_section.html", {
+        return render_to_string("editor/foreign_key_fields/one_to_one_field_popup_section.html", {
             "field_name": self.fk_column_name,
             "resource": self.get_fk_resource(),
             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
@@ -157,7 +157,7 @@ class OneToOneFieldEditorSectionView(View):
         })
 
 
-class OneToManyFieldEditorSectionView(View):
+class OneToManyFieldPopupSectionView(View):
     table_name: str
     resource_type: str
 
@@ -199,7 +199,7 @@ class OneToManyFieldEditorSectionView(View):
         )
 
     def get_section_template(self, forms_for_existing_fk_resources: dict):
-        return render_to_string("editor/foreign_key_fields/one_to_many_field_section.html", {
+        return render_to_string("editor/foreign_key_fields/one_to_many_field_popup_section.html", {
             "field_name": self.fk_table_name,
             "forms_for_existing_resources": forms_for_existing_fk_resources,
             "resource_type": self.fk_table_name,
@@ -207,7 +207,7 @@ class OneToManyFieldEditorSectionView(View):
 
     def get_list_item_template(self):
         return render_to_string(
-            "editor/foreign_key_fields/one_to_many_field_list_item.html",
+            "editor/foreign_key_fields/one_to_many_field_popup_list_item.html",
             {
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
                     fields=self.form_config.get_fields(),
@@ -369,7 +369,7 @@ class OneToManyFieldEditorSectionView(View):
         })
 
 
-class NonDialogBasedOneToOneFieldEditorSectionView(View):
+class NonDialogBasedOneToOneFieldSectionView(View):
     table_name: str
     
     new_foreign_key_resource_editor_reverse_base: str
@@ -465,7 +465,7 @@ class NonDialogBasedOneToOneFieldEditorSectionView(View):
         })
 
 
-class NonDialogBasedOneToManyFieldEditorSectionView(View):
+class NonDialogBasedOneToManyFieldSectionView(View):
     table_name: str
     resource_type: str
     

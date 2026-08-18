@@ -27,13 +27,13 @@ urlpatterns = [
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
-        views.ApplicationOneToOneFieldEditorSectionView.as_view(),
-        name="application_editor_one_to_one_section",
+        views.ApplicationOneToOneFieldPopupSectionView.as_view(),
+        name="application_one_to_one_field_popup_section",
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
-        views.ApplicationOneToManyFieldEditorSectionView.as_view(),
-        name="application_editor_one_to_many_section",
+        views.ApplicationOneToManyFieldPopupSectionView.as_view(),
+        name="application_one_to_many_field_popup_section",
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
