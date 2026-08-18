@@ -388,6 +388,8 @@ class EditorStartFormView(FormView):
         )
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
+        if not hasattr(self, "disabled_properties"):
+            self.disabled_properties = list()
         return super().dispatch(request, *args, **kwargs)
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
