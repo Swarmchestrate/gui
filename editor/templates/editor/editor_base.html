@@ -9,13 +9,13 @@
 <div class="editor-container">
     <div class="editor-layout">
         <div class="editor-layout__content">
-            {# Editor header #}
-            <div class="editor-layout__header">
-                {% block top_section %}{% endblock top_section %}
-            </div>
             {# TOC #}
             <div class="editor-layout__toc mb-sm-0 mb-4">
                 {% block toc %}{% endblock toc %}
+            </div>
+            {# Editor header #}
+            <div class="editor-layout__header">
+                {% block top_section %}{% endblock top_section %}
             </div>
             {# Editor main content #}
             <div class="editor-layout__body">

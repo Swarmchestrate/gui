@@ -34,7 +34,7 @@
     </div>
     {% if list_item_data.descendents %}
     {% for descendent_list_item, descendent_list_item_data in list_item_data.descendents.items %}
-    {% with list_item=descendent_list_item list_item_data=descendent_list_item_data heading_level='3' heading_classes='fs-5 fw-semibold text-body-secondary' section_extra_classes='pt-2' %}
+    {% with list_item=descendent_list_item list_item_data=descendent_list_item_data heading_level='4' heading_classes='fs-5 fw-semibold text-body-secondary' section_extra_classes='pt-2' %}
     {% include 'editor/overview_section.html' %}
     {% endwith %}
     {% endfor %}

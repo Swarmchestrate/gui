@@ -3,7 +3,7 @@
 
 {% block top_section %}
 <hgroup class="d-flex flex-column row-gap-1">
-    <h1 class="mb-0">{{ main_heading }}</h1>
+    <h2 class="mb-0">{{ main_heading }}</h2>
 </hgroup>
 {% endblock top_section %}
 
@@ -13,7 +13,7 @@
 
 {% block main_section %}
 {% for list_item, list_item_data in toc_list_items.items %}
-{% with heading_level='2' heading_classes='fs-5' %}
+{% with heading_level='3' heading_classes='fs-5' %}
 {% include 'editor/overview_section.html' %}
 {% endwith %}
 {% endfor %}
