@@ -13,12 +13,11 @@
 </p>
 <hgroup class="d-flex flex-column row-gap-1">
     <h1 class="mb-0">{{ main_heading }}</h1>
-    <p class="fs-6 text-body-secondary">{{ main_subheading }}</p>
 </hgroup>
 {% endblock top_section %}
 
 {% block toc %}
-{% include 'editor/toc_links/toc_links_base.html' %}
+{% include 'editor/toc_links/active_sidebar_toc_links.html' %}
 {% endblock toc %}
 
 {% block main_section %}

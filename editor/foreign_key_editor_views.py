@@ -172,7 +172,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         )
         context.update({
             "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
-            "main_subheading": resource_label(
+            "resource_name": resource_label(
                 self.resource.as_dict(), self.resource_type, self.resource_id
             ),
             "main_heading": resource_label(
@@ -187,6 +187,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
             "fk_table_name": self.fk_table_name,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
+            "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
             "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
@@ -334,7 +335,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             self.resource_type = self.table_name
         context.update({
             "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
-            "main_subheading": resource_label(
+            "resource_name": resource_label(
                 self.resource.as_dict(), self.resource_type, self.resource_id
             ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
@@ -346,6 +347,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
             "fk_table_name": self.fk_table_name,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
+            "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
         })
         return context
@@ -521,7 +523,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         )
         context.update({
             "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
-            "main_subheading": resource_label(
+            "resource_name": resource_label(
                 self.resource.as_dict(), self.resource_type, self.resource_id
             ),
             "main_heading": resource_label(
@@ -536,6 +538,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
             "fk_column_name": self.fk_column_name,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
+            "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
             "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
@@ -659,7 +662,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             self.resource_type = self.table_name
         context.update({
             "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
-            "main_subheading": resource_label(
+            "resource_name": resource_label(
                 self.resource.as_dict(), self.resource_type, self.resource_id
             ),
             "main_heading": f"New {humanise_resource_type(self.fk_table_name).title()}",
@@ -671,6 +674,7 @@ class NewOneToOneForeignKeyResourceEditorView(FormView):
             "fk_table_name": self.fk_table_name,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
+            "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "toc_list_items": self.get_toc_list_items(),
         })
         return context

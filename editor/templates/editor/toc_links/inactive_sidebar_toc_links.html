@@ -1,0 +1,8 @@
+{% extends 'editor/toc_links/sidebar_toc_links_base.html' %}
+{% block h1_heading_text %}
+{{ title }}
+{% endblock h1_heading_text %}
+{% block overview_link %}{% endblock overview_link %}
+{% block toc %}
+{% include 'editor/toc_links/inactive_toc_links.html' %}
+{% endblock toc %}

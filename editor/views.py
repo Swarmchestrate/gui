@@ -124,7 +124,7 @@ class EditorView(TemplateView):
         context.update(
             {
                 "title": self.title_base,
-                "main_subheading": resource_label(
+                "resource_name": resource_label(
                     self.resource.as_dict(), self.resource_type, self.resource_id
                 ),
                 "main_heading": self.title_base,
@@ -524,7 +524,7 @@ class EditorOverviewTemplateView(TemplateView):
             {
                 "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
                 "main_heading": "Overview",
-                "main_subheading": resource_label(
+                "resource_name": resource_label(
                     self.resource.as_dict(), self.resource_type, self.resource_id
                 ),
                 "resource_data_by_category": self.format_resource_data_for_template(),

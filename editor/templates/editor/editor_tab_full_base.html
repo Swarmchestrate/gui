@@ -15,41 +15,7 @@
 {% endblock top_section %}
 
 {% block toc %}
-<div class="bg-light rounded h-100 px-4">
-    <div class="sticky-top py-4">
-        <div class="d-flex align-items-center column-gap-2 ps-3">
-            <div>
-                <h1 class="fs-6">
-                    {{ main_heading }}
-                </h1>
-                {% url editor_overview_reverse_base resource_id as overview_url %}
-                <a href="{{ overview_url }}" class="icon-link icon-link-hover link-secondary link-underline-opacity-25 link-underline-opacity-75-hover">
-                    Overview
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-                    </svg>
-                </a>
-            </div>
-            <div class="ms-auto">
-                <button
-                    class="btn btn-light rounded-circle lh-1 px-2"
-                    type="button"
-                    style="aspect-ratio: 1 / 1;"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#toc-collapse"
-                    aria-expanded="true"
-                    aria-controls="toc-collapse"
-                    aria-label="Toggle table of contents">
-                    <i class="bi bi-list-ul fs-5" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
-        <div class="collapse show" id="toc-collapse">
-            <hr>
-            {% include 'editor/toc_tab/toc_tab_base.html' %}
-        </div>
-    </div>
-</div>
+{% include 'editor/toc_tab/sidebar_toc_tab.html' %}
 {% endblock toc %}
 
 {% block main_section %}
