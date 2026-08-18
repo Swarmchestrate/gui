@@ -40,8 +40,14 @@ class EditorTableOfContents:
         # Category metadata
         table_of_contents.update({
             category: {
+                # Parent categories are removed from the descendent "title"
+                # later. E.g., "parent:descendent" -> "descendent".
                 "title": category,
-                "non_toc_title": category.replace(":", ": "),
+                # The "full_title" keeps the parent categories from the original
+                # category text - the colons separating the categories just have
+                # a space added to make the full title more readable.
+                # E.g., "parent:descendent" -> "parent: descendent".
+                "full_title": category.replace(":", ": "),
                 "descendents": dict(),
                 "previous": prev_category,
                 "next": next_category,
@@ -113,7 +119,7 @@ class EditorTableOfContents:
         if self.is_unknown_category_needed:
             uncategorised_metadata = {
                 "title": UNKNOWN_ATTRIBUTE_CATEGORY,
-                "non_toc_title": UNKNOWN_ATTRIBUTE_CATEGORY,
+                "full_title": UNKNOWN_ATTRIBUTE_CATEGORY,
                 "descendents": dict(),
                 "previous": None,
                 "next": None,

@@ -1,7 +1,7 @@
 {% load helpers %}
 <section class="d-flex flex-column row-gap-2 {{ section_extra_classes|default:'' }}">
     <div class="d-flex align-items-baseline column-gap-3">
-        <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.non_toc_title }}</h{{ heading_level }}>
+        <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.full_title }}</h{{ heading_level }}>
         <a
             href="{% url editor_reverse_base resource_id %}?category={{ list_item|urlencode }}"
             class="btn btn-success icon-link icon-link-hover">
