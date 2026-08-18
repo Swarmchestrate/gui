@@ -6,7 +6,7 @@
 {% load helpers %}
 
 {% block top_section %}
-<p class="fw-semibold">
+<div class="d-flex flex-column align-items-start row-gap-2 border rounded px-2 py-3">
     <a
         href="{% url editor_reverse_base resource_id %}?category={{ initial_category }}"
         class="icon-link icon-link-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
@@ -16,10 +16,8 @@
         </svg>
         Back to {{ initial_category }}
     </a>
-</p>
-<hgroup class="d-flex flex-column row-gap-1">
-    <h1 class="mb-0">{{ main_heading }}</h1>
-</hgroup>
+    <h2 class="fs-6 px-4 mb-0">{{ main_heading }}</h2>
+</div>
 {% endblock top_section %}
 
 {% block toc %}
