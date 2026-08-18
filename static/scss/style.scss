@@ -245,8 +245,8 @@ label:has(~ :required)::after,
     display: grid;
     column-gap: 2rem;
     grid-template-areas:
-        "header"
         "toc"
+        "header"
         "body";
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, auto);
