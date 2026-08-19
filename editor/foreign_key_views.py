@@ -416,7 +416,7 @@ class OneToOneFieldSectionView(View):
         if fk_resource:
             initial = fk_resource.as_dict()
             fk_resource_id = fk_resource.pk
-        return render_to_string("editor/foreign_key_fields/popup_based/one_to_one_field_section.html", {
+        return render_to_string("editor/foreign_key_fields/one_to_one_field_section.html", {
             "field_name": self.fk_column_name,
             "resource_id": self.resource_id,
             "resource": fk_resource,
