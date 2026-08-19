@@ -22,12 +22,12 @@ urlpatterns = [
         name="delete_cloud_capacities",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
+        "cloud-capacities/api/<resource_id>/editor/one-to-one-popup-section/<fk_column_name>/",
         foreign_key_views.CloudCapacityOneToOneFieldPopupSectionView.as_view(),
         name="cloud_capacity_one_to_one_field_popup_section",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        "cloud-capacities/api/<resource_id>/editor/one-to-many-popup-section/<fk_table_name>/",
         foreign_key_views.CloudCapacityOneToManyFieldPopupSectionView.as_view(),
         name="cloud_capacity_one_to_many_field_popup_section",
     ),
@@ -107,12 +107,12 @@ urlpatterns = [
         name="edge_capacity_overview",
     ),
     path(
-        "edge-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
+        "edge-capacities/api/<resource_id>/editor/one-to-one-popup-section/<fk_column_name>/",
         foreign_key_views.EdgeCapacityOneToOneFieldPopupSectionView.as_view(),
         name="edge_capacity_one_to_one_field_popup_section",
     ),
     path(
-        "edge-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        "edge-capacities/api/<resource_id>/editor/one-to-many-popup-section/<fk_table_name>/",
         foreign_key_views.EdgeCapacityOneToManyFieldPopupSectionView.as_view(),
         name="edge_capacity_one_to_many_field_popup_section",
     ),

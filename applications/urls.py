@@ -26,12 +26,12 @@ urlpatterns = [
         name="delete_applications",
     ),
     path(
-        "applications/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
+        "applications/api/<resource_id>/editor/one-to-one-popup-section/<fk_column_name>/",
         views.ApplicationOneToOneFieldPopupSectionView.as_view(),
         name="application_one_to_one_field_popup_section",
     ),
     path(
-        "applications/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
+        "applications/api/<resource_id>/editor/one-to-many-popup-section/<fk_table_name>/",
         views.ApplicationOneToManyFieldPopupSectionView.as_view(),
         name="application_one_to_many_field_popup_section",
     ),

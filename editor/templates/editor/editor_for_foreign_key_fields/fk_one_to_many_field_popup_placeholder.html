@@ -2,7 +2,8 @@
 <section
     class="one-to-many-field py-4"
     data-field="{{ field.name }}"
-    data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}">
+    data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}"
+    data-popup-based>
     <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
     {# table_name is the row being edited, so its own id is fk_resource_id. #}
     <div data-section-url="{% url 'editor:one_to_many_field_popup_section' table_name fk_resource_id field.field.metadata.created_from_table_name %}">
