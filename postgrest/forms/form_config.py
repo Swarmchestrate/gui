@@ -209,8 +209,13 @@ class OneToManyProperties:
                 and not (other_table_name == table_name))
                 for other_table_name in references_to_other_tables
             )
-            is_fk_ref_made_from_secondary_table = self._openapi_spec.find_references_to_table(
+            references_from_other_tables = self._openapi_spec.find_references_to_table(
                 table_name
+            )
+            is_fk_ref_made_from_secondary_table = any(
+                (other_table_name not in MAIN_TABLE_NAMES
+                and not (other_table_name == table_name))
+                for other_table_name in references_from_other_tables
             )
             has_fk_relation_to_secondary_table = is_fk_ref_made_to_secondary_table or is_fk_ref_made_from_secondary_table
             properties_as_dict.update({
