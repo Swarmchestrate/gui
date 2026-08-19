@@ -14,6 +14,10 @@ from utils.humanise import humanise_resource_type, resource_label
 
 
 class ForeignKeyEditorView(FormView):
+    def get_form_fields_for_category(self, form_config, category):
+        fields = form_config.get_fields_for_category(category)
+        return fields
+
     def get_forms_by_category(
             self,
             form_config: FormConfig,
@@ -21,7 +25,7 @@ class ForeignKeyEditorView(FormView):
         forms_by_category = dict()
         for category in form_config.get_field_categories():
             form_for_category = FormWithDynamicallyPopulatedFields(
-                fields=form_config.get_fields_for_category(category),
+                fields=self.get_form_fields_for_category(form_config, category),
                 initial=initial
             )
             if not category:
@@ -292,6 +296,22 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
             row.pop(key, None)
         return row
 
+    def get_form_fields_for_category(self, form_config, category):
+        unprocessed_fields = super().get_form_fields_for_category(form_config, category)
+        # Remove relational fields as these require an ID to a resource that doesn't
+        # exist yet.
+        relational = {
+            name
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
+        fields = {
+            name: field
+            for name, field in unprocessed_fields.items()
+            if name not in relational
+        }
+        return fields
+
     def get_initial(self):
         initial = super().get_initial()
         initial.update(self.get_copy_source())
@@ -537,6 +557,22 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
             ]
         )
         return super().dispatch(request, *args, **kwargs)
+
+    def get_form_fields_for_category(self, form_config, category):
+        unprocessed_fields = super().get_form_fields_for_category(form_config, category)
+        # Remove relational fields as these require an ID to a resource that doesn't
+        # exist yet.
+        relational = {
+            name
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
+        fields = {
+            name: field
+            for name, field in unprocessed_fields.items()
+            if name not in relational
+        }
+        return fields
 
     def form_valid(self, form):
         registration_data = form.cleaned_data
