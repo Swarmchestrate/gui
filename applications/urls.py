@@ -36,12 +36,12 @@ urlpatterns = [
         name="application_one_to_many_field_popup_section",
     ),
     path(
-        "applications/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
+        "applications/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
         views.ApplicationOneToOneFieldSectionView.as_view(),
         name="application_editor_one_to_one_section",
     ),
     path(
-        "applications/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
+        "applications/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
         views.ApplicationOneToManyFieldSectionView.as_view(),
         name="application_editor_one_to_many_section",
     ),

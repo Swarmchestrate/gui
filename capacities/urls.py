@@ -32,12 +32,12 @@ urlpatterns = [
         name="cloud_capacity_one_to_many_field_popup_section",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
+        "cloud-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
         foreign_key_views.CloudCapacityOneToOneFieldSectionView.as_view(),
         name="cloud_capacity_editor_one_to_one_section",
     ),
     path(
-        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
+        "cloud-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
         foreign_key_views.CloudCapacityOneToManyFieldSectionView.as_view(),
         name="cloud_capacity_editor_one_to_many_section",
     ),
@@ -117,12 +117,12 @@ urlpatterns = [
         name="edge_capacity_one_to_many_field_popup_section",
     ),
     path(
-        "edge-capacities/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
+        "edge-capacities/api/<resource_id>/editor/one-to-one-section/<fk_column_name>/",
         foreign_key_views.EdgeCapacityOneToOneFieldSectionView.as_view(),
         name="edge_capacity_editor_one_to_one_section",
     ),
     path(
-        "edge-capacities/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
+        "edge-capacities/api/<resource_id>/editor/one-to-many-section/<fk_table_name>/",
         foreign_key_views.EdgeCapacityOneToManyFieldSectionView.as_view(),
         name="edge_capacity_editor_one_to_many_section",
     ),
