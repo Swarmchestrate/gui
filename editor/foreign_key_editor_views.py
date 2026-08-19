@@ -225,11 +225,8 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        self.fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(self.fk_resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
-        if self.fk_resource is None or self.fk_resource.as_dict() is None:
-            raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
@@ -507,11 +504,8 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
         definition = self.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        self.fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(self.fk_resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
-        if self.fk_resource is None or self.fk_resource.as_dict() is None:
-            raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
