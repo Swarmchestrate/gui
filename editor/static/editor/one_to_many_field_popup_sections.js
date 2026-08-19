@@ -308,7 +308,7 @@ async function getSection(sectionUrl) {
 
 export async function loadOneToManyFieldPopupSections() {
     const oneToManyFieldPopupSections = Array.from(
-        document.querySelectorAll(".one-to-many-field:not([data-editor-based]"),
+        document.querySelectorAll(".one-to-many-field[data-popup-based]"),
     );
     const sectionUrls = oneToManyFieldPopupSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
     const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
