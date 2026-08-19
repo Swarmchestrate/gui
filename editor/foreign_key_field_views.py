@@ -59,7 +59,7 @@ class OneToOneFieldPopupSectionView(View):
         initial = dict()
         if fk_resource:
             initial = fk_resource.as_dict()
-        return render_to_string("editor/foreign_key_fields/one_to_one_field_popup_section.html", {
+        return render_to_string("editor/foreign_key_fields/popup_based/one_to_one_field_popup_section.html", {
             "field_name": self.fk_column_name,
             "resource": self.get_fk_resource(),
             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
