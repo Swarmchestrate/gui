@@ -4,7 +4,7 @@ from django.views.generic import View
 
 from .tosca import generate_adt_yaml
 
-from editor.foreign_key_views import (
+from editor.foreign_key_field_views import (
     OneToManyFieldSectionView,
     OneToOneFieldSectionView,
     OneToManyFieldPopupSectionView,

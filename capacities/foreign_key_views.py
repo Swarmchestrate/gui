@@ -10,7 +10,7 @@ from editor.foreign_key_editor_views import (
     OneToManyForeignKeyEditorView,
     OneToOneForeignKeyEditorView,
 )
-from editor.foreign_key_views import (
+from editor.foreign_key_field_views import (
     OneToManyFieldSectionView,
     OneToOneFieldSectionView,
     OneToManyFieldPopupSectionView,
