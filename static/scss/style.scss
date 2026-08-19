@@ -233,9 +233,14 @@ label:has(~ :required)::after,
     color: var(--bs-danger);
 }
 
+.label-wrapper {
+    padding-bottom: 0.75em;
+}
+
 .label-wrapper .label {
     display: inline-block;
 }
+
 
 .editor-container {
     position: relative;
@@ -311,7 +316,9 @@ label:has(~ :required)::after,
 
 .card .list-group:empty::after {
     content: attr(placeholder);
-    padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
+    padding: 2em;
+    text-align: center;
+    // padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
 }
 
 /* Wizard nav */
