@@ -5,10 +5,10 @@ from .view_helpers import (
 )
 
 from editor.foreign_key_editor_views import (
-    NewOneToManyForeignKeyResourceEditorView,
-    NewOneToOneForeignKeyResourceEditorView,
-    OneToManyForeignKeyResourceEditorView,
-    OneToOneForeignKeyResourceEditorView,
+    NewOneToManyForeignKeyEditorView,
+    NewOneToOneForeignKeyEditorView,
+    OneToManyForeignKeyEditorView,
+    OneToOneForeignKeyEditorView,
 )
 from editor.foreign_key_views import (
     OneToManyFieldSectionView,
@@ -38,39 +38,39 @@ class CloudCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, Cl
 class CloudCapacityOneToOneFieldSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_one_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "capacities:cloud_capacity_one_to_one_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "capacities:cloud_capacity_new_one_to_one_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "capacities:cloud_capacity_one_to_one_foreign_key_update_editor"
 
 
 class CloudCapacityOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_many_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "capacities:cloud_capacity_one_to_many_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "capacities:cloud_capacity_new_one_to_many_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "capacities:cloud_capacity_one_to_many_foreign_key_update_editor"
 
 
-class CloudCapacityNewOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToOneForeignKeyResourceEditorView):
+class CloudCapacityNewOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
-class CloudCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
+class CloudCapacityOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
-class CloudCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
+class CloudCapacityNewOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
-class CloudCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
+class CloudCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
@@ -96,39 +96,39 @@ class EdgeCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, Edg
 class EdgeCapacityOneToOneFieldSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_one_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "capacities:edge_capacity_one_to_one_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "capacities:edge_capacity_new_one_to_one_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "capacities:edge_capacity_one_to_one_foreign_key_update_editor"
 
 
 class EdgeCapacityOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_many_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "capacities:edge_capacity_one_to_many_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "capacities:edge_capacity_new_one_to_many_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "capacities:edge_capacity_one_to_many_foreign_key_update_editor"
 
 
-class EdgeCapacityNewOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToOneForeignKeyResourceEditorView):
+class EdgeCapacityNewOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "capacities/edge_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
-class EdgeCapacityOneToOneForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneForeignKeyResourceEditorView):
+class EdgeCapacityOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneForeignKeyEditorView):
     template_name = "capacities/edge_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
-class EdgeCapacityNewOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToManyForeignKeyResourceEditorView):
+class EdgeCapacityNewOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "capacities/edge_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
-class EdgeCapacityOneToManyForeignKeyResourceEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyForeignKeyResourceEditorView):
+class EdgeCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyForeignKeyEditorView):
     template_name = "capacities/edge_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY

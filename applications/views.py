@@ -11,10 +11,10 @@ from editor.foreign_key_views import (
     OneToOneFieldPopupSectionView,
 )
 from editor.foreign_key_editor_views import (
-    OneToManyForeignKeyResourceEditorView,
-    OneToOneForeignKeyResourceEditorView,
-    NewOneToManyForeignKeyResourceEditorView,
-    NewOneToOneForeignKeyResourceEditorView,
+    OneToManyForeignKeyEditorView,
+    OneToOneForeignKeyEditorView,
+    NewOneToManyForeignKeyEditorView,
+    NewOneToOneForeignKeyEditorView,
 )
 from editor.views import (
     EditorAutosaveView,
@@ -128,39 +128,39 @@ class ApplicationDescriptionTemplateDownloadView(
 class ApplicationOneToOneFieldSectionView(ApplicationViewMixin, OneToOneFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
-    new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_update_editor"
 
 
 class ApplicationOneToManyFieldSectionView(ApplicationViewMixin, OneToManyFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
-    new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
-    foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
+    new_foreign_key_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_editor"
+    foreign_key_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_update_editor"
 
 
-class ApplicationNewOneToOneForeignKeyResourceEditorView(ApplicationViewMixin, NewOneToOneForeignKeyResourceEditorView):
+class ApplicationNewOneToOneForeignKeyEditorView(ApplicationViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "applications/application_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
-class ApplicationOneToOneForeignKeyResourceEditorView(ApplicationViewMixin, OneToOneForeignKeyResourceEditorView):
+class ApplicationOneToOneForeignKeyEditorView(ApplicationViewMixin, OneToOneForeignKeyEditorView):
     template_name = "applications/application_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
-class ApplicationNewOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, NewOneToManyForeignKeyResourceEditorView):
+class ApplicationNewOneToManyForeignKeyEditorView(ApplicationViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "applications/application_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
-class ApplicationOneToManyForeignKeyResourceEditorView(ApplicationViewMixin, OneToManyForeignKeyResourceEditorView):
+class ApplicationOneToManyForeignKeyEditorView(ApplicationViewMixin, OneToManyForeignKeyEditorView):
     template_name = "applications/application_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION

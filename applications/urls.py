@@ -47,23 +47,23 @@ urlpatterns = [
     ),
     path(
         "applications/<resource_id>/one-to-one-field/<fk_column_name>/new/",
-        views.ApplicationNewOneToOneForeignKeyResourceEditorView.as_view(),
-        name="application_new_one_to_one_foreign_key_resource_editor",
+        views.ApplicationNewOneToOneForeignKeyEditorView.as_view(),
+        name="application_new_one_to_one_foreign_key_editor",
     ),
     path(
         "applications/<resource_id>/one-to-one-field/<fk_column_name>/<fk_resource_id>/edit/",
-        views.ApplicationOneToOneForeignKeyResourceEditorView.as_view(),
-        name="application_one_to_one_foreign_key_resource_update_editor",
+        views.ApplicationOneToOneForeignKeyEditorView.as_view(),
+        name="application_one_to_one_foreign_key_update_editor",
     ),
     path(
         "applications/<resource_id>/one-to-many-field/<fk_table_name>/new/",
-        views.ApplicationNewOneToManyForeignKeyResourceEditorView.as_view(),
-        name="application_new_one_to_many_foreign_key_resource_editor",
+        views.ApplicationNewOneToManyForeignKeyEditorView.as_view(),
+        name="application_new_one_to_many_foreign_key_editor",
     ),
     path(
         "applications/<resource_id>/one-to-many-field/<fk_table_name>/<fk_resource_id>/edit/",
-        views.ApplicationOneToManyForeignKeyResourceEditorView.as_view(),
-        name="application_one_to_many_foreign_key_resource_update_editor",
+        views.ApplicationOneToManyForeignKeyEditorView.as_view(),
+        name="application_one_to_many_foreign_key_update_editor",
     ),
     path(
         "applications/api/<resource_id>/edit/",

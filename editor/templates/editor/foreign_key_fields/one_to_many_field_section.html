@@ -7,7 +7,7 @@
             {% endwith %}
             {% endfor %}</ul>
         <a
-            href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}"
+            href="{% url new_foreign_key_editor_reverse_base resource_id field_name %}"
             class="btn btn-light new-editor-btn rounded-top-0 w-100 {% if field.value %}d-none{% endif %}">
             <i class="bi bi-plus"></i>
             Add {{ resource_type|humanise_resource_type|title }}

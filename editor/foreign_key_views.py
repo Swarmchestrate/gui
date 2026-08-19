@@ -372,8 +372,8 @@ class OneToManyFieldPopupSectionView(View):
 class OneToOneFieldSectionView(View):
     table_name: str
     
-    new_foreign_key_resource_editor_reverse_base: str
-    foreign_key_resource_update_editor_reverse_base: str
+    new_foreign_key_editor_reverse_base: str
+    foreign_key_update_editor_reverse_base: str
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self, "table_name"):
@@ -426,8 +426,8 @@ class OneToOneFieldSectionView(View):
                 initial=initial
             ),
             "resource_type": self.fk_table_name,
-            "new_foreign_key_resource_editor_reverse_base": self.new_foreign_key_resource_editor_reverse_base,
-            "foreign_key_resource_update_editor_reverse_base": self.foreign_key_resource_update_editor_reverse_base,
+            "new_foreign_key_editor_reverse_base": self.new_foreign_key_editor_reverse_base,
+            "foreign_key_update_editor_reverse_base": self.foreign_key_update_editor_reverse_base,
         })
 
     def get_delete_dialog_template(self, fk_resource: Resource):
@@ -469,8 +469,8 @@ class OneToManyFieldSectionView(View):
     table_name: str
     resource_type: str
     
-    new_foreign_key_resource_editor_reverse_base: str
-    foreign_key_resource_update_editor_reverse_base: str
+    new_foreign_key_editor_reverse_base: str
+    foreign_key_update_editor_reverse_base: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = int(self.kwargs["resource_id"])
@@ -513,8 +513,8 @@ class OneToManyFieldSectionView(View):
             "field_name": self.fk_table_name,
             "forms_for_existing_resources": forms_for_existing_fk_resources,
             "resource_type": self.fk_table_name,
-            "new_foreign_key_resource_editor_reverse_base": self.new_foreign_key_resource_editor_reverse_base,
-            "foreign_key_resource_update_editor_reverse_base": self.foreign_key_resource_update_editor_reverse_base,
+            "new_foreign_key_editor_reverse_base": self.new_foreign_key_editor_reverse_base,
+            "foreign_key_update_editor_reverse_base": self.foreign_key_update_editor_reverse_base,
         })
     
     def get_delete_form(self, fk_resource_id: str | int):

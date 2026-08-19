@@ -13,14 +13,14 @@
         </div>
         <div class="col-xl-3 d-flex column-gap-2">
             <a
-                href="{% url foreign_key_resource_update_editor_reverse_base resource_id field_name fk_resource_id %}"
+                href="{% url foreign_key_update_editor_reverse_base resource_id field_name fk_resource_id %}"
                 class="btn btn-light update-editor-btn ms-xl-auto"
                 aria-label="Edit"
                 title="Edit">
                 <i class="bi bi-pencil-fill"></i>
             </a>
             <a
-                href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}?copy_from={{ fk_resource_id }}"
+                href="{% url new_foreign_key_editor_reverse_base resource_id field_name %}?copy_from={{ fk_resource_id }}"
                 class="btn btn-light new-editor-btn"
                 aria-label="Copy"
                 title="Copy">

@@ -19,13 +19,13 @@
         </dl>
         <div class="d-flex column-gap-2">
             <a
-                href="{% url new_foreign_key_resource_editor_reverse_base resource_id field_name %}"
+                href="{% url new_foreign_key_editor_reverse_base resource_id field_name %}"
                 class="btn btn-light new-editor-btn {% if resource %}d-none{% endif %}">
                 <i class="bi bi-plus"></i>
                 Add {{ resource_type|humanise_resource_type|title }}
             </a>
             <a
-            href="{% url foreign_key_resource_update_editor_reverse_base resource_id field_name fk_resource_id %}"
+            href="{% url foreign_key_update_editor_reverse_base resource_id field_name fk_resource_id %}"
                 class="btn btn-light update-editor-btn {% if not resource %}d-none{% endif %}"
                 aria-label="Edit"
                 title="Edit">

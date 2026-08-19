@@ -13,7 +13,7 @@ from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type, resource_label
 
 
-class OneToManyForeignKeyResourceEditorView(FormView):
+class OneToManyForeignKeyEditorView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
     template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
@@ -196,7 +196,7 @@ class OneToManyForeignKeyResourceEditorView(FormView):
         return context
 
 
-class NewOneToManyForeignKeyResourceEditorView(FormView):
+class NewOneToManyForeignKeyEditorView(FormView):
     template_name = "editor/editor_for_foreign_key_fields/new_fk_editor.html"
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
@@ -401,7 +401,7 @@ class NewOneToManyForeignKeyResourceEditorView(FormView):
         return context
 
 
-class OneToOneForeignKeyResourceEditorView(FormView):
+class OneToOneForeignKeyEditorView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
     template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
@@ -601,7 +601,7 @@ class OneToOneForeignKeyResourceEditorView(FormView):
         return context
 
 
-class NewOneToOneForeignKeyResourceEditorView(FormView):
+class NewOneToOneForeignKeyEditorView(FormView):
     template_name = "editor/editor_for_foreign_key_fields/new_fk_editor.html"
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
