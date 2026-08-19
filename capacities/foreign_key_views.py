@@ -35,14 +35,14 @@ class CloudCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, Cl
     delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
 
 
-class CloudCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
+class CloudCapacityNonDialogBasedOneToOneFieldSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_one_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "capacities:cloud_capacity_one_to_one_foreign_key_resource_update_editor"
 
 
-class CloudCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
+class CloudCapacityNonDialogBasedOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:cloud_capacity_new_one_to_many_foreign_key_resource_editor"
@@ -93,14 +93,14 @@ class EdgeCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, Edg
     delete_one_to_many_relation_reverse_base = "capacities:delete_edge_capacity_one_to_many_relation"
 
 
-class EdgeCapacityNonDialogBasedOneToOneFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
+class EdgeCapacityNonDialogBasedOneToOneFieldSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_one_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "capacities:edge_capacity_one_to_one_foreign_key_resource_update_editor"
 
 
-class EdgeCapacityNonDialogBasedOneToManyFieldView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
+class EdgeCapacityNonDialogBasedOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
     new_foreign_key_resource_editor_reverse_base = "capacities:edge_capacity_new_one_to_many_foreign_key_resource_editor"

@@ -125,14 +125,14 @@ class ApplicationDescriptionTemplateDownloadView(
         return generate_adt_yaml(self.resource_id)
 
 
-class ApplicationNonDialogBasedOneToOneFieldView(ApplicationViewMixin, NonDialogBasedOneToOneFieldSectionView):
+class ApplicationNonDialogBasedOneToOneFieldSectionView(ApplicationViewMixin, NonDialogBasedOneToOneFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
-class ApplicationNonDialogBasedOneToManyFieldView(ApplicationViewMixin, NonDialogBasedOneToManyFieldSectionView):
+class ApplicationNonDialogBasedOneToManyFieldSectionView(ApplicationViewMixin, NonDialogBasedOneToManyFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"

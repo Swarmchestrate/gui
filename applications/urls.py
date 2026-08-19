@@ -37,12 +37,12 @@ urlpatterns = [
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-one-section/non-dialog-based/<fk_column_name>/",
-        views.ApplicationNonDialogBasedOneToOneFieldView.as_view(),
+        views.ApplicationNonDialogBasedOneToOneFieldSectionView.as_view(),
         name="application_editor_non_dialog_based_one_to_one_section",
     ),
     path(
         "applications/api/<resource_id>/editor/one-to-many-section/non-dialog-based/<fk_table_name>/",
-        views.ApplicationNonDialogBasedOneToManyFieldView.as_view(),
+        views.ApplicationNonDialogBasedOneToManyFieldSectionView.as_view(),
         name="application_editor_non_dialog_based_one_to_many_section",
     ),
     path(
