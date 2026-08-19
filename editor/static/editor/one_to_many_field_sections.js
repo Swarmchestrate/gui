@@ -26,12 +26,22 @@ class OneToManyField {
     }
 
     setupListItem(listItem) {
-        new OneToManyFieldListItem(listItem, this.resourceType);
+        new OneToManyFieldListItem(listItem, this.resourceType, {
+            onDelete: () => {
+                if (Array.from(this.list.children).length === 0) {
+                    this.list.replaceChildren();
+                }
+            }
+        });
     }
 }
 
 class OneToManyFieldListItem {
-    constructor(listItem, resourceType) {
+    constructor(listItem, resourceType, options) {
+        if (!("onDelete" in options)) {
+            options.onDelete = () => {};
+        }
+        this.options = options;
         this.listItem = listItem;
         this.resourceType = resourceType;
         this.setupClassFields();
@@ -64,6 +74,7 @@ class OneToManyFieldListItem {
             {
                 onFormSuccess: (responseData) => {
                     this.removeListItem();
+                    this.options.onDelete();
                     displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']"
                     ).value}.`);
