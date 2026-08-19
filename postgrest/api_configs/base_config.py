@@ -173,7 +173,7 @@ class BaseEndpoint:
         for key in uncleaned_data.keys():
             if key in allowed_properties:
                 continue
-            uncleaned_data_copy.pop(key)
+            uncleaned_data_copy.pop(key, None)
         return uncleaned_data_copy
 
     def _get_existing_resource_ids(self):
