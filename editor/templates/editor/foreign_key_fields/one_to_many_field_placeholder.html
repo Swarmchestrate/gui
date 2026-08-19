@@ -3,7 +3,15 @@
     class="one-to-many-field py-4"
     data-field="{{ field.name }}"
     data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}">
-    <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
+    <div class="d-flex flex-wrap align-items-baseline column-gap-4 row-gap-1 w-100 pb-1">
+        <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
+        <a class="add-fk-btn btn btn-light btn-sm ms-auto disabled placeholder placeholder-wave bg-secondary-subtle" aria-disabled="true">
+            <span class="invisible">
+                Add {{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}
+                <i class="bi bi-plus-lg"></i>
+            </span>
+        </a>
+    </div>
     <div data-section-url="{% url editor_one_to_many_section_reverse_base resource_id field.field.metadata.created_from_table_name %}">
         <div class="d-flex flex-column row-gap-5 placeholder-wave">
             <div class="d-flex flex-column row-gap-3 placeholder-wave">

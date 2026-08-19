@@ -6,12 +6,5 @@
             {% include 'editor/foreign_key_fields/popup_based/one_to_many_field_popup_list_item.html' %}
             {% endwith %}
             {% endfor %}</ul>
-        <button
-            class="btn btn-light new-dialog-btn rounded-top-0 w-100 {% if field.value %}d-none{% endif %}"
-            type="button"
-            data-dialog-id="new-{{ field_name }}-dialog">
-            <i class="bi bi-plus-lg"></i>
-            Add {{ resource_type|humanise_resource_type|title }}
-        </button>
     </div>
 </div>

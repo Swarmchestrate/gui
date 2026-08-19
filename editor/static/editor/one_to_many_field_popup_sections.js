@@ -311,20 +311,30 @@ export async function loadOneToManyFieldPopupSections() {
         document.querySelectorAll(".one-to-many-field[data-popup-based]"),
     );
     const sectionUrls = oneToManyFieldPopupSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
-    const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
+    const responses = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
     oneToManyFieldPopupSections.forEach((section, i) => {
+        const addButtonPlaceholder = section.querySelector(".new-dialog-btn");
+        addButtonPlaceholder.href = responses[i].add_url;
+        addButtonPlaceholder.removeAttribute("disabled");
+        addButtonPlaceholder.querySelector(".invisible").classList.remove("invisible");
+        addButtonPlaceholder.classList.remove(
+            "disabled",
+            "placeholder",
+            "placeholder-wave",
+            "bg-secondary-subtle"
+        );
         const sectionPlaceholder = section.querySelector("[data-section-url]");
-        sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
+        sectionPlaceholder.replaceWith(htmlToNode(responses[i].section.trim()));
         dialogsContainer = document.querySelector("#dialogs");
-        dialogsContainer.append(htmlToNode(htmlForSections[i].new_dialog.trim()));
-        const dialogsForResources = htmlForSections[i].resource_dialogs;
+        dialogsContainer.append(htmlToNode(responses[i].new_dialog.trim()));
+        const dialogsForResources = responses[i].resource_dialogs;
         for (const resourceId in dialogsForResources) {
             const dialogsForResource = dialogsForResources[resourceId];
             dialogsContainer.append(htmlToNode(dialogsForResource.update_dialog.trim()));
             dialogsContainer.append(htmlToNode(dialogsForResource.delete_dialog.trim()));
         }
         const headElement = document.querySelector("head");
-        const templates = htmlForSections[i].templates;
+        const templates = responses[i].templates;
         headElement.append(htmlToNode(templates.update_dialog.trim()));
         headElement.append(htmlToNode(templates.delete_dialog.trim()));
         headElement.append(htmlToNode(templates.list_item.trim()));

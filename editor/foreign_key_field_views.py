@@ -11,7 +11,7 @@ from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
-from utils.humanise import resource_label
+from utils.humanise import humanise_resource_type, resource_label
 
 
 logger = logging.getLogger(__name__)
@@ -217,6 +217,9 @@ class OneToManyFieldPopupSectionView(View):
                 "resource_type": self.fk_table_name,
                 "field": {"name": self.fk_table_name},
                 "field_name": self.fk_table_name,
+                # Use humanise_resource_type() instead of resource_label() as
+                # the resource may not exist yet.
+                "label": f"{humanise_resource_type(self.fk_table_name).title()} __resource_id__",
             },
             request=self.request
         )
@@ -366,6 +369,14 @@ class OneToManyFieldPopupSectionView(View):
                     request=self.request
                 ),
             },
+            "add_url": reverse_lazy(
+                "postgrest:new_one_to_many_relation",
+                kwargs={
+                    "table_name": self.table_name,
+                    "resource_id": self.resource_id,
+                    "fk_table_name": self.fk_table_name,
+                }
+            ),
         })
 
 
@@ -569,4 +580,11 @@ class OneToManyFieldSectionView(View):
                 }
                 for fk_resource in fk_resources
             },
+            "add_url": reverse_lazy(
+                self.new_foreign_key_editor_reverse_base,
+                kwargs={
+                    "resource_id": self.resource_id,
+                    "fk_table_name": self.fk_table_name,
+                }
+            ),
         })

@@ -121,12 +121,22 @@ export async function loadOneToManyFieldSections() {
         document.querySelectorAll(".one-to-many-field:not([data-popup-based])"),
     );
     const sectionUrls = oneToManyFieldSections.map(section => section.querySelector("[data-section-url]").dataset.sectionUrl);
-    const htmlForSections = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
+    const responses = await Promise.all(sectionUrls.map(sectionUrl => getSection(sectionUrl)));
     const dialogsContainer = document.querySelector("#dialogs");
     oneToManyFieldSections.forEach((section, i) => {
+        const addButtonPlaceholder = section.querySelector(".add-fk-btn");
+        addButtonPlaceholder.href = responses[i].add_url;
+        addButtonPlaceholder.removeAttribute("aria-disabled");
+        addButtonPlaceholder.querySelector(".invisible").classList.remove("invisible");
+        addButtonPlaceholder.classList.remove(
+            "disabled",
+            "placeholder",
+            "placeholder-wave",
+            "bg-secondary-subtle"
+        );
         const sectionPlaceholder = section.querySelector("[data-section-url]");
-        sectionPlaceholder.replaceWith(htmlToNode(htmlForSections[i].section.trim()));
-        const dialogsForResources = htmlForSections[i].resource_dialogs;
+        sectionPlaceholder.replaceWith(htmlToNode(responses[i].section.trim()));
+        const dialogsForResources = responses[i].resource_dialogs;
         for (const resourceId in dialogsForResources) {
             const dialogsForResource = dialogsForResources[resourceId];
             dialogsContainer.append(htmlToNode(dialogsForResource.delete_dialog.trim()));
