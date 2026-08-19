@@ -116,7 +116,7 @@ async function getSection(sectionUrl) {
     );
 }
 
-export async function loadNonDialogBasedOneToManyFieldSections() {
+export async function loadOneToManyFieldSections() {
     const oneToManyFieldSections = Array.from(
         document.querySelectorAll(".one-to-many-field[data-editor-based"),
     );

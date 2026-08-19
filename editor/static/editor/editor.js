@@ -2,8 +2,8 @@ import { AsyncFormHandler } from "/static/editor/autosave.js";
 import { setupFormsetTables } from "/static/editor/formset_tables.js";
 import { loadOneToOneFieldPopupSections } from "/static/editor/one_to_one_field_popup_sections.js";
 import { loadOneToManyFieldPopupSections } from "/static/editor/one_to_many_field_popup_sections.js";
-import { loadNonDialogBasedOneToOneFieldSections } from "/static/editor/non_dialog_based_one_to_one_field_sections.js";
-import { loadNonDialogBasedOneToManyFieldSections } from "/static/editor/non_dialog_based_one_to_many_field_sections.js";
+import { loadOneToOneFieldSections } from "/static/editor/one_to_one_field_sections.js";
+import { loadOneToManyFieldSections } from "/static/editor/one_to_many_field_sections.js";
 import { setupTextArrayFields } from "/static/editor/text_array_fields.js";
 import { displayToast } from "/static/editor/toasts.js";
 
@@ -31,8 +31,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     setupFormsetTables();
     loadOneToOneFieldPopupSections();
     loadOneToManyFieldPopupSections();
-    loadNonDialogBasedOneToOneFieldSections();
-    loadNonDialogBasedOneToManyFieldSections();
+    loadOneToOneFieldSections();
+    loadOneToManyFieldSections();
     setupTextArrayFields();
     const tooltipTriggerElements = Array.from(
         document.querySelectorAll("[data-bs-toggle='tooltip']"),

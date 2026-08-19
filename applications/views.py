@@ -5,8 +5,8 @@ from django.views.generic import View
 from .tosca import generate_adt_yaml
 
 from editor.foreign_key_views import (
-    NonDialogBasedOneToManyFieldSectionView,
-    NonDialogBasedOneToOneFieldSectionView,
+    OneToManyFieldSectionView,
+    OneToOneFieldSectionView,
     OneToManyFieldPopupSectionView,
     OneToOneFieldPopupSectionView,
 )
@@ -36,8 +36,8 @@ class ApplicationViewMixin:
     editor_reverse_base = "applications:application_editor"
     one_to_one_field_popup_section_reverse_base = "applications:application_one_to_one_field_popup_section"
     one_to_many_field_popup_section_reverse_base = "applications:application_one_to_many_field_popup_section"
-    editor_non_dialog_based_one_to_one_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_one_section"
-    editor_non_dialog_based_one_to_many_section_reverse_base = "applications:application_editor_non_dialog_based_one_to_many_section"
+    editor_one_to_one_section_reverse_base = "applications:application_editor_one_to_one_section"
+    editor_one_to_many_section_reverse_base = "applications:application_editor_one_to_many_section"
     editor_start_reverse_base = "applications:new_application"
     editor_overview_reverse_base = "applications:application_overview"
     resource_list_reverse = "applications:application_list"
@@ -125,14 +125,14 @@ class ApplicationDescriptionTemplateDownloadView(
         return generate_adt_yaml(self.resource_id)
 
 
-class ApplicationNonDialogBasedOneToOneFieldSectionView(ApplicationViewMixin, NonDialogBasedOneToOneFieldSectionView):
+class ApplicationOneToOneFieldSectionView(ApplicationViewMixin, OneToOneFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"
     foreign_key_resource_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_resource_update_editor"
 
 
-class ApplicationNonDialogBasedOneToManyFieldSectionView(ApplicationViewMixin, NonDialogBasedOneToManyFieldSectionView):
+class ApplicationOneToManyFieldSectionView(ApplicationViewMixin, OneToManyFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_resource_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_resource_editor"

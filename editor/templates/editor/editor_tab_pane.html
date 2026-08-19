@@ -36,15 +36,15 @@
         {% with min_max_base_field_name=field.name|remove_min_max_prefix %}
         {% if field.field.metadata.refers_to_table_name %}
         {% if field.field.metadata.has_fk_relation_to_secondary_table %}
-        {% include 'editor/foreign_key_fields/non_dialog_based/one_to_one_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/one_to_one_field_placeholder.html' %}
         {% else %}
-        {% include 'editor/foreign_key_fields/one_to_one_field_popup_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/popup_based/one_to_one_field_popup_placeholder.html' %}
         {% endif %}
         {% elif field.field.metadata.created_from_table_name %}
         {% if field.field.metadata.has_fk_relation_to_secondary_table %}
-        {% include 'editor/foreign_key_fields/non_dialog_based/one_to_many_field_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/one_to_many_field_placeholder.html' %}
         {% else %}
-        {% include 'editor/foreign_key_fields/one_to_many_field_popup_placeholder.html' %}
+        {% include 'editor/foreign_key_fields/popup_based/one_to_many_field_popup_placeholder.html' %}
         {% endif %}
         {% elif field.field.widget.input_type == 'checkbox' %}
         {% include 'editor/field_templates/checkbox_field_wrapper.html' %}

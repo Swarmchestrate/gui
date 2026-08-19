@@ -93,7 +93,7 @@ async function getSection(sectionUrl) {
     );
 }
 
-export async function loadNonDialogBasedOneToOneFieldSections() {
+export async function loadOneToOneFieldSections() {
     const oneToOneFieldSections = Array.from(
         document.querySelectorAll(".one-to-one-field[data-editor-based]"),
     );

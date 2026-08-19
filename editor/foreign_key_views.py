@@ -199,7 +199,7 @@ class OneToManyFieldPopupSectionView(View):
         )
 
     def get_section_template(self, forms_for_existing_fk_resources: dict):
-        return render_to_string("editor/foreign_key_fields/one_to_many_field_popup_section.html", {
+        return render_to_string("editor/foreign_key_fields/popup_based/one_to_many_field_popup_section.html", {
             "field_name": self.fk_table_name,
             "forms_for_existing_resources": forms_for_existing_fk_resources,
             "resource_type": self.fk_table_name,
@@ -207,7 +207,7 @@ class OneToManyFieldPopupSectionView(View):
 
     def get_list_item_template(self):
         return render_to_string(
-            "editor/foreign_key_fields/one_to_many_field_popup_list_item.html",
+            "editor/foreign_key_fields/popup_based/one_to_many_field_popup_list_item.html",
             {
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
                     fields=self.form_config.get_fields(),
@@ -369,7 +369,7 @@ class OneToManyFieldPopupSectionView(View):
         })
 
 
-class NonDialogBasedOneToOneFieldSectionView(View):
+class OneToOneFieldSectionView(View):
     table_name: str
     
     new_foreign_key_resource_editor_reverse_base: str
@@ -416,7 +416,7 @@ class NonDialogBasedOneToOneFieldSectionView(View):
         if fk_resource:
             initial = fk_resource.as_dict()
             fk_resource_id = fk_resource.pk
-        return render_to_string("editor/foreign_key_fields/non_dialog_based/one_to_one_field_section.html", {
+        return render_to_string("editor/foreign_key_fields/popup_based/one_to_one_field_section.html", {
             "field_name": self.fk_column_name,
             "resource_id": self.resource_id,
             "resource": fk_resource,
@@ -465,7 +465,7 @@ class NonDialogBasedOneToOneFieldSectionView(View):
         })
 
 
-class NonDialogBasedOneToManyFieldSectionView(View):
+class OneToManyFieldSectionView(View):
     table_name: str
     resource_type: str
     
@@ -508,7 +508,7 @@ class NonDialogBasedOneToManyFieldSectionView(View):
         )
 
     def get_section_template(self, forms_for_existing_fk_resources: dict):
-        return render_to_string("editor/foreign_key_fields/non_dialog_based/one_to_many_field_section.html", {
+        return render_to_string("editor/foreign_key_fields/one_to_many_field_section.html", {
             "resource_id": self.resource_id,
             "field_name": self.fk_table_name,
             "forms_for_existing_resources": forms_for_existing_fk_resources,
