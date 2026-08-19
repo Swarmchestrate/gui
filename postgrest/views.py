@@ -294,7 +294,9 @@ class UpdateOneToManyRelationFormView(FormView):
         if not (fk_resource.as_dict().get(self.fk_table_column_name) == self.resource_id):
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
         update_data = form.cleaned_data
-        update_data.pop(self.fk_table_column_name)
+        # Pop the FK column from the update data in case it has been submitted (and is
+        # overwritten with another value).
+        update_data.pop(self.fk_table_column_name, None)
         self.api_client.get_endpoint(
             self.fk_table_name
         ).update(self.fk_resource_id, update_data)
