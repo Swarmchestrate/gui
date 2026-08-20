@@ -81,6 +81,7 @@ class ForeignKeyEditorView(FormView):
                 self.fk_table_form_config,
                 initial=self.get_initial()
             ),
+            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
         })
         return kwargs
 
@@ -205,7 +206,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
             "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
             "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
             "toast_template": render_to_string("editor/toast_template.html", {}),
-            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
         })
         return context
 
@@ -498,7 +498,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
             "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
             "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
             "toast_template": render_to_string("editor/toast_template.html", {}),
-            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
         })
         return context
 
