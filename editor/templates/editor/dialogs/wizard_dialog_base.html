@@ -1,0 +1,21 @@
+{% extends 'dialog_base.html' %}
+
+{% block dialog_content %}
+<div class="d-flex flex-column dialog-content overflow-hidden p-0">
+    <div class="dialog-error">
+        <div class="alert alert-danger top-0 start-0 end-0 mb-0 rounded-0">
+            <div class="d-inline-flex align-items-center justify-content-start column-gap-3">
+                <i class="bi bi-exclamation-triangle flex-shrink-0"></i>
+                <span>
+                    Changes may not have been saved due to an unexpected error. Please report
+                    the problem using the <a href="https://github.com/Swarmchestrate/gui/issues" target="_blank">GUI issues tracker</a>.
+                </span>
+            </div>
+            {% include 'editor/util_templates/form_errors_list.html' %}
+        </div>
+    </div>
+    <div class="dialog-body">
+        {% block w_dialog_body_content %}{% endblock w_dialog_body_content %}
+    </div>
+</div>
+{% endblock dialog_content %}

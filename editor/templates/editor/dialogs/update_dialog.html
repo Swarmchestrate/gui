@@ -1,4 +1,4 @@
-{% extends 'dialog_base.html' %}
+{% extends 'editor/dialogs/wizard_dialog_base.html' %}
 {% load humanise_swch %}
 
 {% block dialog_header_content %}
@@ -7,10 +7,12 @@
 </div>
 {% endblock dialog_header_content %}
 
-{% block dialog_body_content %}
-<form method="POST" action="{{ update_resource_url }}">
+{% block w_dialog_body_content %}
+<form
+    {% if form_id %}id="{{ form_id }}"{% endif %}
+    method="POST"
+    action="{{ update_resource_url }}">
     {% csrf_token %}
-    {% include 'editor/util_templates/form_errors_list.html' %}
     {% for field in form %}
     {% if field.field.widget.input_type == 'checkbox' %}
     {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
@@ -22,4 +24,4 @@
         <button class="btn btn-primary fw-semibold" type="submit">Update</button>
     </div>
 </form>
-{% endblock dialog_body_content %}
+{% endblock w_dialog_body_content %}

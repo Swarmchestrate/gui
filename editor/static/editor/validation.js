@@ -2,7 +2,7 @@ export class EditorValidator {
     constructor(form) {
         this.form = form;
         this.fields = form.querySelectorAll("input, select, textarea");
-        this.formMessagesList = form.querySelector(".form-messages-list");
+        this.formMessagesList = form.querySelector(".form-messages-list") || document.querySelector(`[data-form="${form.getAttribute("id")}"]`);
     }
 
     setupInlineValidation() {
@@ -40,15 +40,7 @@ export class EditorValidator {
     }
 
     displayFormErrors(errors) {
-        this.formMessagesList.classList.remove("text-success");
-        this.formMessagesList.classList.add("text-danger");
         this.displayFormMessages(errors);
-    }
-
-    displayFormSuccessMessages(messages) {
-        this.formMessagesList.classList.add("text-success");
-        this.formMessagesList.classList.remove("text-danger");
-        this.displayFormMessages(messages);
     }
 
     scrollFieldIntoView(field, fieldLabel) {

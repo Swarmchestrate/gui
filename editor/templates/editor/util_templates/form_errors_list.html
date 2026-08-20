@@ -1,1 +1,3 @@
-<ul class="d-none text-danger list-unstyled form-messages-list"></ul>
+<ul
+    {% if form_id %}data-form="{{ form_id }}"{% endif %}
+    class="d-none list-unstyled form-messages-list"></ul>

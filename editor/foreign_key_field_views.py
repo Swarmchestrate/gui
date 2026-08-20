@@ -77,6 +77,7 @@ class OneToOneFieldPopupSectionView(View):
                     fields=self.form_config.get_fields(),
                     id_prefix=f'new_{self.fk_column_name}'
                 ),
+                "form_id": f"new-{self.table_name}-{self.fk_column_name}-form",
                 "new_resource_url": reverse_lazy(
                     "postgrest:new_one_to_one_relation",
                     kwargs={
@@ -92,10 +93,10 @@ class OneToOneFieldPopupSectionView(View):
         )
 
     def get_update_dialog_template(self, fk_resource: Resource):
-        resource_id = None
+        fk_resource_id = None
         initial = dict()
         if fk_resource:
-            resource_id = fk_resource.pk
+            fk_resource_id = fk_resource.pk
             initial = fk_resource.as_dict()
         return render_to_string(
             "editor/dialogs/update_dialog.html",
@@ -105,6 +106,7 @@ class OneToOneFieldPopupSectionView(View):
                     id_suffix=f"{self.fk_column_name}",
                     initial=initial
                 ),
+                "form_id": f"update-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
                 "update_resource_url": reverse_lazy(
                     "postgrest:update_one_to_one_relation",
                     kwargs={
@@ -114,24 +116,25 @@ class OneToOneFieldPopupSectionView(View):
                     }
                 ),
                 "dialog_id": f"update-{self.fk_column_name}-dialog",
-                "resource_id": resource_id,
+                "resource_id": fk_resource_id,
                 "resource_type": self.fk_table_name,
             },
             request=self.request
         )
 
     def get_delete_dialog_template(self, fk_resource: Resource):
-        resource_id = None
+        fk_resource_id = None
         initial = dict()
         if fk_resource:
-            resource_id = fk_resource.pk
-            initial = {"resource_id_to_delete": resource_id}
+            fk_resource_id = fk_resource.pk
+            initial = {"resource_id_to_delete": fk_resource_id}
         return render_to_string(
             "editor/dialogs/delete_dialog.html",
             {
                 "form": ResourceDeletionForm(
                     initial=initial
                 ),
+                "form_id": f"delete-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_one_relation",
                     kwargs={
@@ -141,7 +144,7 @@ class OneToOneFieldPopupSectionView(View):
                     }
                 ),
                 "dialog_id": f"delete-{self.fk_column_name}-dialog",
-                "resource_id": resource_id,
+                "resource_id": fk_resource_id,
                 "resource_type": self.fk_table_name,
             },
             request=self.request
@@ -232,6 +235,7 @@ class OneToManyFieldPopupSectionView(View):
                     fields=self.form_config.get_fields(),
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
+                "form_id": f"new-{self.table_name}-{self.fk_table_name}-form",
                 "new_resource_url": reverse_lazy(
                     "postgrest:new_one_to_many_relation",
                     kwargs={
@@ -266,6 +270,7 @@ class OneToManyFieldPopupSectionView(View):
                     fk_resource_id,
                     initial
                 ),
+                "form_id": f"update-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
                     "postgrest:update_one_to_many_relation",
@@ -298,6 +303,7 @@ class OneToManyFieldPopupSectionView(View):
             "editor/dialogs/delete_dialog.html",
             {
                 "form": self.get_delete_form(fk_resource_id),
+                "form_id": f"delete-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
                 "resource_id": fk_resource_id,
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_many_relation",
@@ -442,17 +448,18 @@ class OneToOneFieldSectionView(View):
         })
 
     def get_delete_dialog_template(self, fk_resource: Resource):
-        resource_id = None
+        fk_resource_id = None
         initial = dict()
         if fk_resource:
-            resource_id = fk_resource.pk
-            initial = {"resource_id_to_delete": resource_id}
+            fk_resource_id = fk_resource.pk
+            initial = {"resource_id_to_delete": fk_resource_id}
         return render_to_string(
             "editor/dialogs/delete_dialog.html",
             {
                 "form": ResourceDeletionForm(
                     initial=initial
                 ),
+                "form_id": f"delete-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_one_relation",
                     kwargs={
@@ -462,7 +469,7 @@ class OneToOneFieldSectionView(View):
                     }
                 ),
                 "dialog_id": f"delete-{self.fk_column_name}-dialog",
-                "resource_id": resource_id,
+                "resource_id": fk_resource_id,
                 "resource_type": self.fk_table_name,
             },
             request=self.request
@@ -543,6 +550,7 @@ class OneToManyFieldSectionView(View):
             "editor/dialogs/delete_dialog.html",
             {
                 "form": self.get_delete_form(fk_resource_id),
+                "form_id": f"delete-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
                 "resource_id": fk_resource_id,
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_many_relation",
