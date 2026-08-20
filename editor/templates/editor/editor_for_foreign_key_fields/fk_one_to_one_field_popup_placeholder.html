@@ -3,7 +3,9 @@
     class="one-to-one-field py-4"
     data-resource-type="{{ field.field.metadata.refers_to_table_name|humanise_resource_type|title }}"
     data-popup-based>
-    <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
+    <div class="label-wrapper">
+        <h3 class="fs-6 fw-semibold label">{{ field.label }}</h3>
+    </div>
     <div data-section-url="{% url 'editor:one_to_one_field_popup_section' table_name fk_resource_id field.name %}">
         <div class="d-flex flex-column row-gap-5 placeholder-wave">
             <div class="d-flex flex-column row-gap-3 placeholder-wave">

@@ -234,11 +234,12 @@ label:has(~ :required)::after,
 }
 
 .label-wrapper {
-    padding-bottom: 0.75em;
+    padding-bottom: 1em;
 }
 
 .label-wrapper .label {
     display: inline-block;
+    margin-bottom: 0;
 }
 
 

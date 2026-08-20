@@ -4,10 +4,12 @@
     data-field="{{ field.name }}"
     data-resource-type="{{ field.field.metadata.created_from_table_name|humanise_resource_type|title }}"
     data-popup-based>
-    <div class="d-flex flex-wrap align-items-baseline column-gap-4 row-gap-1 w-100 pb-1">
-        <h3 class="fs-6 fw-semibold">{{ field.label }}</h3>
+    <div class="d-flex flex-wrap align-items-baseline column-gap-4 row-gap-1 w-100">
+        <div class="label-wrapper">
+            <h3 class="fs-6 fw-semibold label">{{ field.label }}</h3>
+        </div>
         <button
-            class="new-dialog-btn btn btn-light btn-sm ms-auto disabled placeholder placeholder-wave bg-secondary-subtle"
+            class="new-dialog-btn btn btn-light ms-auto disabled placeholder placeholder-wave bg-secondary-subtle"
             type="button"
             data-dialog-id="new-{{ field.name }}-dialog"
             disabled>
