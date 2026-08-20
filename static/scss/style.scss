@@ -115,7 +115,6 @@ dialog[open] {
     pointer-events: inherit;
 }
 
-html:has(dialog[open]),
 body:has(dialog[open]) {
     overflow: hidden;
 }
