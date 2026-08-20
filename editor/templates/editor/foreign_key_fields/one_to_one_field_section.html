@@ -1,44 +1,53 @@
 {% load humanise_swch %}
-<div class="w-100 rounded border p-3">
-    <div class="d-flex flex-md-row flex-column flex-wrap align-items-md-center align-items-start justify-content-between row-gap-3 column-gap-4">
-        <dl class="d-flex flex-md-row flex-column column-gap-4 form-text mb-0">
-            {% for field in form %}
-            <div>
-                <dt>
-                    {{ field.label }}
-                </dt>
-                <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>
-                    {% if field.get_choices_display %}
-                    {{ field.get_choices_display|default:'None' }}
-                    {% else %}
-                    {{ field.value|default:'None' }}
-                    {% endif %}
-                </dd>
-            </div>
-            {% endfor %}
-        </dl>
-        <div class="d-flex column-gap-2">
+<div class="border rounded w-100 p-3">
+    <div class="empty {% if resource %}d-none{% endif %}">
+        <div class="text-center p-4">
+            <p class="text-body-secondary">
+                A {{ resource_type|humanise_resource_type }} hasn't been specified.
+            </p>
             <a
                 href="{% url new_foreign_key_editor_reverse_base resource_id field_name %}"
-                class="btn btn-light new-editor-btn {% if resource %}d-none{% endif %}">
+                class="btn btn-light new-editor-btn">
                 <i class="bi bi-plus"></i>
                 Add {{ resource_type|humanise_resource_type|title }}
             </a>
-            <a
-            href="{% url foreign_key_update_editor_reverse_base resource_id field_name fk_resource_id %}"
-                class="btn btn-light update-editor-btn {% if not resource %}d-none{% endif %}"
-                aria-label="Edit"
-                title="Edit">
-                <i class="bi bi-pencil-fill"></i>
-            </a>
-            <button
-                class="btn btn-outline-danger delete-dialog-btn {% if not resource %}d-none{% endif %}"
-                data-dialog-id="delete-{{ field_name }}-dialog"
-                type="button"
-                aria-label="Delete"
-                title="Delete">
-                <i class="bi bi-trash3-fill"></i>
-            </button>
+        </div>
+    </div>
+    <div class="not-empty">
+        <div class="d-flex flex-md-row flex-column align-items-center column-gap-5 row-gap-4 text-center">
+            <dl class="d-flex flex-row flex-wrap justify-content-around column-gap-4 form-text mb-0">
+                {% for field in form %}
+                <div>
+                    <dt>
+                        {{ field.label }}
+                    </dt>
+                    <dd data-field="{{ field.name }}" {% if forloop.last %}class="pb-0"{% endif %}>
+                        {% if field.get_choices_display %}
+                        {{ field.get_choices_display|default:'Not Set' }}
+                        {% else %}
+                        {{ field.value|default:'Not Set' }}
+                        {% endif %}
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+            <div class="d-flex column-gap-2 ms-md-auto ms-0">
+                <a
+                    href="{% url foreign_key_update_editor_reverse_base resource_id field_name fk_resource_id %}"
+                    class="btn btn-light update-editor-btn {% if not resource %}d-none{% endif %}"
+                    aria-label="Edit"
+                    title="Edit">
+                    <i class="bi bi-pencil-fill"></i>
+                </a>
+                <button
+                    class="btn btn-outline-danger delete-dialog-btn {% if not resource %}d-none{% endif %}"
+                    data-dialog-id="delete-{{ field_name }}-dialog"
+                    type="button"
+                    aria-label="Delete"
+                    title="Delete">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>

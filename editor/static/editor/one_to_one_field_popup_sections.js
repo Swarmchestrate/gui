@@ -10,6 +10,13 @@ class OneToOneField {
     }
 
     setupClassFields() {
+        // Switch between content when the field is empty/not empty
+        this.emptyContent = this.oneToOneField.querySelector(
+            ".empty"
+        );
+        this.nonEmptyContent = this.oneToOneField.querySelector(
+            ".not-empty"
+        );
         // New dialog button
         this.newDialogButton = this.oneToOneField.querySelector(
             "button.new-dialog-btn[data-dialog-id]",
@@ -53,9 +60,8 @@ class OneToOneField {
                 lightDismiss: false,
                 onFormSuccess: (responseData) => {
                     this.newDialogForm.reset();
-                    this.newDialogButton.classList.add("d-none");
-                    this.updateDialogButton.classList.remove("d-none");
-                    this.deleteDialogButton.classList.remove("d-none");
+                    this.emptyContent.classList.add("d-none");
+                    this.nonEmptyContent.classList.remove("d-none");
                     for (const property in responseData.resource) {
                         let propertyValue = responseData.resource[property];
                         const elementForProperty =
@@ -65,7 +71,7 @@ class OneToOneField {
                         if (!elementForProperty) continue;
                         elementForProperty.textContent = propertyValue;
                         if (!propertyValue) {
-                            elementForProperty.textContent = "None";
+                            elementForProperty.textContent = "Not Set";
                         }
                         const fieldForProperty =
                             this.updateDialogForm.querySelector(
@@ -120,7 +126,7 @@ class OneToOneField {
                                 propertyValue.join(", ");
                         }
                         if (!propertyValue) {
-                            elementForProperty.textContent = "None";
+                            elementForProperty.textContent = "Not Set";
                         }
                         // Set the value of multiple input fields assigned
                         // for the property (if applicable).
@@ -182,9 +188,8 @@ class OneToOneField {
             [this.deleteDialogButton],
             {
                 onFormSuccess: (responseData) => {
-                    this.newDialogButton.classList.remove("d-none");
-                    this.updateDialogButton.classList.add("d-none");
-                    this.deleteDialogButton.classList.add("d-none");
+                    this.emptyContent.classList.remove("d-none");
+                    this.nonEmptyContent.classList.add("d-none");
                     Array.from(
                         this.updateDialogForm.querySelectorAll(
                             "input, textarea, select",
@@ -206,7 +211,7 @@ class OneToOneField {
                     Array.from(
                         this.oneToOneField.querySelectorAll("[data-field]"),
                     ).forEach((element) => {
-                        element.textContent = "None";
+                        element.textContent = "Not Set";
                     });
                     displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']"

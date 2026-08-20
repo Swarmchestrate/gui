@@ -10,6 +10,13 @@ class OneToOneField {
     }
 
     setupClassFields() {
+        // Switch between content when the field is empty/not empty
+        this.emptyContent = this.oneToOneField.querySelector(
+            ".empty"
+        );
+        this.nonEmptyContent = this.oneToOneField.querySelector(
+            ".not-empty"
+        );
         this.newEditorButton = this.oneToOneField.querySelector("a.new-editor-btn");
         this.updateEditorButton = this.oneToOneField.querySelector("a.update-editor-btn");
         // Delete dialog button
@@ -33,9 +40,8 @@ class OneToOneField {
             [this.deleteDialogButton],
             {
                 onFormSuccess: (responseData) => {
-                    this.newEditorButton.classList.remove("d-none");
-                    this.updateEditorButton.classList.add("d-none");
-                    this.deleteDialogButton.classList.add("d-none");
+                    this.emptyContent.classList.remove("d-none");
+                    this.nonEmptyContent.classList.add("d-none");
                     Array.from(
                         this.oneToOneField.querySelectorAll("[data-field]"),
                     ).forEach((element) => {
