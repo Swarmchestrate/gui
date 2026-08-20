@@ -138,7 +138,9 @@ export async function loadOneToManyFieldSections() {
         const addButtonPlaceholder = section.querySelector(".add-fk-btn");
         addButtonPlaceholder.href = responses[i].add_url;
         addButtonPlaceholder.removeAttribute("aria-disabled");
-        addButtonPlaceholder.querySelector(".invisible").classList.remove("invisible");
+        Array.from(addButtonPlaceholder.querySelectorAll(".invisible")).forEach(
+            element => element.classList.remove("invisible")
+        );
         addButtonPlaceholder.classList.remove(
             "disabled",
             "placeholder",
