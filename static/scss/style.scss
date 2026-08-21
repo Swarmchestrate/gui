@@ -98,8 +98,7 @@ dialog {
     transition: opacity 0.25s;
     display: flex;
     flex-direction: column;
-    min-inline-size: MIN(90vw, 80ch);
-    max-inline-size: MIN(90vw, 80ch);
+    min-inline-size: 100vw;
     max-block-size: MIN(80vh, 100%);
     max-block-size: MIN(80dvb, 100%);
     margin: auto;
@@ -120,7 +119,7 @@ body:has(dialog[open]) {
 }
 
 dialog .dialog-header {
-    padding-block: 0.5em;
+    padding-block: 1em;
     padding-inline: 1em;
     border-bottom: var(--bs-border-width) var(--bs-gray-300)
         var(--bs-border-style);
@@ -473,8 +472,12 @@ details.error-details {
         padding-inline-start: 1em;
     }
 
+    dialog {
+        min-inline-size: MIN(90vw, 80ch);
+        max-inline-size: MIN(90vw, 80ch);
+    }
+
     dialog .dialog-header {
-        padding-block: 1em;
         padding-inline: 2em;
     }
 
