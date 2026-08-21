@@ -161,7 +161,7 @@ class OneToManyField {
             if (!elementForProperty) continue;
             elementForProperty.textContent = propertyValue;
             if (!propertyValue) {
-                elementForProperty.textContent = "None";
+                elementForProperty.textContent = "Not Set";
             }
         }
         return listItem;
@@ -224,7 +224,7 @@ class OneToManyFieldListItem {
                         if (!elementForProperty) continue;
                         elementForProperty.textContent = propertyValue;
                         if (!propertyValue) {
-                            elementForProperty.textContent = "None";
+                            elementForProperty.textContent = "Not Set";
                         }
                         const fieldForProperty =
                             this.updateDialogForm.querySelector(

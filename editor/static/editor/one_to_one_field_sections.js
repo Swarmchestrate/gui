@@ -45,7 +45,7 @@ class OneToOneField {
                     Array.from(
                         this.oneToOneField.querySelectorAll("[data-field]"),
                     ).forEach((element) => {
-                        element.textContent = "None";
+                        element.textContent = "Not Set";
                     });
                     displayToast(`Deleted ${this.resourceType} ${this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']"
