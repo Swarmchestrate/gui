@@ -106,7 +106,30 @@ class BaseDefinition:
             }
         return None
 
-    def find_reference_to_table(self, table_name: str) -> dict | None:
+    def find_foreign_key_references_to_other_tables(self) -> list[str]:
+        table_names = list()
+        for property_metadata in self.properties.values():
+            # FK relations are put in the description, so if it doesn't
+            # exist, it means this isn't a foreign key column.
+            if "description" not in property_metadata:
+                continue
+            description = property_metadata.get("description")
+            is_fk = lxml.html.fromstring(description).xpath("fk")
+            if not is_fk:
+                continue
+            fk_table_name = next(iter(
+                lxml.html.fromstring(description).xpath("fk/@table")
+            ), None)
+            if not fk_table_name:
+                continue
+            table_names.append(fk_table_name)
+        return table_names
+
+    def _find_possible_reference_to_table(self, table_name: str) -> dict | None:
+        """Finds a reference to a given table, including possible references that
+        haven't explicitly been specified as FKs (this is where the property name has a
+        format of "<table_name>_id" and may result in false-positives).
+        """
         possible_column_name = f"{table_name.replace("_new", "")}_id"
         for property_name in self.properties.keys():
             table_name_for_property = self.get_foreign_key_table_name_for_column(
@@ -122,7 +145,12 @@ class BaseDefinition:
                 }
         return None
 
-    def find_references_to_other_tables(self) -> list[str]:
+    def _find_possible_references_to_other_tables(self) -> list[str]:
+        """Finds reference to any tables for the current definition, including
+        possible references that haven't explicitly been specified as FKs (this
+        is where the property name has a format of "<possible_table_name>_id",
+        and may result in false-positives).
+        """
         table_names = list()
         for property_name, property_metadata in self.properties.items():
             if (property_name.endswith("_id")
@@ -143,6 +171,12 @@ class BaseDefinition:
                 continue
             table_names.append(fk_table_name)
         return table_names
+
+    def find_reference_to_table(self, table_name: str) -> dict | None:
+        return self.find_foreign_key_reference_to_table(table_name)
+
+    def find_references_to_other_tables(self) -> list[str]:
+        return self.find_foreign_key_references_to_other_tables()
 
     def has_column(self, column_name: str) -> bool:
         return column_name in self.properties
