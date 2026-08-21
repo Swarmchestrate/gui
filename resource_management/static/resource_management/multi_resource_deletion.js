@@ -37,9 +37,9 @@ function getAllSelectedRows(dataTable) {
 function updateDeleteCheckedButtonState(numChecked) {
     numCheckedElement.textContent = numChecked;
     if (numChecked === 0) {
-        return deleteCheckedButton.classList.add("invisible");
+        return deleteCheckedButton.classList.add("d-none");
     }
-    return deleteCheckedButton.classList.remove("invisible");
+    return deleteCheckedButton.classList.remove("d-none");
 }
 
 function setupResourcesTableCheckboxStyling(selectAllRowsCheckbox, dataTable) {
