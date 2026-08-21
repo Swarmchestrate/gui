@@ -11,6 +11,7 @@ from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
+from utils.helpers import generate_random_string
 from utils.humanise import humanise_resource_type, resource_label
 
 
@@ -77,7 +78,7 @@ class OneToOneFieldPopupSectionView(View):
                     fields=self.form_config.get_fields(),
                     id_prefix=f'new_{self.fk_column_name}'
                 ),
-                "form_id": f"new-{self.table_name}-{self.fk_column_name}-form",
+                "form_id": f"new-form-{generate_random_string()}",
                 "new_resource_url": reverse_lazy(
                     "postgrest:new_one_to_one_relation",
                     kwargs={
@@ -106,7 +107,7 @@ class OneToOneFieldPopupSectionView(View):
                     id_suffix=f"{self.fk_column_name}",
                     initial=initial
                 ),
-                "form_id": f"update-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
+                "form_id": f"update-form-{generate_random_string()}",
                 "update_resource_url": reverse_lazy(
                     "postgrest:update_one_to_one_relation",
                     kwargs={
@@ -134,7 +135,7 @@ class OneToOneFieldPopupSectionView(View):
                 "form": ResourceDeletionForm(
                     initial=initial
                 ),
-                "form_id": f"delete-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
+                "form_id": f"delete-form-{generate_random_string()}",
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_one_relation",
                     kwargs={
@@ -235,7 +236,7 @@ class OneToManyFieldPopupSectionView(View):
                     fields=self.form_config.get_fields(),
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
-                "form_id": f"new-{self.table_name}-{self.fk_table_name}-form",
+                "form_id": f"new-form-{generate_random_string()}",
                 "new_resource_url": reverse_lazy(
                     "postgrest:new_one_to_many_relation",
                     kwargs={
@@ -270,7 +271,7 @@ class OneToManyFieldPopupSectionView(View):
                     fk_resource_id,
                     initial
                 ),
-                "form_id": f"update-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
+                "form_id": f"update-form-{generate_random_string()}",
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
                     "postgrest:update_one_to_many_relation",
@@ -303,7 +304,7 @@ class OneToManyFieldPopupSectionView(View):
             "editor/dialogs/delete_dialog.html",
             {
                 "form": self.get_delete_form(fk_resource_id),
-                "form_id": f"delete-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
+                "form_id": f"delete-form-{generate_random_string()}",
                 "resource_id": fk_resource_id,
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_many_relation",
@@ -459,7 +460,7 @@ class OneToOneFieldSectionView(View):
                 "form": ResourceDeletionForm(
                     initial=initial
                 ),
-                "form_id": f"delete-{self.table_name}-{self.fk_column_name}-{fk_resource_id}-form",
+                "form_id": f"delete-form-{generate_random_string()}",
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_one_relation",
                     kwargs={
@@ -550,7 +551,7 @@ class OneToManyFieldSectionView(View):
             "editor/dialogs/delete_dialog.html",
             {
                 "form": self.get_delete_form(fk_resource_id),
-                "form_id": f"delete-{self.table_name}-{self.fk_table_name}-{fk_resource_id}-form",
+                "form_id": f"delete-form-{generate_random_string()}",
                 "resource_id": fk_resource_id,
                 "delete_resource_url": reverse_lazy(
                     "postgrest:delete_one_to_many_relation",
