@@ -1,99 +1,60 @@
 {% extends 'base.html' %}
 {% load humanise_swch %}
 {% block content %}
-<h1>Swarmchestrate TOSCA Templates</h1>
-<p>
-    A portal for registering and managing Swarmchestrate TOSCA
-    Templates for {{ 'capacity'|humanise_resource_type_plural|title }}
-    (Capacity Description Templates or CDTs) and
-    {{ 'application'|humanise_resource_type_plural|title }} (Application Description
-    Templates or ADTs).
-</p>
 <section>
-    <h2 class="fs-6 text-body-secondary">{{ 'cloud_capacity'|humanise_resource_type_plural|title }}</h2>
-    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
-        <li class="col">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'capacities:cloud_capacity_list' %}"
-                            class="fw-medium text-decoration-none stretched-link">{{ 'cloud_capacity'|humanise_resource_type_plural|title }}</a>
-                    </div>
-                    <p class="card-text">View registered Swarmchestrate {{ 'cloud_capacity'|humanise_resource_type_plural|title }}.</p>
-                </div>
-            </div>
-        </li>
-        <li class="col">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'capacities:new_cloud_capacity' %}"
-                            class="fw-medium text-decoration-none stretched-link">Register a New {{ 'cloud_capacity'|humanise_resource_type|title }}</a>
-                    </div>
-                    <p class="card-text">Register a new Swarmchestrate {{ 'cloud_capacity'|humanise_resource_type|title }}.</p>
-                </div>
-            </div>
-        </li>
-    </ul>
+    <h1>CDT / SAT Builder</h1>
+    <p class="lead col-md-8 mb-0">
+        This website was built to facilitate the development of Swarmchestrate CDTs and ADTs for
+        Capacity Providers and Application Developers. Access the tools using the links below.
+    </p>
 </section>
-<section>
-    <h2 class="fs-6 text-body-secondary">{{ 'edge_capacity'|humanise_resource_type_plural|title }}</h2>
-    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
-        <li class="col">
+<div class="row">
+    <div class="col-md-6">
+        <section>
             <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'capacities:edge_capacity_list' %}"
-                            class="fw-medium text-decoration-none stretched-link">{{ 'edge_capacity'|humanise_resource_type_plural|title }}</a>
+                <div class="d-flex flex-column align-items-start row-gap-4 card-body">
+                    <h2 class="fs-5">
+                        Capacity Providers
+                    </h2>
+                    <p>
+                        Describe a Cloud or Edge Capacity with the Cloud Capacity Wizard or
+                        Edge Capacity Wizard.
+                    </p>
+                    <div class="d-flex flex-column row-gap-2">
+                        <a href="{% url 'capacities:cloud_capacity_list' %}" class="btn btn-outline-primary icon-link icon-link-hover">
+                            Go to Cloud Capacities
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+                            </svg>
+                        </a>
+                        <a href="{% url 'capacities:edge_capacity_list' %}" class="btn btn-outline-primary icon-link icon-link-hover">
+                            Go to Edge Capacities
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+                            </svg>
+                        </a>
                     </div>
-                    <p class="card-text">View registered Swarmchestrate {{ 'edge_capacity'|humanise_resource_type_plural|title }}.</p>
                 </div>
             </div>
-        </li>
-        <li class="col">
+        </section>
+    </div>
+    <div class="col-md-6">
+        <section>
             <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'capacities:new_edge_capacity' %}"
-                            class="fw-medium text-decoration-none stretched-link">Register a New {{ 'edge_capacity'|humanise_resource_type|title }}</a>
-                    </div>
-                    <p class="card-text">Register a new Swarmchestrate {{ 'edge_capacity'|humanise_resource_type|title }}.</p>
+                <div class="d-flex flex-column align-items-start row-gap-4 card-body">
+                    <h2 class="fs-5">
+                        Application Developers
+                    </h2>
+                    <p>Describe an Application using the Application Wizard.</p>
+                    <a href="{% url 'applications:application_list' %}" class="btn btn-outline-primary icon-link icon-link-hover">
+                        Go to Applications
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
-        </li>
-    </ul>
-</section>
-<section>
-    <h2 class="fs-6 text-body-secondary">{{ 'application'|humanise_resource_type_plural|title }}</h2>
-    <ul class="row row-cols-1 g-4 list-unstyled home-menu-links">
-        <li class="col">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'applications:application_list' %}"
-                            class="fw-medium text-decoration-none stretched-link">{{ 'application'|humanise_resource_type_plural|title }}</a>
-                    </div>
-                    <p class="card-text">View registered Swarmchestrate {{ 'application'|humanise_resource_type_plural|title }}.</p>
-                </div>
-            </div>
-        </li>
-        <li class="col">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a
-                            href="{% url 'applications:new_application' %}"
-                            class="fw-medium text-decoration-none stretched-link">Register a New {{ 'application'|humanise_resource_type|title }}</a>
-                    </div>
-                    <p class="card-text">Register a new Swarmchestrate {{ 'application'|humanise_resource_type|title }}.</p>
-                </div>
-            </div>
-        </li>
-    </ul>
-</section>
+        </section>
+    </div>
+</div>
 {% endblock content %}
