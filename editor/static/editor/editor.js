@@ -25,9 +25,22 @@ function linkEditorTabSwitchingToCurrentPageCategory() {
     });
 }
 
+function activateTocCollapse() {
+    const tocCollapseElement = document.querySelector("#toc-collapse");
+    const tocCollapse = bootstrap.Collapse.getOrCreateInstance(tocCollapseElement, {
+        toggle: false,
+    });
+    Array.from(tocCollapseElement.querySelectorAll("button")).forEach(buttonElement => {
+        buttonElement.addEventListener("click", () => {
+            tocCollapse.hide();
+        });
+    });
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
     const bsEditorTab = new bootstrap.Tab("#editor-tab");
     linkEditorTabSwitchingToCurrentPageCategory();
+    activateTocCollapse();
     setupFormsetTables();
     loadOneToOneFieldPopupSections();
     loadOneToManyFieldPopupSections();
