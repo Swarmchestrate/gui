@@ -96,6 +96,16 @@ class OneToOneField {
                     this.deleteDialogForm.querySelector(
                         "[name='resource_id_to_delete']",
                     ).value = responseData.resource.pk;
+                    Array.from(
+                        this.updateDialogElement.querySelectorAll(".resource-id")
+                    ).forEach(element => {
+                        element.textContent = responseData.resource.pk;
+                    });
+                    Array.from(
+                        this.deleteDialogElement.querySelectorAll(".resource-id")
+                    ).forEach(element => {
+                        element.textContent = responseData.resource.pk;
+                    });
                     displayToast(`Registered ${this.resourceType} ${responseData.resource.pk}.`);
                 },
             },

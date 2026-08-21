@@ -3,7 +3,7 @@
 
 {% block dialog_header_content %}
 <div>
-    {{ resource_type|humanise_resource_type|title }} {{ resource_id }}
+    {{ resource_type|humanise_resource_type|title }} <span class="resource-id">{{ resource_id }}</span>
 </div>
 {% endblock dialog_header_content %}
 
