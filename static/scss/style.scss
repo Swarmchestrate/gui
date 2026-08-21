@@ -120,11 +120,8 @@ body:has(dialog[open]) {
 }
 
 dialog .dialog-header {
-    padding-block: 1rem;
-    padding-inline: 2rem;
-}
-
-dialog .dialog-header {
+    padding-block: 0.5em;
+    padding-inline: 1em;
     border-bottom: var(--bs-border-width) var(--bs-gray-300)
         var(--bs-border-style);
 }
@@ -132,7 +129,7 @@ dialog .dialog-header {
 dialog .dialog-content {
     flex-grow: 1;
     overflow: auto;
-    padding: 2rem;
+    padding: 1em;
 }
 
 dialog .dialog-footer {
@@ -185,7 +182,7 @@ dialog .btn-close {
 .dialog-error + .dialog-body {
     flex-grow: 1;
     overflow: auto;
-    padding: 2em;
+    padding: 1em;
 }
 
 /* Skip to main content link */
@@ -474,5 +471,18 @@ details.error-details {
 
     .sidebar-top {
         padding-inline-start: 1em;
+    }
+
+    dialog .dialog-header {
+        padding-block: 1em;
+        padding-inline: 2em;
+    }
+
+    dialog .dialog-content {
+        padding: 2em;
+    }
+
+    .dialog-error + .dialog-body {
+        padding: 2em;
     }
 }
