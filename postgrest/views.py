@@ -108,14 +108,18 @@ class UpdateOneToOneRelationFormView(FormView):
         fk_resource_id = int(resource.as_dict().get(self.fk_column_name))
         self.api_client.get_endpoint(self.fk_table_name).update(fk_resource_id, form.cleaned_data)
         message = f"Updated {humanise_resource_type(self.fk_table_name).title()} registration."
-        resource = self.api_client.get_endpoint(self.fk_table_name).get(fk_resource_id)
-        resource.as_dict().update(
-            {"pk": resource.pk}
-        )
+        fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(fk_resource_id)
         if self.request.accepts("text/html"):
             messages.success(self.request, message)
             return super().form_valid(form)
-        return JsonResponse({"resource": resource.as_dict()})
+        resource_data_for_response = fk_resource.as_dict()
+        # The property name for PKs changes between resource
+        # types, so add a "pk" property to make it easier for
+        # the UI to work with.
+        resource_data_for_response.update({
+            "pk": fk_resource.pk,
+        })
+        return JsonResponse({"resource": resource_data_for_response})
 
     def form_invalid(self, form):
         logger.exception("form.errors", form.errors)
