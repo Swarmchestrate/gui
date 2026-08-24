@@ -229,6 +229,7 @@ nav[aria-label="breadcrumb"] {
 
 .breadcrumb-item:nth-last-child(2) {
     font-size: $font-size-lg;
+    padding-left: 0;
 }
 
 /* Site-wide messages */
