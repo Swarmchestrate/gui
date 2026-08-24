@@ -460,6 +460,7 @@ details.error-details {
     .breadcrumb-item:nth-last-child(2) {
         font-size: inherit;
         color: inherit;
+        padding-left: var(--bs-breadcrumb-item-padding-x);
     }
 
     button[data-bs-target="#toc-collapse"] {
