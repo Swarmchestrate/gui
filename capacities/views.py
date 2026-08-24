@@ -88,6 +88,8 @@ class CloudCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, CloudC
     template_name = "capacities/cloud_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
+    one_to_one_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_one_field"
+    one_to_many_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_many_field"
 
 
 # Resource management views (CC)
@@ -172,6 +174,8 @@ class EdgeCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, EdgeCap
     template_name = "capacities/edge_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
+    one_to_one_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_one_field"
+    one_to_many_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_many_field"
 
 
 # Resource management views (EC)

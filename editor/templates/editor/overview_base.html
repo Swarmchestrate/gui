@@ -1,5 +1,10 @@
 {% extends 'editor/editor_base.html' %}
+{% load static %}
 {% load helpers %}
+
+{% block scripts %}
+<script src="{% static 'editor/overview.js' %}" type="module" defer></script>
+{% endblock scripts %}
 
 {% block top_section %}
 <hgroup class="d-flex flex-column row-gap-1">

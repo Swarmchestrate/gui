@@ -515,7 +515,7 @@ class EditorOverviewTemplateView(TemplateView):
                     # Pass the rest of the property metadata for further configuration
                     # in the overview HTML template.
                     "additional_metadata": metadata,
-                }
+                },
             })
         return overview_data
 
@@ -532,5 +532,7 @@ class EditorOverviewTemplateView(TemplateView):
             "toc_list_items": self.get_toc(),
             "properties": self.properties_as_dict,
             "editor_reverse_base": self.editor_reverse_base,
+            "one_to_one_field_subsection_reverse_base": self.one_to_one_field_subsection_reverse_base,
+            "one_to_many_field_subsection_reverse_base": self.one_to_many_field_subsection_reverse_base,
         })
         return context

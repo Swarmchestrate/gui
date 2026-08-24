@@ -1,0 +1,22 @@
+<div class="border-start ps-4 py-2 mt-2 mb-0">
+    <dl class="text-body-secondary mb-0">
+        {% for property_name, metadata in overview_data.items %}
+        <div>
+            <dt>{{ metadata.title }}</dt>
+            {% if forloop.last %}
+            <dd class="mb-0">
+            {% else %}
+            <dd>
+            {% endif %}
+                {% if not metadata.value %}
+                <span class="text-body-secondary">
+                    Not Set
+                </span>
+                {% else %}
+                {{ metadata.value }}
+                {% endif %}
+            </dd>
+        </div>
+        {% endfor %}
+    </dl>
+</div>

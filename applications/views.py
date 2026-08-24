@@ -9,6 +9,8 @@ from editor.foreign_key_field_views import (
     OneToOneFieldSectionView,
     OneToManyFieldPopupSectionView,
     OneToOneFieldPopupSectionView,
+    OneToManyFieldOverviewSubsectionView,
+    OneToOneFieldOverviewSubsectionView,
 )
 from editor.foreign_key_editor_views import (
     OneToManyForeignKeyEditorView,
@@ -112,6 +114,22 @@ class ApplicationEditorOverviewTemplateView(
         ApplicationViewMixin,
         EditorOverviewTemplateView):
     template_name = "applications/application_overview.html"
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+    one_to_one_field_subsection_reverse_base = "applications:application_overview_one_to_one_field"
+    one_to_many_field_subsection_reverse_base = "applications:application_overview_one_to_many_field"
+
+
+class ApplicationOneToOneFieldOverviewSubsectionView(
+        ApplicationViewMixin,
+        OneToOneFieldOverviewSubsectionView):
+    table_name = TableNames.APPLICATION_NEW
+    column_metadata_table_name = TableNames.APPLICATION
+
+
+class ApplicationOneToManyFieldOverviewSubsectionView(
+        ApplicationViewMixin,
+        OneToManyFieldOverviewSubsectionView):
     table_name = TableNames.APPLICATION_NEW
     column_metadata_table_name = TableNames.APPLICATION
 

@@ -1,4 +1,5 @@
 {% load helpers %}
+{% load humanise_swch %}
 <section class="d-flex flex-column row-gap-2 {{ section_extra_classes|default:'' }}">
     <div class="d-flex align-items-baseline column-gap-3">
         <h{{ heading_level }} class="{{ heading_classes|default:'fs-6' }}">{{ list_item_data.full_title }}</h{{ heading_level }}>
@@ -21,8 +22,16 @@
             {% else %}
             <dd>
             {% endif %}
-                {% if not property_metadata_for_section.value %}
+                {% if property_metadata_for_section.additional_metadata.created_from_table_name %}
+                <div class="placeholder-wave" data-subsection-url="{% url one_to_many_field_subsection_reverse_base resource_id property_name %}">
+                    <span class="col-3 bg-secondary-subtle placeholder rounded"></span>
+                </div>
+                {% elif not property_metadata_for_section.value %}
                 <span class="text-secondary">Not Set</span>
+                {% elif property_metadata_for_section.additional_metadata.refers_to_table_name %}
+                <div class="placeholder-wave" data-subsection-url="{% url one_to_one_field_subsection_reverse_base resource_id property_name property_metadata_for_section.value %}">
+                    <span class="col-3 bg-secondary-subtle placeholder rounded"></span>
+                </div>
                 {% else %}
                 {{ property_metadata_for_section.value }}
                 {% endif %}

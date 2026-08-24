@@ -72,6 +72,16 @@ urlpatterns = [
         name="cloud_capacity_overview",
     ),
     path(
+        "cloud-capacities/<resource_id>/overview/one-to-one-field/<fk_column_name>/<fk_resource_id>/",
+        foreign_key_views.CloudCapacityOneToOneFieldOverviewSubsectionView.as_view(),
+        name="cloud_capacity_overview_one_to_one_field",
+    ),
+    path(
+        "cloud-capacities/<resource_id>/overview/one-to-many-field/<fk_table_name>/",
+        foreign_key_views.CloudCapacityOneToManyFieldOverviewSubsectionView.as_view(),
+        name="cloud_capacity_overview_one_to_many_field",
+    ),
+    path(
         "cloud-capacities/<resource_id>/edit/",
         views.CloudCapacityEditorView.as_view(),
         name="cloud_capacity_editor",
@@ -105,6 +115,16 @@ urlpatterns = [
         "edge-capacities/<resource_id>/overview/",
         views.EdgeCapacityEditorOverviewTemplateView.as_view(),
         name="edge_capacity_overview",
+    ),
+    path(
+        "edge-capacities/<resource_id>/overview/one-to-one-field/<fk_column_name>/<fk_resource_id>/",
+        foreign_key_views.EdgeCapacityOneToOneFieldOverviewSubsectionView.as_view(),
+        name="edge_capacity_overview_one_to_one_field",
+    ),
+    path(
+        "edge-capacities/<resource_id>/overview/one-to-many-field/<fk_table_name>/",
+        foreign_key_views.EdgeCapacityOneToManyFieldOverviewSubsectionView.as_view(),
+        name="edge_capacity_overview_one_to_many_field",
     ),
     path(
         "edge-capacities/api/<resource_id>/editor/one-to-one-popup-section/<fk_column_name>/",

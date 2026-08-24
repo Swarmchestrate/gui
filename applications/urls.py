@@ -76,6 +76,16 @@ urlpatterns = [
         name="application_overview",
     ),
     path(
+        "applications/<resource_id>/overview/one-to-one-field/<fk_column_name>/<fk_resource_id>/",
+        views.ApplicationOneToOneFieldOverviewSubsectionView.as_view(),
+        name="application_overview_one_to_one_field",
+    ),
+    path(
+        "applications/<resource_id>/overview/one-to-many-field/<fk_table_name>/",
+        views.ApplicationOneToManyFieldOverviewSubsectionView.as_view(),
+        name="application_overview_one_to_many_field",
+    ),
+    path(
         "applications/<resource_id>/edit/",
         views.ApplicationEditorView.as_view(),
         name="application_editor",

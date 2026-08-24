@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.views.generic import View
+from django.views.generic import TemplateView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
@@ -597,3 +597,79 @@ class OneToManyFieldSectionView(View):
                 }
             ),
         })
+
+
+class OneToOneFieldOverviewSubsectionView(TemplateView):
+    template_name = "editor/overview/foreign_key_fields/one_to_one_field_overview_subsection.html"
+
+    def get(self, request, *args, **kwargs):
+        fk_column_name = kwargs["fk_column_name"]
+        fk_resource_id = kwargs["fk_resource_id"]
+        # Get resource referred to by main resource.
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        definition = api_client.openapi_spec.get_definition(self.table_name)
+        self.fk_table_name = definition.get_foreign_key_table_name_for_column(fk_column_name)
+        fk_table_endpoint = api_client.get_endpoint(self.fk_table_name)
+        self.fk_resource = fk_table_endpoint.get(fk_resource_id)
+        # Get the titles for the FK table column names so the properties (and their values)
+        # can be listed out in a more readable way in the overview page.
+        column_metadata = api_client.get_endpoint("column_metadata").get_resources()
+        if not hasattr(self, "column_metadata_table_name"):
+            self.column_metadata_table_name = self.table_name
+        fk_table_form_config = get_form_config_for_table(
+            self.fk_table_name,
+            api_client.openapi_spec,
+            column_metadata,
+            column_metadata_table_name=self.column_metadata_table_name,
+            infer_one_to_many_properties=False
+        )
+        self.properties_as_dict = fk_table_form_config.get_properties()
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs.update({
+            "fk_table_name": self.fk_table_name,
+            "fk_resource": self.fk_resource,
+            "overview_data": {
+                property_name: {
+                    "title": metadata.title,
+                    "value": self.fk_resource.as_dict().get(property_name),
+                    # Pass the rest of the property metadata for further configuration
+                    # in the overview HTML template.
+                    "additional_metadata": metadata,
+                }
+                for property_name, metadata in self.properties_as_dict.items()
+            }
+        })
+        return kwargs
+
+
+class OneToManyFieldOverviewSubsectionView(TemplateView):
+    template_name = "editor/overview/foreign_key_fields/one_to_many_field_overview_subsection.html"
+
+    def get(self, request, *args, **kwargs):
+        resource_id = kwargs["resource_id"]
+        self.fk_table_name = kwargs["fk_table_name"]
+        # Get resources referring to the main resources.
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        referring_tables = api_client.openapi_spec.find_references_to_table(
+            self.table_name
+        )
+        fk_table_column_name = referring_tables.get(self.fk_table_name)
+        fk_table_endpoint = api_client.get_endpoint(self.fk_table_name)
+        self.fk_resources = fk_table_endpoint.get_resources_referencing_resource_id(
+            fk_table_column_name,
+            resource_id
+        )
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs.update({
+            "fk_table_name": self.fk_table_name,
+            "fk_resources": self.fk_resources,
+        })
+        return kwargs

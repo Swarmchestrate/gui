@@ -15,6 +15,8 @@ from editor.foreign_key_field_views import (
     OneToOneFieldSectionView,
     OneToManyFieldPopupSectionView,
     OneToOneFieldPopupSectionView,
+    OneToManyFieldOverviewSubsectionView,
+    OneToOneFieldOverviewSubsectionView,
 )
 from postgrest.table_names import TableNames
 
@@ -77,6 +79,20 @@ class CloudCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, Clo
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
+class CloudCapacityOneToOneFieldOverviewSubsectionView(
+        CloudCapacityViewMixin,
+        OneToOneFieldOverviewSubsectionView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
+
+
+class CloudCapacityOneToManyFieldOverviewSubsectionView(
+        CloudCapacityViewMixin,
+        OneToManyFieldOverviewSubsectionView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
+
+
 # Edge Capacity views
 class EdgeCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
@@ -133,3 +149,17 @@ class EdgeCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, Edge
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
+
+
+class EdgeCapacityOneToOneFieldOverviewSubsectionView(
+        EdgeCapacityViewMixin,
+        OneToOneFieldOverviewSubsectionView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY
+
+
+class EdgeCapacityOneToManyFieldOverviewSubsectionView(
+        EdgeCapacityViewMixin,
+        OneToManyFieldOverviewSubsectionView):
+    table_name = TableNames.CAPACITY_NEW
+    column_metadata_table_name = TableNames.CAPACITY

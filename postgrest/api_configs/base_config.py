@@ -125,7 +125,7 @@ class BaseDefinition:
             table_names.append(fk_table_name)
         return table_names
 
-    def _find_possible_reference_to_table(self, table_name: str) -> dict | None:
+    def _find_any_possible_reference_to_table(self, table_name: str) -> dict | None:
         """Finds a reference to a given table, including possible references that
         haven't explicitly been specified as FKs (this is where the property name has a
         format of "<table_name>_id" and may result in false-positives).
@@ -145,7 +145,7 @@ class BaseDefinition:
                 }
         return None
 
-    def _find_possible_references_to_other_tables(self) -> list[str]:
+    def _find_any_possible_references_to_other_tables(self) -> list[str]:
         """Finds reference to any tables for the current definition, including
         possible references that haven't explicitly been specified as FKs (this
         is where the property name has a format of "<possible_table_name>_id",
@@ -323,7 +323,7 @@ class BaseOpenApiSpecification:
     def get_definition(self, table_name: str) -> BaseDefinition:
         return BaseDefinition(self._data.get("definitions", {}).get(table_name, {}))
 
-    def find_foreign_key_references_to_table(self, table_name: str) -> dict:
+    def _find_foreign_key_references_to_table(self, table_name: str) -> dict:
         references = dict()
         definitions = self.get_definitions()
         # Go through each definition's properties and find a property
@@ -339,7 +339,7 @@ class BaseOpenApiSpecification:
             })
         return references
 
-    def find_references_to_table(
+    def _find_any_possible_references_to_table(
             self,
             table_name: str,
             possible_column_name: str = None) -> dict:
@@ -364,6 +364,15 @@ class BaseOpenApiSpecification:
                     definition_name: possible_column_name,
                 })
         return references
+
+    def find_references_to_table(
+            self,
+            table_name: str,
+            possible_column_name: str = None) -> dict:
+        return self._find_any_possible_references_to_table(
+            table_name,
+            possible_column_name=possible_column_name
+        )
 
     def as_dict(self) -> dict:
         return self._data
