@@ -57,6 +57,12 @@ h6 {
     font-family: "Overpass", sans-serif;
 }
 
+h1:not(.fs-4, .fs-5, .fs-6),
+h2:not(.fs-4, .fs-5, .fs-6),
+h3:not(.fs-4, .fs-5, .fs-6) {
+    letter-spacing: -0.02em;
+}
+
 body {
     min-height: 100%;
     display: grid;
