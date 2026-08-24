@@ -496,41 +496,41 @@ class EditorOverviewTemplateView(TemplateView):
             )
         ).as_dict()
 
-    def format_resource_data_for_template(self) -> dict:
-        formatted_resource_data = dict()
+    def organise_data_for_overview(self) -> dict:
+        overview_data = dict()
         for property_name, metadata in self.properties_as_dict.items():
             if property_name not in self.form_fields:
+                # If the property name isn't included in the final form for the
+                # wizard, then don't include it in the overview.
                 continue
-            value = self.resource.as_dict().get(property_name)
-            field_title = metadata.title
-            if not field_title:
-                field_title = " ".join(property_name.split("_")).title()
-            field_category = metadata.category
-            if not field_category:
-                field_category = UNKNOWN_ATTRIBUTE_CATEGORY
-            if field_category not in formatted_resource_data:
-                formatted_resource_data.update({field_category: dict()})
-            formatted_resource_data[field_category].update({
+            formatted_category = metadata.category
+            if not formatted_category:
+                formatted_category = UNKNOWN_ATTRIBUTE_CATEGORY
+            if formatted_category not in overview_data:
+                overview_data.update({formatted_category: dict()})
+            overview_data[formatted_category].update({
                 property_name: {
-                    "title": field_title,
-                    "value": value,
+                    "title": metadata.title,
+                    "value": self.resource.as_dict().get(property_name),
+                    # Pass the rest of the property metadata for further configuration
+                    # in the overview HTML template.
+                    "additional_metadata": metadata,
                 }
             })
-        return formatted_resource_data
+        return overview_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
-                "main_heading": "Overview",
-                "resource_name": resource_label(
-                    self.resource.as_dict(), self.resource_type, self.resource_id
-                ),
-                "resource_data_by_category": self.format_resource_data_for_template(),
-                "resource": self.resource.as_dict(),
-                "toc_list_items": self.get_toc(),
-                "editor_reverse_base": self.editor_reverse_base,
-            }
-        )
+        context.update({
+            "title": f"{resource_label(self.resource.as_dict(), self.resource_type, self.resource_id)} | Overview",
+            "main_heading": "Overview",
+            "resource_name": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "resource": self.resource.as_dict(),
+            "overview_data_by_category": self.organise_data_for_overview(),
+            "toc_list_items": self.get_toc(),
+            "properties": self.properties_as_dict,
+            "editor_reverse_base": self.editor_reverse_base,
+        })
         return context

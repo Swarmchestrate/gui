@@ -11,20 +11,20 @@
             </svg></a>
     </div>
     <div class="bg-body-tertiary rounded p-3">
-        {% if list_item in resource_data_by_category %}
+        {% if list_item in overview_data_by_category %}
         <dl class="mb-0">
-            {% with category_resource_data=resource_data_by_category|get_key_value_or_empty_dict:list_item %}
-            {% for field_name, field_data in category_resource_data.items %}
-            <dt>{{ field_data.title }}</dt>
+            {% with section_data=overview_data_by_category|get_key_value_or_empty_dict:list_item %}
+            {% for property_name, property_metadata_for_section in section_data.items %}
+            <dt>{{ property_metadata_for_section.title }}</dt>
             {% if forloop.last %}
             <dd class="mb-0">
             {% else %}
             <dd>
             {% endif %}
-                {% if not field_data.value %}
+                {% if not property_metadata_for_section.value %}
                 <span class="text-secondary">Not Set</span>
                 {% else %}
-                {{ field_data.value }}
+                {{ property_metadata_for_section.value }}
                 {% endif %}
             </dd>
             {% endfor %}

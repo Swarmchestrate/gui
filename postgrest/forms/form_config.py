@@ -137,7 +137,7 @@ class Properties:
             type=metadata.get("type"),
             description=metadata.get("description"),
             enum=metadata.get("enum"),
-            title=column_metadata_for_property.get("title"),
+            title=column_metadata_for_property.get("title") or " ".join(name.split("_")).title(),
             category=column_metadata_for_property.get("category"),
             help_text=column_metadata_for_property.get("description")
         )
@@ -349,7 +349,10 @@ class FormConfig:
             metadata.category,
         )
 
-    def get_properties(self):
+    def get_properties(self) -> dict:
+        """Returns a dictionary of PropertyMetadata instances mapped to
+        their property name. Excludes PKs and any disabled properties.
+        """
         properties = dict()
         for name, metadata in self._properties.items():
             if (metadata.is_pk
@@ -382,6 +385,9 @@ class FormConfig:
         return fields
 
     def get_fields(self, include_pk_fields: bool = False) -> dict:
+        """Returns a dictionary of typed Django Field instances mapped to their
+        field names. Excludes any disabled properties and, optionally, primary keys.
+        """
         return self._get_fields(include_pk_fields=include_pk_fields)
     
     def get_fields_for_category(self, category) -> dict:
