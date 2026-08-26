@@ -6,7 +6,6 @@ from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
-from http import HTTPStatus
 
 from .exceptions import NameMissingException, SatBuilderException
 from .forms import (
@@ -225,7 +224,6 @@ class ColumnMetadataManagementView(TemplateView):
     multi_resource_deletion_form_class = MultiResourceDeletionForm
 
     table_name = TableNames.COLUMN_METADATA
-    resource_type = TableNames.COLUMN_METADATA
 
     resource_list_reverse = "resource_management:manage_column_metadata"
     new_resource_reverse = "resource_management:new_column_metadata"
@@ -233,33 +231,61 @@ class ColumnMetadataManagementView(TemplateView):
     resource_deletion_reverse = "resource_management:delete_column_metadata"
     multi_resource_deletion_reverse = "resource_management:delete_column_metadata_multi"
 
-    def get_resource_list(self):
-        api_client = ApiClient()
-        api_client.initialise_openapi_spec()
-        return api_client.get_endpoint(self.table_name).get_resources()
+    def get_fields_by_table_name(self):
+        fields_by_table_name = dict()
+        for table_name in self.openapi_spec.get_definitions().keys():
+            form_config = get_form_config_for_table(
+                table_name,
+                self.openapi_spec,
+                self.column_metadata
+            )
+            fields_by_table_name.update({
+                table_name: list(form_config.get_fields().keys())
+            })
+        return fields_by_table_name
+
+    def get_column_metadata_by_table_name(self, column_metadata: list[Resource]):
+        column_metadata_by_table_name = dict()
+        unknown_table_column_metadata = list()
+        for resource in column_metadata:
+            table_name = resource.as_dict().get("table_name")
+            if not table_name:
+                unknown_table_column_metadata.append(resource)
+                continue
+            if table_name not in column_metadata_by_table_name:
+                column_metadata_by_table_name.update({
+                    table_name: dict()
+                })
+            column_metadata_by_table_name[table_name].update({
+                _get_composite_pk(resource): resource,
+            })
+        UNKNOWN_TABLE = "Unknown"
+        column_metadata_by_table_name.update({
+            UNKNOWN_TABLE: {
+                _get_composite_pk(resource): resource
+                for resource in unknown_table_column_metadata
+            }
+        })
+        return column_metadata_by_table_name
 
     def dispatch(self, request, *args, **kwargs):
-        self.resource_list = self.get_resource_list()
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "resource_type"):
-            self.resource_type = self.table_name
+        column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
+        self.resource_list = column_metadata
+        self.column_metadata = column_metadata
         return super().dispatch(request, *args, **kwargs)
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if not hasattr(self, "resource_type"):
-            self.resource_type = self.table_name
         form_config = get_form_config_for_table(
             self.table_name,
             self.openapi_spec,
             self.column_metadata,
         )
         context.update({
-            "title": humanise_resource_type_plural(self.resource_type).title(),
+            "title": "Wizard Fields",
             "new_resource_reverse": self.new_resource_reverse,
             "new_resource_form": NewColumnMetadataEditorForm(
                 table_names=self.openapi_spec.get_definitions().keys(),
@@ -294,7 +320,8 @@ class ColumnMetadataManagementView(TemplateView):
                 _get_composite_pk(resource): resource
                 for resource in self.resource_list
             },
-            "resource_type": self.resource_type,
+            "resources_by_table_name": self.get_column_metadata_by_table_name(self.resource_list),
+            "fields_by_table_name": self.get_fields_by_table_name(),
             "get_columns_url_template": reverse_lazy(
                 "postgrest:get_table_columns",
                 kwargs={"table_name": "__table_name__"}

@@ -13,7 +13,6 @@
 {% endblock scripts %}
 {% load helpers %}
 {% block content %}
-{% block title %}
 <div class="d-flex flex-wrap align-items-center column-gap-4 row-gap-4 pb-2">
     <h1 class="mb-0">{{ title }}</h1>
     <ul class="d-inline-flex flex-wrap column-gap-3 row-gap-2 list-unstyled mb-0">
@@ -29,18 +28,20 @@
         <li>
             <button
                 id="delete-checked-btn"
-                class="d-none d-inline-flex align-items-center column-gap-2 btn btn-outline-danger"
+                class="d-none d-inline-flex align-items-center column-gap-2 delete-checked-btn btn btn-outline-danger"
                 type="button"
+                data-dialog-id="delete-multiple-dialog"
+                data-table-id="resources-table"
+                data-form-id="multi-resource-deletion-form"
                 aria-label="Delete"
                 title="Delete">
                 <i class="bi bi-trash3-fill"></i>
-                <span>Delete selected (<span id="num-checked"></span>)</span>
+                <span>Delete selected (<span class="num-checked"></span>)</span>
             </button>    
         </li>
         {% endif %}
     </ul>
 </div>
-{% endblock title %}
 {% if description %}
 <p class="pb-4">{{ description }}</p>
 {% endif %}
@@ -52,7 +53,7 @@
         {% else %}
         <form id="multi-resource-deletion-form" method="POST" action="{% url multi_resource_deletion_reverse %}">
             {% csrf_token %}
-            <table id="resources-table" class="table table-hover">
+            <table id="resources-table" class="resources-table table table-hover">
                 <thead>
                     <tr>
                         <th class="align-middle p-3"></th>

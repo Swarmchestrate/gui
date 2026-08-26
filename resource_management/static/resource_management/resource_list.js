@@ -1,12 +1,16 @@
-import { initialiseAndSetupDataTable } from "/static/resource_management/base_resource_list.js";
+import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 
 // Table row setup
 window.addEventListener("DOMContentLoaded", () => {
-    initialiseAndSetupDataTable([
-        "checkbox",
-        "id",
-        "date_created",
-        "date_updated",
-        "actions",
-    ]);
+    const tableElementId = "resources-table";
+    initialiseAndSetupDataTable(
+        tableElementId,
+        [
+            "checkbox",
+            "id",
+            "date_created",
+            "date_updated",
+            "actions",
+        ]
+    );
 });

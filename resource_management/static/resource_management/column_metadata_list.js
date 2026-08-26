@@ -1,6 +1,6 @@
 import { setupDialog } from "/static/dialog.js";
 import { htmlToNode } from "/static/editor/utils.js";
-import { initialiseAndSetupDataTable } from "/static/resource_management/base_resource_list.js";
+import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 
 const newDialog = document.querySelector("#new-dialog");
 const getColumnsForTableUrlBase = JSON.parse(
@@ -87,36 +87,32 @@ function setupUpdateDialogs(dataTable) {
     });
 }
 
-export function setupIndividualResourceDeletion(dataTable) {
-    const dataTableRows = dataTable.rows().nodes().toArray();
-    dataTableRows.forEach((tr) => {
-        const deleteButton = tr.querySelector(".delete-btn");
-        const deleteDialog = document.querySelector(
-            `#${deleteButton.dataset.dialogId}`,
-        );
-        // Open delete dialog when button clicked.
-        setupDialog(
-            deleteDialog,
-            [
-                deleteDialog.querySelector(".btn-close"),
-                deleteDialog.querySelector("button[value='cancel']"),
-            ],
-            [deleteButton],
-        );
-    });
+function setupDataTableForTabPane(tabPane) {
+    const tableElement = tabPane.querySelector("table");
+    const dataTable = initialiseAndSetupDataTable(
+        tableElement.id,
+        [
+            "checkbox",
+            "column_name",
+            "title",
+            "date_created",
+            "date_updated",
+            "actions",
+        ]
+    );
+    const tableRowUpdateButton = document.querySelector(`#${tableElement.id} tr .edit-btn`);
+    if (!tableRowUpdateButton) return;
+    setupUpdateDialogs(dataTable);
 }
 
 // Table row setup
 window.addEventListener("DOMContentLoaded", async () => {
-    const dataTable = initialiseAndSetupDataTable([
-        "checkbox",
-        "column_name",
-        "table_name",
-        "title",
-        "date_created",
-        "date_updated",
-        "actions",
-    ]);
-    setupUpdateDialogs(dataTable);
-    await setupNewDialog();
+    // const activeTabPane = document.querySelector("#table-nav-tabContent .tab-pane.active");
+    // setupDataTableForTabPane(activeTabPane);
+    const tabPanes = Array.from(document.querySelectorAll("#table-nav-tabContent .tab-pane"));
+    tabPanes.forEach(tabPane => {
+        setupDataTableForTabPane(tabPane);
+    });
+    const bsTab = new bootstrap.Tab("#table-nav-tab");
+    // await setupNewDialog();
 });

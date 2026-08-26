@@ -384,15 +384,15 @@ label:has(~ :required)::after,
 }
 
 /* DataTables */
-#resources-table_wrapper {
+.resources-table_wrapper {
     max-width: calc(100vw - var(--bs-gutter-x));
 }
 
-#resources-table_wrapper .dt-layout-table {
+.resources-table_wrapper .dt-layout-table {
     overflow-x: auto;
 }
 
-#resources-table thead input[type="checkbox"] {
+.resources-table thead input[type="checkbox"] {
     margin: auto;
 }
 

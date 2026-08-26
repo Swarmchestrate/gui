@@ -34,6 +34,14 @@ def get_key_value_or_empty_dict(d: dict, key: str):
 
 
 @register.filter
+def get_key_value_or_empty_list(d: dict, key: str):
+    try:
+        return d[key]
+    except KeyError:
+        return list()
+
+
+@register.filter
 def convert_str_date(value: str):
     return parser.parse(value)
 

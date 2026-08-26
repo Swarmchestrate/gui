@@ -1,12 +1,13 @@
 import { setupDialog } from "/static/dialog.js";
 
-const form = document.getElementById("multi-resource-deletion-form");
-const deleteCheckedButton = document.getElementById("delete-checked-btn");
-const numCheckedElement = document.getElementById("num-checked");
-
-function setupMultiResourceDeletionDialog(dataTable) {
+function setupMultiResourceDeletionDialog(
+    dataTable,
+    deleteCheckedButton,
+    form
+) {
+    const dialogId = deleteCheckedButton.dataset.dialogId;
     const deleteMultipleDialog = document.querySelector(
-        "#delete-multiple-dialog",
+        `#${dialogId}`,
     );
     // Multi delete dialog content is updated by "delete selected (X)"
     // button.
@@ -34,33 +35,29 @@ function getAllSelectedRows(dataTable) {
     return dataTable.rows(".selected").nodes();
 }
 
-function updateDeleteCheckedButtonState(numChecked) {
-    numCheckedElement.textContent = numChecked;
+function updateDeleteCheckedButtonState(deleteCheckedButton, numChecked) {
+    deleteCheckedButton.querySelector(".num-checked").textContent = numChecked;
     if (numChecked === 0) {
         return deleteCheckedButton.classList.add("d-none");
     }
     return deleteCheckedButton.classList.remove("d-none");
 }
 
-function setupResourcesTableCheckboxStyling(selectAllRowsCheckbox, dataTable) {
-    selectAllRowsCheckbox.classList.add("form-check-input");
-    const dataTableRows = dataTable.rows().nodes().toArray();
-    dataTableRows.forEach((row) => {
-        const checkbox = row.querySelector("input[type='checkbox']");
-        return checkbox.classList.add("form-check-input");
-    });
-}
-
-export function setupMultiResourceDeletion(dataTable) {
-    const selectAllRowsCheckbox = document.querySelector(
-        "#resources-table thead input[type='checkbox']",
+export function setupMultiResourceDeletion(tableId, dataTable) {
+    const deleteCheckedButton = document.querySelector(
+        `button.delete-checked-btn[data-table-id="${tableId}"]`
     );
-    selectAllRowsCheckbox.addEventListener("input", () => {
+    if (!deleteCheckedButton) return;
+    const tableSelector = `#${tableId}`;
+    document.querySelector(
+        `${tableSelector} thead input[type='checkbox']`
+    ).addEventListener("input", () => {
         // Small timeout added before updating delete checked
         // button state as number of selected rows doesn't
         // update straight away.
         window.setTimeout(() => {
             updateDeleteCheckedButtonState(
+                deleteCheckedButton,
                 getAllSelectedRows(dataTable).length,
             );
         }, 25);
@@ -73,6 +70,7 @@ export function setupMultiResourceDeletion(dataTable) {
         // is clicked.
         checkbox.addEventListener("input", () => {
             updateDeleteCheckedButtonState(
+                deleteCheckedButton,
                 getAllSelectedRows(dataTable).length,
             );
         });
@@ -85,8 +83,12 @@ export function setupMultiResourceDeletion(dataTable) {
         }
         checkbox.setAttribute("value", resourceId);
     });
-    // Apply Bootstrap styling to checkboxes.
-    setupResourcesTableCheckboxStyling(selectAllRowsCheckbox, dataTable);
     // Set up multi delete dialog.
-    setupMultiResourceDeletionDialog(dataTable);
+    const formId = deleteCheckedButton.dataset.formId;
+    const form = document.querySelector(`#${formId}`);
+    setupMultiResourceDeletionDialog(
+        dataTable,
+        deleteCheckedButton,
+        form
+    );
 }

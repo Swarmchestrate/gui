@@ -2,9 +2,9 @@ import { setupIndividualResourceDeletion } from "/static/resource_management/res
 import { setupMultiResourceDeletion } from "/static/resource_management/multi_resource_deletion.js";
 
 // DataTables setup
-function initialiseDataTable(columnNames) {
+function initialiseDataTable(tableSelector, columnNames) {
     DataTable.datetime("dd/MM/yyyy, HH:mm:ss");
-    const dataTable = new DataTable("#resources-table", {
+    const dataTable = new DataTable(tableSelector, {
         columnDefs: [
             {
                 orderable: false,
@@ -25,6 +25,19 @@ function initialiseDataTable(columnNames) {
         },
     });
     return dataTable;
+}
+
+function applyBootstrapStylingToDataTableCheckboxes(tableSelector, dataTable) {
+    // Apply styling to checkbox that selects all rows
+    document.querySelector(
+        `${tableSelector} thead input[type='checkbox']`
+    ).classList.add("form-check-input");
+    // Checkbox for each row
+    const dataTableRows = dataTable.rows().nodes().toArray();
+    dataTableRows.forEach((row) => {
+        const checkbox = row.querySelector("input[type='checkbox']");
+        return checkbox.classList.add("form-check-input");
+    });
 }
 
 function setupDataTableEventListeners(dataTable) {
@@ -49,10 +62,19 @@ function setupDataTableEventListeners(dataTable) {
     });
 }
 
-export function initialiseAndSetupDataTable(columnNames) {
-    const dataTable = initialiseDataTable(columnNames);
+export function initialiseAndSetupDataTable(tableId, columnNames) {
+    const tableSelector = `#${tableId}`;
+    const dataTable = initialiseDataTable(tableSelector, columnNames);
     setupDataTableEventListeners(dataTable);
-    setupIndividualResourceDeletion(dataTable);
-    setupMultiResourceDeletion(dataTable);
+    // Apply Bootstrap styling to checkboxes.
+    applyBootstrapStylingToDataTableCheckboxes(tableSelector, dataTable);
+    const deleteTableRowButton = document.querySelector(`${tableSelector} tr .delete-btn`);
+    if (deleteTableRowButton) {
+        setupIndividualResourceDeletion(dataTable);
+    }
+    setupMultiResourceDeletion(
+        tableId,
+        dataTable
+    );
     return dataTable;
 }
