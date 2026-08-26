@@ -285,7 +285,7 @@ class ColumnMetadataManagementView(TemplateView):
             self.column_metadata,
         )
         context.update({
-            "title": "Wizard Fields",
+            "title": "Wizard Configurations",
             "new_resource_reverse": self.new_resource_reverse,
             "new_resource_form": NewColumnMetadataEditorForm(
                 table_names=self.openapi_spec.get_definitions().keys(),
