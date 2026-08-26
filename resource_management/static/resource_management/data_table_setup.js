@@ -68,10 +68,7 @@ export function initialiseAndSetupDataTable(tableId, columnNames) {
     setupDataTableEventListeners(dataTable);
     // Apply Bootstrap styling to checkboxes.
     applyBootstrapStylingToDataTableCheckboxes(tableSelector, dataTable);
-    const deleteTableRowButton = document.querySelector(`${tableSelector} tr .delete-btn`);
-    if (deleteTableRowButton) {
-        setupIndividualResourceDeletion(dataTable);
-    }
+    setupIndividualResourceDeletion(dataTable);
     setupMultiResourceDeletion(
         tableId,
         dataTable

@@ -5,9 +5,15 @@ export function setupIndividualResourceDeletion(dataTable) {
     const dataTableRows = dataTable.rows().nodes().toArray();
     dataTableRows.forEach((tr) => {
         const deleteButton = tr.querySelector(".delete-btn");
+        // The column metadata management table may have some rows without
+        // a delete button; just skip these rows.
+        if (!deleteButton) return;
         const deleteDialog = document.querySelector(
             `#${deleteButton.dataset.dialogId}`,
         );
+        if (!deleteDialog) {
+            return console.error(`Delete dialog #${deleteButton.dataset.dialogId} not found.`);
+        }
         // Open delete dialog when button clicked.
         setupDialog(
             deleteDialog,

@@ -68,14 +68,18 @@ async function setupNewDialog() {
     });
 }
 
-function setupUpdateDialogs(dataTable) {
+function setupTableRowUpdateDialogs(dataTable) {
     const dataTableRows = dataTable.rows().nodes().toArray();
     dataTableRows.forEach((tr) => {
         const updateButtons = Array.from(tr.querySelectorAll(".edit-btn"));
+        if (updateButtons.length === 0) return;
         const updateDialogId = updateButtons[0].dataset.dialogId;
         const updateDialog = document.querySelector(
             `#${updateDialogId}`,
         );
+        if (!updateDialog) {
+            return console.error(`Update dialog #${updateButtons[0].dataset.dialogId} not found.`);
+        }
         // Open update dialog when button clicked.
         setupDialog(
             updateDialog,
@@ -100,9 +104,7 @@ function setupDataTableForTabPane(tabPane) {
             "actions",
         ]
     );
-    const tableRowUpdateButton = document.querySelector(`#${tableElement.id} tr .edit-btn`);
-    if (!tableRowUpdateButton) return;
-    setupUpdateDialogs(dataTable);
+    setupTableRowUpdateDialogs(dataTable);
 }
 
 // Table row setup
