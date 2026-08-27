@@ -10,7 +10,6 @@ from django.views.generic.base import ContextMixin
 from .exceptions import NameMissingException, SatBuilderException
 from .forms import (
     ColumnMetadataDeletionForm,
-    NewColumnMetadataEditorForm,
     MultiResourceDeletionForm,
     ResourceDeletionForm,
 )
@@ -226,7 +225,7 @@ class ColumnMetadataManagementView(TemplateView):
     table_name = TableNames.COLUMN_METADATA
 
     resource_list_reverse = "resource_management:manage_column_metadata"
-    new_resource_reverse = "resource_management:new_column_metadata"
+    new_resource_reverse_base = "resource_management:new_column_metadata"
     resource_update_reverse = "resource_management:update_column_metadata"
     resource_deletion_reverse = "resource_management:delete_column_metadata"
     multi_resource_deletion_reverse = "resource_management:delete_column_metadata_multi"
@@ -234,13 +233,16 @@ class ColumnMetadataManagementView(TemplateView):
     def get_fields_by_table_name(self):
         fields_by_table_name = dict()
         for table_name in self.openapi_spec.get_definitions().keys():
+            include_pk_fields = table_name == "column_metadata"
             form_config = get_form_config_for_table(
                 table_name,
                 self.openapi_spec,
                 self.column_metadata
             )
             fields_by_table_name.update({
-                table_name: list(form_config.get_fields().keys())
+                table_name: list(form_config.get_fields(
+                    include_pk_fields=include_pk_fields
+                ).keys())
             })
         return fields_by_table_name
 
@@ -286,10 +288,9 @@ class ColumnMetadataManagementView(TemplateView):
         )
         context.update({
             "title": "Wizard Configurations",
-            "new_resource_reverse": self.new_resource_reverse,
-            "new_resource_form": NewColumnMetadataEditorForm(
-                table_names=self.openapi_spec.get_definitions().keys(),
-                fields=form_config.get_fields(include_pk_fields=True)
+            "new_resource_reverse_base": self.new_resource_reverse_base,
+            "new_resource_form": FormWithDynamicallyPopulatedFields(
+                fields=form_config.get_fields()
             ),
             "resource_update_forms": {
                 _get_composite_pk(resource): FormWithDynamicallyPopulatedFields(
@@ -331,7 +332,7 @@ class ColumnMetadataManagementView(TemplateView):
 
 
 class NewColumnMetadataFormView(FormView):
-    form_class = NewColumnMetadataEditorForm
+    form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
 
@@ -345,8 +346,8 @@ class NewColumnMetadataFormView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        table_name = form.cleaned_data["table_name"]
-        column_name = form.cleaned_data["column_name"]
+        table_name = self.kwargs["table_name"]
+        column_name = self.kwargs["column_name"]
         self.api_client.get_endpoint(
             self.table_name
         ).register_with_composite_key(
@@ -370,8 +371,7 @@ class NewColumnMetadataFormView(FormView):
             self.column_metadata,
         )
         kwargs.update({
-            "table_names": self.openapi_spec.get_definitions().keys(),
-            "fields": form_config.get_fields(include_pk_fields=True)
+            "fields": form_config.get_fields()
         })
         return kwargs
 

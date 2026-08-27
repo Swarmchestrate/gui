@@ -11,7 +11,7 @@ urlpatterns = [
         name="manage_column_metadata",
     ),
     path(
-        "column-metadata/new/",
+        "column-metadata/new/table/<table_name>/column/<column_name>/",
         views.NewColumnMetadataFormView.as_view(),
         name="new_column_metadata",
     ),

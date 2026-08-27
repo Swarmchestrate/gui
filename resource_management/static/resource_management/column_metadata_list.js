@@ -1,70 +1,26 @@
 import { setupDialog } from "/static/dialog.js";
-import { htmlToNode } from "/static/editor/utils.js";
 import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 
-const newDialog = document.querySelector("#new-dialog");
-const getColumnsForTableUrlBase = JSON.parse(
-    document.querySelector("#get-columns-url-template").textContent
-);
-const spinnerElement = htmlToNode('<span class="spinner-border spinner-border-sm ms-2" aria-hidden="true"></span>');
-
-
-async function getColumnsForTable(tableName) {
-    const getColumnsForTableUrl = getColumnsForTableUrlBase.replace(
-        "__table_name__",
-        tableName
-    );
-    const response = await fetch(getColumnsForTableUrl, {
-        "method": "GET",
-    });
-    if (!response.ok) {
-        throw new Error("A problem occurred whilst attempting to get the column names for a table.");
-    }
-    const responseContent = await response.json();
-    return responseContent.columns;
-
-} 
-
-function updateColumnNameSelect(columnNameSelect, columnNames) {
-    const blankOption = document.createElement("OPTION");
-    blankOption.value = "";
-    const options = columnNames.map(columnName => {
-        const optionElement = document.createElement("OPTION");
-        optionElement.value = columnName;
-        optionElement.textContent = columnName;
-        return optionElement;
-    });
-    columnNameSelect.replaceChildren(blankOption, ...options);
-    columnNameSelect.disabled = false;
-}
-
-async function refreshColumnNames(tableName, columnNameSelect) {
-    const labelElement = document.querySelector(`label[for="${columnNameSelect.id}"]`);
-    labelElement.insertAdjacentElement("afterend", spinnerElement);
-    columnNameSelect.disabled = true;
-    try {
-        const columnNames = await getColumnsForTable(tableName);
-        updateColumnNameSelect(columnNameSelect, columnNames);
-    } catch (error) {
-        console.error(error);
-    }
-    spinnerElement.remove();
-}
-
-async function setupNewDialog() {
-    setupDialog(
-        newDialog,
-        [newDialog.querySelector(".btn-close")],
-        [document.querySelector("#new-dialog-button")],
-    );
-    const tableNameSelect = newDialog.querySelector("select[name='table_name']");
-    const columnNameSelect = newDialog.querySelector("select[name='column_name']");
-    if (!tableNameSelect || !columnNameSelect) return;
-    if (tableNameSelect.value) {
-        await refreshColumnNames(tableNameSelect.value, columnNameSelect);
-    }
-    tableNameSelect.addEventListener("change", async () => {
-        await refreshColumnNames(tableNameSelect.value, columnNameSelect);
+function setupTableRowNewDialogs(dataTable) {
+    const dataTableRows = dataTable.rows().nodes().toArray();
+    dataTableRows.forEach((tr) => {
+        const newButton = tr.querySelector(".new-btn");
+        if (!newButton) return;
+        const newDialogId = newButton.dataset.dialogId;
+        const newDialog = document.querySelector(
+            `#${newDialogId}`,
+        );
+        if (!newDialog) {
+            return console.error(`New resource dialog #${newButton.dataset.dialogId} not found.`);
+        }
+        // Open update dialog when button clicked.
+        setupDialog(
+            newDialog,
+            [
+                newDialog.querySelector(".btn-close"),
+            ],
+            [newButton],
+        );
     });
 }
 
@@ -104,11 +60,12 @@ function setupDataTableForTabPane(tabPane) {
             "actions",
         ]
     );
+    setupTableRowNewDialogs(dataTable);
     setupTableRowUpdateDialogs(dataTable);
 }
 
 // Table row setup
-window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("DOMContentLoaded", () => {
     // const activeTabPane = document.querySelector("#table-nav-tabContent .tab-pane.active");
     // setupDataTableForTabPane(activeTabPane);
     const tabPanes = Array.from(document.querySelectorAll("#table-nav-tabContent .tab-pane"));
@@ -116,5 +73,4 @@ window.addEventListener("DOMContentLoaded", async () => {
         setupDataTableForTabPane(tabPane);
     });
     const bsTab = new bootstrap.Tab("#table-nav-tab");
-    // await setupNewDialog();
 });

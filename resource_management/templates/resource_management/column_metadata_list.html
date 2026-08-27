@@ -68,7 +68,7 @@
                             <tr>
                                 <th class="align-middle p-3"></th>
                                 <th class="align-middle p-3">Field Name</th>
-                                <th class="align-middle p-3">Displayed Title</th>
+                                <th class="align-middle p-3">Display Name</th>
                                 <th class="align-middle p-3">Created At</th>
                                 <th class="align-middle p-3">Last Updated</th>
                                 <th
@@ -123,8 +123,9 @@
                                         {% if not resource %}
                                         <li>
                                             <button
-                                                class="btn btn-light"
+                                                class="btn btn-light new-btn"
                                                 type="button"
+                                                data-dialog-id="{{ table_name }}-{{ field_name }}-new-dialog"
                                                 aria-label="New"
                                                 title="New">
                                                 <i class="bi bi-plus-lg"></i>
@@ -169,15 +170,17 @@
     {% endfor %}
 </div>
 <div id="dialogs">
-    {% for table_name in fields_by_table_name.keys %}
+    {% for table_name, fields in fields_by_table_name.items %}
     {# Delete dialog (multiple) #}
     {% with dialog_id=table_name|add:'-delete-multiple-dialog' %}
     {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
     {% endwith %}
     {# New dialog (single) #}
-    {% with dialog_id=table_name|add:'-new-dialog' %}
+    {% for field_name in fields %}
+    {% with dialog_id=table_name|add:'-'|add:field_name|add:'-new-dialog' form=new_resource_form %}
     {% include 'resource_management/dialogs/new_dialog.html' %}
     {% endwith %}
+    {% endfor %}
     {% endfor %}
     {# Delete dialogs (single) #}
     {% for resource_id, form in resource_deletion_forms.items %}

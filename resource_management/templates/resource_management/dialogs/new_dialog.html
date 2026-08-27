@@ -3,12 +3,13 @@
 
 {% block dialog_header_content %}
 <div>
-    New {{ resource_type|humanise_resource_type|title }}
+    New Field Configuration
+    (<span class="text-body-secondary">{{ field_name }}</span>)
 </div>
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
-<form method="POST" action="{% url new_resource_reverse %}">
+<form method="POST" action="{% url new_resource_reverse_base table_name field_name %}">
     {% csrf_token %}
     {% for field in form %}
     {% if field.field.widget.input_type == 'checkbox' %}
