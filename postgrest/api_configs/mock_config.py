@@ -263,8 +263,8 @@ class MockEndpoint(BaseEndpoint):
         updated_resources = [
             r
             for r in resources
-            if all(
-                r.get(property_name == value)
+            if not all(
+                r.get(property_name) == value
                 for property_name, value in composite_key.items()
             )
         ]
