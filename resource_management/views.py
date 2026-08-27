@@ -354,6 +354,11 @@ class NewColumnMetadataFormView(FormView):
     def form_valid(self, form):
         table_name = self.kwargs["table_name"]
         column_name = self.kwargs["column_name"]
+        registration_data = form.cleaned_data
+        registration_data.update({
+            "table_name": table_name,
+            "column_name": column_name,
+        })
         self.api_client.get_endpoint(
             self.table_name
         ).register_with_composite_key(
@@ -361,7 +366,7 @@ class NewColumnMetadataFormView(FormView):
                 "table_name": table_name,
                 "column_name": column_name,
             },
-            form.cleaned_data
+            registration_data
         )
         messages.success(
             self.request,
