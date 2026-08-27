@@ -339,6 +339,7 @@ class ColumnMetadataManagementView(TemplateView):
                 "postgrest:get_table_columns",
                 kwargs={"table_name": "__table_name__"}
             ),
+            "initial_table_name": self.request.GET.get("table_name"),
         })
         return context
 

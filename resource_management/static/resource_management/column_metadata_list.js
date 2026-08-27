@@ -62,13 +62,29 @@ function setupDataTableForTabPane(tabPane) {
     setupTableRowUpdateDialogs(dataTable);
 }
 
+function saveCurrentTabInPageUrlParams(event) {
+    const selectedTabPaneButton = event.target;
+    const selectedTableName =
+        selectedTabPaneButton.dataset.tableName;
+    if ("URLSearchParams" in window) {
+        const url = new URL(window.location);
+        url.searchParams.set("table_name", selectedTableName);
+        history.pushState(null, "", url);
+    }
+}
+
 // Table row setup
 window.addEventListener("DOMContentLoaded", () => {
-    // const activeTabPane = document.querySelector("#table-nav-tabContent .tab-pane.active");
-    // setupDataTableForTabPane(activeTabPane);
     const tabPanes = Array.from(document.querySelectorAll("#table-nav-tabContent .tab-pane"));
     tabPanes.forEach(tabPane => {
         setupDataTableForTabPane(tabPane);
     });
-    const bsTab = new bootstrap.Tab("#table-nav-tab");
+    // Set up tabs to save the current tab in the page's URL
+    // params after switching.
+    const tabPaneButtons = Array.from(
+        document.querySelectorAll("#table-nav-tab button[data-bs-toggle='tab']"),
+    );
+    tabPaneButtons.forEach((tabPaneButton) => {
+        tabPaneButton.addEventListener("shown.bs.tab", saveCurrentTabInPageUrlParams);
+    });
 });

@@ -12,20 +12,19 @@
 {% load helpers %}
 {% load humanise_swch %}
 {% block content %}
-<div class="d-flex flex-wrap align-items-center column-gap-4 row-gap-4 pb-4">
-    <h1 class="mb-0">{{ title }}</h1>
-</div>
-{% if description %}
-<p class="pb-4">{{ description }}</p>
-{% endif %}
+<h1 class="mb-0">{{ title }}</h1>
+<p class="my-4">
+    Use this page to configure how each wizard displays field labels, categories and the order that they are laid out.
+</p>
 <nav>
     <div class="nav nav-tabs" id="table-nav-tab" role="tablist">
         {% for table_name in fields_by_table_name.keys %}
         <button
-            class="nav-link{% if forloop.first %} active{% endif %}"
+            class="nav-link{% if not initial_table_name %}{% if forloop.first %} active{% endif %}{% else %}{% if initial_table_name == table_name %} active{% endif %}{% endif %}"
             id="nav-{{ table_name }}-tab"
             data-bs-toggle="tab"
             data-bs-target="#nav-{{ table_name }}"
+            data-table-name="{{ table_name }}"
             type="button"
             role="tab"
             aria-controls="nav-{{ table_name }}"
@@ -36,7 +35,7 @@
 <div id="table-nav-tabContent" class="tab-content pt-4">
     {% for table_name in fields_by_table_name.keys %}
     <div
-        class="tab-pane fade{% if forloop.first %} show active{% endif %}"
+        class="tab-pane fade{% if not initial_table_name %}{% if forloop.first %} show active{% endif %}{% else %}{% if initial_table_name == table_name %} show active{% endif %}{% endif %}"
         id="nav-{{ table_name }}"
         role="tabpanel"
         aria-labelledby="nav-{{ table_name }}-tab"
@@ -58,8 +57,6 @@
         <div class="row">
             <div class="col-lg-12">
                 {% if not resources %}
-                {% load humanise_swch %}
-                <p class="text-body-secondary">Update how wizard fields appear in the user interface here.</p>
                 {% else %}
                 <form id="{{ table_name }}-multi-resource-deletion-form" class="multi-resource-deletion-form" method="POST" action="{% url multi_resource_deletion_reverse %}">
                     {% csrf_token %}
