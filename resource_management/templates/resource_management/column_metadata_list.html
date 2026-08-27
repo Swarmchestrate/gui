@@ -69,8 +69,6 @@
                                 <th class="align-middle p-3"></th>
                                 <th class="align-middle p-3">Field Name</th>
                                 <th class="align-middle p-3">Display Name</th>
-                                <th class="align-middle p-3">Created At</th>
-                                <th class="align-middle p-3">Last Updated</th>
                                 <th
                                     class="align-middle text-end p-3"
                                     data-dt-order="disable">
@@ -102,20 +100,6 @@
                                     -
                                     {% else %}
                                     {{ resource.as_dict.title }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-body-secondary align-middle px-3">
-                                    {% if 'created_at' in resource %}
-                                    {{ resource.created_at|convert_str_date|date:'d/m/Y, H:i:s' }}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                </td>
-                                <td class="text-body-secondary align-middle px-3">
-                                    {% if 'updated_at' in resource %}
-                                    {{ resource.updated_at|convert_str_date|date:'d/m/Y, H:i:s' }}
-                                    {% else %}
-                                    -
                                     {% endif %}
                                 </td>
                                 <td class="align-middle text-center px-3">

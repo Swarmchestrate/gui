@@ -55,8 +55,6 @@ function setupDataTableForTabPane(tabPane) {
             "checkbox",
             "column_name",
             "title",
-            "date_created",
-            "date_updated",
             "actions",
         ]
     );
