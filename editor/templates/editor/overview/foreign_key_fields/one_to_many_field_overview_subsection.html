@@ -2,6 +2,7 @@
 <div class="border-start ps-4 py-2 mt-2">
     <span class="text-body-secondary">
         {% if fk_resources|length == 1 %}
+        {{ fk_resources|length }} {{ fk_table_name|humanise_resource_type|title }}
         {% else %}
         {{ fk_resources|length }} {{ fk_table_name|humanise_resource_type_plural|title }}
         {% endif %}
