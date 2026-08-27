@@ -274,15 +274,15 @@ class MockEndpoint(BaseEndpoint):
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = list()
         for resource in resources:
-            is_matching_with_any_properties = False
-            for composite_key in composite_key_list:
-                for property_name, value in composite_key.items():
-                    is_matching_properties = all(
-                        resource.get(property_name == value)
-                    )
-                    if is_matching_properties:
-                        is_matching_with_any_properties = True
-            if is_matching_with_any_properties:
+            is_matching_with_any_composite_key = any(
+                all(
+                    resource.get(property_name) == value
+                    for property_name, value in composite_key.items()
+                )
+                for composite_key in composite_key_list
+            )
+            
+            if is_matching_with_any_composite_key:
                 continue
             updated_resources.append(resource)
         return self._update_temp_data(updated_resources)
