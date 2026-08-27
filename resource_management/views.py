@@ -223,6 +223,10 @@ class ColumnMetadataManagementView(TemplateView):
     multi_resource_deletion_form_class = MultiResourceDeletionForm
 
     table_name = TableNames.COLUMN_METADATA
+    disabled_table_names = [
+        TableNames.CAPACITY_NEW,
+        TableNames.APPLICATION_NEW,
+    ]
 
     resource_list_reverse = "resource_management:manage_column_metadata"
     new_resource_reverse_base = "resource_management:new_column_metadata"
@@ -233,6 +237,8 @@ class ColumnMetadataManagementView(TemplateView):
     def get_fields_by_table_name(self, updatable_resource_pks: list[str]):
         fields_by_table_name = dict()
         for table_name in self.openapi_spec.get_definitions().keys():
+            if table_name in self.disabled_table_names:
+                continue
             include_pk_fields = table_name == "column_metadata"
             form_config = get_form_config_for_table(
                 table_name,
