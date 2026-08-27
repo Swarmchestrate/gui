@@ -230,7 +230,7 @@ class ColumnMetadataManagementView(TemplateView):
     resource_deletion_reverse = "resource_management:delete_column_metadata"
     multi_resource_deletion_reverse = "resource_management:delete_column_metadata_multi"
 
-    def get_fields_by_table_name(self):
+    def get_fields_by_table_name(self, updatable_resource_pks: list[str]):
         fields_by_table_name = dict()
         for table_name in self.openapi_spec.get_definitions().keys():
             include_pk_fields = table_name == "column_metadata"
@@ -240,9 +240,12 @@ class ColumnMetadataManagementView(TemplateView):
                 self.column_metadata
             )
             fields_by_table_name.update({
-                table_name: list(form_config.get_fields(
-                    include_pk_fields=include_pk_fields
-                ).keys())
+                table_name: sorted(
+                    list(form_config.get_fields(
+                        include_pk_fields=include_pk_fields
+                    ).keys()),
+                    key=lambda field_name: f"{table_name}__{field_name}" in updatable_resource_pks
+                )
             })
         return fields_by_table_name
 
@@ -322,7 +325,10 @@ class ColumnMetadataManagementView(TemplateView):
                 for resource in self.resource_list
             },
             "resources_by_table_name": self.get_column_metadata_by_table_name(self.resource_list),
-            "fields_by_table_name": self.get_fields_by_table_name(),
+            "fields_by_table_name": self.get_fields_by_table_name([
+                _get_composite_pk(resource)
+                for resource in self.resource_list
+            ]),
             "get_columns_url_template": reverse_lazy(
                 "postgrest:get_table_columns",
                 kwargs={"table_name": "__table_name__"}
