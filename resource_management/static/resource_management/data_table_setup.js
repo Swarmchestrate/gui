@@ -16,6 +16,9 @@ function initialiseDataTable(tableSelector, columnNames) {
         select: {
             style: "os",
             selector: "td:first-child",
+            selectable: (rowData, tr) => {
+                return Boolean(tr.querySelector("td:nth-child(2) button"));
+            },
         },
         order: [[3, "desc"]],
         language: {
@@ -36,6 +39,7 @@ function applyBootstrapStylingToDataTableCheckboxes(tableSelector, dataTable) {
     const dataTableRows = dataTable.rows().nodes().toArray();
     dataTableRows.forEach((row) => {
         const checkbox = row.querySelector("input[type='checkbox']");
+        if (!checkbox) return;
         return checkbox.classList.add("form-check-input");
     });
 }

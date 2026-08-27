@@ -43,6 +43,28 @@ function updateDeleteCheckedButtonState(deleteCheckedButton, numChecked) {
     return deleteCheckedButton.classList.remove("d-none");
 }
 
+function disableUnneededTableCheckboxes(tableSelector, dataTable) {
+    const selectAllTableRowsCheckbox = document.querySelector(
+        `${tableSelector} thead input[type='checkbox']`
+    );
+    let isSelectAllEnabled = false;
+    const dataTableRows = dataTable.rows().nodes().toArray();
+    dataTableRows.forEach((tr) => {
+        // Select row checkbox
+        const checkbox = tr.querySelector("input[type='checkbox']");
+        if (!checkbox) {
+            return;
+        }
+        const isValueAssigned = Boolean(checkbox.getAttribute("value"));
+        checkbox.disabled = !isValueAssigned;
+        if (isValueAssigned) {
+            isSelectAllEnabled = true;
+        }
+    });
+    if (isSelectAllEnabled) return;
+    return selectAllTableRowsCheckbox.disabled = true;
+}
+
 export function setupMultiResourceDeletion(tableId, dataTable) {
     const deleteCheckedButton = document.querySelector(
         `button.delete-checked-btn[data-table-id="${tableId}"]`
@@ -66,6 +88,7 @@ export function setupMultiResourceDeletion(tableId, dataTable) {
     dataTableRows.forEach((tr) => {
         // Select row checkbox
         const checkbox = tr.querySelector("input[type='checkbox']");
+        if (!checkbox) return;
         // Delete selected (X) button is updated when checkbox
         // is clicked.
         checkbox.addEventListener("input", () => {
@@ -83,6 +106,9 @@ export function setupMultiResourceDeletion(tableId, dataTable) {
         }
         checkbox.setAttribute("value", resourceId);
     });
+    // Disable any table row checkboxes without a resource ID assigned to
+    // prevent it from interfering with multi-resource deletion.
+    disableUnneededTableCheckboxes(tableSelector, dataTable);
     // Set up multi delete dialog.
     const formId = deleteCheckedButton.dataset.formId;
     const form = document.querySelector(`#${formId}`);
