@@ -224,8 +224,11 @@ class ColumnMetadataManagementView(TemplateView):
 
     table_name = TableNames.COLUMN_METADATA
     disabled_table_names = [
-        TableNames.CAPACITY_NEW,
         TableNames.APPLICATION_NEW,
+        TableNames.CAPACITY_NEW,
+        "geography_columns",
+        "geometry_columns",
+        "spatial_ref_sys",
     ]
 
     resource_list_reverse = "resource_management:manage_column_metadata"
