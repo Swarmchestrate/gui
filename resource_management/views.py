@@ -296,7 +296,7 @@ class ColumnMetadataManagementView(TemplateView):
             self.column_metadata,
         )
         context.update({
-            "title": "Wizard Configurations",
+            "title": "Wizard Customisation",
             "new_resource_reverse_base": self.new_resource_reverse_base,
             "new_resource_form": FormWithDynamicallyPopulatedFields(
                 fields=form_config.get_fields()
