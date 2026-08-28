@@ -73,8 +73,32 @@ function saveCurrentTabInPageUrlParams(event) {
     }
 }
 
+function appendCurrentTabToFormActionAndSubmit(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formAction = form.getAttribute("action");
+    if (!formAction) return form.submit();
+    const pageUrl = new URL(window.location);
+    const tableNameInPageUrl = pageUrl.searchParams.get("table_name");
+    if (tableNameInPageUrl) {
+        const newFormUrl = new URL(
+            formAction,
+            window.location.origin
+        );
+        newFormUrl.searchParams.set("table_name", tableNameInPageUrl)
+        form.setAttribute("action", newFormUrl);
+    }
+    return form.submit();
+}
+
 // Table row setup
 window.addEventListener("DOMContentLoaded", () => {
+    const forms = Array.from(document.querySelectorAll(
+        ".multi-resource-deletion-form, #dialogs form:not([method='dialog'])"
+    ));
+    forms.forEach(form => {
+        form.addEventListener("submit", appendCurrentTabToFormActionAndSubmit);
+    });
     const tabPanes = Array.from(document.querySelectorAll("#table-nav-tabContent .tab-pane"));
     tabPanes.forEach(tabPane => {
         setupDataTableForTabPane(tabPane);

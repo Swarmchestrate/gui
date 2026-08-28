@@ -27,7 +27,7 @@ function setupMultiResourceDeletionDialog(
         if (returnValue === "cancel" || returnValue === "") {
             return;
         }
-        form.submit();
+        form.requestSubmit();
     });
 }
 

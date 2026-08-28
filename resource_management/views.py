@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
+from django.utils.http import urlencode
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 
@@ -217,6 +218,30 @@ class ToscaTemplateDownloadView(View):
 def _get_composite_pk(resource: Resource):
     return f"{resource.as_dict().get('table_name')}__{resource.as_dict().get('column_name')}"
 
+
+class ColumnMetadataManagementFormView(FormView):
+    success_url = reverse_lazy("resource_management:manage_column_metadata")
+    resource_list_reverse = "resource_management:manage_column_metadata"
+
+    def form_valid(self, form):
+        table_name = self.request.GET.get("table_name")
+        if table_name:
+            query_params = {
+                "table_name": table_name,
+            }
+            self.success_url = f"{self.success_url}?{urlencode(query_params)}"
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        table_name = self.request.GET.get("table_name")
+        if not table_name:
+            return redirect(self.resource_list_reverse)
+        query_params = {
+            "table_name": table_name,
+        }
+        return redirect(f"{reverse_lazy(self.resource_list_reverse)}?{urlencode(query_params)}")
+
+
 class ColumnMetadataManagementView(TemplateView):
     template_name = "resource_management/column_metadata_list.html"
     resource_deletion_form_class = ResourceDeletionForm
@@ -347,7 +372,7 @@ class ColumnMetadataManagementView(TemplateView):
         return context
 
 
-class NewColumnMetadataFormView(FormView):
+class NewColumnMetadataFormView(ColumnMetadataManagementFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
@@ -397,7 +422,7 @@ class NewColumnMetadataFormView(FormView):
         return kwargs
 
 
-class UpdateColumnMetadataFormView(FormView):
+class UpdateColumnMetadataFormView(ColumnMetadataManagementFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
@@ -443,11 +468,9 @@ class UpdateColumnMetadataFormView(FormView):
         return kwargs
 
 
-class ColumnMetadataDeletionFormView(FormView):
+class ColumnMetadataDeletionFormView(ColumnMetadataManagementFormView):
     form_class = ColumnMetadataDeletionForm
-    success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
-    resource_list_reverse = "resource_management:manage_column_metadata"
 
     resource_type: str
 
@@ -461,7 +484,7 @@ class ColumnMetadataDeletionFormView(FormView):
             self.request,
             f"The selected {humanise_resource_type(self.resource_type)} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
-        return redirect(self.resource_list_reverse)
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         resource_id_to_delete = form.cleaned_data.get("resource_id_to_delete")
@@ -477,11 +500,9 @@ class ColumnMetadataDeletionFormView(FormView):
         return super().form_valid(form)
 
 
-class MultiColumnMetadataDeletionFormView(FormView):
-    success_url = reverse_lazy("resource_management:manage_column_metadata")
+class MultiColumnMetadataDeletionFormView(ColumnMetadataManagementFormView):
     form_class = MultiResourceDeletionForm
     table_name = TableNames.COLUMN_METADATA
-    resource_list_reverse = "resource_management:manage_column_metadata"
 
     api_client: ApiClient
     resource_type: str
@@ -509,7 +530,7 @@ class MultiColumnMetadataDeletionFormView(FormView):
             self.request,
             f"The selected {humanise_resource_type_plural(self.resource_type)} may not have been deleted as an error occurred during deletion. Please try again later.",
         )
-        return redirect(self.resource_list_reverse)
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         delete_conditions = list()
