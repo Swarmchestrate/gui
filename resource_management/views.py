@@ -243,7 +243,7 @@ class ColumnMetadataManagementFormView(FormView):
 
 
 class ColumnMetadataManagementView(TemplateView):
-    template_name = "resource_management/column_metadata_list.html"
+    template_name = "resource_management/column_metadata_management.html"
     resource_deletion_form_class = ResourceDeletionForm
     multi_resource_deletion_form_class = MultiResourceDeletionForm
 

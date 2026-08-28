@@ -7,7 +7,7 @@
 {{ get_columns_url_template|json_script:"get-columns-url-template" }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
-<script src="{% static 'resource_management/column_metadata_list.js' %}" type="module"></script>
+<script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
 {% endblock scripts %}
 {% load helpers %}
 {% load humanise_swch %}
