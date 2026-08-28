@@ -1,6 +1,6 @@
 {% if messages %}
 <div class="container-xxl gx-sm-5 gx-4">
-    <div class="messages-container mt-4 mb-5">
+    <div class="messages-container mt-4">
         {% for message in messages %}
         {# Unstyled message, in case of no tags #}
         {% if 'info' in message.tags or not message.tags %}
