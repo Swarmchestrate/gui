@@ -1,38 +1,60 @@
-{% extends 'base.html' %}
+{% extends 'resource_management/column_metadata_management_base.html' %}
 {% load static %}
 {% block styles %}
 <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
 {% endblock styles %}
+{% load helpers %}
+{% load humanise_swch %}
 {% block scripts %}
 {{ get_columns_url_template|json_script:"get-columns-url-template" }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
 {% endblock scripts %}
-{% load helpers %}
-{% load humanise_swch %}
-{% block content %}
-<h1 class="mb-0">{{ title }}</h1>
+
+{% block top_section %}
+<div class="d-flex align-items-center column-gap-4">
+    <h1 class="mb-0">{{ title }}</h1>
+    <button
+        class="btn btn-light rounded-circle fs-5"
+        type="button"
+        style="aspect-ratio: 1 / 1;"
+        data-bs-toggle="collapse"
+        data-bs-target="#toc-collapse"
+        aria-expanded="true"
+        aria-controls="toc-collapse"
+        aria-label="Toggle tables">
+        <i class="bi bi-list-ul fs-5" aria-hidden="true"></i>
+    </button>
+</div>
 <p class="my-4">
     Use this page to configure how each wizard displays field labels, categories and the order that they are laid out.
 </p>
-<nav>
-    <div class="nav nav-tabs" id="table-nav-tab" role="tablist">
-        {% for table_name in fields_by_table_name.keys %}
-        <button
-            class="nav-link{% if not initial_table_name %}{% if forloop.first %} active{% endif %}{% else %}{% if initial_table_name == table_name %} active{% endif %}{% endif %}"
-            id="nav-{{ table_name }}-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#nav-{{ table_name }}"
-            data-table-name="{{ table_name }}"
-            type="button"
-            role="tab"
-            aria-controls="nav-{{ table_name }}"
-            aria-selected="true">{{ table_name|humanise_resource_type|title }}</button>
-        {% endfor %}
-    </div>
-</nav>
-<div id="table-nav-tabContent" class="tab-content pt-4">
+{% endblock top_section %}
+
+{% block toc %}
+<div class="collapse" id="toc-collapse">
+    <nav>
+        <div class="nav nav-pills flex-column list-unstyled editor-toc sticky-top" id="table-nav-tab" role="tablist">
+            {% for table_name in fields_by_table_name.keys %}
+            <button
+                class="nav-link text-start w-100{% if not initial_table_name %}{% if forloop.first %} active{% endif %}{% else %}{% if initial_table_name == table_name %} active{% endif %}{% endif %}"
+                id="nav-{{ table_name }}-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#nav-{{ table_name }}"
+                data-table-name="{{ table_name }}"
+                type="button"
+                role="tab"
+                aria-controls="nav-{{ table_name }}"
+                aria-selected="true">{{ table_name|humanise_resource_type|title }}</button>
+            {% endfor %}
+        </div>
+    </nav>
+</div>
+{% endblock toc %}
+
+{% block main_section %}
+<div id="table-nav-tabContent" class="tab-content pt-2">
     {% for table_name in fields_by_table_name.keys %}
     <div
         class="tab-pane fade{% if not initial_table_name %}{% if forloop.first %} show active{% endif %}{% else %}{% if initial_table_name == table_name %} show active{% endif %}{% endif %}"
@@ -54,9 +76,26 @@
             <span>Delete selected (<span class="num-checked"></span>)</span>
         </button>
         {% endif %}
-        <div class="row">
+        <div class="row gy-3">
             <div class="col-lg-12">
-                {% if not resources %}
+                <div class="d-flex flex-lg-row flex-column align-items-center column-gap-3 row-gap-2">
+                    <h2 class="text-body-secondary fs-6 mb-0">
+                        <i class="bi bi-filter-left"></i>
+                        Order Customisation
+                    </h2>
+                    <div>
+                        <button class="btn btn-light btn-sm">
+                            Manage Category Order...
+                        </button>
+                        <button class="btn btn-light btn-sm">
+                            Manage Field Order...
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                {% if not fields_by_table_name %}
+                <p>No tables exist.</p>
                 {% else %}
                 <form id="{{ table_name }}-multi-resource-deletion-form" class="multi-resource-deletion-form" method="POST" action="{% url multi_resource_deletion_reverse %}">
                     {% csrf_token %}
@@ -76,6 +115,7 @@
                         <tbody>
                             {% with table_fields=fields_by_table_name|get_key_value_or_empty_list:table_name %}
                             {% for field_name in table_fields %}
+                            {# "resources" are records from the column_metadata table #}
                             {% with possible_resource_id=table_name|add:'__'|add:field_name %}
                             {% with resource=resources|get_key_value_or_empty_dict:possible_resource_id %}
                             <tr{% if resource %} data-resource-id="{{ possible_resource_id }}"{% endif %}>
@@ -153,14 +193,18 @@
 <div id="dialogs">
     {% for table_name, fields in fields_by_table_name.items %}
     {# Delete dialog (multiple) #}
-    {% with dialog_id=table_name|add:'-delete-multiple-dialog' %}
-    {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
-    {% endwith %}
+    <div id="delete-multiple-dialogs">
+        {% with dialog_id=table_name|add:'-delete-multiple-dialog' %}
+        {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
+        {% endwith %}
+    </div>
     {# New dialog (single) #}
-    {% for field_name in fields %}
-    {% with dialog_id=table_name|add:'-'|add:field_name|add:'-new-dialog' form=new_resource_form %}
-    {% include 'resource_management/dialogs/new_dialog.html' %}
-    {% endwith %}
+    <div id="new-dialogs">
+        {% for field_name in fields %}
+        {% with dialog_id=table_name|add:'-'|add:field_name|add:'-new-dialog' form=new_resource_form %}
+        {% include 'resource_management/dialogs/new_dialog.html' %}
+        {% endwith %}
+    </div>
     {% endfor %}
     {% endfor %}
     {# Delete dialogs (single) #}
@@ -180,4 +224,4 @@
     {% endwith %}
     {% endfor %}
 </div>
-{% endblock content %}
+{% endblock main_section %}

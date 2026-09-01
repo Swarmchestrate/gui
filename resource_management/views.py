@@ -267,7 +267,9 @@ class ColumnMetadataManagementView(TemplateView):
         for table_name in self.openapi_spec.get_definitions().keys():
             if table_name in self.disabled_table_names:
                 continue
-            include_pk_fields = table_name == "column_metadata"
+            # We want to include the column metadata table's PK fields as these
+            # are made up by the "table_name" column and the "column_name" column.
+            include_pk_fields = (table_name == "column_metadata")
             form_config = get_form_config_for_table(
                 table_name,
                 self.openapi_spec,
@@ -283,29 +285,107 @@ class ColumnMetadataManagementView(TemplateView):
             })
         return fields_by_table_name
 
-    def get_column_metadata_by_table_name(self, column_metadata: list[Resource]):
-        column_metadata_by_table_name = dict()
-        unknown_table_column_metadata = list()
-        for resource in column_metadata:
-            table_name = resource.as_dict().get("table_name")
-            if not table_name:
-                unknown_table_column_metadata.append(resource)
+    def get_ordered_fields_and_categories_by_table_name(self):
+        UNCATEGORISED = "Unknown"
+        DEFAULT_ORDER_VALUE = -1
+        MAX_ORDER_VALUE = 999999
+        category_order_by_table_name = dict()
+        data = dict()
+        table_names_available_at_postgrest = self.openapi_spec.get_definitions().keys()
+        for table_name in table_names_available_at_postgrest:
+            if table_name in self.disabled_table_names:
                 continue
-            if table_name not in column_metadata_by_table_name:
-                column_metadata_by_table_name.update({
-                    table_name: dict()
-                })
-            column_metadata_by_table_name[table_name].update({
-                _get_composite_pk(resource): resource,
+            # We want to include the column metadata table's PK fields as these
+            # are made up by the "table_name" column and the "column_name" column.
+            include_pk_fields = (table_name == "column_metadata")
+            form_config = get_form_config_for_table(
+                table_name,
+                self.openapi_spec,
+                self.column_metadata
+            )
+            data.update({
+                table_name: {
+                    UNCATEGORISED: {
+                        # these dict keys should match the stringified composite key
+                        # format of the column metadata records ({table_name}__{column_name}).
+                        f"{table_name}__{field_name}": {"order": DEFAULT_ORDER_VALUE}
+                        for field_name in form_config.get_fields(
+                            include_pk_fields=include_pk_fields
+                        ).keys()
+                    }
+                }
             })
-        UNKNOWN_TABLE = "Unknown"
-        column_metadata_by_table_name.update({
-            UNKNOWN_TABLE: {
-                _get_composite_pk(resource): resource
-                for resource in unknown_table_column_metadata
+            category_order_by_table_name.update({
+                table_name: dict(),
+            })
+        # Sort existing column metadata into tables + get category order for each table
+        for resource in self.column_metadata:
+            table_name = resource.as_dict().get("table_name", "")
+            # Don't want to handle tables not available at the PostgREST
+            # API yet.
+            if table_name not in table_names_available_at_postgrest:
+                continue
+            category = resource.as_dict().get("category", "")
+            if not category or len(category.strip()) == 0:
+                # If no category assigned or blank, leave the field in the
+                # UNCATEGORISED dict.
+                continue
+            if category not in data[table_name]:
+                data[table_name].update({
+                    category: dict(),
+                })
+            resource_pk = _get_composite_pk(resource)
+            order = resource.as_dict().get("order")
+            try:
+                order = int(order)
+            except (TypeError, ValueError):
+                order = DEFAULT_ORDER_VALUE
+            data[table_name][category].update({
+                resource_pk: {
+                    "order": order,
+                },
+            })
+            data[table_name][UNCATEGORISED].pop(resource_pk, None)
+            # Update top-level category order
+            current_category_position = category_order_by_table_name[table_name].get(category)
+            # Set default category order to a blank string so it can still be sorted.
+            if current_category_position is None:
+                current_category_position = DEFAULT_ORDER_VALUE
+                category_order_by_table_name[table_name].update({
+                    category: DEFAULT_ORDER_VALUE,
+                })
+
+            try:
+                current_category_position = int(current_category_position)
+            except (TypeError, ValueError):
+                pass
+            try:
+                if (order > current_category_position):
+                    category_order_by_table_name[table_name].update({
+                        category: order,
+                    })
+            except TypeError:
+                pass
+        # Ordering
+        for table_name, categories_dict in data.items():
+            data[table_name] = {
+                key: category_dict
+                for key, category_dict in sorted(
+                    list(categories_dict.items()),
+                    key=lambda category_item: category_order_by_table_name[table_name].get(
+                        category_item[0], MAX_ORDER_VALUE
+                    )
+                )
             }
-        })
-        return column_metadata_by_table_name
+            for category_name, fields_dict in categories_dict.items():
+                data[table_name][category_name].update({
+                    key: field_dict
+                    for key, field_dict in sorted(
+                        list(fields_dict.items()),
+                        key=lambda field_item: field_item[1].get("order")
+                    )
+                })
+        return data
 
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
@@ -354,15 +434,16 @@ class ColumnMetadataManagementView(TemplateView):
                     for resource in self.resource_list
                 ]
             ),
+            # "resources" are records from the column_metadata table
             "resources": {
                 _get_composite_pk(resource): resource
                 for resource in self.resource_list
             },
-            "resources_by_table_name": self.get_column_metadata_by_table_name(self.resource_list),
             "fields_by_table_name": self.get_fields_by_table_name([
                 _get_composite_pk(resource)
                 for resource in self.resource_list
             ]),
+            "ordered_fields_and_categories_by_table_name": self.get_ordered_fields_and_categories_by_table_name(),
             "get_columns_url_template": reverse_lazy(
                 "postgrest:get_table_columns",
                 kwargs={"table_name": "__table_name__"}
