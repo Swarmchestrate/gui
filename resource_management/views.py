@@ -416,6 +416,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                     initial=resource.as_dict()
                 )
                 for resource in self.resource_list
+                if resource.as_dict().get("table_name") == self.current_table_name
             },
             "resource_update_reverse": self.resource_update_reverse,
             "resource_deletion_reverse": self.resource_deletion_reverse,
@@ -427,12 +428,14 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                     },
                 )
                 for i, resource in enumerate(self.resource_list)
+                if resource.as_dict().get("table_name") == self.current_table_name
             },
             "multi_resource_deletion_reverse": self.multi_resource_deletion_reverse,
             "multi_resource_deletion_form": self.multi_resource_deletion_form_class(
                 resource_ids=[
                     _get_composite_pk(resource)
                     for resource in self.resource_list
+                    if resource.as_dict().get("table_name") == self.current_table_name
                 ]
             ),
             # "resources" are records from the column_metadata table
@@ -442,6 +445,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 [
                     _get_composite_pk(resource)
                     for resource in self.resource_list
+                    if resource.as_dict().get("table_name") == self.current_table_name
                 ]
             ),
             "ordered_fields_and_categories_for_table_name": self.get_ordered_fields_and_categories_for_table_name(
