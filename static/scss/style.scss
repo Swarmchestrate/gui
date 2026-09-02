@@ -390,7 +390,6 @@ label:has(~ :required)::after,
 
 .management-layout {
     display: grid;
-    align-items: baseline;
     column-gap: 2rem;
     row-gap: 1rem;
     grid-template-areas:
