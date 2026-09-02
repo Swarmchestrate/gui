@@ -16,7 +16,11 @@ class EditorTableOfContents:
             category_names: list[str],
             is_unknown_category_needed: bool = False):
         self.table_name = table_name
-        self.category_names = category_names
+        self.category_names = [
+            category_name
+            for category_name in category_names
+            if not len(category_name.strip()) == 0
+        ]
         self.is_unknown_category_needed = is_unknown_category_needed
 
     def _add_metadata_for_category(
@@ -67,11 +71,9 @@ class EditorTableOfContents:
         # Remove parent category from title displayed
         # in TOC.
         if parent_category:
-            table_of_contents[category].update(
-                {
-                    "title": category.replace(f"{parent_category}:", ""),
-                }
-            )
+            table_of_contents[category].update({
+                "title": category.replace(f"{parent_category}:", ""),
+            })
         category_with_colon = f"{category}:"
         descendent_names = [
             possible_descendent_name
