@@ -2,7 +2,15 @@ import { setupIndividualResourceDeletion } from "/static/resource_management/res
 import { setupMultiResourceDeletion } from "/static/resource_management/multi_resource_deletion.js";
 
 // DataTables setup
-function initialiseDataTable(tableSelector, columnNames) {
+function initialiseDataTable(tableSelector, columnNames, options) {
+    if (typeof options !== "object") {
+        options = {};
+    }
+    if (!("selectableCondition" in options)) {
+        options.selectableCondition = (rowData, tr) => {
+            return true;
+        };
+    }
     DataTable.datetime("dd/MM/yyyy, HH:mm:ss");
     const dataTable = new DataTable(tableSelector, {
         columnDefs: [
@@ -16,9 +24,7 @@ function initialiseDataTable(tableSelector, columnNames) {
         select: {
             style: "os",
             selector: "td:first-child",
-            selectable: (rowData, tr) => {
-                return Boolean(tr.querySelector("td:nth-child(2) button"));
-            },
+            selectable: options.selectableCondition,
         },
         order: [[3, "desc"]],
         language: {
@@ -66,9 +72,9 @@ function setupDataTableEventListeners(dataTable) {
     });
 }
 
-export function initialiseAndSetupDataTable(tableId, columnNames) {
+export function initialiseAndSetupDataTable(tableId, columnNames, options) {
     const tableSelector = `#${tableId}`;
-    const dataTable = initialiseDataTable(tableSelector, columnNames);
+    const dataTable = initialiseDataTable(tableSelector, columnNames, options);
     setupDataTableEventListeners(dataTable);
     // Apply Bootstrap styling to checkboxes.
     applyBootstrapStylingToDataTableCheckboxes(tableSelector, dataTable);

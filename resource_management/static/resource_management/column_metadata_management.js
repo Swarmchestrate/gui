@@ -47,21 +47,6 @@ function setupTableRowUpdateDialogs(dataTable) {
     });
 }
 
-function setupDataTableForTabPane(tabPane) {
-    const tableElement = tabPane.querySelector("table");
-    const dataTable = initialiseAndSetupDataTable(
-        tableElement.id,
-        [
-            "checkbox",
-            "column_name",
-            "title",
-            "actions",
-        ]
-    );
-    setupTableRowNewDialogs(dataTable);
-    setupTableRowUpdateDialogs(dataTable);
-}
-
 function setupResourcesTable(tableElement) {
     const dataTable = initialiseAndSetupDataTable(
         tableElement.id,
@@ -70,7 +55,12 @@ function setupResourcesTable(tableElement) {
             "column_name",
             "title",
             "actions",
-        ]
+        ],
+        {
+            selectableCondition: (rowData, tr) => {
+                return Boolean(tr.querySelector("td:nth-child(2) button"));
+            }
+        }
     );
     setupTableRowNewDialogs(dataTable);
     setupTableRowUpdateDialogs(dataTable);
