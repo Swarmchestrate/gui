@@ -4,6 +4,8 @@
 <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
 {% endblock styles %}
 {% load helpers %}
+{% load humanise_swch %}
+
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
@@ -25,6 +27,9 @@
     <span>Delete selected (<span class="num-checked"></span>)</span>
 </button>
 {% endif %}
+<h2 class="fs-5 pb-2">
+    {{ current_table_name|humanise_resource_type|title }} Fields
+</h2>
 {% if not field_names_for_table_name %}
 <div class="d-flex align-items-center justify-content-center border border-5 border-dashed rounded w-100 h-100">
     <p class="fs-5 text-body-tertiary">This table has no fields to customise.</p>
@@ -123,15 +128,13 @@
         </form>
     </div>
     <div class="col-lg-12">
-        <div class="d-flex flex-lg-row flex-column align-items-center justify-content-lg-end column-gap-3 row-gap-2">
-            <div>
-                <button class="btn btn-light btn-sm">
-                    Manage Category Order...
-                </button>
-                <button class="btn btn-light btn-sm">
-                    Manage Field Order...
-                </button>
-            </div>
+        <div>
+            <button class="btn btn-light btn-sm">
+                Manage Category Order...
+            </button>
+            <button class="btn btn-light btn-sm">
+                Manage Field Order...
+            </button>
         </div>
     </div>
 </div>
