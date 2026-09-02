@@ -443,6 +443,11 @@ details.error-details {
     font-size: 0.875em;
 }
 
+/* Utils */
+.border-dashed {
+    border-style: dashed !important;
+}
+
 /* Bootstrap */
 .tooltip .tooltip-arrow {
     display: none;

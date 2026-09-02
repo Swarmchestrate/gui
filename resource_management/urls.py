@@ -7,8 +7,13 @@ app_name = "resource_management"
 urlpatterns = [
     path(
         "column-metadata/",
-        views.ColumnMetadataManagementView.as_view(),
+        views.ColumnMetadataManagementListView.as_view(),
         name="manage_column_metadata",
+    ),
+    path(
+        "column-metadata/table/<table_name>/",
+        views.ColumnMetadataManagementForTableView.as_view(),
+        name="manage_column_metadata_for_table",
     ),
     path(
         "column-metadata/new/table/<table_name>/column/<column_name>/",

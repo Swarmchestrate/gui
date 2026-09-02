@@ -219,42 +219,43 @@ def _get_composite_pk(resource: Resource):
     return f"{resource.as_dict().get('table_name')}__{resource.as_dict().get('column_name')}"
 
 
-class ColumnMetadataManagementFormView(FormView):
-    success_url = reverse_lazy("resource_management:manage_column_metadata")
-    resource_list_reverse = "resource_management:manage_column_metadata"
-
-    def form_valid(self, form):
-        table_name = self.request.GET.get("table_name")
-        if table_name:
-            query_params = {
-                "table_name": table_name,
-            }
-            self.success_url = f"{self.success_url}?{urlencode(query_params)}"
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        table_name = self.request.GET.get("table_name")
-        if not table_name:
-            return redirect(self.resource_list_reverse)
-        query_params = {
-            "table_name": table_name,
-        }
-        return redirect(f"{reverse_lazy(self.resource_list_reverse)}?{urlencode(query_params)}")
-
-
-class ColumnMetadataManagementView(TemplateView):
-    template_name = "resource_management/column_metadata_management.html"
-    resource_deletion_form_class = ResourceDeletionForm
-    multi_resource_deletion_form_class = MultiResourceDeletionForm
-
+class ColumnMetadataManagementListView(TemplateView):
+    template_name = "resource_management/column_metadata_management_index.html"
     table_name = TableNames.COLUMN_METADATA
     disabled_table_names = [
+        # Column metadata for "APPLICATION_NEW" is stored in "APPLICATION".
         TableNames.APPLICATION_NEW,
+        # Column metadata for "CAPACITY_NEW" is stored in "CAPACITY".
         TableNames.CAPACITY_NEW,
         "geography_columns",
         "geometry_columns",
         "spatial_ref_sys",
     ]
+
+    def dispatch(self, request, *args, **kwargs):
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        self.postgrest_table_names = [
+            table_name
+            for table_name in self.openapi_spec.get_definitions().keys()
+            if table_name not in self.disabled_table_names
+        ]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "title": "Wizard Customisation",
+            "table_names": self.postgrest_table_names,
+        })
+        return context
+
+
+class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
+    template_name = "resource_management/column_metadata_management_for_table.html"
+    resource_deletion_form_class = ResourceDeletionForm
+    multi_resource_deletion_form_class = MultiResourceDeletionForm
 
     resource_list_reverse = "resource_management:manage_column_metadata"
     new_resource_reverse_base = "resource_management:new_column_metadata"
@@ -262,139 +263,140 @@ class ColumnMetadataManagementView(TemplateView):
     resource_deletion_reverse = "resource_management:delete_column_metadata"
     multi_resource_deletion_reverse = "resource_management:delete_column_metadata_multi"
 
-    def get_fields_by_table_name(self, updatable_resource_pks: list[str]):
-        fields_by_table_name = dict()
-        for table_name in self.openapi_spec.get_definitions().keys():
-            if table_name in self.disabled_table_names:
-                continue
-            # We want to include the column metadata table's PK fields as these
-            # are made up by the "table_name" column and the "column_name" column.
-            include_pk_fields = (table_name == "column_metadata")
-            form_config = get_form_config_for_table(
-                table_name,
-                self.openapi_spec,
-                self.column_metadata
-            )
-            fields_by_table_name.update({
-                table_name: sorted(
-                    list(form_config.get_fields(
-                        include_pk_fields=include_pk_fields
-                    ).keys()),
-                    key=lambda field_name: f"{table_name}__{field_name}" in updatable_resource_pks
-                )
-            })
-        return fields_by_table_name
+    def get_field_names_for_table_name(
+            self,
+            table_name: str,
+            updatable_resource_pks: list[str]) -> list[str]:
+        if table_name in self.disabled_table_names:
+            return list()
+        # We want to include the column metadata table's PK fields as these
+        # are made up by the "table_name" column and the "column_name" column.
+        include_pk_fields = (table_name == "column_metadata")
+        column_metadata_table_name = table_name
+        if table_name == TableNames.APPLICATION_NEW:
+            column_metadata_table_name = TableNames.APPLICATION
+        if table_name == TableNames.CAPACITY_NEW:
+            column_metadata_table_name = TableNames.CAPACITY
+        form_config = get_form_config_for_table(
+            table_name,
+            self.openapi_spec,
+            self.column_metadata,
+            column_metadata_table_name=column_metadata_table_name
+        )
+        return sorted(
+            list(form_config.get_fields(
+                include_pk_fields=include_pk_fields
+            ).keys()),
+            key=lambda field_name: f"{table_name}__{field_name}" in updatable_resource_pks
+        )
 
-    def get_ordered_fields_and_categories_by_table_name(self):
+    def get_field_order_by_category_for_table_name(self, table_name) -> dict[str, dict]:
+        if table_name in self.disabled_table_names:
+            return dict()
         UNCATEGORISED = "Unknown"
-        DEFAULT_ORDER_VALUE = -1
-        MAX_ORDER_VALUE = 999999
-        category_order_by_table_name = dict()
-        data = dict()
-        table_names_available_at_postgrest = self.openapi_spec.get_definitions().keys()
-        for table_name in table_names_available_at_postgrest:
-            if table_name in self.disabled_table_names:
-                continue
-            # We want to include the column metadata table's PK fields as these
-            # are made up by the "table_name" column and the "column_name" column.
-            include_pk_fields = (table_name == "column_metadata")
-            form_config = get_form_config_for_table(
-                table_name,
-                self.openapi_spec,
-                self.column_metadata
-            )
-            data.update({
-                table_name: {
-                    UNCATEGORISED: {
-                        # these dict keys should match the stringified composite key
-                        # format of the column metadata records ({table_name}__{column_name}).
-                        f"{table_name}__{field_name}": {"order": DEFAULT_ORDER_VALUE}
-                        for field_name in form_config.get_fields(
-                            include_pk_fields=include_pk_fields
-                        ).keys()
-                    }
-                }
-            })
-            category_order_by_table_name.update({
-                table_name: dict(),
-            })
-        # Sort existing column metadata into tables + get category order for each table
+        DEFAULT_ORDER_NUMBER = 999999
+        column_metadata_by_category = {
+            UNCATEGORISED: dict(),
+        }
         for resource in self.column_metadata:
-            table_name = resource.as_dict().get("table_name", "")
-            # Don't want to handle tables not available at the PostgREST
-            # API yet.
-            if table_name not in table_names_available_at_postgrest:
+            cm_table_name = resource.as_dict().get("table_name", "")
+            if cm_table_name != table_name:
                 continue
             category = resource.as_dict().get("category", "")
+            order_number = resource.as_dict().get("order", DEFAULT_ORDER_NUMBER)
+            if not isinstance(order_number, int):
+                order_number = DEFAULT_ORDER_NUMBER
             if not category or len(category.strip()) == 0:
-                # If no category assigned or blank, leave the field in the
-                # UNCATEGORISED dict.
+                column_metadata_by_category[UNCATEGORISED].update({
+                    _get_composite_pk(resource): {"order": order_number},
+                })
                 continue
-            if category not in data[table_name]:
-                data[table_name].update({
+            if category not in column_metadata_by_category:
+                column_metadata_by_category.update({
                     category: dict(),
                 })
-            resource_pk = _get_composite_pk(resource)
-            order = resource.as_dict().get("order")
-            try:
-                order = int(order)
-            except (TypeError, ValueError):
-                order = DEFAULT_ORDER_VALUE
-            data[table_name][category].update({
-                resource_pk: {
-                    "order": order,
-                },
+            column_metadata_by_category[category].update({
+                _get_composite_pk(resource): {"order": order_number},
             })
-            data[table_name][UNCATEGORISED].pop(resource_pk, None)
-            # Update top-level category order
-            current_category_position = category_order_by_table_name[table_name].get(category)
-            # Set default category order to a blank string so it can still be sorted.
-            if current_category_position is None:
-                current_category_position = DEFAULT_ORDER_VALUE
-                category_order_by_table_name[table_name].update({
-                    category: DEFAULT_ORDER_VALUE,
-                })
+        return column_metadata_by_category
 
-            try:
-                current_category_position = int(current_category_position)
-            except (TypeError, ValueError):
-                pass
-            try:
-                if (order > current_category_position):
-                    category_order_by_table_name[table_name].update({
-                        category: order,
-                    })
-            except TypeError:
-                pass
-        # Ordering
-        for table_name, categories_dict in data.items():
-            data[table_name] = {
-                key: category_dict
-                for key, category_dict in sorted(
-                    list(categories_dict.items()),
-                    key=lambda category_item: category_order_by_table_name[table_name].get(
-                        category_item[0], MAX_ORDER_VALUE
-                    )
-                )
+    def get_ordered_fields_and_categories_for_table_name(self, table_name: str) -> dict:
+        if (table_name not in self.postgrest_table_names
+            or table_name in self.disabled_table_names):
+            return dict()
+        
+        data = dict()
+        DEFAULT_ORDER_NUMBER = 999999
+
+        field_order_by_category = self.get_field_order_by_category_for_table_name(table_name)
+        # Format category order as a list to make it easier to sort.
+        category_order = [
+            {
+                "category": category_name,
+                "order": max(
+                    field_order.values(),
+                    key=lambda data: data.get("order", DEFAULT_ORDER_NUMBER),
+                    default={"order": DEFAULT_ORDER_NUMBER}
+                ).get("order")
             }
-            for category_name, fields_dict in categories_dict.items():
-                data[table_name][category_name].update({
+            for category_name, field_order in field_order_by_category.items()
+        ]
+        data = {
+            order_data["category"]: field_order_by_category.get(
+                order_data["category"],
+                dict()
+            )
+            for order_data in sorted(
+                category_order,
+                key=lambda order_data: order_data["order"]
+            )
+        }
+
+        UNCATEGORISED = "Unknown"
+        # We want to include the column metadata table's PK fields as these
+        # are made up by the "table_name" column and the "column_name" column.
+        include_pk_fields = (table_name == "column_metadata")
+        form_config = get_form_config_for_table(
+            table_name,
+            self.openapi_spec,
+            self.column_metadata
+        )
+        fields_names = form_config.get_fields(include_pk_fields=include_pk_fields).keys()
+        for field_name in fields_names:
+            # These dict keys should match the stringified composite key
+            # format of the column metadata records ({table_name}__{column_name}).
+            possible_resource_pk = f"{table_name}__{field_name}"
+            # If the resource PK already has some column metadata assigned, there's no
+            # need to add it again.
+            if possible_resource_pk in self.resources_by_id:
+                continue
+            data[UNCATEGORISED].update({
+                possible_resource_pk: {"order": DEFAULT_ORDER_NUMBER}
+            })
+
+        for category_name, field_order in data.items():
+            data.update({
+                category_name: {
                     key: field_dict
                     for key, field_dict in sorted(
-                        list(fields_dict.items()),
+                        list(field_order.items()),
                         key=lambda field_item: field_item[1].get("order")
                     )
-                })
+                }
+            })
+
         return data
 
-    def dispatch(self, request, *args, **kwargs):
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
+    def get(self, request, *args, **kwargs):
+        self.current_table_name = kwargs.get("table_name") or None
         column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
         self.resource_list = column_metadata
         self.column_metadata = column_metadata
-        return super().dispatch(request, *args, **kwargs)
+        self.resources_by_id = {
+            _get_composite_pk(resource): resource
+            for resource in self.resource_list
+        }
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -404,7 +406,6 @@ class ColumnMetadataManagementView(TemplateView):
             self.column_metadata,
         )
         context.update({
-            "title": "Wizard Customisation",
             "new_resource_reverse_base": self.new_resource_reverse_base,
             "new_resource_form": FormWithDynamicallyPopulatedFields(
                 fields=form_config.get_fields()
@@ -435,25 +436,46 @@ class ColumnMetadataManagementView(TemplateView):
                 ]
             ),
             # "resources" are records from the column_metadata table
-            "resources": {
-                _get_composite_pk(resource): resource
-                for resource in self.resource_list
-            },
-            "fields_by_table_name": self.get_fields_by_table_name([
-                _get_composite_pk(resource)
-                for resource in self.resource_list
-            ]),
-            "ordered_fields_and_categories_by_table_name": self.get_ordered_fields_and_categories_by_table_name(),
-            "get_columns_url_template": reverse_lazy(
-                "postgrest:get_table_columns",
-                kwargs={"table_name": "__table_name__"}
+            "resources": self.resources_by_id,
+            "field_names_for_table_name": self.get_field_names_for_table_name(
+                self.current_table_name,
+                [
+                    _get_composite_pk(resource)
+                    for resource in self.resource_list
+                ]
             ),
-            "initial_table_name": self.request.GET.get("table_name"),
+            "ordered_fields_and_categories_for_table_name": self.get_ordered_fields_and_categories_for_table_name(
+                self.current_table_name
+            ),
+            "current_table_name": self.kwargs["table_name"],
         })
         return context
 
 
-class NewColumnMetadataFormView(ColumnMetadataManagementFormView):
+class ColumnMetadataFormView(FormView):
+    resource_list_reverse_base = "resource_management:manage_column_metadata_for_table"
+
+    def form_valid(self, form):
+        table_name = self.request.GET.get("table_name")
+        self.success_url = reverse_lazy(
+            self.resource_list_reverse_base,
+            kwargs={
+                "table_name": table_name,
+            }
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        table_name = self.request.GET.get("table_name")
+        return redirect(
+            self.resource_list_reverse_base,
+            kwargs={
+                "table_name": table_name,
+            }
+        )
+
+
+class NewColumnMetadataFormView(ColumnMetadataFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
@@ -503,7 +525,7 @@ class NewColumnMetadataFormView(ColumnMetadataManagementFormView):
         return kwargs
 
 
-class UpdateColumnMetadataFormView(ColumnMetadataManagementFormView):
+class UpdateColumnMetadataFormView(ColumnMetadataFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
@@ -549,7 +571,7 @@ class UpdateColumnMetadataFormView(ColumnMetadataManagementFormView):
         return kwargs
 
 
-class ColumnMetadataDeletionFormView(ColumnMetadataManagementFormView):
+class ColumnMetadataDeletionFormView(ColumnMetadataFormView):
     form_class = ColumnMetadataDeletionForm
     table_name = TableNames.COLUMN_METADATA
 
@@ -581,7 +603,7 @@ class ColumnMetadataDeletionFormView(ColumnMetadataManagementFormView):
         return super().form_valid(form)
 
 
-class MultiColumnMetadataDeletionFormView(ColumnMetadataManagementFormView):
+class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
     form_class = MultiResourceDeletionForm
     table_name = TableNames.COLUMN_METADATA
 

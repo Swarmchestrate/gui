@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load humanise_swch %}
+{% block content %}
+<div class="management-container">
+    <div class="management-layout">
+        <div class="management-layout__content">
+            {# TOC #}
+            <div class="management-layout__toc mb-sm-0 mb-4">
+                {% block toc %}
+                <div class="collapse" id="toc-collapse">
+                    <nav>
+                        <div class="nav nav-pills flex-column list-unstyled editor-toc sticky-top" id="table-nav-tab" role="tablist">
+                            {% for table_name in table_names %}
+                            <a
+                                href="{% url 'resource_management:manage_column_metadata_for_table' table_name %}"
+                                class="nav-link text-start w-100{% if current_table_name == table_name %} active{% endif %}"
+                                id="nav-{{ table_name }}-tab"
+                                data-table-name="{{ table_name }}">{{ table_name|humanise_resource_type|title }}</a>
+                            {% endfor %}
+                        </div>
+                    </nav>
+                </div>
+                {% endblock toc %}
+            </div>
+            {# Editor header #}
+            <div class="management-layout__header">
+                {% block top_section %}
+                <div class="d-flex align-items-center column-gap-4">
+                    <h1 class="mb-0">{{ title }}</h1>
+                    <button
+                        class="btn btn-light rounded-circle fs-5"
+                        type="button"
+                        style="aspect-ratio: 1 / 1;"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#toc-collapse"
+                        aria-expanded="true"
+                        aria-controls="toc-collapse"
+                        aria-label="Toggle tables">
+                        <i class="bi bi-list-ul fs-5" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <p class="my-4">
+                    Use this page to configure how each wizard displays field labels, categories and the order that they are laid out.
+                </p>
+                {% endblock top_section %}
+            </div>
+            {# Editor main content #}
+            <div class="management-layout__body">
+                {% block main_section %}
+                <div class="d-flex align-items-center justify-content-center border border-5 border-dashed rounded w-100 h-100 p-4">
+                    <p class="text-body-tertiary fs-5 m-auto">
+                        Select a table to edit from the wizard customisation menu.
+                    </p>
+                </div>    
+                {% endblock main_section %}
+            </div>
+        </div>
+    </div>
+    {% block extra_section %}{% endblock extra_section %}
+</div>
+{% endblock content %}

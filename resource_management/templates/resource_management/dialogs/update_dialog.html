@@ -8,7 +8,7 @@
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
-<form method="POST" action="{% url resource_update_reverse resource_id %}">
+<form method="POST" action="{{ form_action }}">
     {% csrf_token %}
     {% for field in form %}
     {% if field.field.widget.input_type == 'checkbox' %}

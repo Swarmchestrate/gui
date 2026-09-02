@@ -1,0 +1,176 @@
+{% extends 'resource_management/column_metadata_management_index.html' %}
+{% load static %}
+{% block styles %}
+<link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
+{% endblock styles %}
+{% load helpers %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
+<script src="{% static 'DataTables/datatables.min.js' %}"></script>
+<script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
+{% endblock scripts %}
+
+{% block main_section %}
+{% if resources %}
+<button
+    id="{{ current_table_name }}-delete-checked-btn"
+    class="d-none d-inline-flex align-items-center column-gap-2 delete-checked-btn btn btn-outline-danger"
+    type="button"
+    data-dialog-id="{{ current_table_name }}-delete-multiple-dialog"
+    data-table-id="{{ current_table_name }}-table"
+    data-form-id="{{ current_table_name }}-multi-resource-deletion-form"
+    aria-label="Delete"
+    title="Delete">
+    <i class="bi bi-trash3-fill"></i>
+    <span>Delete selected (<span class="num-checked"></span>)</span>
+</button>
+{% endif %}
+{% if not field_names_for_table_name %}
+<div class="d-flex align-items-center justify-content-center border border-5 border-dashed rounded w-100 h-100">
+    <p class="fs-5 text-body-tertiary">This table has no fields to customise.</p>
+</div>
+{% else %}
+<div class="row gy-3">
+    <div class="col-lg-12">
+        <form
+            id="{{ current_table_name }}-multi-resource-deletion-form"
+            class="multi-resource-deletion-form"
+            method="POST"
+            action="{% url multi_resource_deletion_reverse %}?table_name={{ current_table_name }}">
+            {% csrf_token %}
+            <table id="{{ current_table_name }}-table" class="resources-table table table-hover">
+                <thead>
+                    <tr>
+                        <th class="align-middle p-3"></th>
+                        <th class="align-middle p-3">Field Name</th>
+                        <th class="align-middle p-3">Display Name</th>
+                        <th
+                            class="align-middle text-end p-3"
+                            data-dt-order="disable">
+                            <span class="visually-hidden">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field_name in field_names_for_table_name %}
+                    {# "resources" are records from the column_metadata table #}
+                    {% with possible_resource_id=current_table_name|add:'__'|add:field_name %}
+                    {% with resource=resources|get_key_value_or_empty_dict:possible_resource_id %}
+                    <tr{% if resource %} data-resource-id="{{ possible_resource_id }}"{% endif %}>
+                        <td class="align-middle px-3"></td>
+                        <td class="align-middle px-3">
+                            {% if not resource %}
+                            {{ field_name }}
+                            {% else %}
+                            <button
+                                class="btn btn-link edit-btn p-0"
+                                data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                type="button">
+                                {{ resource.as_dict.column_name }}
+                            </button>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle px-3">
+                            {% if not resource %}
+                            -
+                            {% else %}
+                            {{ resource.as_dict.title }}
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-center px-3">
+                            <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
+                                {% if not resource %}
+                                <li>
+                                    <button
+                                        class="btn btn-light new-btn"
+                                        type="button"
+                                        data-dialog-id="{{ current_table_name }}-{{ field_name }}-new-dialog"
+                                        aria-label="New"
+                                        title="New">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </li>
+                                {% else %}
+                                <li>
+                                    <button
+                                        class="btn btn-light edit-btn"
+                                        type="button"
+                                        data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                        aria-label="Edit"
+                                        title="Edit">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        class="btn btn-light delete-btn"
+                                        data-dialog-id="delete-{{ possible_resource_id }}-dialog"
+                                        type="button"
+                                        aria-label="Delete"
+                                        title="Delete">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endwith %}
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="col-lg-12">
+        <div class="d-flex flex-lg-row flex-column align-items-center justify-content-lg-end column-gap-3 row-gap-2">
+            <div>
+                <button class="btn btn-light btn-sm">
+                    Manage Category Order...
+                </button>
+                <button class="btn btn-light btn-sm">
+                    Manage Field Order...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div id="dialogs">
+    {# Delete dialog (multiple) #}
+    <div id="delete-multiple-dialogs">
+        {% with dialog_id=current_table_name|add:'-delete-multiple-dialog' %}
+        {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
+        {% endwith %}
+    </div>
+    {% with current_tn_urlencoded=current_table_name|urlencode %}
+    {# New dialog (single) #}
+    <div id="new-dialogs">
+    {% for field_name in field_names_for_table_name %}
+    {% url new_resource_reverse_base table_name field_name as form_action %}
+    {% with dialog_id=current_table_name|add:'-'|add:field_name|add:'-new-dialog' form=new_resource_form form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
+    {% include 'resource_management/dialogs/new_dialog.html' %}
+    {% endwith %}
+    {% endfor %}
+    </div>
+    {# Delete dialogs (single) #}
+    {% for resource_id, form in resource_deletion_forms.items %}
+    {% url resource_deletion_reverse resource_id as form_action %}
+    {% with resource_id_str=resource_id|stringformat:'s' %}
+    {% with dialog_id='delete-'|add:resource_id_str|add:'-dialog' form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
+    {% include 'resource_management/dialogs/delete_dialog.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
+    {# Update dialogs (single) #}
+    {% for resource_id, form in resource_update_forms.items %}
+    {% url resource_update_reverse resource_id as form_action %}
+    {% with resource_id_str=resource_id|stringformat:'s' %}
+    {% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='update-dialog col-lg-6' form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
+    {% include 'resource_management/dialogs/update_dialog.html' %}
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
+    {% endwith %}
+</div>
+{% endblock main_section %}
