@@ -2,6 +2,7 @@ import { setupDialog } from "/static/dialog.js";
 import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 
 function setupTableRowNewDialogs(dataTable) {
+    const newResourceTemplateUrl = JSON.parse(document.querySelector("#new-resource-template-url").textContent);
     const dataTableRows = dataTable.rows().nodes().toArray();
     dataTableRows.forEach((tr) => {
         const newButton = tr.querySelector(".new-btn");
@@ -13,6 +14,17 @@ function setupTableRowNewDialogs(dataTable) {
         if (!newDialog) {
             return console.error(`New resource dialog #${newButton.dataset.dialogId} not found.`);
         }
+        const newDialogForm = newDialog.querySelector("form");
+        const newDialogFieldNamePlaceholder = newDialog.querySelector(".field-name");
+        const tableName = newButton.dataset.tableName;
+        const columnName = newButton.dataset.columnName;
+        const newResourceUrl = `${
+            newResourceTemplateUrl.replace("__table_name__", tableName).replace("__column_name__", columnName)
+        }?table_name=${encodeURIComponent(tableName)}`;
+        newButton.addEventListener("click", () => {
+            newDialogFieldNamePlaceholder.textContent = columnName;
+            newDialogForm.setAttribute("action", newResourceUrl);
+        });
         // Open update dialog when button clicked.
         setupDialog(
             newDialog,
@@ -21,6 +33,12 @@ function setupTableRowNewDialogs(dataTable) {
             ],
             [newButton],
         );
+        // Form is reset if changes haven't been submitted, as carrying over changes
+        // may cause confusion when going to edit another field. If changes have been made,
+        // the form is reset after it has been submitted, so an empty form isn't submitted.
+        newDialog.addEventListener("close", () => {
+            newDialogForm.reset();
+        });
     });
 }
 

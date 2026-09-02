@@ -7,6 +7,9 @@
 {% load humanise_swch %}
 
 {% block scripts %}
+{{ current_table_name|json_script:'current-table-name' }}
+{% url new_resource_reverse_base '__table_name__' '__column_name__' as new_resource_template_url %}
+{{ new_resource_template_url|json_script:'new-resource-template-url' }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
@@ -90,7 +93,9 @@
                                         <button
                                             class="btn btn-light new-btn"
                                             type="button"
-                                            data-dialog-id="{{ current_table_name }}-{{ field_name }}-new-dialog"
+                                            data-dialog-id="new-dialog"
+                                            data-table-name="{{ current_table_name }}"
+                                            data-column-name="{{ field_name }}"
                                             aria-label="New"
                                             title="New">
                                             <i class="bi bi-plus-lg"></i>
@@ -150,14 +155,9 @@
     </div>
     {% with current_tn_urlencoded=current_table_name|urlencode %}
     {# New dialog (single) #}
-    <div id="new-dialogs">
-    {% for field_name in field_names_for_table_name %}
-    {% url new_resource_reverse_base table_name field_name as form_action %}
-    {% with dialog_id=current_table_name|add:'-'|add:field_name|add:'-new-dialog' form=new_resource_form form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
+    {% with dialog_id='new-dialog' form=new_resource_form form_action=new_resource_template_url %}
     {% include 'resource_management/dialogs/new_dialog.html' %}
     {% endwith %}
-    {% endfor %}
-    </div>
     {# Delete dialogs (single) #}
     {% for resource_id, form in resource_deletion_forms.items %}
     {% url resource_deletion_reverse resource_id as form_action %}
