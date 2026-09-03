@@ -387,6 +387,16 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
 
         return data
 
+    def get_data_for_resource_update_forms(self) -> dict[str, dict]:
+        data = dict()
+        for resource in self.resource_list:
+            if not (resource.as_dict().get("table_name") == self.current_table_name):
+                continue
+            data.update({
+                _get_composite_pk(resource): resource.as_dict(),
+            })
+        return data
+
     def get(self, request, *args, **kwargs):
         self.current_table_name = kwargs.get("table_name") or None
         column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
@@ -410,27 +420,13 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             "new_resource_form": FormWithDynamicallyPopulatedFields(
                 fields=form_config.get_fields()
             ),
-            "resource_update_forms": {
-                _get_composite_pk(resource): FormWithDynamicallyPopulatedFields(
-                    fields=form_config.get_fields(),
-                    initial=resource.as_dict()
-                )
-                for resource in self.resource_list
-                if resource.as_dict().get("table_name") == self.current_table_name
-            },
             "resource_update_reverse": self.resource_update_reverse,
+            "resource_update_form": FormWithDynamicallyPopulatedFields(
+                fields=form_config.get_fields()
+            ),
+            "data_for_resource_update_forms": self.get_data_for_resource_update_forms(),
             "resource_deletion_reverse": self.resource_deletion_reverse,
             "resource_deletion_form": self.resource_deletion_form_class(),
-            "resource_deletion_forms": {
-                _get_composite_pk(resource): self.resource_deletion_form_class(
-                    id_suffix=str(i),
-                    initial={
-                        "resource_id_to_delete": _get_composite_pk(resource)
-                    },
-                )
-                for i, resource in enumerate(self.resource_list)
-                if resource.as_dict().get("table_name") == self.current_table_name
-            },
             "multi_resource_deletion_reverse": self.multi_resource_deletion_reverse,
             "multi_resource_deletion_form": self.multi_resource_deletion_form_class(
                 resource_ids=[

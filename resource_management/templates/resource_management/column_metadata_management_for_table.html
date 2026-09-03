@@ -12,16 +12,22 @@
 {{ new_resource_template_url|json_script:'new-resource-template-url' }}
 {% url resource_deletion_reverse '__resource_id__' as resource_deletion_template_url %}
 {{ resource_deletion_template_url|json_script:'resource-deletion-template-url' }}
+{% url resource_update_reverse '__resource_id__' as resource_update_template_url %}
+{{ resource_update_template_url|json_script:'resource-update-template-url' }}
+{{ data_for_resource_update_forms|json_script:'data-for-resource-update-forms' }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
 {% endblock scripts %}
 
 {% block main_section %}
+<h2 class="fs-5 pb-2">
+    {{ current_table_name|humanise_resource_type|title }} Fields
+</h2>
 {% if resources %}
 <button
     id="{{ current_table_name }}-delete-checked-btn"
-    class="d-none d-inline-flex align-items-center column-gap-2 delete-checked-btn btn btn-outline-danger"
+    class="d-none d-inline-flex align-items-center column-gap-2 delete-checked-btn btn btn-outline-danger mb-3"
     type="button"
     data-dialog-id="{{ current_table_name }}-delete-multiple-dialog"
     data-table-id="{{ current_table_name }}-table"
@@ -32,9 +38,6 @@
     <span>Delete selected (<span class="num-checked"></span>)</span>
 </button>
 {% endif %}
-<h2 class="fs-5 pb-2">
-    {{ current_table_name|humanise_resource_type|title }} Fields
-</h2>
 {% if not field_names_for_table_name %}
 <div class="d-flex align-items-center justify-content-center border border-5 border-dashed rounded w-100 h-100">
     <p class="fs-5 text-body-tertiary">This table has no fields to customise.</p>
@@ -74,7 +77,9 @@
                             {% else %}
                             <button
                                 class="btn btn-link edit-btn p-0"
-                                data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                data-dialog-id="update-dialog"
+                                data-column-name="{{ resource.as_dict.column_name }}"
+                                data-resource-id="{{ possible_resource_id }}"
                                 type="button">
                                 {{ resource.as_dict.column_name }}
                             </button>
@@ -107,7 +112,9 @@
                                     <button
                                         class="btn btn-light edit-btn"
                                         type="button"
-                                        data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                        data-dialog-id="update-dialog"
+                                        data-column-name="{{ resource.as_dict.column_name }}"
+                                        data-resource-id="{{ possible_resource_id }}"
                                         aria-label="Edit"
                                         title="Edit">
                                         <i class="bi bi-pencil-fill"></i>
@@ -150,16 +157,13 @@
 {% endif %}
 <div id="dialogs">
     {# Delete dialog (multiple) #}
-    <div id="delete-multiple-dialogs">
-        {% with dialog_id=current_table_name|add:'-delete-multiple-dialog' %}
-        {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
-        {% endwith %}
-    </div>
+    {% with dialog_id=current_table_name|add:'-delete-multiple-dialog' %}
+    {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
+    {% endwith %}
     {# Category order dialog #}
     {% with category_names=ordered_fields_and_categories_for_table_name.keys %}
     {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
     {% endwith %}
-    {% with current_tn_urlencoded=current_table_name|urlencode %}
     {# New dialog (single) #}
     {% with dialog_id='new-dialog' form=new_resource_form form_action=new_resource_template_url %}
     {% include 'resource_management/dialogs/column_metadata/cm_new_dialog.html' %}
@@ -168,15 +172,9 @@
     {% with dialog_id='delete-dialog' form=resource_deletion_form form_action=resource_deletion_template_url %}
     {% include 'resource_management/dialogs/column_metadata/cm_delete_dialog.html' %}
     {% endwith %}
-    {# Update dialogs (single) #}
-    {% for resource_id, form in resource_update_forms.items %}
-    {% url resource_update_reverse resource_id as form_action %}
-    {% with resource_id_str=resource_id|stringformat:'s' %}
-    {% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='update-dialog col-lg-6' form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
+    {# Update dialog (single) #}
+    {% with dialog_id='update-dialog' dialog_extra_classes='update-dialog col-lg-6' form=resource_update_form form_action=resource_update_template_url %}
     {% include 'resource_management/dialogs/column_metadata/cm_update_dialog.html' %}
-    {% endwith %}
-    {% endwith %}
-    {% endfor %}
     {% endwith %}
 </div>
 {% endblock main_section %}

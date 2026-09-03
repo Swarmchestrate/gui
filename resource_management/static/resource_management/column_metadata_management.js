@@ -1,7 +1,7 @@
 import { setupDialog } from "/static/dialog.js";
 import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 
-function setupNewDialogForTableRow(tr) {
+function setupNewDialogForTableRow(tr, newResourceTemplateUrl) {
     // Check all the relevant elements are present.
     const newButton = tr.querySelector(".new-btn");
     if (!newButton) return;
@@ -15,7 +15,6 @@ function setupNewDialogForTableRow(tr) {
     // Dynamically set dialog content depending on table row.
     const newDialogFieldNamePlaceholder = newDialog.querySelector(".field-name");
     const newDialogForm = newDialog.querySelector("form");
-    const newResourceTemplateUrl = JSON.parse(document.querySelector("#new-resource-template-url").textContent);
     const tableName = newButton.dataset.tableName;
     const columnName = newButton.dataset.columnName;
     const newResourceUrl = `${
@@ -41,7 +40,7 @@ function setupNewDialogForTableRow(tr) {
     });
 }
 
-function setupUpdateDialogForTableRow(tr) {
+function setupUpdateDialogForTableRow(tr, updateResourceTemplateUrl, data) {
     // Check all the relevant elements are presents.
     const updateButtons = Array.from(tr.querySelectorAll(".edit-btn"));
     if (updateButtons.length === 0) return;
@@ -52,6 +51,31 @@ function setupUpdateDialogForTableRow(tr) {
     if (!updateDialog) {
         return console.error(`Update dialog #${updateButtons[0].dataset.dialogId} not found.`);
     }
+    // Dynamically set dialog content depending on table row.
+    const updateDialogFieldNamePlaceholder = updateDialog.querySelector(".field-name");
+    const updateDialogForm = updateDialog.querySelector("form");
+    const resourceId = updateButtons[0].dataset.resourceId;
+    const columnName = updateButtons[0].dataset.columnName;
+    const tableName = JSON.parse(document.querySelector("#current-table-name").textContent);
+    const updateResourceUrl = `${
+        updateResourceTemplateUrl.replace("__resource_id__", resourceId)
+    }?table_name=${encodeURIComponent(tableName)}`;
+    let dataForForm = {};
+    if (resourceId in data) {
+        dataForForm = data[resourceId];
+    }
+    updateButtons.forEach(updateButton => {
+        updateButton.addEventListener("click", () => {
+            updateDialogFieldNamePlaceholder.textContent = columnName;
+            updateDialogForm.setAttribute("action", updateResourceUrl);
+            for (const fieldName in dataForForm) {
+                const field = updateDialogForm.querySelector(`[name="${fieldName}"]`);
+                if (!field) continue;
+                const fieldValue = dataForForm[fieldName];
+                field.value = fieldValue;
+            }
+        });
+    });
     // Open update dialog when button clicked.
     setupDialog(
         updateDialog,
@@ -62,7 +86,7 @@ function setupUpdateDialogForTableRow(tr) {
     );
 }
 
-function setupDeleteDialogForTableRow(tr) {
+function setupDeleteDialogForTableRow(tr, deleteResourceTemplateUrl) {
     // Check all the relevant elements are presents.
     const deleteButton = tr.querySelector(".delete-btn");
     if (!deleteButton) return;
@@ -76,9 +100,8 @@ function setupDeleteDialogForTableRow(tr) {
     // Dynamically set dialog content depending on table row.
     const deleteDialogFieldNamePlaceholder = deleteDialog.querySelector(".field-name");
     const deleteDialogForm = deleteDialog.querySelector("form");
-    const deleteResourceTemplateUrl = JSON.parse(document.querySelector("#resource-deletion-template-url").textContent);
-    const columnName = deleteButton.dataset.columnName;
     const resourceId = deleteButton.dataset.resourceId;
+    const columnName = deleteButton.dataset.columnName;
     const tableName = JSON.parse(document.querySelector("#current-table-name").textContent);
     const deleteResourceUrl = `${
         deleteResourceTemplateUrl.replace("__resource_id__", resourceId)
@@ -92,10 +115,14 @@ function setupDeleteDialogForTableRow(tr) {
 
 function setupDialogsForTableRows(dataTable) {
     const dataTableRows = dataTable.rows().nodes().toArray();
+    const newResourceTemplateUrl = JSON.parse(document.querySelector("#new-resource-template-url").textContent);
+    const updateResourceTemplateUrl = JSON.parse(document.querySelector("#resource-update-template-url").textContent);
+    const dataForResourceUpdateForms = JSON.parse(document.querySelector("#data-for-resource-update-forms").textContent);
+    const deleteResourceTemplateUrl = JSON.parse(document.querySelector("#resource-deletion-template-url").textContent);
     dataTableRows.forEach((tr) => {
-        setupNewDialogForTableRow(tr);
-        setupUpdateDialogForTableRow(tr);
-        setupDeleteDialogForTableRow(tr);
+        setupNewDialogForTableRow(tr, newResourceTemplateUrl);
+        setupUpdateDialogForTableRow(tr, updateResourceTemplateUrl, dataForResourceUpdateForms);
+        setupDeleteDialogForTableRow(tr, deleteResourceTemplateUrl);
     });
 }
 
