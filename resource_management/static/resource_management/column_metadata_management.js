@@ -126,6 +126,66 @@ function setupDialogsForTableRows(dataTable) {
     });
 }
 
+function setupCategoryOrderDialog() {
+    const dialogButton = document.querySelector(".category-order-btn");
+    if (!dialogButton) return;
+    const dialogId = dialogButton.dataset.dialogId;
+    const dialog = document.querySelector(`#${dialogId}`);
+    if (!dialog) {
+        return console.error(`Category order dialog #${dialogId} not found.`);
+    }
+    setupDialog(
+        dialog,
+        [
+            dialog.querySelector(".btn-close"),
+        ],
+        [dialogButton],
+    );
+    const categoryList = dialog.querySelector("ul");
+    if (!categoryList) return;
+    const sortable = new Sortable(categoryList, {
+        handle: ".handle",
+        animation: 150,
+        onMove: () => {
+            window.setTimeout(() => {
+                const listItems = Array.from(categoryList.querySelectorAll("li"));
+                listItems.forEach((listItem, i) => {
+                    listItem.setAttribute("data-id", (i + 1));
+                });
+            }, 0.25);
+        },
+    });
+    const categoryListItems = Array.from(categoryList.querySelectorAll("li"));
+    categoryListItems.forEach(listItem => {
+        const moveUpButton = listItem.querySelector(".move-up-button");
+        moveUpButton.addEventListener("click", () => {
+            const previousListItem = listItem.previousElementSibling;
+            if (!previousListItem) return;
+            const currentListItemNumber = listItem.dataset.id;
+            const previousListItemNumber = previousListItem.dataset.id;
+            listItem.setAttribute("data-id", previousListItemNumber);
+            previousListItem.setAttribute("data-id", currentListItemNumber);
+            const order = sortable.toArray().map(num => parseInt(num)).sort((a, b) => {
+                return a - b;
+            });
+            sortable.sort(order, true);
+        });
+        const moveDownButton = listItem.querySelector(".move-down-button");
+        moveDownButton.addEventListener("click", () => {
+            const nextListItem = listItem.nextElementSibling;
+            if (!nextListItem) return;
+            const currentListItemNumber = listItem.dataset.id;
+            const nextListItemNumber = nextListItem.dataset.id;
+            listItem.setAttribute("data-id", nextListItemNumber);
+            nextListItem.setAttribute("data-id", currentListItemNumber);
+            const order = sortable.toArray().map(num => parseInt(num)).sort((a, b) => {
+                return a - b;
+            });
+            sortable.sort(order, true);
+        });
+    });
+}
+
 function setupResourcesTable(tableElement) {
     const dataTable = initialiseAndSetupDataTable(
         tableElement.id,
@@ -150,4 +210,5 @@ window.addEventListener("DOMContentLoaded", () => {
     resourcesTables.forEach(tableElement => {
         setupResourcesTable(tableElement);
     });
+    setupCategoryOrderDialog();
 });

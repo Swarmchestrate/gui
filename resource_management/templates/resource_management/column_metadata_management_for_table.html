@@ -17,6 +17,7 @@
 {{ data_for_resource_update_forms|json_script:'data-for-resource-update-forms' }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
 {% endblock scripts %}
 
@@ -145,7 +146,9 @@
     </div>
     <div class="col-lg-12">
         <div>
-            <button class="btn btn-light btn-sm">
+            <button
+                class="btn btn-light btn-sm category-order-btn"
+                data-dialog-id="category-order-dialog">
                 Manage Category Order...
             </button>
             <button class="btn btn-light btn-sm">
@@ -161,7 +164,7 @@
     {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
     {% endwith %}
     {# Category order dialog #}
-    {% with category_names=ordered_fields_and_categories_for_table_name.keys %}
+    {% with dialog_id='category-order-dialog' category_names=ordered_fields_and_categories_for_table_name.keys %}
     {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
     {% endwith %}
     {# New dialog (single) #}

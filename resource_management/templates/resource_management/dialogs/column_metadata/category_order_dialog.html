@@ -8,9 +8,48 @@
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
-<ul>
-    {% for category_name in category_names %}
-    <li>{{ category_name }}</li>
-    {% endfor %}
-</ul>
+{# When only the "Unknown" category is present. #}
+{% if category_names|length == 1 %}
+<p class="text-body-secondary mb-0">
+    No categories have been added yet. Categories can be specified during field customisation.
+</p>
+{% else %}
+<p>
+    Drag and drop categories to re-order them. Use the save button to save changes.
+</p>
+<form action="" method="POST">
+    <ul class="list-group mb-4">
+        {% for category_name in category_names %}
+        {% if category_name|lower == "unknown" %}
+        {% else %}
+        <li class="list-group-item list-group-item-action" data-id="{{ forloop.counter }}">
+            <div class="d-inline-flex align-items-center justify-content-between w-100">
+                <div class="d-inline-flex align-items-center column-gap-2">
+                    <i class="bi bi-grip-vertical text-body-secondary handle fs-5 me-2"></i>
+                    <span>{{ category_name }}</span>
+                </div>
+                <div>
+                    <button
+                        class="btn btn-light rounded-circle move-up-button fs-3 lh-1 p-1"
+                        type="button"
+                        style="aspect-ratio: 1 / 1;">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </button>
+                    <button
+                        class="btn btn-light rounded-circle move-down-button fs-3 lh-1 p-1"
+                        type="button"
+                        style="aspect-ratio: 1 / 1;">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </button>
+                </div>
+            </div>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    <button class="btn btn-primary" type="submit">
+        Save
+    </button>
+</form>
+{% endif %}
 {% endblock dialog_body_content %}
