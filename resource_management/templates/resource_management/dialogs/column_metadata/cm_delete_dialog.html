@@ -1,0 +1,12 @@
+{% extends 'resource_management/dialogs/delete_dialog.html' %}
+{% block dialog_header_content %}
+<div>
+    Delete Field Customisation
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_message %}
+<p>
+    Are you sure you want to delete the field customisation for "<span class="field-name">{{ field_name }}</span>"?
+</p>
+{% endblock dialog_message %}

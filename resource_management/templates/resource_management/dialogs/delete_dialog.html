@@ -9,7 +9,11 @@
 
 {% block dialog_body_content %}
 <form method="POST" action="{{ form_action }}">
-    <p>Are you sure you want to delete this {{ resource_type|humanise_resource_type }}?</p>
+    {% block dialog_message %}
+    <p>
+        Are you sure you want to delete this {{ resource_type|humanise_resource_type }}?
+    </p>
+    {% endblock dialog_message %}
     {% csrf_token %}
     {{ form }}
     <div class="row align-items-lg-start align-items-stretch g-2">

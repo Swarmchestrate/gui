@@ -10,6 +10,8 @@
 {{ current_table_name|json_script:'current-table-name' }}
 {% url new_resource_reverse_base '__table_name__' '__column_name__' as new_resource_template_url %}
 {{ new_resource_template_url|json_script:'new-resource-template-url' }}
+{% url resource_deletion_reverse '__resource_id__' as resource_deletion_template_url %}
+{{ resource_deletion_template_url|json_script:'resource-deletion-template-url' }}
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/column_metadata_management.js' %}" type="module"></script>
@@ -114,7 +116,9 @@
                                 <li>
                                     <button
                                         class="btn btn-light delete-btn"
-                                        data-dialog-id="delete-{{ possible_resource_id }}-dialog"
+                                        data-dialog-id="delete-dialog"
+                                        data-column-name="{{ resource.as_dict.column_name }}"
+                                        data-resource-id="{{ possible_resource_id }}"
                                         type="button"
                                         aria-label="Delete"
                                         title="Delete">
@@ -151,30 +155,25 @@
         {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
         {% endwith %}
     </div>
-    {# Category order dialogs #}
+    {# Category order dialog #}
     {% with category_names=ordered_fields_and_categories_for_table_name.keys %}
     {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
     {% endwith %}
     {% with current_tn_urlencoded=current_table_name|urlencode %}
     {# New dialog (single) #}
     {% with dialog_id='new-dialog' form=new_resource_form form_action=new_resource_template_url %}
-    {% include 'resource_management/dialogs/new_dialog.html' %}
+    {% include 'resource_management/dialogs/column_metadata/cm_new_dialog.html' %}
     {% endwith %}
-    {# Delete dialogs (single) #}
-    {% for resource_id, form in resource_deletion_forms.items %}
-    {% url resource_deletion_reverse resource_id as form_action %}
-    {% with resource_id_str=resource_id|stringformat:'s' %}
-    {% with dialog_id='delete-'|add:resource_id_str|add:'-dialog' form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
-    {% include 'resource_management/dialogs/delete_dialog.html' %}
+    {# Delete dialog (single) #}
+    {% with dialog_id='delete-dialog' form=resource_deletion_form form_action=resource_deletion_template_url %}
+    {% include 'resource_management/dialogs/column_metadata/cm_delete_dialog.html' %}
     {% endwith %}
-    {% endwith %}
-    {% endfor %}
     {# Update dialogs (single) #}
     {% for resource_id, form in resource_update_forms.items %}
     {% url resource_update_reverse resource_id as form_action %}
     {% with resource_id_str=resource_id|stringformat:'s' %}
     {% with dialog_id='update-'|add:resource_id_str|add:'-dialog' dialog_extra_classes='update-dialog col-lg-6' form_action=form_action|add:'?table_name='|add:current_tn_urlencoded %}
-    {% include 'resource_management/dialogs/update_dialog.html' %}
+    {% include 'resource_management/dialogs/column_metadata/cm_update_dialog.html' %}
     {% endwith %}
     {% endwith %}
     {% endfor %}

@@ -420,6 +420,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             },
             "resource_update_reverse": self.resource_update_reverse,
             "resource_deletion_reverse": self.resource_deletion_reverse,
+            "resource_deletion_form": self.resource_deletion_form_class(),
             "resource_deletion_forms": {
                 _get_composite_pk(resource): self.resource_deletion_form_class(
                     id_suffix=str(i),
