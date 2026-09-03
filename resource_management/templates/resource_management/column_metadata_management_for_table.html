@@ -46,92 +46,90 @@
             method="POST"
             action="{% url multi_resource_deletion_reverse %}?table_name={{ current_table_name }}">
             {% csrf_token %}
-            <div class="table-responsive">
-                <table id="{{ current_table_name }}-table" class="resources-table table table-hover">
-                    <thead>
-                        <tr>
-                            <th class="align-middle p-3"></th>
-                            <th class="align-middle p-3">Field Name</th>
-                            <th class="align-middle p-3">Display Name</th>
-                            <th
-                                class="align-middle text-end p-3"
-                                data-dt-order="disable">
-                                <span class="visually-hidden">Actions</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for field_name in field_names_for_table_name %}
-                        {# "resources" are records from the column_metadata table #}
-                        {% with possible_resource_id=current_table_name|add:'__'|add:field_name %}
-                        {% with resource=resources|get_key_value_or_empty_dict:possible_resource_id %}
-                        <tr{% if resource %} data-resource-id="{{ possible_resource_id }}"{% endif %}>
-                            <td class="align-middle px-3"></td>
-                            <td class="align-middle px-3">
+            <table id="{{ current_table_name }}-table" class="resources-table table table-hover">
+                <thead>
+                    <tr>
+                        <th class="align-middle p-3"></th>
+                        <th class="align-middle p-3">Field Name</th>
+                        <th class="align-middle p-3">Display Name</th>
+                        <th
+                            class="align-middle text-end p-3"
+                            data-dt-order="disable">
+                            <span class="visually-hidden">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field_name in field_names_for_table_name %}
+                    {# "resources" are records from the column_metadata table #}
+                    {% with possible_resource_id=current_table_name|add:'__'|add:field_name %}
+                    {% with resource=resources|get_key_value_or_empty_dict:possible_resource_id %}
+                    <tr{% if resource %} data-resource-id="{{ possible_resource_id }}"{% endif %}>
+                        <td class="align-middle px-3"></td>
+                        <td class="align-middle px-3">
+                            {% if not resource %}
+                            {{ field_name }}
+                            {% else %}
+                            <button
+                                class="btn btn-link edit-btn p-0"
+                                data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                type="button">
+                                {{ resource.as_dict.column_name }}
+                            </button>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle px-3">
+                            {% if not resource %}
+                            -
+                            {% else %}
+                            {{ resource.as_dict.title }}
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-center px-3">
+                            <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
                                 {% if not resource %}
-                                {{ field_name }}
+                                <li>
+                                    <button
+                                        class="btn btn-light new-btn"
+                                        type="button"
+                                        data-dialog-id="new-dialog"
+                                        data-table-name="{{ current_table_name }}"
+                                        data-column-name="{{ field_name }}"
+                                        aria-label="New"
+                                        title="New">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </li>
                                 {% else %}
-                                <button
-                                    class="btn btn-link edit-btn p-0"
-                                    data-dialog-id="update-{{ possible_resource_id }}-dialog"
-                                    type="button">
-                                    {{ resource.as_dict.column_name }}
-                                </button>
+                                <li>
+                                    <button
+                                        class="btn btn-light edit-btn"
+                                        type="button"
+                                        data-dialog-id="update-{{ possible_resource_id }}-dialog"
+                                        aria-label="Edit"
+                                        title="Edit">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        class="btn btn-light delete-btn"
+                                        data-dialog-id="delete-{{ possible_resource_id }}-dialog"
+                                        type="button"
+                                        aria-label="Delete"
+                                        title="Delete">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </li>
                                 {% endif %}
-                            </td>
-                            <td class="align-middle px-3">
-                                {% if not resource %}
-                                -
-                                {% else %}
-                                {{ resource.as_dict.title }}
-                                {% endif %}
-                            </td>
-                            <td class="align-middle text-center px-3">
-                                <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
-                                    {% if not resource %}
-                                    <li>
-                                        <button
-                                            class="btn btn-light new-btn"
-                                            type="button"
-                                            data-dialog-id="new-dialog"
-                                            data-table-name="{{ current_table_name }}"
-                                            data-column-name="{{ field_name }}"
-                                            aria-label="New"
-                                            title="New">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </li>
-                                    {% else %}
-                                    <li>
-                                        <button
-                                            class="btn btn-light edit-btn"
-                                            type="button"
-                                            data-dialog-id="update-{{ possible_resource_id }}-dialog"
-                                            aria-label="Edit"
-                                            title="Edit">
-                                            <i class="bi bi-pencil-fill"></i>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button
-                                            class="btn btn-light delete-btn"
-                                            data-dialog-id="delete-{{ possible_resource_id }}-dialog"
-                                            type="button"
-                                            aria-label="Delete"
-                                            title="Delete">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </li>
-                                    {% endif %}
-                                </ul>
-                            </td>
-                        </tr>
-                        {% endwith %}
-                        {% endwith %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endwith %}
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
         </form>
     </div>
     <div class="col-lg-12">
@@ -153,6 +151,10 @@
         {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
         {% endwith %}
     </div>
+    {# Category order dialogs #}
+    {% with category_names=ordered_fields_and_categories_for_table_name.keys %}
+    {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
+    {% endwith %}
     {% with current_tn_urlencoded=current_table_name|urlencode %}
     {# New dialog (single) #}
     {% with dialog_id='new-dialog' form=new_resource_form form_action=new_resource_template_url %}

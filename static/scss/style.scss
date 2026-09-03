@@ -418,11 +418,13 @@ label:has(~ :required)::after,
 }
 
 /* DataTables */
-.resources-table_wrapper {
+// The .dt-container rules allow the table to scroll, but not
+// the other controls (search box, "x" entries per page).
+.dt-container {
     max-width: calc(100vw - var(--bs-gutter-x));
 }
 
-.resources-table_wrapper .dt-layout-table {
+.dt-container .dt-layout-table {
     overflow-x: auto;
 }
 
