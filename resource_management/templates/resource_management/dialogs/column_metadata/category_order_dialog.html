@@ -1,0 +1,16 @@
+{% extends 'dialog_base.html' %}
+{% load humanise_swch %}
+
+{% block dialog_header_content %}
+<div>
+    Manage Category Order
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+<ul>
+    {% for category_name in category_names %}
+    <li>{{ category_name }}</li>
+    {% endfor %}
+</ul>
+{% endblock dialog_body_content %}
