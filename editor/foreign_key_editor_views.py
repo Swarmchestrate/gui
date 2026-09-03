@@ -330,6 +330,11 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
             for name, metadata in self.fk_table_form_config.get_properties().items()
             if metadata.refers_to_table_name or metadata.created_from_table_name
         }
+        self.disabled_relational_fields = {
+            metadata.title
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
         fields = {
             name: field
             for name, field in self.fk_table_form_config.get_fields().items()
@@ -354,6 +359,7 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
             "table_name": self.fk_table_name,
             "fk_resource_type": self.fk_table_name,
             "fk_table_name": self.fk_table_name,
+            "disabled_relational_fields": self.disabled_relational_fields,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
@@ -566,6 +572,11 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
             for name, metadata in self.fk_table_form_config.get_properties().items()
             if metadata.refers_to_table_name or metadata.created_from_table_name
         }
+        self.disabled_relational_fields = {
+            metadata.title
+            for name, metadata in self.fk_table_form_config.get_properties().items()
+            if metadata.refers_to_table_name or metadata.created_from_table_name
+        }
         fields = {
             name: field
             for name, field in unprocessed_fields.items()
@@ -620,6 +631,7 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
             "table_name": self.fk_table_name,
             "fk_resource_type": self.fk_table_name,
             "fk_table_name": self.fk_table_name,
+            "disabled_relational_fields": self.disabled_relational_fields,
             "initial_category": self.category,
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,

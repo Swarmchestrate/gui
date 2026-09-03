@@ -6,17 +6,20 @@
 {% load helpers %}
 
 {% block top_section %}
-<div class="d-flex flex-column align-items-start row-gap-2 border rounded p-3">
-    <a
-        href="{% url editor_reverse_base resource_id %}?category={{ initial_category }}"
-        class="icon-link icon-link-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
-        style="--bs-icon-link-transform: translate3d(-.25rem, 0, 0);">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-        </svg>
-        Back to {{ initial_category }}
-    </a>
-    <h2 class="fs-6 px-4 mb-0">{{ main_heading }}</h2>
+<div class="d-flex flex-column row-gap-3">
+    <div class="d-flex flex-column align-items-start row-gap-2 border rounded p-3">
+        <a
+            href="{% url editor_reverse_base resource_id %}?category={{ initial_category }}"
+            class="icon-link icon-link-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+            style="--bs-icon-link-transform: translate3d(-.25rem, 0, 0);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+            </svg>
+            Back to {{ initial_category }}
+        </a>
+        <h2 class="fs-6 px-4 mb-0">{{ main_heading }}</h2>
+    </div>
+    {% block notice %}{% endblock notice %}
 </div>
 {% endblock top_section %}
 
