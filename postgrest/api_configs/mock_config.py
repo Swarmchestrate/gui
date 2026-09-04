@@ -212,6 +212,7 @@ class MockEndpoint(BaseEndpoint):
         cleaned_data = self._clean_data(data)
         resource_to_update_as_dict = self.get(resource_id).as_dict()
         resource_to_update_as_dict.update(cleaned_data)
+        resource_to_update_as_dict = self._json_serialisable(resource_to_update_as_dict)
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = [
             r

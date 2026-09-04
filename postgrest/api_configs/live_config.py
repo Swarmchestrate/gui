@@ -193,6 +193,7 @@ class LiveEndpoint(BaseEndpoint):
             data.update({
                 "updated_at": current_time_no_tz,
             })
+        data = self._json_serialisable(data)
         response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 

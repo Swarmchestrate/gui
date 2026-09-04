@@ -253,6 +253,14 @@ class BaseEndpoint:
         })
         return data
 
+    def _json_serialisable(self, data: dict) -> dict:
+        creation_date_property_name = "creation_date"
+        creation_date = data.get(creation_date_property_name)
+        if not creation_date:
+            return data
+        data.update({creation_date_property_name: creation_date.strftime("%Y-%m-%d")})
+        return data
+
     # Main methods
     def get(self, resource_id: int, params: dict | None = None) -> BaseResource:
         pass
