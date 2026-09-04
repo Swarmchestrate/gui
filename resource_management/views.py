@@ -10,6 +10,7 @@ from django.views.generic.base import ContextMixin
 
 from .exceptions import NameMissingException, SatBuilderException
 from .forms import (
+    CategoryOrderForm,
     ColumnMetadataDeletionForm,
     MultiResourceDeletionForm,
     ResourceDeletionForm,
@@ -415,6 +416,9 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             self.openapi_spec,
             self.column_metadata,
         )
+        ordered_fields_and_categories_for_table_name = self.get_ordered_fields_and_categories_for_table_name(
+            self.current_table_name
+        )
         context.update({
             "new_resource_reverse_base": self.new_resource_reverse_base,
             "new_resource_form": FormWithDynamicallyPopulatedFields(
@@ -445,19 +449,24 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                     if resource.as_dict().get("table_name") == self.current_table_name
                 ]
             ),
-            "ordered_fields_and_categories_for_table_name": self.get_ordered_fields_and_categories_for_table_name(
-                self.current_table_name
-            ),
+            "ordered_fields_and_categories_for_table_name": ordered_fields_and_categories_for_table_name,
             "current_table_name": self.kwargs["table_name"],
+            "category_order_form": CategoryOrderForm(
+                initial={"category_order": list(ordered_fields_and_categories_for_table_name.keys())},
+            ),
         })
         return context
 
 
 class ColumnMetadataFormView(FormView):
     resource_list_reverse_base = "resource_management:manage_column_metadata_for_table"
+    column_management_index_url = reverse_lazy("resource_management:manage_column_metadata")
 
     def form_valid(self, form):
         table_name = self.request.GET.get("table_name")
+        if not table_name:
+            self.success_url = self.column_management_index_url
+            return super().form_valid(form)
         self.success_url = reverse_lazy(
             self.resource_list_reverse_base,
             kwargs={
@@ -467,13 +476,16 @@ class ColumnMetadataFormView(FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        logger.exception(form.errors.as_json())
         table_name = self.request.GET.get("table_name")
-        return redirect(
+        if not table_name:
+            return redirect(self.column_management_index_url)
+        return redirect(reverse_lazy(
             self.resource_list_reverse_base,
             kwargs={
                 "table_name": table_name,
             }
-        )
+        ))
 
 
 class NewColumnMetadataFormView(ColumnMetadataFormView):
@@ -651,4 +663,35 @@ class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
         if len(delete_conditions) != 1:
             success_msg = f"Deleted {len(delete_conditions)} {humanise_resource_type_plural(self.resource_type)}."
         messages.success(self.request, success_msg)
+        return super().form_valid(form)
+
+
+class CategoryOrderFormView(ColumnMetadataFormView):
+    form_class = CategoryOrderForm
+    table_name = TableNames.COLUMN_METADATA
+
+    api_client: ApiClient
+    resource_type: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.resource_list = self.api_client.get_endpoint(self.table_name).get_resources()
+        if not hasattr(self, "resource_type"):
+            self.resource_type = self.table_name
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'The submitted category order data was malformed. Please report the problem using the <a href="https://github.com/Swarmchestrate/gui/issues" target="_blank">GUI issues tracker</a>',
+        )
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        category_order = form.cleaned_data.get("category_order", list())
+        messages.success(
+            self.request,
+            f"Updated category order for table."
+        );
         return super().form_valid(form)

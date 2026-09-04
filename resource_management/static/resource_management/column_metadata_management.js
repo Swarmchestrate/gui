@@ -1,5 +1,9 @@
 import { setupDialog } from "/static/dialog.js";
 import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
+import {
+    swapListItemNumbersAndResortList,
+    updateCategoryOrderInForm,
+} from "/static/resource_management/category_order.js";
 
 function setupNewDialogForTableRow(tr, newResourceTemplateUrl) {
     // Check all the relevant elements are present.
@@ -143,6 +147,8 @@ function setupCategoryOrderDialog() {
     );
     const categoryList = dialog.querySelector("ul");
     if (!categoryList) return;
+    const form = dialog.querySelector("form");
+    if (!form) return;
     const sortable = new Sortable(categoryList, {
         handle: ".handle",
         animation: 150,
@@ -152,6 +158,7 @@ function setupCategoryOrderDialog() {
                 listItems.forEach((listItem, i) => {
                     listItem.setAttribute("data-id", (i + 1));
                 });
+                updateCategoryOrderInForm(form, listItems);
             }, 0.25);
         },
     });
@@ -161,27 +168,23 @@ function setupCategoryOrderDialog() {
         moveUpButton.addEventListener("click", () => {
             const previousListItem = listItem.previousElementSibling;
             if (!previousListItem) return;
-            const currentListItemNumber = listItem.dataset.id;
-            const previousListItemNumber = previousListItem.dataset.id;
-            listItem.setAttribute("data-id", previousListItemNumber);
-            previousListItem.setAttribute("data-id", currentListItemNumber);
-            const order = sortable.toArray().map(num => parseInt(num)).sort((a, b) => {
-                return a - b;
-            });
-            sortable.sort(order, true);
+            swapListItemNumbersAndResortList(
+                listItem,
+                previousListItem,
+                sortable
+            );
+            updateCategoryOrderInForm(form, categoryListItems);
         });
         const moveDownButton = listItem.querySelector(".move-down-button");
         moveDownButton.addEventListener("click", () => {
             const nextListItem = listItem.nextElementSibling;
             if (!nextListItem) return;
-            const currentListItemNumber = listItem.dataset.id;
-            const nextListItemNumber = nextListItem.dataset.id;
-            listItem.setAttribute("data-id", nextListItemNumber);
-            nextListItem.setAttribute("data-id", currentListItemNumber);
-            const order = sortable.toArray().map(num => parseInt(num)).sort((a, b) => {
-                return a - b;
-            });
-            sortable.sort(order, true);
+            swapListItemNumbersAndResortList(
+                listItem,
+                nextListItem,
+                sortable
+            );
+            updateCategoryOrderInForm(form, categoryListItems);
         });
     });
 }

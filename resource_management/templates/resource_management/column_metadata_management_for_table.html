@@ -164,7 +164,7 @@
     {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
     {% endwith %}
     {# Category order dialog #}
-    {% with dialog_id='category-order-dialog' category_names=ordered_fields_and_categories_for_table_name.keys %}
+    {% with dialog_id='category-order-dialog' category_names=ordered_fields_and_categories_for_table_name.keys form=category_order_form %}
     {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
     {% endwith %}
     {# New dialog (single) #}

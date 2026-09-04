@@ -16,6 +16,11 @@ urlpatterns = [
         name="manage_column_metadata_for_table",
     ),
     path(
+        "column-metadata/table/<table_name>/category-order/update/",
+        views.CategoryOrderFormView.as_view(),
+        name="update_category_order",
+    ),
+    path(
         "column-metadata/new/table/<table_name>/column/<column_name>/",
         views.NewColumnMetadataFormView.as_view(),
         name="new_column_metadata",

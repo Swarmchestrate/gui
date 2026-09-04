@@ -41,3 +41,10 @@ class ColumnMetadataDeletionForm(FormWithIdAttributeSuffix):
         required=True,
         widget=forms.HiddenInput()
     )
+
+
+class CategoryOrderForm(forms.Form):
+    category_order = forms.JSONField(
+        required=True,
+        widget=forms.HiddenInput()
+    )

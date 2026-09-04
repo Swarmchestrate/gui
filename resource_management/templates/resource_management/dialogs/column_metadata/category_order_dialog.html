@@ -15,14 +15,20 @@
 </p>
 {% else %}
 <p>
-    Drag and drop categories to re-order them. Use the save button to save changes.
+    Drag and drop the categories below to re-order them. Use the save button to save changes.
 </p>
-<form action="" method="POST">
+<form
+    action="{% url "resource_management:update_category_order" current_table_name %}?table_name={{ current_table_name|urlencode }}"
+    method="POST">
+    {% csrf_token %}
     <ul class="list-group mb-4">
         {% for category_name in category_names %}
         {% if category_name|lower == "unknown" %}
         {% else %}
-        <li class="list-group-item list-group-item-action" data-id="{{ forloop.counter }}">
+        <li
+            class="list-group-item list-group-item-action"
+            data-id="{{ forloop.counter }}"
+            data-category-name="{{ category_name }}">
             <div class="d-inline-flex align-items-center justify-content-between w-100">
                 <div class="d-inline-flex align-items-center column-gap-2">
                     <i class="bi bi-grip-vertical text-body-secondary handle fs-5 me-2"></i>
@@ -47,6 +53,7 @@
         {% endif %}
         {% endfor %}
     </ul>
+    {{ form }}
     <button class="btn btn-primary" type="submit">
         Save
     </button>
