@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 from datetime import datetime, timezone
@@ -14,6 +15,7 @@ from .base_config import (
 )
 
 
+logger = logging.getLogger(__name__)
 BASE_DIR = settings.BASE_DIR
 
 
@@ -55,8 +57,9 @@ class MockEndpoint(BaseEndpoint):
         return temp_data
 
     def _update_temp_data(self, update_data: list):
+        update_data_json = json.dumps(update_data, indent=4)
         with open(self.path_to_temp_data, "w") as f:
-            f.write(json.dumps(update_data, indent=4))
+            f.write(update_data_json)
 
     # Main methods
     def get(self, resource_id: int, params: dict | None = None) -> BaseResource:
