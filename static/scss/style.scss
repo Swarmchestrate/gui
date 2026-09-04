@@ -422,6 +422,7 @@ label:has(~ :required)::after,
 // the other controls (search box, "x" entries per page).
 .dt-container {
     max-width: calc(100vw - var(--bs-gutter-x));
+    overflow-x: hidden;
 }
 
 .dt-container .dt-layout-table {
