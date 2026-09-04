@@ -417,6 +417,14 @@ label:has(~ :required)::after,
     grid-area: body;
 }
 
+.handle {
+    cursor: grab;
+}
+
+.handle:active {
+    cursor: grabbing;
+}
+
 /* DataTables */
 // The .dt-container rules allow the table to scroll, but not
 // the other controls (search box, "x" entries per page).
