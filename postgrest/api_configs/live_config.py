@@ -212,7 +212,7 @@ class LiveEndpoint(BaseEndpoint):
         update_ready = list()
         for resource_update in data:
             composite_key = {
-                resource_update.get(column_name)
+                column_name: resource_update.get(column_name)
                 for column_name in composite_key_column_names
             }
             if (any(
