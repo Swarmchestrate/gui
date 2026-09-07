@@ -205,6 +205,33 @@ class LiveEndpoint(BaseEndpoint):
         response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
+    def bulk_update_with_composite_keys(
+            self,
+            data: list[dict],
+            composite_key_column_names: list[str]):
+        update_ready = list()
+        for resource_update in data:
+            composite_key = {
+                resource_update.get(column_name)
+                for column_name in composite_key_column_names
+            }
+            if (any(
+                value is None
+                for value in composite_key.values())):
+                raise Exception(
+                    "All data used for a bulk update must have non-blank values for composite key columns."
+                )
+            update_ready.append({
+                "composite_key": composite_key,
+                "data": resource_update,
+            })
+        for ur_data in update_ready:
+            self.update_by_composite_key(
+                ur_data["composite_key"],
+                ur_data["data"]
+            )
+        return super().bulk_update(data)
+
     def delete(self, resource_id: int, params: dict | None = None):
         if not params:
             params = dict()

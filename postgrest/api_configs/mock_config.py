@@ -242,6 +242,42 @@ class MockEndpoint(BaseEndpoint):
         updated_resources.append(resource_to_update_as_dict)
         return self._update_temp_data(updated_resources)
 
+    def bulk_update_with_composite_keys(
+            self,
+            data: list[dict],
+            composite_key_column_names: list[str]):
+        resources = self._get_temp_data_and_create_if_not_exists()
+        updated_resources = list()
+        for resource in resources:
+            update_data_for_resource = next((
+                update_data
+                for update_data in data
+                if all(
+                    update_data.get(column_name) == resource.get(column_name)
+                    for column_name in composite_key_column_names
+                )
+            ), None)
+            # As this is a mock config, the database records just get rebuilt. So, if
+            # there is no update data for a record, just re-add the record to the list
+            # of records to rewrite to the database file.
+            if not update_data_for_resource:
+                updated_resources.append(resource)
+                continue
+            # If update data does exist, update the record in the database file and then
+            # re-add it to the list of records to rewrite to the database file.
+            cleaned_data = self._clean_data(update_data_for_resource)
+            if (any(
+                value is None
+                for value in cleaned_data.values())):
+                raise Exception(
+                    "Values for all composite key columns should be present when performing a bulk update."
+                )
+            updated_resource = resource
+            updated_resource.update(cleaned_data)
+            updated_resource = self._json_serialisable(updated_resource)
+            updated_resources.append(updated_resource)
+        return self._update_temp_data(updated_resources)
+
     def delete(self, resource_id: int, params: dict | None = None):
         resources = self._get_temp_data_and_create_if_not_exists()
         updated_resources = [

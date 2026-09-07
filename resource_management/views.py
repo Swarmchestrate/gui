@@ -666,7 +666,45 @@ class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
         return super().form_valid(form)
 
 
-class CategoryOrderFormView(ColumnMetadataFormView):
+class FieldOrderViewMixin():
+    def update_field_order_for_table(
+            self,
+            table_name: str,
+            category_order: list[str],
+            field_order: list[str] = None) -> list[dict]:
+        if not field_order:
+            field_order = list()
+        update_data = list()
+        endpoint = self.api_client.get_endpoint(self.table_name)
+        order_number = 0
+        DEFAULT_ORDER_NUMBER = 999999
+        for category_name in category_order:
+            if not category_name:
+                continue
+            resources = endpoint.get_resources_by_params({
+                "table_name": table_name,
+                "category": category_name,
+            })
+            resources_sorted = sorted(
+                resources,
+                key=lambda resource: (
+                    resource.as_dict().get("order")
+                    if resource.as_dict().get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+            for resource in resources_sorted:
+                resource_dict = resource.as_dict()
+                update_data.append({
+                    "table_name": resource_dict.get("table_name"),
+                    "column_name": resource_dict.get("column_name"),
+                    "order": order_number,
+                })
+                order_number += 1
+        return update_data
+
+
+class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
     form_class = CategoryOrderForm
     table_name = TableNames.COLUMN_METADATA
 
@@ -676,9 +714,6 @@ class CategoryOrderFormView(ColumnMetadataFormView):
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
-        self.resource_list = self.api_client.get_endpoint(self.table_name).get_resources()
-        if not hasattr(self, "resource_type"):
-            self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
@@ -689,7 +724,17 @@ class CategoryOrderFormView(ColumnMetadataFormView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
+        table_name_for_category = self.kwargs.get("table_name") or None
         category_order = form.cleaned_data.get("category_order", list())
+        update_data = self.update_field_order_for_table(
+            table_name_for_category,
+            category_order
+        )
+        endpoint = self.api_client.get_endpoint(self.table_name)
+        endpoint.bulk_update_with_composite_keys(
+            update_data,
+            ["table_name", "column_name"]
+        )
         messages.success(
             self.request,
             f"Updated category order for table."

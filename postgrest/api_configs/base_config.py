@@ -305,6 +305,13 @@ class BaseEndpoint:
     def update_by_composite_key(self, composite_key: dict, data: dict):
         pass
 
+    def bulk_update_with_composite_keys(self, data: list[dict], composite_key_column_names: list[str]):
+        """Update multiple resources by passing a list of update data as dicts. Each update
+        data dict must have the column names that make up the composite key (which are specified
+        in the "composite_key_column_names" parameter).
+        """
+        pass
+
     def delete(self, resource_id: int, params: dict | None = None):
         pass
 
