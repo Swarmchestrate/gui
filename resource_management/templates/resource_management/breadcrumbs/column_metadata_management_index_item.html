@@ -1,0 +1,4 @@
+{% load humanise_swch %}
+{% with page_title=title url_name='resource_management:manage_column_metadata_for_table' url_arg_1=current_table_name %}
+{% include 'breadcrumbs/item_base.html' %}
+{% endwith %}

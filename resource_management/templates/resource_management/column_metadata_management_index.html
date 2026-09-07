@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% load humanise_swch %}
+
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'resource_management/breadcrumbs/column_metadata_management_index_item.html' with active=True %}
+{% endblock breadcrumb_items %}
+
 {% block content %}
 <div class="management-container">
     <div class="management-layout">

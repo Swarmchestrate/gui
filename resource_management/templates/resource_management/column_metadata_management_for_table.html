@@ -6,6 +6,11 @@
 {% load helpers %}
 {% load humanise_swch %}
 
+{% block breadcrumb_items %}
+{% include 'breadcrumbs/index_item.html' %}
+{% include 'resource_management/breadcrumbs/column_metadata_management_for_table_item.html' with active=True %}
+{% endblock breadcrumb_items %}
+
 {% block scripts %}
 {{ current_table_name|json_script:'current-table-name' }}
 {% url new_resource_reverse_base '__table_name__' '__column_name__' as new_resource_template_url %}

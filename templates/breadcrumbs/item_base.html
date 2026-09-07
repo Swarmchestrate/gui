@@ -1,16 +1,32 @@
 {% load breadcrumbs %}
 {% if active %}
+{# Just show the current page as text. #}
 {% breadcrumb_item_active page_title %}
 {% elif resource_id_in_url and fk_column_name_in_url and fk_resource_id_in_url %}
+{# Updating an existing one-to-one FK. #}
 {% breadcrumb_item page_title url_name resource_id_in_url fk_column_name_in_url fk_resource_id_in_url %}
 {% elif resource_id_in_url and fk_column_name_in_url %}
+{# Adding a new one-to-one FK. #}
 {% breadcrumb_item page_title url_name resource_id_in_url fk_column_name_in_url %}
 {% elif resource_id_in_url and fk_table_name_in_url and fk_resource_id_in_url %}
+{# Updating an existing one-to-many FK. #}
 {% breadcrumb_item page_title url_name resource_id_in_url fk_table_name_in_url fk_resource_id_in_url %}
 {% elif resource_id_in_url and fk_table_name_in_url %}
+{# Adding a new one-to-many FK. #}
 {% breadcrumb_item page_title url_name resource_id_in_url fk_table_name_in_url %}
 {% elif resource_id_in_url %}
+{# A resource detail page. E.g., resource overview, wizard. #}
 {% breadcrumb_item page_title url_name resource_id_in_url %}
+{% elif url_arg_3 and url_arg_2 and url_arg_1 %}
+{# URL with 3 arguments. E.g., an editor for an existing FK. #}
+{% breadcrumb_item page_title url_name url_arg_1 url_arg_2 url_arg_3 %}
+{% elif url_arg_2 and url_arg_1 %}
+{# URL with 2 arguments. E.g., an editor for a new FK. #}
+{% breadcrumb_item page_title url_name url_arg_1 url_arg_2 %}
+{% elif url_arg_1 %}
+{# URL with 1 argument. E.g., a detail page. #}
+{% breadcrumb_item page_title url_name url_arg_1 %}
 {% else %}
+{# URL with no arguments. E.g., a list page. #}
 {% breadcrumb_item page_title url_name %}
 {% endif %}
