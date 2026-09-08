@@ -142,6 +142,10 @@ class LiveEndpoint(BaseEndpoint):
         ]
 
     def get_resources_by_params(self, params):
+        params = {
+            property_name: f"eq.{value}"
+            for property_name, value in params.items()
+        }
         response = self._send_request(HTTPMethod.GET, params=params)
         try:
             self.log_and_raise_response_status_if_error(response)
