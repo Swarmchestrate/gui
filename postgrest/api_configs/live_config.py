@@ -232,6 +232,8 @@ class LiveEndpoint(BaseEndpoint):
             composite_key = ur_data["composite_key"],
             data = ur_data["data"]
             params = self._create_filter_params_for_composite_key(composite_key)
+            logger.debug("params", params)
+            logger.debug("data", data)
             response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
             self.log_and_raise_response_status_if_error(response)
 
