@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -667,7 +668,7 @@ class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
 
 
 class FieldOrderViewMixin():
-    def update_field_order_for_table(
+    def get_updated_field_order_for_table(
             self,
             table_name: str,
             category_order: list[str],
@@ -726,12 +727,12 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
     def form_valid(self, form):
         table_name_for_category = self.kwargs.get("table_name") or None
         category_order = form.cleaned_data.get("category_order", list())
-        update_data = self.update_field_order_for_table(
+        update_data = self.get_updated_field_order_for_table(
             table_name_for_category,
             category_order
         )
         endpoint = self.api_client.get_endpoint(self.table_name)
-        logger.debug("update_data", update_data)
+        logger.debug(update_data)
         endpoint.bulk_update_with_composite_keys(
             update_data,
             ["table_name", "column_name"]
