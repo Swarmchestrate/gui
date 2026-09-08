@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.contrib import messages
 from django.http import Http404
 from django.urls import reverse_lazy
@@ -39,13 +40,24 @@ class ForeignKeyEditorView(FormView):
         return forms_by_category
 
     def get_toc_list_items(self):
-        category_names = list(set(
-            resource.as_dict().get("category", "")
+        resource_dicts = list(
+            resource.as_dict()
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        ))
-        category_names.sort()
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
         return EditorTableOfContents(
             self.table_name,
             category_names,
@@ -56,13 +68,24 @@ class ForeignKeyEditorView(FormView):
         ).as_dict()
 
     def get_fk_table_toc_list_items(self):
-        category_names = list(set(
-            resource.as_dict().get("category", "")
+        resource_dicts = list(
+            resource.as_dict()
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.fk_table_name
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        ))
-        category_names.sort()
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
         return EditorTableOfContents(
             self.fk_table_name,
             category_names,

@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import OrderedDict
 from http import HTTPStatus
 
 from django.contrib import messages
@@ -81,13 +82,24 @@ class EditorView(TemplateView):
     
     def get_toc_list_items(self):
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        category_names = list(set(
-            resource.as_dict().get("category", "")
+        resource_dicts = list(
+            resource.as_dict()
             for resource in column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        ))
-        category_names.sort()
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
         form_fields = self.form_config.get_fields()
         return EditorTableOfContents(
             self.table_name,
@@ -413,13 +425,24 @@ class EditorStartFormView(FormView):
         context = super().get_context_data(**kwargs)
         if not hasattr(self, "column_metadata_table_name"):
             self.column_metadata_table_name = self.table_name
-        category_names = list(set(
-            resource.as_dict().get("category", "")
+        resource_dicts = list(
+            resource.as_dict()
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        ))
-        category_names.sort()
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
         categories = EditorTableOfContents(
             self.table_name,
             category_names,
@@ -480,13 +503,24 @@ class EditorOverviewTemplateView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
     
     def get_toc(self):
-        category_names = list(set(
-            resource.as_dict().get("category", "")
+        resource_dicts = list(
+            resource.as_dict()
             for resource in self.column_metadata
             if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        ))
-        category_names.sort()
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
         return EditorTableOfContents(
             self.table_name,
             category_names,
