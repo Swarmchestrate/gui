@@ -197,11 +197,14 @@ class LiveEndpoint(BaseEndpoint):
         response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
-    def update_by_composite_key(self, composite_key: dict, data: dict):
-        params = {
+    def _create_filter_params_for_composite_key(self, composite_key: dict):
+        return {
             property_name: f"eq.{value}"
             for property_name, value in composite_key.items()
         }
+
+    def update_by_composite_key(self, composite_key: dict, data: dict):
+        params = self._create_filter_params_for_composite_key(composite_key)
         response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
@@ -226,11 +229,11 @@ class LiveEndpoint(BaseEndpoint):
                 "data": resource_update,
             })
         for ur_data in update_ready:
-            self.update_by_composite_key(
-                ur_data["composite_key"],
-                ur_data["data"]
-            )
-        return super().bulk_update(data)
+            composite_key = ur_data["composite_key"],
+            data = ur_data["data"]
+            params = self._create_filter_params_for_composite_key(composite_key)
+            response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
+            self.log_and_raise_response_status_if_error(response)
 
     def delete(self, resource_id: int, params: dict | None = None):
         if not params:
