@@ -202,7 +202,6 @@ class LiveEndpoint(BaseEndpoint):
         self.log_and_raise_response_status_if_error(response)
 
     def _create_filter_params_for_composite_key(self, composite_key: dict):
-        logger.debug(composite_key)
         return {
             property_name: f"eq.{value}"
             for property_name, value in composite_key.items()
@@ -229,13 +228,10 @@ class LiveEndpoint(BaseEndpoint):
                 raise Exception(
                     "All data used for a bulk update must have non-blank values for composite key columns."
                 )
-            update_ready.append({
-                "composite_key": composite_key,
-                "data": resource_update,
-            })
+            update_ready.append((composite_key, resource_update))
         for ur_data in update_ready:
-            composite_key = ur_data["composite_key"],
-            data = ur_data["data"]
+            composite_key = ur_data[0]
+            data = ur_data[1]
             params = self._create_filter_params_for_composite_key(composite_key)
             response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
             self.log_and_raise_response_status_if_error(response)
