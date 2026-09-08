@@ -731,6 +731,7 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
             category_order
         )
         endpoint = self.api_client.get_endpoint(self.table_name)
+        logger.debug("update_data", update_data)
         endpoint.bulk_update_with_composite_keys(
             update_data,
             ["table_name", "column_name"]
