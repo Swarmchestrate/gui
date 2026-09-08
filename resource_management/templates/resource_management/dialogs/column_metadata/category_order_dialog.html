@@ -15,12 +15,12 @@
 </p>
 {% else %}
 <p class="text-body-secondary">
-    Use this dialog to reorder the categories that appear in the wizard sidebar (or the collapsible
-    menu <i class="bi bi-list-ul" aria-hidden="true"></i> on smaller screen sizes).
+    Reorder the categories that appear in the wizard sidebar (or the collapsible menu
+    <i class="bi bi-list-ul" aria-hidden="true"></i> on smaller screen sizes).
 </p>
-<p class="fs-sm bg-light rounded py-2 px-3 mb-2">
-    Use the provided up and down buttons or drag-and-drop list items to reorder
-    categories. Use the save button to save changes.
+<p class="fs-sm bg-light rounded px-3 py-4 my-2">
+    Use an item's up and down buttons to reorder. You can also drag-and-drop
+    a list item to change its position. Use the save button to save changes.
 </p>
 <form
     action="{% url "resource_management:update_category_order" current_table_name %}?table_name={{ current_table_name|urlencode }}"
