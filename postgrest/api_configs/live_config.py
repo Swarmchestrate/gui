@@ -202,6 +202,7 @@ class LiveEndpoint(BaseEndpoint):
         self.log_and_raise_response_status_if_error(response)
 
     def _create_filter_params_for_composite_key(self, composite_key: dict):
+        logger.debug(composite_key)
         return {
             property_name: f"eq.{value}"
             for property_name, value in composite_key.items()
@@ -232,7 +233,6 @@ class LiveEndpoint(BaseEndpoint):
                 "composite_key": composite_key,
                 "data": resource_update,
             })
-        logger.debug(update_ready)
         for ur_data in update_ready:
             composite_key = ur_data["composite_key"],
             data = ur_data["data"]
