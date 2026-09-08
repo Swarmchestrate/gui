@@ -232,7 +232,6 @@ class LiveEndpoint(BaseEndpoint):
                 "composite_key": composite_key,
                 "data": resource_update,
             })
-        logger.debug(update_ready)
         for ur_data in update_ready:
             composite_key = ur_data["composite_key"],
             data = ur_data["data"]
