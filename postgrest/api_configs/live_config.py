@@ -197,7 +197,8 @@ class LiveEndpoint(BaseEndpoint):
             data.update({
                 "updated_at": current_time_no_tz,
             })
-        data = self._json_serialisable(data)
+        cleaned_data = self._clean_data(data)
+        data = self._json_serialisable(cleaned_data)
         response = self._send_request(HTTPMethod.PATCH, params=params, json=data)
         self.log_and_raise_response_status_if_error(response)
 
@@ -228,7 +229,7 @@ class LiveEndpoint(BaseEndpoint):
                 raise Exception(
                     "All data used for a bulk update must have non-blank values for composite key columns."
                 )
-            update_ready.append((composite_key, resource_update))
+            update_ready.append((composite_key, self._clean_data(resource_update)))
         for ur_data in update_ready:
             composite_key = ur_data[0]
             data = ur_data[1]
