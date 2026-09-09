@@ -274,13 +274,22 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         # We want to include the column metadata table's PK fields as these
         # are made up by the "table_name" column and the "column_name" column.
         include_pk_fields = (table_name == "column_metadata")
+        form_config_table_name = table_name
         column_metadata_table_name = table_name
         if table_name == TableNames.APPLICATION_NEW:
             column_metadata_table_name = TableNames.APPLICATION
-        if table_name == TableNames.CAPACITY_NEW:
+        elif table_name == TableNames.CAPACITY_NEW:
             column_metadata_table_name = TableNames.CAPACITY
+        elif table_name == TableNames.APPLICATION:
+            # Column metadata table name should be "APPLICATION"
+            # but the wizard fields should come from "APPLICATION_NEW".
+            form_config_table_name = TableNames.APPLICATION_NEW
+        elif table_name == TableNames.CAPACITY:
+            # Column metadata table name should be "CAPACITY"
+            # but the wizard fields should come from "CAPACITY_NEW".
+            form_config_table_name = TableNames.CAPACITY_NEW
         form_config = get_form_config_for_table(
-            table_name,
+            form_config_table_name,
             self.openapi_spec,
             self.column_metadata,
             column_metadata_table_name=column_metadata_table_name
