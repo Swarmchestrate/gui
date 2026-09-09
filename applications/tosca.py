@@ -98,6 +98,7 @@ def _rows_for_microservices(
 def generate_adt_yaml(application_id: int) -> str:
     """Build the Application Description Template for an application."""
     payload = build_application_payload(application_id)
+    logger.debug(payload)
     params = {
         "node_types": [MICROSERVICE_NODE_TYPE],
         "response_type": "yaml",
