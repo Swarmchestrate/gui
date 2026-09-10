@@ -156,7 +156,9 @@
                 data-dialog-id="category-order-dialog">
                 Manage Category Order...
             </button>
-            <button class="btn btn-light btn-sm">
+            <button
+                class="btn btn-light btn-sm field-order-btn"
+                data-dialog-id="field-order-dialog">
                 Manage Field Order...
             </button>
         </div>
@@ -171,6 +173,10 @@
     {# Category order dialog #}
     {% with dialog_id='category-order-dialog' category_names=ordered_fields_and_categories_for_table_name.keys form=category_order_form %}
     {% include 'resource_management/dialogs/column_metadata/category_order_dialog.html' %}
+    {% endwith %}
+    {# Field order dialog #}
+    {% with dialog_id='field-order-dialog' order_data=ordered_fields_and_categories_for_table_name form=field_order_form %}
+    {% include 'resource_management/dialogs/column_metadata/field_order_dialog.html' %}
     {% endwith %}
     {# New dialog (single) #}
     {% with dialog_id='new-dialog' form=new_resource_form form_action=new_resource_template_url %}

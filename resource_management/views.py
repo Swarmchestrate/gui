@@ -1,11 +1,9 @@
-import json
 import logging
 
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
-from django.utils.http import urlencode
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 
@@ -13,6 +11,7 @@ from .exceptions import NameMissingException, SatBuilderException
 from .forms import (
     CategoryOrderForm,
     ColumnMetadataDeletionForm,
+    FieldOrderForm,
     MultiResourceDeletionForm,
     ResourceDeletionForm,
 )
@@ -301,25 +300,33 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             key=lambda field_name: f"{table_name}__{field_name}" in updatable_resource_pks
         )
 
-    def get_field_order_by_category_for_table_name(self, table_name) -> dict[str, dict]:
+    def _get_field_data_by_category_for_table_name(self, table_name) -> dict[str, dict]:
         if table_name in self.disabled_table_names:
             return dict()
         UNCATEGORISED = "Unknown"
-        DEFAULT_ORDER_NUMBER = 999999
         column_metadata_by_category = {
             UNCATEGORISED: dict(),
         }
+        DEFAULT_ORDER_NUMBER = 999999
         for resource in self.column_metadata:
             cm_table_name = resource.as_dict().get("table_name", "")
             if cm_table_name != table_name:
                 continue
             category = resource.as_dict().get("category", "")
+            title = resource.as_dict().get(
+                "title",
+                resource.as_dict().get("column_name")
+            )
             order_number = resource.as_dict().get("order", DEFAULT_ORDER_NUMBER)
             if not isinstance(order_number, int):
                 order_number = DEFAULT_ORDER_NUMBER
+            field_data = {
+                "title": title,
+                "order": order_number,
+            }
             if not category or len(category.strip()) == 0:
                 column_metadata_by_category[UNCATEGORISED].update({
-                    _get_composite_pk(resource): {"order": order_number},
+                    _get_composite_pk(resource): field_data,
                 })
                 continue
             if category not in column_metadata_by_category:
@@ -327,7 +334,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                     category: dict(),
                 })
             column_metadata_by_category[category].update({
-                _get_composite_pk(resource): {"order": order_number},
+                _get_composite_pk(resource): field_data,
             })
         return column_metadata_by_category
 
@@ -339,8 +346,8 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         data = dict()
         DEFAULT_ORDER_NUMBER = 999999
 
-        field_order_by_category = self.get_field_order_by_category_for_table_name(table_name)
-        # Format category order as a list to make it easier to sort.
+        field_order_by_category = self._get_field_data_by_category_for_table_name(table_name)
+        # Format the dict to a list to make sorting easier.
         category_order = [
             {
                 "category": category_name,
@@ -364,8 +371,9 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         }
 
         UNCATEGORISED = "Unknown"
-        # We want to include the column metadata table's PK fields as these
-        # are made up by the "table_name" column and the "column_name" column.
+        # The column metadata table uses the "table_name" column and the "column_name"
+        # column to form a composite PK. These should be included so they can be specified
+        # in the UI.
         include_pk_fields = (table_name == "column_metadata")
         form_config = get_form_config_for_table(
             table_name,
@@ -373,25 +381,32 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             self.column_metadata
         )
         fields_names = form_config.get_fields(include_pk_fields=include_pk_fields).keys()
+        # Go through each field and ensure it has an order number, so they all appear
+        # in the right order in the UI.
         for field_name in fields_names:
             # These dict keys should match the stringified composite key
             # format of the column metadata records ({table_name}__{column_name}).
             possible_resource_pk = f"{table_name}__{field_name}"
-            # If the resource PK already has some column metadata assigned, there's no
-            # need to add it again.
+            # Assign a default order number to fields without column metadata,
+            # otherwise, skip.
             if possible_resource_pk in self.resources_by_id:
                 continue
             data[UNCATEGORISED].update({
-                possible_resource_pk: {"order": DEFAULT_ORDER_NUMBER}
+                # This should mirror the "field_data" dict in
+                # _get_field_data_by_category_for_table_name().
+                possible_resource_pk: {
+                    "order": DEFAULT_ORDER_NUMBER,
+                    "title": field_name,
+                }
             })
 
-        for category_name, field_order in data.items():
+        for category_name, category_field_data in data.items():
             data.update({
                 category_name: {
-                    key: field_dict
-                    for key, field_dict in sorted(
-                        list(field_order.items()),
-                        key=lambda field_item: field_item[1].get("order")
+                    field_pk: field_data
+                    for field_pk, field_data in sorted(
+                        list(category_field_data.items()),
+                        key=lambda item: item[1].get("order")
                     )
                 }
             })
@@ -463,6 +478,17 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             "current_table_name": self.kwargs["table_name"],
             "category_order_form": CategoryOrderForm(
                 initial={"category_order": list(ordered_fields_and_categories_for_table_name.keys())},
+            ),
+            "field_order_form": FieldOrderForm(
+                initial={
+                    "field_order": {
+                        category_name: [
+                            field_name
+                            for field_name in field_data.keys()
+                        ]
+                        for category_name, field_data in ordered_fields_and_categories_for_table_name.items()
+                    }
+                }
             ),
         })
         return context
@@ -681,9 +707,9 @@ class FieldOrderViewMixin():
             self,
             table_name: str,
             category_order: list[str],
-            field_order: list[str] = None) -> list[dict]:
-        if not field_order:
-            field_order = list()
+            field_order_by_category: dict[str, list[str]] = None) -> list[dict]:
+        if not field_order_by_category:
+            field_order_by_category = list()
         update_data = list()
         endpoint = self.api_client.get_endpoint(self.table_name)
         order_number = 0
@@ -729,7 +755,7 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
     def form_invalid(self, form):
         messages.error(
             self.request,
-            'The submitted category order data was malformed. Please report the problem using the <a href="https://github.com/Swarmchestrate/gui/issues" target="_blank">GUI issues tracker</a>',
+            'The submitted category order data was malformed.',
         )
         return super().form_invalid(form)
 
@@ -748,5 +774,44 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
         messages.success(
             self.request,
             f"Updated category order for table."
+        )
+        return super().form_valid(form)
+
+
+class FieldOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
+    form_class = CategoryOrderForm
+    table_name = TableNames.COLUMN_METADATA
+
+    api_client: ApiClient
+    resource_type: str
+
+    def dispatch(self, request, *args, **kwargs):
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'The submitted field order data was malformed.',
+        )
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        table_name_for_category = self.kwargs.get("table_name") or None
+        field_order = form.cleaned_data.get("field_order", dict())
+        update_data = self.get_updated_field_order_for_table(
+            table_name_for_category,
+            list(field_order.keys()),
+            field_order_by_category=field_order
+        )
+        # endpoint = self.api_client.get_endpoint(self.table_name)
+        # endpoint.bulk_update_with_composite_keys(
+        #     update_data,
+        #     ["table_name", "column_name"]
+        # )
+        messages.success(
+            self.request,
+            f"Updated field order for table."
         );
         return super().form_valid(form)

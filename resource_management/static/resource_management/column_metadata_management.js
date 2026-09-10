@@ -1,9 +1,9 @@
 import { setupDialog } from "/static/dialog.js";
 import { initialiseAndSetupDataTable } from "/static/resource_management/data_table_setup.js";
 import {
-    swapListItemNumbersAndResortList,
-    updateCategoryOrderInForm,
-} from "/static/resource_management/category_order.js";
+    setupCategoryOrderDialog,
+    setupFieldOrderDialog,
+} from "/static/resource_management/order_dialogs.js";
 
 function setupNewDialogForTableRow(tr, newResourceTemplateUrl) {
     // Check all the relevant elements are present.
@@ -130,65 +130,6 @@ function setupDialogsForTableRows(dataTable) {
     });
 }
 
-function setupCategoryOrderDialog() {
-    const dialogButton = document.querySelector(".category-order-btn");
-    if (!dialogButton) return;
-    const dialogId = dialogButton.dataset.dialogId;
-    const dialog = document.querySelector(`#${dialogId}`);
-    if (!dialog) {
-        return console.error(`Category order dialog #${dialogId} not found.`);
-    }
-    setupDialog(
-        dialog,
-        [
-            dialog.querySelector(".btn-close"),
-        ],
-        [dialogButton],
-    );
-    const categoryList = dialog.querySelector("ul");
-    if (!categoryList) return;
-    const form = dialog.querySelector("form");
-    if (!form) return;
-    const sortable = new Sortable(categoryList, {
-        handle: ".handle",
-        animation: 150,
-        onMove: () => {
-            window.setTimeout(() => {
-                const listItems = Array.from(categoryList.querySelectorAll("li"));
-                listItems.forEach((listItem, i) => {
-                    listItem.setAttribute("data-id", (i + 1));
-                });
-                updateCategoryOrderInForm(form, listItems);
-            }, 0.25);
-        },
-    });
-    const categoryListItems = Array.from(categoryList.querySelectorAll("li"));
-    categoryListItems.forEach(listItem => {
-        const moveUpButton = listItem.querySelector(".move-up-button");
-        moveUpButton.addEventListener("click", () => {
-            const previousListItem = listItem.previousElementSibling;
-            if (!previousListItem) return;
-            swapListItemNumbersAndResortList(
-                listItem,
-                previousListItem,
-                sortable
-            );
-            updateCategoryOrderInForm(form, categoryListItems);
-        });
-        const moveDownButton = listItem.querySelector(".move-down-button");
-        moveDownButton.addEventListener("click", () => {
-            const nextListItem = listItem.nextElementSibling;
-            if (!nextListItem) return;
-            swapListItemNumbersAndResortList(
-                listItem,
-                nextListItem,
-                sortable
-            );
-            updateCategoryOrderInForm(form, categoryListItems);
-        });
-    });
-}
-
 function setupResourcesTable(tableElement) {
     const dataTable = initialiseAndSetupDataTable(
         tableElement.id,
@@ -214,4 +155,5 @@ window.addEventListener("DOMContentLoaded", () => {
         setupResourcesTable(tableElement);
     });
     setupCategoryOrderDialog();
+    setupFieldOrderDialog();
 });

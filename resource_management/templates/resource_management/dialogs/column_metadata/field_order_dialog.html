@@ -1,0 +1,79 @@
+{% extends 'dialog_base.html' %}
+{% load humanise_swch %}
+
+{% block dialog_header_content %}
+<div>
+    Manage Field Order
+</div>
+{% endblock dialog_header_content %}
+
+{% block dialog_body_content %}
+{% if field_names_for_table_name|length == 0 %}
+<p class="text-body-secondary mb-0">
+    There are no fields to reorder.
+</p>
+{% else %}
+<p class="text-body-secondary">
+    Change the order in which fields are laid out in the wizard.
+</p>
+<p class="fs-sm bg-light rounded py-2 px-3 mb-2">
+    Use the provided up and down buttons or drag-and-drop list items to reorder
+    fields. Use the save button to save changes.
+</p>
+<form
+    action="{% url "resource_management:update_field_order" current_table_name %}?table_name={{ current_table_name|urlencode }}"
+    method="POST">
+    {% csrf_token %}
+    {% for category_name, category_fields in order_data.items %}
+    {% if category_name|lower == 'unknown' and category_fields|length == 0 %}
+    {% else %}
+    <section>
+        <h2 class="fs-6">{{ category_name }}</h2>
+        {% if category_fields|length == 0 %}
+        {# Something is wrong - categories shouldn't be able to exist without a field.  #}
+        <p class="text-body-secondary">
+            No fields have been assigned to this category.
+        </p>
+        {% else %}
+        <ul
+            class="list-group mb-4"
+            data-category-name="{{ category_name }}">
+            {% for field_pk, field_data in category_fields.items %}
+            <li
+                class="list-group-item list-group-item-action"
+                data-id="{{ forloop.counter }}"
+                data-field-pk="{{ field_pk }}">
+                <div class="d-inline-flex align-items-center justify-content-between w-100">
+                    <div class="d-inline-flex align-items-center column-gap-2">
+                        <i class="bi bi-grip-vertical text-body-secondary handle fs-5 me-2"></i>
+                        <span>{{ field_data.title }}</span>
+                    </div>
+                    <div>
+                        <button
+                            class="btn btn-light rounded-circle move-up-button fs-3 lh-1 p-1"
+                            type="button"
+                            style="aspect-ratio: 1 / 1;">
+                            <i class="bi bi-arrow-up-short"></i>
+                        </button>
+                        <button
+                            class="btn btn-light rounded-circle move-down-button fs-3 lh-1 p-1"
+                            type="button"
+                            style="aspect-ratio: 1 / 1;">
+                            <i class="bi bi-arrow-down-short"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </section>
+    {% endif %}
+    {% endfor %}
+    {{ form }}
+    <button class="btn btn-primary" type="submit">
+        Save
+    </button>
+</form>
+{% endif %}
+{% endblock dialog_body_content %}

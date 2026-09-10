@@ -48,3 +48,10 @@ class CategoryOrderForm(forms.Form):
         required=True,
         widget=forms.HiddenInput()
     )
+
+
+class FieldOrderForm(forms.Form):
+    field_order = forms.JSONField(
+        required=True,
+        widget=forms.HiddenInput()
+    )
