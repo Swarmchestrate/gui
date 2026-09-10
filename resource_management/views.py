@@ -498,6 +498,17 @@ class ColumnMetadataFormView(FormView):
     resource_list_reverse_base = "resource_management:manage_column_metadata_for_table"
     column_management_index_url = reverse_lazy("resource_management:manage_column_metadata")
 
+    def redirect_to_resource_list_or_index(self):
+        table_name = self.request.GET.get("table_name")
+        if not table_name:
+            return redirect(self.column_management_index_url)
+        return redirect(reverse_lazy(
+            self.resource_list_reverse_base,
+            kwargs={
+                "table_name": table_name,
+            }
+        ))
+
     def form_valid(self, form):
         table_name = self.request.GET.get("table_name")
         if not table_name:
@@ -513,15 +524,7 @@ class ColumnMetadataFormView(FormView):
 
     def form_invalid(self, form):
         logger.exception(form.errors.as_json())
-        table_name = self.request.GET.get("table_name")
-        if not table_name:
-            return redirect(self.column_management_index_url)
-        return redirect(reverse_lazy(
-            self.resource_list_reverse_base,
-            kwargs={
-                "table_name": table_name,
-            }
-        ))
+        return self.redirect_to_resource_list_or_index()
 
 
 class NewColumnMetadataFormView(ColumnMetadataFormView):
@@ -702,14 +705,17 @@ class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
         return super().form_valid(form)
 
 
-class FieldOrderViewMixin():
-    def get_updated_field_order_for_table(
+class CategoryOrderFormView(ColumnMetadataFormView):
+    form_class = CategoryOrderForm
+    table_name = TableNames.COLUMN_METADATA
+
+    api_client: ApiClient
+    resource_type: str
+
+    def get_updated_field_order_for_table_by_category_order(
             self,
             table_name: str,
-            category_order: list[str],
-            field_order_by_category: dict[str, list[str]] = None) -> list[dict]:
-        if not field_order_by_category:
-            field_order_by_category = list()
+            category_order: list[str]) -> list[dict]:
         update_data = list()
         endpoint = self.api_client.get_endpoint(self.table_name)
         order_number = 0
@@ -739,14 +745,6 @@ class FieldOrderViewMixin():
                 order_number += 1
         return update_data
 
-
-class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
-    form_class = CategoryOrderForm
-    table_name = TableNames.COLUMN_METADATA
-
-    api_client: ApiClient
-    resource_type: str
-
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
@@ -762,7 +760,7 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
     def form_valid(self, form):
         table_name_for_category = self.kwargs.get("table_name") or None
         category_order = form.cleaned_data.get("category_order", list())
-        update_data = self.get_updated_field_order_for_table(
+        update_data = self.get_updated_field_order_for_table_by_category_order(
             table_name_for_category,
             category_order
         )
@@ -778,12 +776,50 @@ class CategoryOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
         return super().form_valid(form)
 
 
-class FieldOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
-    form_class = CategoryOrderForm
+class FieldOrderFormView(ColumnMetadataFormView):
+    form_class = FieldOrderForm
     table_name = TableNames.COLUMN_METADATA
 
     api_client: ApiClient
     resource_type: str
+
+    def get_updated_field_order_for_table(
+            self,
+            table_name: str,
+            field_order_by_category: dict[str, list[str]]) -> dict[str, list]:
+        update_data = list()
+        registration_data = list()
+        endpoint = self.api_client.get_endpoint(self.table_name)
+        order_number = 0
+        for category_name, field_pks in field_order_by_category.items():
+            if not category_name:
+                continue
+            resources = endpoint.get_resources_by_params({
+                "table_name": table_name,
+                "category": category_name,
+            })
+            resources_by_id = {
+                _get_composite_pk(resource): resource
+                for resource in resources
+            }
+            for field_pk in field_pks:
+                _table_name, column_name = field_pk.split("__")
+                data_for_postgrest = {
+                    "table_name": table_name,
+                    "column_name": column_name,
+                    "order": order_number,
+                }
+                order_number += 1
+                if field_pk in resources_by_id:
+                    update_data.append(data_for_postgrest)
+                    continue
+                # Column metadata registrations are required to have
+                # a title field present.
+                data_for_postgrest.update({
+                    "title": " ".join(column_name.split("_")).title()
+                })
+                registration_data.append(data_for_postgrest)
+        return update_data, registration_data
 
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
@@ -799,19 +835,35 @@ class FieldOrderFormView(ColumnMetadataFormView, FieldOrderViewMixin):
 
     def form_valid(self, form):
         table_name_for_category = self.kwargs.get("table_name") or None
-        field_order = form.cleaned_data.get("field_order", dict())
-        update_data = self.get_updated_field_order_for_table(
-            table_name_for_category,
-            list(field_order.keys()),
-            field_order_by_category=field_order
-        )
-        # endpoint = self.api_client.get_endpoint(self.table_name)
-        # endpoint.bulk_update_with_composite_keys(
-        #     update_data,
-        #     ["table_name", "column_name"]
-        # )
-        messages.success(
-            self.request,
-            f"Updated field order for table."
-        );
-        return super().form_valid(form)
+        ordered_field_pks_by_category = form.cleaned_data.get("field_order", dict())
+        try:
+            update_data, registration_data = self.get_updated_field_order_for_table(
+                table_name_for_category,
+                ordered_field_pks_by_category,
+            )
+            endpoint = self.api_client.get_endpoint(self.table_name)
+            endpoint.bulk_update_with_composite_keys(
+                update_data,
+                ["table_name", "column_name"]
+            )
+            for data in registration_data:
+                composite_key = {
+                    "table_name": data["table_name"],
+                    "column_name": data["column_name"],
+                }
+                endpoint.register_with_composite_key(
+                    composite_key,
+                    data
+                )
+            messages.success(
+                self.request,
+                f"Updated field order for table."
+            )
+            return super().form_valid(form)
+        except Exception:
+            logger.exception("Encountered an error whilst updating field order.")
+            messages.error(
+                self.request,
+                "An unexpected error occurred whilst updating field order. Updates to field order may have been partially applied."
+            )
+        return self.redirect_to_resource_list_or_index()
