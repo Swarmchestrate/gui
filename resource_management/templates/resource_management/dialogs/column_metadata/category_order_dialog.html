@@ -10,8 +10,11 @@
 {% block dialog_body_content %}
 {# When only the "Unknown" category is present. #}
 {% if category_names|length == 1 %}
-<p class="text-body-secondary mb-0">
-    No categories have been added yet. Categories can be specified during field customisation.
+<p class="text-body-secondary">
+    No categories have been added yet.
+</p>
+<p class="fs-sm mb-0">
+    You can add a new category during field customisation.
 </p>
 {% else %}
 <p class="text-body-secondary">
