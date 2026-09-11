@@ -750,7 +750,6 @@ class FieldOrderFormView(ColumnMetadataFormView):
                 continue
             resources = endpoint.get_resources_by_params({
                 "table_name": table_name,
-                "category": category_name,
             })
             resources_by_pk = {
                 get_composite_pk(resource): resource
