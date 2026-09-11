@@ -16,8 +16,10 @@ from .forms import (
     ResourceDeletionForm,
 )
 from .view_helpers import (
+    DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT,
     get_composite_pk,
     get_ordered_fields_and_categories_for_table_name,
+    get_postgrest_table_names,
 )
 
 from editor.forms import FormWithDynamicallyPopulatedFields
@@ -223,32 +225,18 @@ class ToscaTemplateDownloadView(View):
 class ColumnMetadataManagementListView(TemplateView):
     template_name = "resource_management/column_metadata_management_index.html"
     table_name = TableNames.COLUMN_METADATA
-    disabled_table_names = [
-        # Column metadata for "APPLICATION_NEW" is stored in "APPLICATION".
-        TableNames.APPLICATION_NEW,
-        # Column metadata for "CAPACITY_NEW" is stored in "CAPACITY".
-        TableNames.CAPACITY_NEW,
-        "geography_columns",
-        "geometry_columns",
-        "spatial_ref_sys",
-    ]
 
     def dispatch(self, request, *args, **kwargs):
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
-        self.postgrest_table_names = [
-            table_name
-            for table_name in self.openapi_spec.get_definitions().keys()
-            if table_name not in self.disabled_table_names
-        ]
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             "title": "Wizard Customisation",
-            "table_names": self.postgrest_table_names,
+            "table_names": get_postgrest_table_names(self.openapi_spec),
         })
         return context
 
@@ -268,7 +256,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             self,
             table_name: str,
             updatable_resource_pks: list[str]) -> list[str]:
-        if table_name in self.disabled_table_names:
+        if table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
             return list()
         # We want to include the column metadata table's PK fields as these
         # are made up by the "table_name" column and the "column_name" column.
@@ -335,9 +323,8 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 self.openapi_spec,
                 self.column_metadata
             ),
-            self.resources_by_id,
-            self.postgrest_table_names,
-            disabled_table_names=self.disabled_table_names
+            self.openapi_spec,
+            self.resources_by_id
         )
         context.update({
             "new_resource_reverse_base": self.new_resource_reverse_base,

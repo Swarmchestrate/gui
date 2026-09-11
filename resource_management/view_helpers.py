@@ -1,18 +1,35 @@
-from postgrest.api import Resource
+from postgrest.api import OpenApiSpecification, Resource
 from postgrest.forms.form_config import FormConfig
+from postgrest.table_names import TableNames
+
+
+DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT = [
+    # Column metadata for "APPLICATION_NEW" is stored in "APPLICATION".
+    TableNames.APPLICATION_NEW,
+    # Column metadata for "CAPACITY_NEW" is stored in "CAPACITY".
+    TableNames.CAPACITY_NEW,
+    "geography_columns",
+    "geometry_columns",
+    "spatial_ref_sys",
+]
 
 
 def get_composite_pk(resource: Resource):
     return f"{resource.as_dict().get('table_name')}__{resource.as_dict().get('column_name')}"
 
 
+def get_postgrest_table_names(openapi_spec: OpenApiSpecification) -> list:
+    return [
+        table_name
+        for table_name in openapi_spec.get_definitions().keys()
+        if table_name not in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT
+    ]
+
+
 def _get_field_data_by_category_for_table_name(
         table_name: str,
-        column_metadata: list[Resource],
-        disabled_table_names: list[str] = None) -> dict[str, dict]:
-    if not disabled_table_names:
-        disabled_table_names = list()
-    if table_name in disabled_table_names:
+        column_metadata: list[Resource]) -> dict[str, dict]:
+    if table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
         return dict()
     UNCATEGORISED = "Unknown"
     column_metadata_by_category = {
@@ -53,13 +70,11 @@ def _get_field_data_by_category_for_table_name(
 def get_ordered_fields_and_categories_for_table_name(
         table_name: str,
         form_config: FormConfig,
-        column_metadata_by_id: dict[str, Resource],
-        postgrest_table_names: list[str],
-        disabled_table_names: list[str] = None) -> dict:
-    if not disabled_table_names:
-        disabled_table_names = list()
+        openapi_spec: OpenApiSpecification,
+        column_metadata_by_id: dict[str, Resource]) -> dict:
+    postgrest_table_names = get_postgrest_table_names(openapi_spec)
     if (table_name not in postgrest_table_names
-        or table_name in disabled_table_names):
+        or table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT):
         return dict()
     
     data = dict()
@@ -67,8 +82,7 @@ def get_ordered_fields_and_categories_for_table_name(
 
     field_order_by_category = _get_field_data_by_category_for_table_name(
         table_name,
-        list(column_metadata_by_id.values()),
-        disabled_table_names=disabled_table_names
+        list(column_metadata_by_id.values())
     )
     # Format the dict to a list to make sorting easier.
     category_order = [
