@@ -432,6 +432,10 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
         field_order_bulk_update_data = list()
         submitted_category_name = form.cleaned_data.get("category")
         if submitted_category_name:
+            column_metadata_by_id = {   
+                get_composite_pk(resource): resource
+                for resource in self.column_metadata
+            }
             order_before_registration = get_ordered_fields_and_categories_for_table_name(
                 table_name,
                 get_form_config_for_table(
@@ -440,13 +444,11 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
                     self.column_metadata
                 ),
                 self.openapi_spec,
-                {   
-                    get_composite_pk(resource): resource
-                    for resource in self.column_metadata
-                }
+                column_metadata_by_id
             )
             field_order_bulk_update_data = get_update_data_for_new_field_order(
                 order_before_registration,
+                column_metadata_by_id,
                 table_name,
                 column_name,
                 submitted_category_name
@@ -512,6 +514,10 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
         table_name, column_name = self.resource_id.split("__")
         submitted_category_name = form.cleaned_data.get("category")
         if submitted_category_name:
+            column_metadata_by_id = {   
+                get_composite_pk(resource): resource
+                for resource in self.column_metadata
+            }
             order_before_update = get_ordered_fields_and_categories_for_table_name(
                 table_name,
                 get_form_config_for_table(
@@ -520,13 +526,11 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
                     self.column_metadata
                 ),
                 self.openapi_spec,
-                {   
-                    get_composite_pk(resource): resource
-                    for resource in self.column_metadata
-                }
+                column_metadata_by_id
             )
             field_order_bulk_update_data = get_update_data_for_new_field_order(
                 order_before_update,
+                column_metadata_by_id,
                 table_name,
                 column_name,
                 submitted_category_name
