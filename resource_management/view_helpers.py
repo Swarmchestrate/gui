@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from postgrest.api import OpenApiSpecification, Resource
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
@@ -144,3 +146,42 @@ def get_ordered_fields_and_categories_for_table_name(
         })
 
     return data
+
+
+def get_update_data_for_new_field_order(
+        current_category_and_field_order: dict[str, dict],
+        table_name: str,
+        column_name: str,
+        new_category_name: str):
+    updated_order = OrderedDict()
+    update_data = list()
+    # Ensure an existing entry doesn't exist in the current category/field
+    # order to prevent possibility of duplicates.
+    for category_name, fields in current_category_and_field_order.items():
+        if category_name not in updated_order:
+            updated_order.update({category_name: list()})
+        for field_pk in fields.keys():
+            if field_pk == f"{table_name}__{column_name}":
+                continue
+            updated_order[category_name].append(field_pk)
+    if new_category_name not in updated_order:
+        updated_order.update({
+            new_category_name: list(),
+        })
+    # This key for this new dict entry should mirror the get_composite_pk()
+    # output.
+    updated_order[new_category_name].append(
+        f"{table_name}__{column_name}"
+    )
+    order_num_counter = 0
+    for category_name, field_pks in updated_order.items():
+        for field_pk in field_pks:
+            f_table_name, f_column_name = field_pk.split("__")
+            update_data.append({
+                "table_name": f_table_name,
+                "column_name": f_column_name,
+                "category": category_name,
+                "order": order_num_counter,
+            })
+            order_num_counter += 1
+    return update_data

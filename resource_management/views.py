@@ -20,6 +20,7 @@ from .view_helpers import (
     get_composite_pk,
     get_ordered_fields_and_categories_for_table_name,
     get_postgrest_table_names,
+    get_update_data_for_new_field_order,
 )
 
 from editor.forms import FormWithDynamicallyPopulatedFields
@@ -426,6 +427,32 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
     def form_valid(self, form):
         table_name = self.kwargs["table_name"]
         column_name = self.kwargs["column_name"]
+        # Ensure current category order isn't affected by the updated column metadata
+        # record by recalculating field order for the current table.
+        field_order_bulk_update_data = list()
+        submitted_category_name = form.cleaned_data.get("category")
+        if submitted_category_name:
+            order_before_registration = get_ordered_fields_and_categories_for_table_name(
+                table_name,
+                get_form_config_for_table(
+                    table_name,
+                    self.openapi_spec,
+                    self.column_metadata
+                ),
+                self.openapi_spec,
+                {   
+                    get_composite_pk(resource): resource
+                    for resource in self.column_metadata
+                }
+            )
+            field_order_bulk_update_data = get_update_data_for_new_field_order(
+                order_before_registration,
+                table_name,
+                column_name,
+                submitted_category_name
+            )
+        # Register the new column metadata first, then update the field/category
+        # order.
         registration_data = form.cleaned_data
         registration_data.update({
             "table_name": table_name,
@@ -440,6 +467,15 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
             },
             registration_data
         )
+
+        # Only reassign field order if the bulk update data has been created.
+        if field_order_bulk_update_data:
+            self.api_client.get_endpoint(
+                self.table_name
+            ).bulk_update_with_composite_keys(
+                field_order_bulk_update_data,
+                ["table_name", "column_name"]
+            )
         messages.success(
             self.request,
             f"New {humanise_resource_type(self.resource_type)} registered.",
@@ -473,9 +509,30 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        table_name, column_name = self.resource_id.split("__")
+        submitted_category_name = form.cleaned_data.get("category")
+        if submitted_category_name:
+            order_before_update = get_ordered_fields_and_categories_for_table_name(
+                table_name,
+                get_form_config_for_table(
+                    table_name,
+                    self.openapi_spec,
+                    self.column_metadata
+                ),
+                self.openapi_spec,
+                {   
+                    get_composite_pk(resource): resource
+                    for resource in self.column_metadata
+                }
+            )
+            field_order_bulk_update_data = get_update_data_for_new_field_order(
+                order_before_update,
+                table_name,
+                column_name,
+                submitted_category_name
+            )
         update_data = form.cleaned_data
         try:
-            table_name, column_name = self.resource_id.split("__")
             self.api_client.get_endpoint(self.table_name).update_by_composite_key(
                 {
                     "table_name": table_name,
@@ -488,6 +545,14 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
             logger.exception(error_msg)
             return self.form_invalid()
 
+        # Only reassign field order if the bulk update data has been created.
+        if field_order_bulk_update_data:
+            self.api_client.get_endpoint(
+                self.table_name
+            ).bulk_update_with_composite_keys(
+                field_order_bulk_update_data,
+                ["table_name", "column_name"]
+            )
         message = f"Saved changes to {humanise_resource_type(self.table_name)} {self.resource_id}."
         messages.success(self.request, message)
         return super().form_valid(form)
