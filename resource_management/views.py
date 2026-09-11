@@ -752,7 +752,7 @@ class FieldOrderFormView(ColumnMetadataFormView):
                 "table_name": table_name,
                 "category": category_name,
             })
-            resources_by_id = {
+            resources_by_pk = {
                 get_composite_pk(resource): resource
                 for resource in resources
             }
@@ -764,7 +764,7 @@ class FieldOrderFormView(ColumnMetadataFormView):
                     "order": order_number,
                 }
                 order_number += 1
-                if field_pk in resources_by_id:
+                if field_pk in resources_by_pk:
                     update_data.append(data_for_postgrest)
                     continue
                 # Column metadata registrations are required to have
@@ -773,6 +773,8 @@ class FieldOrderFormView(ColumnMetadataFormView):
                     "title": " ".join(column_name.split("_")).title()
                 })
                 registration_data.append(data_for_postgrest)
+        logger.debug("update_data", update_data)
+        logger.debug("registration_data", registration_data)
         return update_data, registration_data
 
     def dispatch(self, request, *args, **kwargs):
