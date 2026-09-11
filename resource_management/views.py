@@ -515,6 +515,7 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
 
     def form_valid(self, form):
         table_name, column_name = self.resource_id.split("__")
+        field_order_bulk_update_data = list()
         submitted_category_name = form.cleaned_data.get("category")
         if submitted_category_name:
             column_metadata_by_id = {   
