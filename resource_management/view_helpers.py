@@ -140,7 +140,7 @@ def get_ordered_fields_and_categories_for_table_name(
                 field_pk: field_data
                 for field_pk, field_data in sorted(
                     list(category_field_data.items()),
-                    key=lambda item: item[1].get("order")
+                    key=lambda item_as_tuple: item_as_tuple[1].get("order")
                 )
             }
         })

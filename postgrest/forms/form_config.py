@@ -139,7 +139,8 @@ class Properties:
             enum=metadata.get("enum"),
             title=column_metadata_for_property.get("title") or " ".join(name.split("_")).title(),
             category=column_metadata_for_property.get("category"),
-            help_text=column_metadata_for_property.get("description")
+            help_text=column_metadata_for_property.get("description"),
+            order=column_metadata_for_property.get("order")
         )
     
     def as_dict(self) -> dict[str, PropertyMetadata]:
@@ -231,7 +232,8 @@ class OneToManyProperties:
                     enum=None,
                     title=column_metadata_for_property.get("title") or humanise_resource_type_plural(table_name).title(),
                     category=column_metadata_for_property.get("category"),
-                    help_text=column_metadata_for_property.get("description")
+                    help_text=column_metadata_for_property.get("description"),
+                    order=column_metadata_for_property.get("order")
                 )
             })
         return properties_as_dict
@@ -368,7 +370,19 @@ class FormConfig:
             include_pk_fields: bool = False,
             extra_skip_conditions: list[Callable[[PropertyMetadata], bool]] = None) -> dict:
         fields = dict()
-        for name, metadata in self._properties.items():
+        DEFAULT_ORDER_NUMBER = 999999
+        sorted_properties = {
+            name: metadata
+            for name, metadata in sorted(
+                list(self._properties.items()),
+                key=lambda item_as_tuple: (
+                    item_as_tuple[1].order
+                    if isinstance(item_as_tuple[1].order, int)
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        }
+        for name, metadata in sorted_properties.items():
             if (metadata.is_pk and not include_pk_fields):
                 continue
             if (name in self.disabled_properties):

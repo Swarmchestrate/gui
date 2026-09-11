@@ -31,3 +31,4 @@ class PropertyMetadata:
     title: str | None = None
     category: str | None = None
     help_text: str | None = None
+    order: str | None = None
