@@ -316,6 +316,9 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             self.table_name,
             self.openapi_spec,
             self.column_metadata,
+            disabled_properties=[
+                "order",
+            ]
         )
         ordered_fields_and_categories_for_table_name = get_ordered_fields_and_categories_for_table_name(
             self.current_table_name,
