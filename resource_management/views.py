@@ -773,8 +773,6 @@ class FieldOrderFormView(ColumnMetadataFormView):
                     "title": " ".join(column_name.split("_")).title()
                 })
                 registration_data.append(data_for_postgrest)
-        logger.debug("update_data", update_data)
-        logger.debug("registration_data", registration_data)
         return update_data, registration_data
 
     def dispatch(self, request, *args, **kwargs):
