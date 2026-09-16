@@ -14,7 +14,13 @@
     {% if field.field.widget.input_type == 'checkbox' %}
     {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
     {% else %}
+    {% if forloop.first %}
+    {% with field_wrapper_classes='pt-2 pb-4' %}
     {% include 'editor/field_templates/field_template.html' %}
+    {% endwith %}
+    {% else %}
+    {% include 'editor/field_templates/field_template.html' %}
+    {% endif %}
     {% endif %}
     {% endfor %}
     <div class="pt-4">
