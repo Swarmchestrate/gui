@@ -255,27 +255,14 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
 
     def get_field_names_for_table_name(
             self,
-            table_name: str,
+            column_metadata_table_name: str,
+            form_config_table_name: str,
             updatable_resource_pks: list[str]) -> list[str]:
-        if table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
+        if column_metadata_table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
             return list()
         # We want to include the column metadata table's PK fields as these
         # are made up by the "table_name" column and the "column_name" column.
-        include_pk_fields = (table_name == "column_metadata")
-        form_config_table_name = table_name
-        column_metadata_table_name = table_name
-        if table_name == TableNames.APPLICATION_NEW:
-            column_metadata_table_name = TableNames.APPLICATION
-        elif table_name == TableNames.CAPACITY_NEW:
-            column_metadata_table_name = TableNames.CAPACITY
-        elif table_name == TableNames.APPLICATION:
-            # Column metadata table name should be "APPLICATION"
-            # but the wizard fields should come from "APPLICATION_NEW".
-            form_config_table_name = TableNames.APPLICATION_NEW
-        elif table_name == TableNames.CAPACITY:
-            # Column metadata table name should be "CAPACITY"
-            # but the wizard fields should come from "CAPACITY_NEW".
-            form_config_table_name = TableNames.CAPACITY_NEW
+        include_pk_fields = (column_metadata_table_name == "column_metadata")
         form_config = get_form_config_for_table(
             form_config_table_name,
             self.openapi_spec,
@@ -286,13 +273,13 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             list(form_config.get_fields(
                 include_pk_fields=include_pk_fields
             ).keys()),
-            key=lambda field_name: f"{table_name}__{field_name}" in updatable_resource_pks
+            key=lambda field_name: f"{column_metadata_table_name}__{field_name}" in updatable_resource_pks
         )
 
     def get_data_for_resource_update_forms(self) -> dict[str, dict]:
         data = dict()
         for resource in self.resource_list:
-            if not (resource.as_dict().get("table_name") == self.current_table_name):
+            if not (resource.as_dict().get("table_name") == self.column_metadata_table_name):
                 continue
             data.update({
                 get_composite_pk(resource): resource.as_dict(),
@@ -300,7 +287,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         return data
 
     def get(self, request, *args, **kwargs):
-        self.current_table_name = kwargs.get("table_name") or None
+        self.column_metadata_table_name = kwargs.get("table_name") or None
         column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
         self.resource_list = column_metadata
         self.column_metadata = column_metadata
@@ -320,10 +307,23 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 "order",
             ]
         )
+        form_config_table_name = self.column_metadata_table_name
+        if self.column_metadata_table_name == TableNames.APPLICATION_NEW:
+            self.column_metadata_table_name = TableNames.APPLICATION
+        elif self.column_metadata_table_name == TableNames.CAPACITY_NEW:
+            self.column_metadata_table_name = TableNames.CAPACITY
+        elif self.column_metadata_table_name == TableNames.APPLICATION:
+            # Column metadata table name should be "APPLICATION"
+            # but the wizard fields should come from "APPLICATION_NEW".
+            form_config_table_name = TableNames.APPLICATION_NEW
+        elif self.column_metadata_table_name == TableNames.CAPACITY:
+            # Column metadata table name should be "CAPACITY"
+            # but the wizard fields should come from "CAPACITY_NEW".
+            form_config_table_name = TableNames.CAPACITY_NEW
         ordered_fields_and_categories_for_table_name = get_ordered_fields_and_categories_for_table_name(
-            self.current_table_name,
+            self.column_metadata_table_name,
             get_form_config_for_table(
-                self.current_table_name,
+                form_config_table_name,
                 self.openapi_spec,
                 self.column_metadata
             ),
@@ -347,17 +347,18 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 resource_ids=[
                     get_composite_pk(resource)
                     for resource in self.resource_list
-                    if resource.as_dict().get("table_name") == self.current_table_name
+                    if resource.as_dict().get("table_name") == self.column_metadata_table_name
                 ]
             ),
             # "resources" are records from the column_metadata table
             "resources": self.resources_by_id,
             "field_names_for_table_name": self.get_field_names_for_table_name(
-                self.current_table_name,
+                self.column_metadata_table_name,
+                form_config_table_name,
                 [
                     get_composite_pk(resource)
                     for resource in self.resource_list
-                    if resource.as_dict().get("table_name") == self.current_table_name
+                    if resource.as_dict().get("table_name") == self.column_metadata_table_name
                 ]
             ),
             "ordered_fields_and_categories_for_table_name": ordered_fields_and_categories_for_table_name,
