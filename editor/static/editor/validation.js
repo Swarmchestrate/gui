@@ -108,6 +108,7 @@ export class EditorValidator {
 
     clearFormMessagesList() {
         this.formMessagesList.replaceChildren();
+        this.formMessagesList.classList.add("d-none");
     }
 
     clearFieldValidationMessages(fieldElement) {

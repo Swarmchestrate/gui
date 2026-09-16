@@ -15,6 +15,13 @@ export class FormDialog extends Dialog {
                 this.dialog.close();
             },
         });
+        this.setupDialogEventListeners();
+    }
+
+    setupDialogEventListeners() {
+        this.dialog.addEventListener("close", () => {
+            this.asyncFormHandler.validator.clearFormAndFieldValidationMessages();
+        });
     }
 
     isAnyFieldChanged() {
