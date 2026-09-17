@@ -183,6 +183,10 @@ class OneToManyFieldPopupSectionView(View):
         if not self.fk_table_column_name:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        # The row this section hangs off. A view that hides fields by what that
+        # row is - an edge capacity's flavours lose the cloud-only fields - reads
+        # it through its disabled_properties, so it must be loaded first.
+        self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         self.form_config = get_form_config_for_table(
             self.fk_table_name,
             self.api_client.openapi_spec,
@@ -190,7 +194,10 @@ class OneToManyFieldPopupSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[f"{TableNames.APPLICATION_MICROSERVICE}_id"]
+            disabled_properties=[
+                f"{TableNames.APPLICATION_MICROSERVICE}_id",
+                *getattr(self, "disabled_properties", []),
+            ]
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -507,6 +514,10 @@ class OneToManyFieldSectionView(View):
         if not self.fk_table_column_name:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
         column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        # The row this section hangs off. A view that hides fields by what that
+        # row is - an edge capacity's flavours lose the cloud-only fields - reads
+        # it through its disabled_properties, so it must be loaded first.
+        self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         self.form_config = get_form_config_for_table(
             self.fk_table_name,
             self.api_client.openapi_spec,
@@ -514,7 +525,10 @@ class OneToManyFieldSectionView(View):
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[f"{TableNames.APPLICATION_MICROSERVICE}_id"]
+            disabled_properties=[
+                f"{TableNames.APPLICATION_MICROSERVICE}_id",
+                *getattr(self, "disabled_properties", []),
+            ]
         )
         return super().dispatch(request, *args, **kwargs)
 
