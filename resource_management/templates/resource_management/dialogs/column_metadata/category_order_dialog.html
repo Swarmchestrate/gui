@@ -11,8 +11,11 @@
 {# When only the "Unknown" category is present. #}
 {% if category_names|length == 1 %}
 <div class="text-center">
-    <p class="text-body-secondary fs-sm mb-0">
-        No categories have been added yet.
+    <p class="text-body-secondary fs-sm">
+        No categories have been added yet. A new category can be specified during <b>field customisation</b>
+        (click either the <i class="bi bi-plus-lg bg-light rounded lh-1 py-1 px-2"></i> or
+        <i class="bi bi-pencil-fill bg-light rounded lh-1 py-1 px-2"></i> at the end of a table row to open
+        the field customisation dialog).
     </p>
 </div>
 {% else %}
