@@ -91,7 +91,7 @@
             "type": "string"
         },
         "cap_id": {
-            "format": "uuid",
+            "format": "character varying",
             "type": "string"
         },
         "ssh_port": {

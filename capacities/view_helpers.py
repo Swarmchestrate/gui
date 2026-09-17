@@ -1,4 +1,3 @@
-import uuid
 from dataclasses import dataclass
 
 from django.core.exceptions import ValidationError
@@ -86,18 +85,20 @@ SUBTYPE_FIELD_LABELS = {
 }
 
 
+CAP_ID_PREFIX = "cap-"
+
+
 def validate_cap_id(value):
-    """A CapID is a UUID; Sardou's get_cap_id() hands it on as one."""
-    try:
-        uuid.UUID(str(value))
-    except ValueError:
+    """A CapID is the string OptimusDB issues, which always starts cap-."""
+    text = str(value).strip()
+    if not text.startswith(CAP_ID_PREFIX) or len(text) == len(CAP_ID_PREFIX):
         raise ValidationError(
-            "Enter a UUID, e.g. d286b2b4-cf57-497f-96d7-99e6f806701e."
+            f"Enter the capacity ID issued by OptimusDB, which starts {CAP_ID_PREFIX}"
         )
 
 
 class CapacityIdFieldMixin:
-    """Asks for the CapID, the UUID identifying a capacity, when one is created.
+    """Asks for the CapID, the ID OptimusDB issues a capacity, when one is created.
 
     The column is nullable so capacities made before it existed stay valid, which
     keeps it out of the required fields a create form shows. It is added back
