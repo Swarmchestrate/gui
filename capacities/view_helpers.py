@@ -1,4 +1,7 @@
+import uuid
 from dataclasses import dataclass
+
+from django.core.exceptions import ValidationError
 
 
 # Cloud and edge capacities share the capacity_new table, but each is a distinct
@@ -81,6 +84,44 @@ SUBTYPE_FIELD_LABELS = {
     "aws": {"os_uuid": "AMI"},
     "openstack": {"os_uuid": "Image ID"},
 }
+
+
+def validate_cap_id(value):
+    """A CapID is a UUID; Sardou's get_cap_id() hands it on as one."""
+    try:
+        uuid.UUID(str(value))
+    except ValueError:
+        raise ValidationError(
+            "Enter a UUID, e.g. d286b2b4-cf57-497f-96d7-99e6f806701e."
+        )
+
+
+class CapacityIdFieldMixin:
+    """Asks for the CapID, the UUID identifying a capacity, when one is created.
+
+    The column is nullable so capacities made before it existed stay valid, which
+    keeps it out of the required fields a create form shows. It is added back
+    here, required and blank: a CapID is issued by the OptimusDB API, so the GUI
+    must not invent one.
+    """
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        field = self.form_config.get_fields().get("cap_id")
+        if field is None:
+            # The column has not been added yet; nothing to ask for.
+            return kwargs
+        field.required = True
+        field.validators.append(validate_cap_id)
+        # Sit it beside the name, since the two together identify the capacity.
+        fields = {}
+        for name, existing in (kwargs.get("fields") or {}).items():
+            fields[name] = existing
+            if name == "name":
+                fields["cap_id"] = field
+        fields.setdefault("cap_id", field)
+        kwargs["fields"] = fields
+        return kwargs
 
 
 class CapacitySubtypeFieldsMixin:

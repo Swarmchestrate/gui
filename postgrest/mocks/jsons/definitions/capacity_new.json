@@ -90,6 +90,10 @@
             "format": "character varying",
             "type": "string"
         },
+        "cap_id": {
+            "format": "uuid",
+            "type": "string"
+        },
         "ssh_port": {
             "default": 22,
             "format": "integer",

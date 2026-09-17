@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 
 from .tosca import generate_cdt_yaml
 from .view_helpers import (
+    CapacityIdFieldMixin,
     CapacitySubtypeFieldsMixin,
     CloudCapacityViewMixin,
     EdgeCapacityViewMixin,
@@ -57,7 +58,7 @@ class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityV
         return data
 
 
-class CloudCapacityEditorStartFormView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorStartFormView):
+class CloudCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
@@ -157,7 +158,7 @@ class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityVie
         return data
 
 
-class EdgeCapacityEditorStartFormView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorStartFormView):
+class EdgeCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
     column_metadata_table_name = TableNames.CAPACITY
