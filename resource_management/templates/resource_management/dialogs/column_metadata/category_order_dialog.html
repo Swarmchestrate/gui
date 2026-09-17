@@ -3,25 +3,25 @@
 
 {% block dialog_header_content %}
 <div>
-    Manage Category Order
+    Organise Wizard Categories
 </div>
 {% endblock dialog_header_content %}
 
 {% block dialog_body_content %}
 {# When only the "Unknown" category is present. #}
 {% if category_names|length == 1 %}
-<p class="text-body-secondary">
-    No categories have been added yet.
-</p>
-<p class="fs-sm mb-0">
-    You can add a new category during field customisation.
-</p>
+<div class="text-center">
+    <p class="text-body-secondary fs-sm mb-0">
+        No categories have been added yet.
+    </p>
+</div>
 {% else %}
-<p class="text-body-secondary">
-    Reorder the categories that appear in the wizard sidebar (or the collapsible menu
-    <i class="bi bi-list-ul" aria-hidden="true"></i> on smaller screen sizes).
+<p class="text-body-secondary fs-sm mb-4">
+    Organise the order that categories appear in the wizard sidebar (this also applies to
+    collapsible menu <i class="bi bi-list-ul" aria-hidden="true"></i> on smaller screen
+    sizes, which the sidebar becomes).
 </p>
-<p class="fs-sm bg-light rounded px-3 py-4 my-2">
+<p class="fs-sm bg-light border-start border-primary border-3 py-4 px-3">
     Use an item's up and down buttons to reorder. You can also drag-and-drop
     a list item to change its position. Use the save button to save changes.
 </p>
