@@ -5,6 +5,8 @@ import random
 from datetime import datetime, timezone
 from urllib.parse import urljoin
 
+from postgrest.table_names import TableNames
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +55,15 @@ class BaseResource:
                 coordinates = gps_location.get("coordinates", [])
             lat, long = coordinates[0], coordinates[1]
             data_as_dict.update({gps_location_property_name: [lat, long]})
+        # Sets the capacity_instance_type table's "credentials" property
+        # to an empty dict if no value has been provided.
+        credentials_property_name = "credentials"
+        credentials = data_as_dict.get(credentials_property_name)
+        if (self.type == TableNames.CAPACITY_INSTANCE_TYPE
+            and not credentials):
+            data_as_dict.update({
+                credentials_property_name: {},
+            })
         return data_as_dict
 
 
