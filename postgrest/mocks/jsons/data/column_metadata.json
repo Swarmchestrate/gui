@@ -312,7 +312,7 @@
         "order": 80
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "edge_ip",
         "title": "Public IP",
         "category": "Networking",
@@ -320,7 +320,7 @@
         "order": 90
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "edge_local_ip",
         "title": "Local IP",
         "category": "Networking",
@@ -328,7 +328,7 @@
         "order": 100
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "ssh_port",
         "title": "SSH Port",
         "category": "Access",
@@ -336,7 +336,7 @@
         "order": 10
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "ssh_user",
         "title": "SSH User",
         "category": "Access",
@@ -352,7 +352,7 @@
         "order": 30
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "ssh_auth_method",
         "title": "SSH Auth Method",
         "category": "Access",
@@ -360,7 +360,7 @@
         "order": 40
     },
     {
-        "table_name": "capacity",
+        "table_name": "capacity_instance_type",
         "column_name": "credentials",
         "title": "Credentials",
         "category": "Access",
@@ -654,5 +654,13 @@
         "category": "Microservices",
         "description": "The microservices this application is made of. Each becomes a node template.",
         "order": 200
+    },
+    {
+        "table_name": "capacity_instance_type",
+        "column_name": "ssh_key_path",
+        "title": "SSH Key Path",
+        "category": "Access",
+        "description": "Path to the SSH key for reaching this device.",
+        "order": 20
     }
 ]

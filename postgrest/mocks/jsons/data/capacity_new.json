@@ -13,8 +13,6 @@
         "connectivity_type": "Ethernet",
         "locality_id": 1,
         "resource_quota_id": 1,
-        "ssh_port": 22,
-        "ssh_user": "ubuntu",
         "ipv4_enabled": true,
         "ipv6_enabled": false,
         "subnet": null,
@@ -24,11 +22,7 @@
         "explicit_udp_allow": [
             "ALL"
         ],
-        "edge_ip": null,
-        "edge_local_ip": null,
         "ssh_key_name": "fuelics",
-        "ssh_auth_method": "key",
-        "credentials": null,
         "cloud": "openstack",
         "security_group": "0eb63f2b-b656",
         "security_groups": [
@@ -49,8 +43,6 @@
         "connectivity_type": "5G",
         "locality_id": 2,
         "resource_quota_id": 2,
-        "ssh_port": 22,
-        "ssh_user": "pi",
         "ipv4_enabled": true,
         "ipv6_enabled": false,
         "subnet": "10.0.0.0/24",
@@ -60,11 +52,7 @@
         "explicit_udp_allow": [
             "ALL"
         ],
-        "edge_ip": "203.0.113.10",
-        "edge_local_ip": "10.0.0.10",
         "ssh_key_name": "uow-edge",
-        "ssh_auth_method": "key",
-        "credentials": null,
         "cloud": null,
         "security_groups": [
             "sg-0eb63f2b"
@@ -85,8 +73,6 @@
         "connectivity_type": "Ethernet",
         "locality_id": 2,
         "resource_quota_id": 2,
-        "ssh_port": 22,
-        "ssh_user": "ec2-user",
         "ipv4_enabled": true,
         "ipv6_enabled": false,
         "subnet": null,
@@ -96,11 +82,7 @@
         "explicit_udp_allow": [
             "ALL"
         ],
-        "edge_ip": null,
-        "edge_local_ip": null,
         "ssh_key_name": "uow-aws",
-        "ssh_auth_method": "key",
-        "credentials": null,
         "cloud": "aws",
         "security_group": "0eb63f2b-b656",
         "security_groups": [

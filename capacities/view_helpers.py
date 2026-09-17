@@ -15,6 +15,7 @@ SUBTYPE_ONLY_PROPERTIES = {
         "edge_local_ip",
         "credentials",
         "ssh_auth_method",
+        "ssh_key_path",
         "ssh_port",
         "ssh_user",
     ],

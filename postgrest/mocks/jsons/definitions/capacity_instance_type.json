@@ -109,6 +109,38 @@
         "use_block_device": {
             "format": "boolean",
             "type": "boolean"
+        },
+        "edge_ip": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "edge_local_ip": {
+            "format": "character varying",
+            "maxLength": 64,
+            "type": "string"
+        },
+        "ssh_port": {
+            "default": 22,
+            "format": "integer",
+            "type": "integer"
+        },
+        "ssh_user": {
+            "format": "character varying",
+            "maxLength": 100,
+            "type": "string"
+        },
+        "ssh_key_path": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "credentials": {
+            "format": "jsonb"
+        },
+        "ssh_auth_method": {
+            "format": "character varying",
+            "maxLength": 50,
+            "type": "string"
         }
     },
     "type": "object"

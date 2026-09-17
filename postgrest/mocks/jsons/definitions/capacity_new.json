@@ -94,16 +94,6 @@
             "format": "character varying",
             "type": "string"
         },
-        "ssh_port": {
-            "default": 22,
-            "format": "integer",
-            "type": "integer"
-        },
-        "ssh_user": {
-            "format": "character varying",
-            "maxLength": 100,
-            "type": "string"
-        },
         "ipv4_enabled": {
             "format": "boolean",
             "type": "boolean"
@@ -131,28 +121,10 @@
             },
             "type": "array"
         },
-        "edge_ip": {
-            "format": "character varying",
-            "maxLength": 64,
-            "type": "string"
-        },
-        "edge_local_ip": {
-            "format": "character varying",
-            "maxLength": 64,
-            "type": "string"
-        },
         "ssh_key_name": {
             "format": "character varying",
             "maxLength": 255,
             "type": "string"
-        },
-        "ssh_auth_method": {
-            "format": "character varying",
-            "maxLength": 50,
-            "type": "string"
-        },
-        "credentials": {
-            "format": "jsonb"
         },
         "cloud": {
             "enum": [

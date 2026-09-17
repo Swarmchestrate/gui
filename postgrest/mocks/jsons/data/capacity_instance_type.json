@@ -19,7 +19,14 @@
         "os_uuid": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
         "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
         "project_id": "facbcbb71bab40c0a8934b3eda67d389",
-        "use_block_device": true
+        "use_block_device": true,
+        "edge_ip": null,
+        "edge_local_ip": null,
+        "ssh_port": 22,
+        "ssh_user": null,
+        "ssh_key_path": null,
+        "credentials": null,
+        "ssh_auth_method": null
     },
     {
         "id": 2,
@@ -41,7 +48,14 @@
         "os_uuid": "b2be6f4e-ebd8-42af-a526-63691a4d90ea",
         "network_id": "eb47e022-fdf3-4f7c-83ef-1fe46ec8e6dc",
         "project_id": "facbcbb71bab40c0a8934b3eda67d389",
-        "use_block_device": true
+        "use_block_device": true,
+        "edge_ip": null,
+        "edge_local_ip": null,
+        "ssh_port": 22,
+        "ssh_user": null,
+        "ssh_key_path": null,
+        "credentials": null,
+        "ssh_auth_method": null
     },
     {
         "id": 3,
@@ -63,7 +77,14 @@
         "os_uuid": null,
         "network_id": null,
         "project_id": null,
-        "use_block_device": null
+        "use_block_device": null,
+        "edge_ip": "203.0.113.10",
+        "edge_local_ip": "10.0.0.10",
+        "ssh_port": 22,
+        "ssh_user": "pi",
+        "ssh_key_path": null,
+        "credentials": null,
+        "ssh_auth_method": "key"
     },
     {
         "id": 4,
@@ -85,6 +106,13 @@
         "os_uuid": "ami-19237951",
         "network_id": null,
         "project_id": null,
-        "use_block_device": null
+        "use_block_device": null,
+        "edge_ip": null,
+        "edge_local_ip": null,
+        "ssh_port": 22,
+        "ssh_user": null,
+        "ssh_key_path": null,
+        "credentials": null,
+        "ssh_auth_method": null
     }
 ]
