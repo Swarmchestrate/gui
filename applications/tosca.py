@@ -33,6 +33,13 @@ PER_MICROSERVICE_TABLES = (
     TableNames.APPLICATION_PROPERTY,
     TableNames.APPLICATION_NODE_FILTER,
     TableNames.APPLICATION_COLOCATE,
+    TableNames.APPLICATION_RAW_METRIC,
+    TableNames.APPLICATION_COMPOSITE_METRIC,
+)
+
+# Tables hanging off the application itself rather than any one microservice.
+PER_APPLICATION_TABLES = (
+    TableNames.APPLICATION_RECONFIGURATION,
 )
 
 MICROSERVICE_FOREIGN_KEY = "application_microservice_id"
@@ -70,6 +77,16 @@ def build_application_payload(application_id: int) -> dict:
         rows = _rows_for_microservices(api_client, table_name, microservice_ids)
         if rows:
             payload[table_name.value] = rows
+
+    for table_name in PER_APPLICATION_TABLES:
+        if not _table_exists(api_client, table_name):
+            logger.warning("No '%s' table; skipping it in the payload", table_name.value)
+            continue
+        rows = api_client.get_endpoint(table_name).get_resources_referencing_resource_id(
+            "application_id", application_id
+        )
+        if rows:
+            payload[table_name.value] = [row.as_dict() for row in rows]
 
     return payload
 

@@ -26,6 +26,10 @@ class PropertyMetadata:
     # capability properties, for one. Takes precedence over enum, because it
     # carries a readable label rather than just the stored value.
     choices: list | None = None
+    # A presentation the column's database type cannot imply: a jsonb column
+    # that is really a flat name/value map, or text long enough to need a
+    # textarea. Set from editor.field_widgets.
+    widget: str | None = None
     # Defined in the corresponding column metadata
     # record (if it exists).
     title: str | None = None
