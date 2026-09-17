@@ -191,7 +191,10 @@ def get_form_config_for_table(
         column_metadata,
         column_metadata_table_name=column_metadata_table_name
     )
-    for property_name, metadata in properties.as_dict().items():
+    # Built once and reused below: as_dict() makes new metadata on every call, so
+    # choices set on one call's result would never reach the form.
+    properties_as_dict = properties.as_dict()
+    for property_name, metadata in properties_as_dict.items():
         choices = choices_for(table_name, property_name, choices_context)
         if choices:
             metadata.choices = choices
@@ -215,7 +218,7 @@ def get_form_config_for_table(
         column_metadata_table_name=column_metadata_table_name
     )
     return FormConfig(
-        properties.as_dict(),
+        properties_as_dict,
         one_to_many_properties=one_to_many_properties.as_dict(),
         additional_disabled_properties=disabled_properties
     )
