@@ -11,11 +11,14 @@
     <div class="management-layout">
         <div class="management-layout__content">
             {# TOC #}
-            <div class="management-layout__toc mb-sm-0 mb-4">
+            <div class="management-layout__toc">
                 {% block toc %}
                 <div class="collapse" id="toc-collapse">
                     <nav>
-                        <div class="nav nav-pills flex-column list-unstyled editor-toc sticky-top" id="table-nav-tab" role="tablist">
+                        <div
+                            class="nav nav-pills flex-column list-unstyled editor-toc sticky-top bg-light rounded py-4 px-3 mb-sm-0 mb-4"
+                            id="table-nav-tab"
+                            role="tablist">
                             {% for table_name in table_names %}
                             <a
                                 href="{% url 'resource_management:manage_column_metadata_for_table' table_name %}"
