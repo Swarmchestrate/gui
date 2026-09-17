@@ -11,8 +11,11 @@ from .field_config import (
     GeometryPointFieldConfig,
     IntegerFieldConfig,
     JsonFieldConfig,
+    KeyValueFieldConfig,
+    MultipleChoiceFieldConfig,
     NumericFieldConfig,
     TextArrayFieldConfig,
+    TextareaFieldConfig,
 )
 
 from postgrest.api import (
@@ -21,6 +24,7 @@ from postgrest.api import (
     Resource
 )
 from postgrest.table_names import TableNames
+from editor.field_widgets import KEY_VALUE, TEXTAREA
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_enum_value, humanise_resource_type_plural
 
@@ -324,12 +328,20 @@ class FormConfig:
     def _get_field_config_instance(self, name: str, metadata: PropertyMetadata):
         field_config_class = self._get_field_config_class_from_format(metadata.format)
         additional_args = []
-        if metadata.choices:
+        if metadata.choices and metadata.format == OasDefinitionPropertyFormat.TEXT_ARRAY.value:
+            # A list column with known choices: pick any number of them.
+            additional_args.append(list(metadata.choices))
+            field_config_class = MultipleChoiceFieldConfig
+        elif metadata.choices:
             choices = list(metadata.choices)
             if not metadata.is_required:
                 choices.insert(0, ("", "Not Set"))
             additional_args.append(choices)
             field_config_class = ChoiceFieldConfig
+        elif metadata.widget == KEY_VALUE:
+            field_config_class = KeyValueFieldConfig
+        elif metadata.widget == TEXTAREA:
+            field_config_class = TextareaFieldConfig
         elif metadata.enum:
             choices = [
                 (field_enum, humanise_enum_value(field_enum))

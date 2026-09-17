@@ -7,6 +7,7 @@ from postgrest.forms.form_config import (
 from postgrest.api import OpenApiSpecification, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from .field_choices import choices_for
+from .field_widgets import widget_for
 
 
 class EditorTableOfContents:
@@ -192,9 +193,10 @@ def get_form_config_for_table(
         column_metadata_table_name=column_metadata_table_name
     )
     # Built once and reused below: as_dict() makes new metadata on every call, so
-    # choices set on one call's result would never reach the form.
+    # choices and widgets set on one call's result would never reach the form.
     properties_as_dict = properties.as_dict()
     for property_name, metadata in properties_as_dict.items():
+        metadata.widget = widget_for(table_name, property_name)
         choices = choices_for(table_name, property_name, choices_context)
         if choices:
             metadata.choices = choices

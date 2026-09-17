@@ -1,0 +1,48 @@
+{
+    "required": [
+        "id",
+        "application_id",
+        "name",
+        "rule",
+        "targets"
+    ],
+    "properties": {
+        "id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "application_id": {
+            "description": "Note:\nThis is a Foreign Key to `application_new.application_id`.<fk table='application_new' column='application_id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "name": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "rule": {
+            "format": "text",
+            "type": "string"
+        },
+        "constants": {
+            "format": "jsonb"
+        },
+        "targets": {
+            "format": "text[]",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "created_at": {
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "updated_at": {
+            "format": "timestamp without time zone",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

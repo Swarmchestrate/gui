@@ -13,6 +13,7 @@ import requests
 from django.core.cache import cache
 
 from editor.field_choices import register_field_choices
+from editor.field_widgets import KEY_VALUE, TEXTAREA, register_field_widget
 from postgrest.api import ApiClient
 from postgrest.api_configs.base_config import build_api_url
 from postgrest.table_names import TableNames
@@ -95,6 +96,27 @@ def colocation_target_choices(context: dict) -> List[Tuple[str, str]]:
     ]
 
 
+def reconfiguration_target_choices(context: dict) -> List[Tuple[str, str]]:
+    """Every microservice of the application a reconfiguration policy belongs to.
+
+    Stored by name, because a policy's targets name node templates.
+    """
+    application_id = context.get("parent_id")
+    if not application_id:
+        return []
+
+    api_client = ApiClient()
+    api_client.initialise_openapi_spec()
+    microservices = api_client.get_endpoint(
+        TableNames.APPLICATION_MICROSERVICE
+    ).get_resources_referencing_resource_id("application_id", application_id)
+    return [
+        (name, name)
+        for microservice in microservices
+        if (name := (microservice.as_dict() or {}).get("name"))
+    ]
+
+
 def operator_choices(context: dict) -> List[Tuple[str, str]]:
     """Every operator any target accepts.
 
@@ -120,7 +142,14 @@ def _target_label(target: Dict[str, Any]) -> str:
 
 
 def register() -> None:
-    """Wire the requirement columns up to the profile's answers."""
+    """Give the application columns their choices and widgets."""
     register_field_choices(TableNames.APPLICATION_NODE_FILTER, "target", target_choices)
     register_field_choices(TableNames.APPLICATION_NODE_FILTER, "operator", operator_choices)
     register_field_choices(TableNames.APPLICATION_COLOCATE, "target", colocation_target_choices)
+    register_field_choices(
+        TableNames.APPLICATION_RECONFIGURATION, "targets", reconfiguration_target_choices
+    )
+    # Flat name/value maps, and a rule far too long for one line.
+    register_field_widget(TableNames.APPLICATION_RAW_METRIC, "config", KEY_VALUE)
+    register_field_widget(TableNames.APPLICATION_RECONFIGURATION, "constants", KEY_VALUE)
+    register_field_widget(TableNames.APPLICATION_RECONFIGURATION, "rule", TEXTAREA)

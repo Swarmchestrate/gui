@@ -1,0 +1,62 @@
+{
+    "required": [
+        "id",
+        "application_microservice_id",
+        "name",
+        "formula",
+        "window_size"
+    ],
+    "properties": {
+        "id": {
+            "description": "Note:\nThis is a Primary Key.<pk/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "application_microservice_id": {
+            "description": "Note:\nThis is a Foreign Key to `application_microservice.id`.<fk table='application_microservice' column='id'/>",
+            "format": "integer",
+            "type": "integer"
+        },
+        "name": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "formula": {
+            "format": "text",
+            "type": "string"
+        },
+        "collection_frequency": {
+            "format": "character varying",
+            "type": "string",
+            "default": "30 sec"
+        },
+        "collection_output": {
+            "format": "character varying",
+            "type": "string",
+            "default": "all"
+        },
+        "window_type": {
+            "format": "character varying",
+            "type": "string",
+            "default": "sliding"
+        },
+        "window_size": {
+            "format": "character varying",
+            "type": "string"
+        },
+        "grouping": {
+            "format": "character varying",
+            "type": "string",
+            "default": "per_zone"
+        },
+        "created_at": {
+            "format": "timestamp without time zone",
+            "type": "string"
+        },
+        "updated_at": {
+            "format": "timestamp without time zone",
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

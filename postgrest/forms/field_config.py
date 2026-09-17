@@ -3,7 +3,9 @@ from django.forms import Widget
 
 from .custom_fields import EnumField, GeometryPointField
 from .custom_widgets import (
+    CheckboxListWidget,
     GeometryPointWidget,
+    KeyValueWidget,
     SelectWithDisabledFirstOption,
 )
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
@@ -103,6 +105,43 @@ class ChoiceFieldConfig(FieldConfig):
     field_class = EnumField
     widget_class = SelectWithDisabledFirstOption
     css_classes = ["form-select"]
+
+
+class MultipleChoiceFieldConfig(FieldConfig):
+    """A list column whose entries must each be one of known choices.
+
+    Checkboxes, because the choices are few and all of them should be visible -
+    the microservices a reconfiguration policy may target, for instance.
+    """
+
+    def __init__(self, choices: list[tuple[str, str]], *args, **kwargs):
+        if not choices:
+            raise Exception(ChoiceFieldConfig.CHOICES_NOT_SPECIFIED)
+        super().__init__(*args, **kwargs)
+        self.extra_field_kwargs = {"choices": choices}
+
+    field_class = forms.MultipleChoiceField
+    widget_class = CheckboxListWidget
+    css_classes = []
+
+
+class KeyValueFieldConfig(FieldConfig):
+    """A jsonb column holding a flat map of names to values."""
+
+    field_class = forms.JSONField
+    widget_class = KeyValueWidget
+    css_classes = []
+
+
+class TextareaFieldConfig(FieldConfig):
+    """Text too long for a single line, such as a reconfiguration rule."""
+
+    widget_class = forms.Textarea
+    css_classes = ["form-control", "font-monospace"]
+    extra_widget_attrs = {"rows": 16, "spellcheck": "false"}
+    # Kept exactly as typed: a rule's leading indentation and final newline are
+    # part of what the user wrote.
+    extra_field_kwargs = {"strip": False}
 
 
 class DateFieldConfig(FieldConfig):
