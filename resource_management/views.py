@@ -237,7 +237,10 @@ class ColumnMetadataManagementListView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({
             "title": "Wizard Customisation",
-            "table_names": get_postgrest_table_names(self.openapi_spec),
+            "table_names": sorted(
+                get_postgrest_table_names(self.openapi_spec),
+                key=lambda table_name: humanise_resource_type(table_name)
+            ),
         })
         return context
 
