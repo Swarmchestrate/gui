@@ -7,9 +7,15 @@
 {% endblock scripts %}
 
 {% block top_section %}
-<hgroup class="d-flex flex-column row-gap-1">
+<div class="d-flex flex-column gap-2">
     <h2 class="mb-0">{{ main_heading }}</h2>
-</hgroup>
+    {% if 'updated_at' in resource %}
+    <div class="d-inline-flex align-items-center column-gap-2 text-body-secondary fs-sm mb-3">
+        <i class="bi bi-clock"></i>
+        Last updated on {{ resource.updated_at|convert_str_date|date:'jS F Y, H:i' }}
+    </div>
+    {% endif %}
+</div>
 {% endblock top_section %}
 
 {% block toc %}
