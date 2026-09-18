@@ -61,14 +61,19 @@ class BaseResource:
         if (self.type == TableNames.CAPACITY_INSTANCE_TYPE):
             credentials_property_name = "credentials"
             credentials = data_as_dict.get(credentials_property_name)
-            # try to parse the credentials property as JSON. If it's
-            # not valid JSON, just leave as a str value.
-            try:
-                data_as_dict.update({
-                    credentials_property_name: json.loads(credentials),
-                })
-            except json.decoder.JSONDecodeError:
-                pass
+            # Only text needs parsing: it is what JSON fields saved before
+            # they parsed their input. A missing value or a real map is left
+            # as it is, and blank text means no credentials. If it's not
+            # valid JSON, just leave as a str value.
+            if isinstance(credentials, str):
+                try:
+                    data_as_dict.update({
+                        credentials_property_name: (
+                            json.loads(credentials) if credentials.strip() else None
+                        ),
+                    })
+                except json.decoder.JSONDecodeError:
+                    pass
         return data_as_dict
 
 
