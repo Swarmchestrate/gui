@@ -478,6 +478,10 @@ details.error-details {
 
 /* Media queries */
 @media (min-width: 992px) {
+    #navbar-content .dropdown-menu {
+        box-shadow: $box-shadow-sm;
+    }
+
     .editor-layout {
         grid-template-areas:
             "toc header"
