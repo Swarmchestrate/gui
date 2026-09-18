@@ -3,7 +3,7 @@ import logging
 import lxml.html
 import os
 import random
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from urllib.parse import urljoin
 
 from postgrest.table_names import TableNames
@@ -279,7 +279,7 @@ class BaseEndpoint:
         creation_date = data.get(creation_date_property_name)
         if not creation_date:
             return data
-        if isinstance(creation_date, datetime):
+        if isinstance(creation_date, date):
             data.update({creation_date_property_name: creation_date.strftime("%Y-%m-%d")})
         return data
 
