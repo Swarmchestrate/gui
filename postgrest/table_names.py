@@ -19,6 +19,7 @@ class TableNames(StrEnum):
     APPLICATION_RAW_METRIC = "application_raw_metric"
     APPLICATION_RECONFIGURATION = "application_reconfiguration"
     APPLICATION_SECURITY_RULE = "application_security_rule"
+    APPLICATION_VOLUME = "application_volume"
     CAPACITY = "capacity"
     CAPACITY_INSTANCE_TYPE = "capacity_instance_type"
     CAPACITY_NEW = "capacity_new"

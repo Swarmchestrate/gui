@@ -35,6 +35,8 @@ PER_MICROSERVICE_TABLES = (
     TableNames.APPLICATION_COLOCATE,
     TableNames.APPLICATION_RAW_METRIC,
     TableNames.APPLICATION_COMPOSITE_METRIC,
+    TableNames.APPLICATION_COMPOSITE_METRIC,
+    TableNames.APPLICATION_VOLUME,
 )
 
 # Tables hanging off the application itself rather than any one microservice.
