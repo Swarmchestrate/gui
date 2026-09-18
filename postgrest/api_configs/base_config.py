@@ -279,7 +279,8 @@ class BaseEndpoint:
         creation_date = data.get(creation_date_property_name)
         if not creation_date:
             return data
-        data.update({creation_date_property_name: creation_date.strftime("%Y-%m-%d")})
+        if isinstance(creation_date, datetime):
+            data.update({creation_date_property_name: creation_date.strftime("%Y-%m-%d")})
         return data
 
     # Main methods
