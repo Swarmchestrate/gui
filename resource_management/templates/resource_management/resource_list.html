@@ -140,8 +140,9 @@
 </div>
 {% for resource_id, form in resource_deletion_forms.items %}
 <div id="delete-dialogs">
+    {% url resource_deletion_reverse resource_id as delete_resource_url %}
     {% with resource_id_str=resource_id|stringformat:'s' %}
-    {% with dialog_id='delete-'|add:resource_id_str|add:'-dialog' %}
+    {% with dialog_id='delete-'|add:resource_id_str|add:'-dialog' form_action=delete_resource_url %}
     {% include 'resource_management/dialogs/delete_dialog.html' %}
     {% endwith %}
     {% endwith %}
