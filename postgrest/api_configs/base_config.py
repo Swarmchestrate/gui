@@ -1,3 +1,4 @@
+import json
 import logging
 import lxml.html
 import os
@@ -57,13 +58,17 @@ class BaseResource:
             data_as_dict.update({gps_location_property_name: [lat, long]})
         # Sets the capacity_instance_type table's "credentials" property
         # to an empty dict if no value has been provided.
-        credentials_property_name = "credentials"
-        credentials = data_as_dict.get(credentials_property_name)
-        if (self.type == TableNames.CAPACITY_INSTANCE_TYPE
-            and not credentials):
-            data_as_dict.update({
-                credentials_property_name: {},
-            })
+        if (self.type == TableNames.CAPACITY_INSTANCE_TYPE):
+            credentials_property_name = "credentials"
+            credentials = data_as_dict.get(credentials_property_name)
+            # try to parse the credentials property as JSON. If it's
+            # not valid JSON, just leave as a str value.
+            try:
+                data_as_dict.update({
+                    credentials_property_name: json.loads(credentials),
+                })
+            except json.decoder.JSONDecodeError:
+                pass
         return data_as_dict
 
 
