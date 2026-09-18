@@ -1,1 +1,3 @@
-{% extends 'editor/breadcrumbs/wizard_item_base.html' %}
+{% with url_name='applications:application_editor' resource_id_in_url=resource_id %}
+{% include 'editor/breadcrumbs/wizard_item_base.html' %}
+{% endwith %}
