@@ -381,7 +381,7 @@ label:has(~ :required)::after,
 /* Wizard nav */
 .editor-toc.nav-pills .nav-link:not(.active):hover,
 .editor-toc.nav-pills .nav-link:not(.active):focus {
-    background: var(--bs-tertiary-bg);
+    background: $light-bg-subtle;
 }
 
 /* Resource management */
