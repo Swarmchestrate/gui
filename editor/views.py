@@ -474,6 +474,7 @@ class EditorOverviewTemplateView(TemplateView):
     disabled_properties: list[str]
 
     editor_reverse_base: str
+    tosca_template_download_reverse_base: str
     resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
@@ -568,5 +569,6 @@ class EditorOverviewTemplateView(TemplateView):
             "editor_reverse_base": self.editor_reverse_base,
             "one_to_one_field_subsection_reverse_base": self.one_to_one_field_subsection_reverse_base,
             "one_to_many_field_subsection_reverse_base": self.one_to_many_field_subsection_reverse_base,
+            "tosca_template_download_reverse_base": self.tosca_template_download_reverse_base,
         })
         return context

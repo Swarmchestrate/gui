@@ -8,7 +8,16 @@
 
 {% block top_section %}
 <div class="d-flex flex-column gap-2">
-    <h2 class="mb-0">{{ main_heading }}</h2>
+    <div class="d-flex align-items-center gap-2">
+        <h2 class="mb-0">{{ main_heading }}</h2>
+        <a
+            href="{% url tosca_template_download_reverse_base resource_id %}?redirect={{ request.path }}"
+            class="btn btn-light"
+            title="Download">
+            <i class="bi bi-download" aria-hidden="true"></i>
+            <span class="visually-hidden">Download</span>
+        </a>
+    </div>
     {% if 'updated_at' in resource %}
     <div class="d-inline-flex align-items-center column-gap-2 text-body-secondary fs-sm mb-3">
         <i class="bi bi-clock"></i>

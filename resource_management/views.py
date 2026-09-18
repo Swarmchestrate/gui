@@ -202,6 +202,7 @@ class ToscaTemplateDownloadView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        redirect_url = request.GET.get("redirect") or self.resource_list_reverse
         try:
             sat_yaml = self.generate_sat_yaml()
             response = HttpResponse(
@@ -213,12 +214,12 @@ class ToscaTemplateDownloadView(View):
             # These carry a message naming what the wizard still needs.
             logger.exception(str(err))
             messages.error(request, str(err))
-            return redirect(self.resource_list_reverse)
+            return redirect(redirect_url)
         except Exception:
             error_msg = "Encountered an error whilst generating the SAT."
             logger.exception(error_msg)
             messages.error(request, error_msg)
-            return redirect(self.resource_list_reverse)
+            return redirect(redirect_url)
         return response
 
 
