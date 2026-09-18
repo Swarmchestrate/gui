@@ -154,6 +154,9 @@ class IntegerFieldConfig(FieldConfig):
 
 
 class JsonFieldConfig(FieldConfig):
+    # Parses the text as JSON, so a jsonb column receives an object rather than
+    # the typed characters as a JSON string.
+    field_class = forms.JSONField
     widget_class = forms.Textarea
     extra_widget_attrs = {
         "autocomplete": "off",
