@@ -16,7 +16,7 @@
         {% endwith %}
         {% elif 'error' in message.tags %}
         {# Error message #}
-        {% with alert_type='danger' bi_font_class='bi-exclamation-diamond-fill' bi_title='Error' %}
+        {% with alert_type='danger' bi_font_class='bi-exclamation-triangle-fill' bi_title='Error' %}
         {% include 'message.html' %}
         {% endwith %}
         {% elif 'warning' in message.tags %}
