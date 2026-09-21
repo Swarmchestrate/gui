@@ -11,23 +11,28 @@ function initialiseDataTable(tableSelector, columnNames, options) {
             return true;
         };
     }
+    const columnDefs = [
+        {
+            orderable: false,
+            render: DataTable.render.select(),
+            target: 0,
+        },
+    ];
     const languages = navigator.languages;
+    if ("createdAtColumnIndex" in options) {
+        columnDefs.push({
+            target: options.createdAtColumnIndex,
+            render: DataTable.render.date("D", languages[0])
+        });
+    }
+    if ("updatedAtColumnIndex" in options) {
+        columnDefs.push({
+            target: options.updatedAtColumnIndex,
+            render: DataTable.render.date("f", languages[0])
+        });
+    }
     const dataTable = new DataTable(tableSelector, {
-        columnDefs: [
-            {
-                orderable: false,
-                render: DataTable.render.select(),
-                target: 0,
-            },
-            {
-                target: 2,
-                render: DataTable.render.date("D", languages[0])
-            },
-            {
-                target: 3,
-                render: DataTable.render.date("f", languages[0])
-            },
-        ],
+        columnDefs: columnDefs,
         columns: columnNames.map(columnName => { name: columnName }),
         select: {
             style: "os",

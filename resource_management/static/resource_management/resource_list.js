@@ -11,6 +11,10 @@ window.addEventListener("DOMContentLoaded", () => {
             "date_created",
             "date_updated",
             "actions",
-        ]
+        ],
+        {
+            createdAtColumnIndex: 2,
+            updatedAtColumnIndex: 3,
+        }
     );
 });
