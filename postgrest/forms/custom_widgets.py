@@ -3,6 +3,7 @@ import json
 from django import forms
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
 
 
 class SelectWithDisabledFirstOption(forms.Select):
@@ -34,6 +35,7 @@ class KeyValueWidget(forms.Widget):
     the page loads without anything having to set them up.
     """
 
+    has_feedback_element = True
     ROW = (
         '<li class="list-group-item key-value-row"><div class="d-flex gap-2">'
         '<input type="text" class="form-control" data-kv="key" placeholder="Name" value="{}" aria-label="Name">'
@@ -64,6 +66,7 @@ class KeyValueWidget(forms.Widget):
             '<button type="button" class="btn btn-light add-btn rounded-top-0 w-100">'
             '<i class="bi bi-plus-lg"></i> Add</button>'
             '<input type="hidden" name="{}" id="{}" value="{}">'
+            '{}'
             '</div>',
             field_id,
             rows,
@@ -71,6 +74,10 @@ class KeyValueWidget(forms.Widget):
             name,
             field_id,
             json.dumps(mapping),
+            render_to_string(
+                "editor/field_templates/invalid_feedback.html",
+                {"invalid_feedback_id_prefix": field_id}
+            )
         )
 
     def value_from_datadict(self, data, files, name):
