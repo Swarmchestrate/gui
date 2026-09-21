@@ -1,0 +1,7 @@
+<div class="key-value-field card w-100 field-wrapper{% if widget.required %} required{% endif %}" data-field-id="{{ field_id }}">
+    <ul class="list-group list-group-flush">{{ rows|safe }}</ul>
+    <template>{{ row_template|safe }}</template>
+    <button type="button" class="btn btn-light add-btn rounded-top-0 w-100">
+    <i class="bi bi-plus-lg"></i> Add</button>
+    <input type="hidden" name="{{ name }}" id="{{ field_id }}" value="{{ value }}" {% include "django/forms/widgets/attrs.html" %}>
+</div>
