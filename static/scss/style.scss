@@ -91,6 +91,7 @@ section {
     padding-block: 1rem;
 }
 
+// Prevents layout shift caused by the scrollbar appearing/disappearing.
 .container-xxl {
     position: relative;
     left: calc((100vw - 100%) / 2);
