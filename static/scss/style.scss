@@ -91,6 +91,11 @@ section {
     padding-block: 1rem;
 }
 
+.container-xxl {
+    position: relative;
+    left: calc((100vw - 100%) / 2);
+}
+
 /* Dialog */
 /* Credit: Used this article as reference for dialog implementation:
 https://web.dev/articles/building/a-dialog-component */
