@@ -241,7 +241,10 @@ class NewOneToManyRelationFormView(FormView):
         # The caller asked for JSON and this view has no template to fall back
         # on, so rendering one turns a validation failure into a 500.
         return JsonResponse(
-            {"feedback": form.errors, "message": "The form submitted was not valid."},
+            {
+                "message": "The form submitted was not valid.",
+                "feedback": json.loads(form.errors.as_json()),
+            },
             status=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
@@ -329,7 +332,10 @@ class UpdateOneToManyRelationFormView(FormView):
         # The caller asked for JSON and this view has no template to fall back
         # on, so rendering one turns a validation failure into a 500.
         return JsonResponse(
-            {"feedback": form.errors, "message": "The form submitted was not valid."},
+            {
+                "message": "The form submitted was not valid.",
+                "feedback": json.loads(form.errors.as_json()),
+            },
             status=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
