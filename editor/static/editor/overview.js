@@ -51,4 +51,6 @@ async function loadSubsections() {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadSubsections();
+    const downloadButton = document.querySelector(".download-btn")
+    new bootstrap.Tooltip(downloadButton);
 });

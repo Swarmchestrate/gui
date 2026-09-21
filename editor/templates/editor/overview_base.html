@@ -12,10 +12,12 @@
         <h2 class="mb-0">{{ main_heading }}</h2>
         <a
             href="{% url tosca_template_download_reverse_base resource_id %}?redirect={{ request.path }}"
-            class="btn btn-light"
-            title="Download">
-            <i class="bi bi-download" aria-hidden="true"></i>
-            <span class="visually-hidden">Download</span>
+            class="btn btn-light download-btn rounded-circle ms-2"
+            style="aspect-ratio: 1 / 1;"
+            data-bs-toggle="tooltip"
+            title="Download{% block download_type__button_title %}{% endblock download_type__button_title %}">
+            <i class="bi bi-download lh-1" aria-hidden="true"></i>
+            <span class="visually-hidden">Download{% block download_type__button_text %}{% endblock download_type__button_text %}</span>
         </a>
     </div>
     {% if 'updated_at' in resource %}
