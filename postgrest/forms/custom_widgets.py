@@ -35,7 +35,6 @@ class KeyValueWidget(forms.Widget):
     the page loads without anything having to set them up.
     """
 
-    has_feedback_element = True
     ROW = (
         '<li class="list-group-item key-value-row"><div class="d-flex gap-2">'
         '<input type="text" class="form-control" data-kv="key" placeholder="Name" value="{}" aria-label="Name">'
@@ -60,24 +59,19 @@ class KeyValueWidget(forms.Widget):
         field_id = (attrs or {}).get("id") or f"id_{name}"
         rows = format_html_join("", self.ROW, ((k, v) for k, v in mapping.items()))
         return format_html(
-            '<div class="key-value-field card w-100" data-field-id="{}">'
+            '<div class="key-value-field card w-100 field-wrapper" data-field-id="{}">'
             '<ul class="list-group list-group-flush">{}</ul>'
             '<template>{}</template>'
             '<button type="button" class="btn btn-light add-btn rounded-top-0 w-100">'
             '<i class="bi bi-plus-lg"></i> Add</button>'
             '<input type="hidden" name="{}" id="{}" value="{}">'
-            '{}'
             '</div>',
             field_id,
             rows,
             format_html(self.ROW, "", ""),
             name,
             field_id,
-            json.dumps(mapping),
-            render_to_string(
-                "editor/field_templates/invalid_feedback.html",
-                {"invalid_feedback_id_prefix": field_id}
-            )
+            json.dumps(mapping)
         )
 
     def value_from_datadict(self, data, files, name):

@@ -5,9 +5,23 @@ export class EditorValidator {
         this.formMessagesList = form.querySelector(".form-messages-list") || document.querySelector(`[data-form="${form.getAttribute("id")}"]`);
     }
 
+    getFeedbackElementForField(fieldElement, fieldWrapperElement) {
+        let fieldFeedbackElement = this.form.querySelector(
+            `#${fieldElement.id} ~ .invalid-feedback`,
+        );
+        if (!fieldFeedbackElement && fieldWrapperElement) {
+            fieldFeedbackElement = this.form.querySelector(
+                `.field-wrapper[data-field-id="${fieldElement.id}"] ~ .invalid-feedback`,
+            );
+        }
+        return fieldFeedbackElement;
+    }
+
     setupInlineValidation() {
         this.fields.forEach((field) => {
-            field.addEventListener("input", this.validateField);
+            field.addEventListener("input", (event) => {
+                this.validateField(event);
+            });
         });
     }
 
@@ -17,14 +31,19 @@ export class EditorValidator {
          * validation message, if any.
          */
         const field = event.currentTarget;
+        const fieldWrapper = document.querySelector(`.field-wrapper[data-field-id="${field.id}"]`);
         const isValid = field.checkValidity();
-        const feedback = this.form.querySelector(
-            `#${field.id} ~ .invalid-feedback`,
-        );
+        const feedback = this.getFeedbackElementForField(field, fieldWrapper);
         if (!isValid) {
+            if (fieldWrapper) {
+                fieldWrapper.classList.add("is-invalid");
+            }
             field.classList.add("is-invalid");
             feedback.textContent = field.validationMessage;
             return;
+        }
+        if (fieldWrapper) {
+            fieldWrapper.classList.remove("is-invalid");
         }
         return field.classList.remove("is-invalid");
     }
@@ -58,10 +77,9 @@ export class EditorValidator {
         if (!field) {
             return;
         }
+        const fieldWrapper = document.querySelector(`.field-wrapper[data-field-id="${field.id}"]`);
         const fieldLabel = this.form.querySelector(`label[for="${field.id}"]`);
-        const fieldFeedbackElement = this.form.querySelector(
-            `#${field.id} ~ .invalid-feedback`,
-        );
+        const fieldFeedbackElement = this.getFeedbackElementForField(field, fieldWrapper);
         // Scroll to first field with feedback
         if (scrollIntoView) {
             this.scrollFieldIntoView(field, fieldLabel);
@@ -74,6 +92,9 @@ export class EditorValidator {
             fieldFeedbackList.appendChild(errorItem);
         }
         fieldFeedbackElement.appendChild(fieldFeedbackList);
+        if (fieldWrapper) {
+            fieldWrapper.classList.add("is-invalid");
+        }
         field.classList.add("is-invalid");
     }
 
@@ -112,7 +133,8 @@ export class EditorValidator {
     }
 
     clearFieldValidationMessages(fieldElement) {
-        const invalidFeedbackElement = document.querySelector(`#${fieldElement.id} ~ .invalid-feedback`);
+        const fieldWrapper = document.querySelector(`.field-wrapper[data-field-id="${field.id}"]`);
+        const invalidFeedbackElement = this.getFeedbackElementForField(field, fieldWrapper);
         if (!invalidFeedbackElement) return;
         invalidFeedbackElement.replaceChildren();
     }

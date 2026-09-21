@@ -8,8 +8,6 @@
     </div>
     {{ field }}
     {% include 'editor/field_templates/field_help_text.html' %}
-    {% if not field.field.widget.has_feedback_element %}
     {% include 'editor/field_templates/field_invalid_feedback.html' %}
-    {% endif %}
 </div>
 {% endif %}
