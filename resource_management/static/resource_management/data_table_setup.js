@@ -11,13 +11,21 @@ function initialiseDataTable(tableSelector, columnNames, options) {
             return true;
         };
     }
-    DataTable.datetime("dd/MM/yyyy, HH:mm:ss");
+    const languages = navigator.languages;
     const dataTable = new DataTable(tableSelector, {
         columnDefs: [
             {
                 orderable: false,
                 render: DataTable.render.select(),
                 target: 0,
+            },
+            {
+                target: 2,
+                render: DataTable.render.date("D", languages[0])
+            },
+            {
+                target: 3,
+                render: DataTable.render.date("f", languages[0])
             },
         ],
         columns: columnNames.map(columnName => { name: columnName }),
