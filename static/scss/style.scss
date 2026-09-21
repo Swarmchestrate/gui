@@ -538,6 +538,9 @@ details.error-details {
     .breadcrumb-item:nth-last-child(2) {
         font-size: inherit;
         color: inherit;
+    }
+
+    .breadcrumb-item:nth-last-child(2):not(:first-child) {
         padding-left: var(--bs-breadcrumb-item-padding-x);
     }
 
