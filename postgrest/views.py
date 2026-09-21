@@ -1,3 +1,4 @@
+import json
 import logging
 from http import HTTPStatus
 
@@ -66,7 +67,7 @@ class NewOneToOneRelationFormView(FormView):
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
+        return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -126,7 +127,7 @@ class UpdateOneToOneRelationFormView(FormView):
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
+        return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -166,7 +167,7 @@ class DeleteOneToOneRelationFormView(FormView):
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
+        return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
     def form_valid(self, form):
         resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
@@ -399,7 +400,7 @@ class DeleteOneToManyRelationFormView(FormView):
         if self.request.accepts("text/html"):
             messages.error(self.request, "The form submitted was not valid.")
             return super().form_invalid(form)
-        return JsonResponse({"feedback": form.errors})
+        return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
 
 class GetTableColumnsView(View):
