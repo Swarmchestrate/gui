@@ -3,7 +3,6 @@ import json
 from django import forms
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
-from django.template.loader import render_to_string
 
 
 class SelectWithDisabledFirstOption(forms.Select):
@@ -81,11 +80,13 @@ class CheckboxListWidget(forms.CheckboxSelectMultiple):
     box outside its container and over the neighbouring text.
     """
 
+    template_name = "editor/custom_widgets/checkbox_list_widget.html"
     # Not "checkbox": templates send that to the single-checkbox layout, which
     # puts the label after the box. A list wants its label above, like any field.
     input_type = "checkbox-list"
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
         if value in (None, ""):
             selected = set()
         elif isinstance(value, (list, tuple)):
@@ -105,4 +106,17 @@ class CheckboxListWidget(forms.CheckboxSelectMultiple):
                 for index, (option_value, label) in enumerate(self.choices)
             ),
         )
-        return format_html('<div id="{}" class="d-flex flex-column gap-1">{}</div>', base_id, options)
+        options = [
+            {
+                "value": option_value,
+                "index": index,
+                "checked": str(option_value) in selected,
+                "label": label,
+            }
+            for index, (option_value, label) in enumerate(self.choices)
+        ]
+        context["widget"].update({
+            "base_id": base_id,
+            "options": options,
+        })
+        return context
