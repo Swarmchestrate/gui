@@ -1,5 +1,11 @@
 <div class="key-value-field card w-100 field-wrapper{% if widget.required %} required{% endif %}" data-field-id="{{ field_id }}">
-    <ul class="list-group list-group-flush">{{ rows|safe }}</ul>
+    <ul class="list-group list-group-flush">
+        {% if rows %}
+        {{ rows|safe }}
+        {% else %}
+        {{ row_template|safe }}
+        {% endif %}
+    </ul>
     <template>{{ row_template|safe }}</template>
     <button type="button" class="btn btn-light add-btn rounded-top-0 w-100">
     <i class="bi bi-plus-lg"></i> Add</button>
