@@ -1,4 +1,5 @@
 import logging
+from collections import OrderedDict
 from http import HTTPStatus
 
 from django.http import JsonResponse
@@ -7,10 +8,12 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.view_helpers import get_form_config_for_table
+from editor.view_helpers import EditorTableOfContents, get_form_config_for_table
 from postgrest.api import ApiClient, Resource
+from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from resource_management.forms import ResourceDeletionForm
+from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.helpers import generate_random_string
 from utils.humanise import humanise_resource_type, resource_label
 
@@ -18,7 +21,68 @@ from utils.humanise import humanise_resource_type, resource_label
 logger = logging.getLogger(__name__)
 
 
-class OneToOneFieldPopupSectionView(View):
+class PopupFormCategoriesMixin:
+    def get_fk_table_toc_list_items(self) -> dict:
+        resource_dicts = list(
+            resource.as_dict()
+            for resource in self.column_metadata
+            if resource.as_dict().get("table_name", "") == self.fk_table_name
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
+        return EditorTableOfContents(
+            self.fk_table_name,
+            category_names,
+            is_unknown_category_needed=any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self.form_config.get_fields().values()
+            )
+        ).as_dict()
+
+    def get_form_fields_for_category(self, form_config, category):
+        fields = form_config.get_fields_for_category(category)
+        return fields
+
+    def get_forms_by_category(
+            self,
+            form_config: FormConfig,
+            initial: dict | None = None,
+            id_prefix: str | None = None,
+            id_suffix: str | None = None):
+        if not id_prefix:
+            id_prefix = ""
+        if not id_suffix:
+            id_suffix = ""
+        forms_by_category = dict()
+        for category in form_config.get_field_categories():
+            form_for_category = ForeignKeyFormWithDynamicallyPopulatedFields(
+                fields=self.get_form_fields_for_category(form_config, category),
+                initial=initial,
+                id_prefix=id_prefix,
+                id_suffix=id_suffix
+            )
+            if not category:
+                forms_by_category.update({
+                    UNKNOWN_ATTRIBUTE_CATEGORY: form_for_category,
+                })
+                continue
+            forms_by_category.update({
+                category: form_for_category,
+            })
+        return forms_by_category
+
+
+class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
     table_name: str
 
     def dispatch(self, request, *args, **kwargs):
@@ -32,11 +96,11 @@ class OneToOneFieldPopupSectionView(View):
         self.api_client.initialise_openapi_spec()
         definition = self.api_client.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         self.form_config = get_form_config_for_table(
             self.fk_table_name,
             self.api_client.openapi_spec,
-            column_metadata,
+            self.column_metadata,
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
@@ -74,10 +138,6 @@ class OneToOneFieldPopupSectionView(View):
         return render_to_string(
             "editor/dialogs/new_dialog.html",
             {
-                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
-                    id_prefix=f'new_{self.fk_column_name}'
-                ),
                 "form_id": f"new-form-{generate_random_string()}",
                 "new_resource_url": reverse_lazy(
                     "postgrest:new_one_to_one_relation",
@@ -89,6 +149,11 @@ class OneToOneFieldPopupSectionView(View):
                 ),
                 "dialog_id": f"new-{self.fk_column_name}-dialog",
                 "resource_type": self.fk_table_name,
+                "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(
+                    self.form_config,
+                    id_prefix=f'new_{self.fk_column_name}'
+                ),
             },
             request=self.request
         )
@@ -102,11 +167,6 @@ class OneToOneFieldPopupSectionView(View):
         return render_to_string(
             "editor/dialogs/update_dialog.html",
             {
-                "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
-                    id_suffix=f"{self.fk_column_name}",
-                    initial=initial
-                ),
                 "form_id": f"update-form-{generate_random_string()}",
                 "update_resource_url": reverse_lazy(
                     "postgrest:update_one_to_one_relation",
@@ -119,6 +179,12 @@ class OneToOneFieldPopupSectionView(View):
                 "dialog_id": f"update-{self.fk_column_name}-dialog",
                 "resource_id": fk_resource_id,
                 "resource_type": self.fk_table_name,
+                "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(
+                    self.form_config,
+                    initial=initial,
+                    id_suffix=f"{self.fk_column_name}",
+                ),
             },
             request=self.request
         )
@@ -161,7 +227,7 @@ class OneToOneFieldPopupSectionView(View):
         })
 
 
-class OneToManyFieldPopupSectionView(View):
+class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
     table_name: str
     resource_type: str
 
@@ -182,7 +248,7 @@ class OneToManyFieldPopupSectionView(View):
         self.fk_table_column_name = referring_tables.get(self.fk_table_name)
         if not self.fk_table_column_name:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
+        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         # The row this section hangs off. A view that hides fields by what that
         # row is - an edge capacity's flavours lose the cloud-only fields - reads
         # it through its disabled_properties, so it must be loaded first.
@@ -190,7 +256,7 @@ class OneToManyFieldPopupSectionView(View):
         self.form_config = get_form_config_for_table(
             self.fk_table_name,
             self.api_client.openapi_spec,
-            column_metadata,
+            self.column_metadata,
             infer_one_to_many_properties=True,
             # Some choices depend on the row this one hangs off.
             choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
@@ -254,6 +320,11 @@ class OneToManyFieldPopupSectionView(View):
                 ),
                 "dialog_id": f"new-{self.fk_table_name}-dialog",
                 "resource_type": self.fk_table_name,
+                "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(
+                    self.form_config,
+                    id_prefix=f'new_{self.fk_table_name}'
+                ),
             },
             request=self.request
         )
@@ -274,10 +345,6 @@ class OneToManyFieldPopupSectionView(View):
         return render_to_string(
             "editor/dialogs/update_dialog.html",
             {
-                "form": self.get_update_form(
-                    fk_resource_id,
-                    initial
-                ),
                 "form_id": f"update-form-{generate_random_string()}",
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
@@ -292,6 +359,12 @@ class OneToManyFieldPopupSectionView(View):
                 "dialog_id": f"update-{self.fk_table_name}-{fk_resource_id}-dialog",
                 "dialog_extra_classes": "col-lg-10",
                 "resource_type": self.fk_table_name,
+                "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
+                "forms_by_category": self.get_forms_by_category(
+                    self.form_config,
+                    initial=initial,
+                    id_suffix=f"{self.fk_table_name}_{fk_resource_id}",
+                ),
             },
             request=self.request
         )

@@ -30,7 +30,8 @@ def get_key_value_or_empty_dict(d: dict, key: str):
     try:
         return d[key]
     except KeyError:
-        return dict()
+        pass
+    return dict()
 
 
 @register.filter

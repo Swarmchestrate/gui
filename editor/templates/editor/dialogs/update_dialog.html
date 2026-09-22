@@ -1,4 +1,5 @@
 {% extends 'editor/dialogs/wizard_dialog_base.html' %}
+{% load helpers %}
 {% load humanise_swch %}
 
 {% block dialog_header_content %}
@@ -13,12 +14,13 @@
     method="POST"
     action="{{ update_resource_url }}">
     {% csrf_token %}
-    {% for field in form %}
-    {% if field.field.widget.input_type == 'checkbox' %}
-    {% include 'editor/field_templates/checkbox_field_wrapper.html' %}
+    {% for category, category_data in fk_table_toc_list_items.items %}
+    {% with category_id_base=category.lower|kebab_case form_for_category=forms_by_category|get_key_value_or_empty_dict:category %}
+    {% if form_for_category.fields|length == 0 %}
     {% else %}
-    {% include 'editor/field_templates/field_template.html' %}
+    {% include 'editor/dialogs/dialog_sections/dialog_section_router.html' %}
     {% endif %}
+    {% endwith %}
     {% endfor %}
     <div class="pt-4">
         <button class="btn btn-primary fw-semibold" type="submit">Update</button>
