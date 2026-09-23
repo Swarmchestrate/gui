@@ -76,7 +76,9 @@
                         <td class="align-middle px-3"></td>
                         <td class="align-middle px-3">
                             {% block td_name_content %}
-                            <a href="{% url editor_overview_reverse_base resource_id %}">{% label_for resource.as_dict resource_type resource_id %}</a>
+                            <a
+                                href="{% url editor_overview_reverse_base resource_id %}"
+                                class="link-underline link-underline-opacity-0-hover">{% label_for resource.as_dict resource_type resource_id %}</a>
                             {% endblock td_name_content %}
                         </td>
                         <td class="text-body-secondary align-middle px-3">
