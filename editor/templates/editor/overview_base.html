@@ -30,7 +30,9 @@
 {% endblock top_section %}
 
 {% block toc %}
+{% with in_overview=True %}
 {% include 'editor/toc_links/active_sidebar_toc_links.html' %}
+{% endwith %}
 {% endblock toc %}
 
 {% block main_section %}
