@@ -87,6 +87,7 @@ export class EditorValidator {
         }
         const fieldLabel = this.form.querySelector(`label[for="${field.id}"]`);
         const fieldFeedbackElement = this.getFeedbackElementForField(field);
+        this.clearFieldValidationMessages(field);
         // Scroll to first field with feedback
         if (scrollIntoView) {
             this.scrollFieldIntoView(field, fieldLabel);
