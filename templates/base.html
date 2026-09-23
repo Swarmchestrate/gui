@@ -25,7 +25,7 @@
         <!-- A handy skip link for keyboard users -->
         <a href="#main" class="btn btn-light">Skip to main content</a>
         {% include 'navbar.html' %}
-        <div class="border-top border-bottom">
+        <div class="breadcrumb-wrapper pt-sm-0 pt-3">
             <div class="container-xxl gx-sm-5 gx-4 py-2">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -38,7 +38,7 @@
         </div>
         {% include 'messages.html' %}
         <main id="main">
-            <div class="container-xxl gx-sm-5 gx-4 pt-5">
+            <div class="container-xxl gx-sm-5 gx-4 pt-sm-5 pt-4">
                 {% block content %}{% endblock content %}
             </div>
         </main>

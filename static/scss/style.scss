@@ -530,6 +530,10 @@ details.error-details {
 }
 
 @media (min-width: 576px) {
+    .breadcrumb-wrapper {
+        border-bottom: var(--bs-border-width) var(--bs-border-color) var(--bs-border-style);
+    }
+
     .breadcrumb-item:not(:nth-last-child(2)) {
         display: inline;
     }
