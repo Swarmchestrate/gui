@@ -1,4 +1,6 @@
-<div id="{{ widget.base_id }}" class="d-flex flex-column gap-1 field-wrapper{% if widget.required %} required{% endif %}">
+<div
+    id="{{ widget.base_id }}"
+    class="d-flex flex-column gap-1 field-wrapper{% if widget.required %} required{% endif %}">
     {% for option in widget.options %}
     <div class="form-check">
         <input
