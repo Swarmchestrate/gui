@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Server Error</h1>
+<p class="lead">
+    Something went wrong.
+</p>
+<p>
+    If the problem has been happening for a while, please
+    <a
+        href="https://github.com/Swarmchestrate/gui/issues"
+        class="link-underline link-underline-opacity-0-hover">let us know</a>.
+</p>
+<p>In case this is a one-off, refreshing the page might help.</p>
+<p><a href="{% url 'index' %}" class="link-underline link-underline-opacity-0-hover">Back to home page</a></p>
+{% endblock content %}

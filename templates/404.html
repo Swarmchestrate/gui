@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+Page not found
+{% endblock title %}
+{% block content %}
+<h1>Page not found</h1>
+<p class="lead">The page you requested could not be found.</p>
+<p>
+    If you feel something is missing that should be here, please
+    <a href="https://github.com/Swarmchestrate/gui/issues" class="link-underline link-underline-opacity-0-hover">let us know</a>.
+</p>
+<p>
+    <a
+        href="{% url 'index' %}"
+        class="link-underline link-underline-opacity-0-hover">Back to home page</a>
+</p>
+{% endblock content %}
