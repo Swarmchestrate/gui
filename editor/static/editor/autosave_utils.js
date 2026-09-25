@@ -16,7 +16,7 @@ export class StatusIndicator {
     constructor(statusIndicatorElement) {
         this.statusIndicatorElement = statusIndicatorElement;
         this.defaultInnerHtml = statusIndicatorElement.innerHTML;
-        this.loadingHtml = '<span class="spinner-border spinner-border-sm text-body-tertiary" role="status"></span>';
+        this.loadingHtml = '<span class="spinner-border spinner-border-sm border-1 text-body-tertiary" role="status"></span>';
         this.successHtml = '<i class="bi bi-check2 text-success" aria-hidden="true"></i>';
         this.errorHtml = '<i class="bi bi-x-lg text-danger" aria-hidden="true"></i>';
     }

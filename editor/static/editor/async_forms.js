@@ -5,7 +5,7 @@ class AsyncFormSubmissionStatusButton {
         this.statusButton = statusButton;
         this.defaultInnerHtml = statusButton.innerHTML;
         this.successText = "Saved Changes";
-        this.loadingHtml = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Applying Changes`;
+        this.loadingHtml = `<span class="spinner-border spinner-border-sm border-1 me-1" role="status"></span> Applying Changes`;
     }
 
     showLoadingState() {
