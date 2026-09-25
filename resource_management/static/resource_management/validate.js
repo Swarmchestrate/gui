@@ -10,7 +10,7 @@ document.addEventListener("submit", (event) => {
     }
     button.disabled = true;
     const spinner = document.createElement("span");
-    spinner.classList.add("spinner-border", "spinner-border-sm");
+    spinner.classList.add("spinner-border", "spinner-border-sm", "border-1");
     spinner.setAttribute("aria-hidden", "true");
     button.replaceChildren(spinner);
     const label = document.createElement("span");
