@@ -13,7 +13,7 @@ import logging
 
 from postgrest.api import ApiClient
 from postgrest.table_names import TableNames
-from resource_management.tosca import generate_sat
+from resource_management.tosca import TemplateRequest, without_validation_bookkeeping
 
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def build_application_payload(application_id: int) -> dict:
     api_client.initialise_openapi_spec()
 
     application_endpoint = api_client.get_endpoint(TableNames.APPLICATION_NEW)
-    application = application_endpoint.get(application_id).as_dict()
+    application = without_validation_bookkeeping(application_endpoint.get(application_id).as_dict())
 
     payload = {TableNames.APPLICATION_NEW.value: application}
 
@@ -114,11 +114,16 @@ def _rows_for_microservices(
     return rows
 
 
-def generate_adt_yaml(application_id: int) -> str:
-    """Build the Application Description Template for an application."""
+def application_template_request(application_id: int) -> TemplateRequest:
+    """What SAT Builder is sent to build an application's SAT."""
     payload = build_application_payload(application_id)
     params = {
         "node_types": [MICROSERVICE_NODE_TYPE],
         "response_type": "yaml",
     }
-    return generate_sat(payload, params, "application/build")
+    return TemplateRequest(payload, params, "application/build")
+
+
+def generate_adt_yaml(application_id: int) -> str:
+    """Build the Application Description Template for an application."""
+    return application_template_request(application_id).generate()

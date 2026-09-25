@@ -7,7 +7,7 @@ change here, as long as its column is in one of the tables below.
 """
 from postgrest.api import ApiClient
 from postgrest.table_names import TableNames
-from resource_management.tosca import generate_sat
+from resource_management.tosca import TemplateRequest, without_validation_bookkeeping
 
 
 # Child tables holding one row per instance flavour, or several rows per
@@ -43,7 +43,7 @@ def build_capacity_payload(capacity_id: int) -> dict:
     api_client.initialise_openapi_spec()
 
     capacity_endpoint = api_client.get_endpoint(TableNames.CAPACITY_NEW)
-    capacity = capacity_endpoint.get(capacity_id).as_dict()
+    capacity = without_validation_bookkeeping(capacity_endpoint.get(capacity_id).as_dict())
 
     payload = {TableNames.CAPACITY_NEW.value: capacity}
 
@@ -88,11 +88,16 @@ def node_types_for(capacity: dict) -> list[str]:
     )
 
 
-def generate_cdt_yaml(capacity_id: int) -> str:
-    """Build the Capacity Description Template for a capacity."""
+def capacity_template_request(capacity_id: int) -> TemplateRequest:
+    """What SAT Builder is sent to build a capacity's CDT."""
     payload = build_capacity_payload(capacity_id)
     params = {
         "node_types": node_types_for(payload[TableNames.CAPACITY_NEW.value]),
         "response_type": "yaml",
     }
-    return generate_sat(payload, params, "capacity/build")
+    return TemplateRequest(payload, params, "capacity/build")
+
+
+def generate_cdt_yaml(capacity_id: int) -> str:
+    """Build the Capacity Description Template for a capacity."""
+    return capacity_template_request(capacity_id).generate()
