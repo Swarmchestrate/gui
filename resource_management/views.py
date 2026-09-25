@@ -3,11 +3,15 @@ import logging
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.urls.base import reverse_lazy
+from django.urls.base import reverse, reverse_lazy
+from django.utils.html import format_html, format_html_join
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, TemplateView, View
 from django.views.generic.base import ContextMixin
 
 from .exceptions import NameMissingException, SatBuilderException
+from .tosca import TemplateRequest
+from .validation import record_validation, validated_fingerprint
 from .forms import (
     CategoryOrderForm,
     ColumnMetadataDeletionForm,
@@ -29,11 +33,16 @@ from postgrest.table_names import TableNames
 from utils.humanise import (
     humanise_resource_type,
     humanise_resource_type_plural,
+    resource_label,
 )
 from postgrest.api import ApiClient, Resource
 
 
 logger = logging.getLogger(__name__)
+
+# Enough to act on; the rest will show once these are fixed. Messages travel in
+# a cookie, which has little room.
+MAX_PROBLEMS_SHOWN = 10
 
 
 # Create your views here.
@@ -61,6 +70,8 @@ class ResourceListFormView(TemplateView):
     editor_reverse_base: str
     editor_overview_reverse_base: str
     tosca_template_download_reverse_base: str
+    tosca_template_validate_reverse_base: str
+    template_kind: str
 
     def get_resource_list(self):
         api_client = ApiClient()
@@ -101,6 +112,12 @@ class ResourceListFormView(TemplateView):
             "editor_reverse_base": self.editor_reverse_base,
             "editor_overview_reverse_base": self.editor_overview_reverse_base,
             "tosca_template_download_reverse_base": self.tosca_template_download_reverse_base,
+            "tosca_template_validate_reverse_base": self.tosca_template_validate_reverse_base,
+            "template_kind": self.template_kind,
+            "validated_resource_ids": {
+                str(resource.pk) for resource in self.resource_list
+                if validated_fingerprint(resource.as_dict())
+            },
             "resource_type": self.resource_type,
         })
         return context
@@ -185,15 +202,17 @@ class MultiResourceDeletionFormView(FormView):
         return super().form_valid(form)
 
 
-class ToscaTemplateDownloadView(View):
+class ToscaTemplateViewMixin:
     resource_id: int
     table_name: str
     resource_type: str
     resource_list_reverse: str
-    
-    def generate_sat_yaml(self) -> str:
+    # "CDT" or "SAT", as users know the template this resource produces.
+    template_kind: str
+
+    def template_request(self) -> TemplateRequest:
         # Overridden in view subclasses
-        pass
+        raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = kwargs["resource_id"]
@@ -201,22 +220,117 @@ class ToscaTemplateDownloadView(View):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        redirect_url = request.GET.get("redirect") or self.resource_list_reverse
+    def redirect_url(self) -> str:
+        # Only back to a page of this site, so the link cannot send anyone
+        # elsewhere.
+        url = self.request.GET.get("redirect")
+        if url and url_has_allowed_host_and_scheme(
+                url,
+                allowed_hosts={self.request.get_host()},
+                require_https=self.request.is_secure()):
+            return url
+        return reverse(self.resource_list_reverse)
+
+    def validated_fingerprint(self) -> str | None:
+        api_client = ApiClient()
+        api_client.initialise_openapi_spec()
+        resource = api_client.get_endpoint(self.table_name).get(self.resource_id)
+        return validated_fingerprint(resource.as_dict() if resource else None)
+
+
+class ToscaTemplateValidateView(ToscaTemplateViewMixin, View):
+    """Build the template as a download would, but only to see if it is valid."""
+    http_method_names = ["post"]
+    # Recording the result writes to the record; that is not an edit.
+    keeps_template_validation = True
+
+    def post(self, request, *args, **kwargs):
+        redirect_url = self.redirect_url()
+        # Named, because a list page validates any of its rows.
+        name = f"This {humanise_resource_type(self.resource_type)}"
+        fingerprint = None
         try:
-            sat_yaml = self.generate_sat_yaml()
+            template = self.template_request()
+            name = resource_label(
+                template.payload.get(str(self.table_name)), self.resource_type, self.resource_id
+            )
+            template.generate()
+            fingerprint = template.fingerprint()
+        except SatBuilderException as err:
+            logger.info("Validation failed: %s", err)
+            messages.error(request, format_html(
+                "{} is not valid yet. Fix the following, then validate again."
+                "<ul class=\"mb-0 mt-2\">{}</ul>",
+                name,
+                format_html_join("", "<li>{}</li>", ((p,) for p in _shown(err.problems or [str(err)]))),
+            ))
+        except (NameMissingException, ValueError) as err:
+            logger.info("Validation failed: %s", err)
+            # Messages are shown as HTML, and this one can quote what a user typed.
+            messages.error(request, format_html("{}", str(err)))
+        except Exception:
+            error_msg = f"Encountered an error whilst validating the {self.template_kind}."
+            logger.exception(error_msg)
+            messages.error(request, error_msg)
+
+        # A failure clears any earlier success: the data it was for is gone.
+        try:
+            record_validation(self.table_name, self.resource_id, fingerprint)
+        except Exception:
+            logger.exception("Could not record the validation")
+            messages.error(request, "Could not record the result of validating. Please try again.")
+            return redirect(redirect_url)
+        if fingerprint:
+            messages.success(request, format_html(
+                "{} is valid. You can now download its {}.", name, self.template_kind,
+            ))
+        return redirect(redirect_url)
+
+
+def _shown(problems: list[str]) -> list[str]:
+    if len(problems) <= MAX_PROBLEMS_SHOWN:
+        return problems
+    hidden = len(problems) - MAX_PROBLEMS_SHOWN
+    return [*problems[:MAX_PROBLEMS_SHOWN], f"...and {hidden} more."]
+
+
+class ToscaTemplateDownloadView(ToscaTemplateViewMixin, View):
+    def get(self, request, *args, **kwargs):
+        redirect_url = self.redirect_url()
+        humanised = humanise_resource_type(self.resource_type)
+        try:
+            expected = self.validated_fingerprint()
+            if not expected:
+                messages.warning(
+                    request,
+                    f"Validate this {humanised} before downloading its {self.template_kind}.",
+                )
+                return redirect(redirect_url)
+            template = self.template_request()
+            # An edit outside the GUI would not have cleared the validation,
+            # so the data is checked against what was validated.
+            if template.fingerprint() != expected:
+                record_validation(self.table_name, self.resource_id, None)
+                messages.warning(
+                    request,
+                    f"This {humanised} has changed since it was validated. "
+                    f"Validate it again before downloading its {self.template_kind}.",
+                )
+                return redirect(redirect_url)
+            sat_yaml = template.generate()
             response = HttpResponse(
                 sat_yaml,
                 content_type="application/yaml"
             )
             response["Content-Disposition"] = f"inline; filename={self.resource_type}_{self.resource_id}.yaml"
         except (NameMissingException, SatBuilderException, ValueError) as err:
-            # These carry a message naming what the wizard still needs.
+            # These carry a message naming what the wizard still needs, which can
+            # quote what a user typed; messages are shown as HTML.
             logger.exception(str(err))
-            messages.error(request, str(err))
+            messages.error(request, format_html("{}", str(err)))
             return redirect(redirect_url)
         except Exception:
-            error_msg = "Encountered an error whilst generating the SAT."
+            error_msg = f"Encountered an error whilst generating the {self.template_kind}."
             logger.exception(error_msg)
             messages.error(request, error_msg)
             return redirect(redirect_url)

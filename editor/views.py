@@ -22,6 +22,7 @@ from postgrest.api import (
     Resource,
 )
 from postgrest.table_names import TableNames
+from resource_management.validation import validated_fingerprint
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_resource_type, resource_label
 
@@ -475,6 +476,8 @@ class EditorOverviewTemplateView(TemplateView):
 
     editor_reverse_base: str
     tosca_template_download_reverse_base: str
+    tosca_template_validate_reverse_base: str
+    template_kind: str
     resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
@@ -570,5 +573,8 @@ class EditorOverviewTemplateView(TemplateView):
             "one_to_one_field_subsection_reverse_base": self.one_to_one_field_subsection_reverse_base,
             "one_to_many_field_subsection_reverse_base": self.one_to_many_field_subsection_reverse_base,
             "tosca_template_download_reverse_base": self.tosca_template_download_reverse_base,
+            "tosca_template_validate_reverse_base": self.tosca_template_validate_reverse_base,
+            "template_kind": self.template_kind,
+            "template_validated": bool(validated_fingerprint(self.resource.as_dict())),
         })
         return context

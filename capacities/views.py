@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 
-from .tosca import generate_cdt_yaml
+from .tosca import capacity_template_request
 from .view_helpers import (
     CapacityIdFieldMixin,
     CapacitySubtypeFieldsMixin,
@@ -22,6 +22,7 @@ from resource_management.views import (
     ResourceDeletionFormView,
     ResourceListFormView,
     ToscaTemplateDownloadView,
+    ToscaTemplateValidateView,
 )
 
 
@@ -121,8 +122,17 @@ class CloudCapacityDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.CAPACITY_NEW
 
-    def generate_sat_yaml(self):
-        return generate_cdt_yaml(self.resource_id)
+    def template_request(self):
+        return capacity_template_request(self.resource_id)
+
+
+class CloudCapacityDescriptionTemplateValidateView(
+        CloudCapacityViewMixin,
+        ToscaTemplateValidateView):
+    table_name = TableNames.CAPACITY_NEW
+
+    def template_request(self):
+        return capacity_template_request(self.resource_id)
 
 
 # Edge Capacity views (EC)
@@ -207,5 +217,14 @@ class EdgeCapacityDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.CAPACITY_NEW
 
-    def generate_sat_yaml(self):
-        return generate_cdt_yaml(self.resource_id)
+    def template_request(self):
+        return capacity_template_request(self.resource_id)
+
+
+class EdgeCapacityDescriptionTemplateValidateView(
+        EdgeCapacityViewMixin,
+        ToscaTemplateValidateView):
+    table_name = TableNames.CAPACITY_NEW
+
+    def template_request(self):
+        return capacity_template_request(self.resource_id)

@@ -100,4 +100,9 @@ urlpatterns = [
         views.ApplicationDescriptionTemplateDownloadView.as_view(),
         name="adt_download",
     ),
+    path(
+        "applications/<resource_id>/validate/",
+        views.ApplicationDescriptionTemplateValidateView.as_view(),
+        name="adt_validate",
+    ),
 ]

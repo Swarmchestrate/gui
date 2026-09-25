@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import View
 
-from .tosca import generate_adt_yaml
+from .tosca import application_template_request
 
 from editor.foreign_key_field_views import (
     OneToManyFieldSectionView,
@@ -31,6 +31,7 @@ from resource_management.views import (
     ResourceDeletionFormView,
     ResourceListFormView,
     ToscaTemplateDownloadView,
+    ToscaTemplateValidateView,
 )
 
 
@@ -47,6 +48,8 @@ class ApplicationViewMixin:
     resource_deletion_reverse = "applications:delete_application"
     multi_resource_deletion_reverse = "applications:delete_applications"
     tosca_template_download_reverse_base = "applications:adt_download"
+    tosca_template_validate_reverse_base = "applications:adt_validate"
+    template_kind = "SAT"
     resource_type = "application"
 
 
@@ -139,8 +142,17 @@ class ApplicationDescriptionTemplateDownloadView(
         ToscaTemplateDownloadView):
     table_name = TableNames.APPLICATION_NEW
 
-    def generate_sat_yaml(self):
-        return generate_adt_yaml(self.resource_id)
+    def template_request(self):
+        return application_template_request(self.resource_id)
+
+
+class ApplicationDescriptionTemplateValidateView(
+        ApplicationViewMixin,
+        ToscaTemplateValidateView):
+    table_name = TableNames.APPLICATION_NEW
+
+    def template_request(self):
+        return application_template_request(self.resource_id)
 
 
 class ApplicationOneToOneFieldSectionView(ApplicationViewMixin, OneToOneFieldSectionView):

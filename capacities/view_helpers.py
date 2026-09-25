@@ -169,6 +169,8 @@ class CloudCapacityViewMixin:
     resource_deletion_reverse = "capacities:delete_cloud_capacity"
     multi_resource_deletion_reverse = "capacities:delete_cloud_capacities"
     tosca_template_download_reverse_base = "capacities:cloud_cdt_download"
+    tosca_template_validate_reverse_base = "capacities:cloud_cdt_validate"
+    template_kind = "CDT"
     resource_type = "cloud_capacity"
 
 
@@ -186,4 +188,6 @@ class EdgeCapacityViewMixin:
     resource_deletion_reverse = "capacities:delete_edge_capacity"
     multi_resource_deletion_reverse = "capacities:delete_edge_capacities"
     tosca_template_download_reverse_base = "capacities:edge_cdt_download"
+    tosca_template_validate_reverse_base = "capacities:edge_cdt_validate"
+    template_kind = "CDT"
     resource_type = "edge_capacity"

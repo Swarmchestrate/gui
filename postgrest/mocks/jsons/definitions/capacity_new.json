@@ -145,6 +145,10 @@
                 "type": "string"
             },
             "type": "array"
+        },
+        "validated_fingerprint": {
+            "format": "text",
+            "type": "string"
         }
     },
     "type": "object"

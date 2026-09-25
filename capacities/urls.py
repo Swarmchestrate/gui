@@ -97,6 +97,11 @@ urlpatterns = [
         name="cloud_cdt_download",
     ),
     path(
+        "cloud-capacities/<resource_id>/validate/",
+        views.CloudCapacityDescriptionTemplateValidateView.as_view(),
+        name="cloud_cdt_validate",
+    ),
+    path(
         "edge-capacities/",
         views.EdgeCapacityListFormView.as_view(),
         name="edge_capacity_list",
@@ -185,5 +190,10 @@ urlpatterns = [
         "edge-capacities/<resource_id>/download/",
         views.EdgeCapacityDescriptionTemplateDownloadView.as_view(),
         name="edge_cdt_download",
+    ),
+    path(
+        "edge-capacities/<resource_id>/validate/",
+        views.EdgeCapacityDescriptionTemplateValidateView.as_view(),
+        name="edge_cdt_validate",
     ),
 ]

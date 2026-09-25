@@ -65,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "resource_management.validation.ClearValidationOnEditMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 

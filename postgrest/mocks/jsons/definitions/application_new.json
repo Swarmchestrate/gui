@@ -97,6 +97,10 @@
             "default": "now()",
             "format": "timestamp without time zone",
             "type": "string"
+        },
+        "validated_fingerprint": {
+            "format": "text",
+            "type": "string"
         }
     },
     "type": "object"

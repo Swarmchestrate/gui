@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.2/build/global/luxon.min.js"></script>
 <script src="{% static 'DataTables/datatables.min.js' %}"></script>
 <script src="{% static 'resource_management/resource_list.js' %}" type="module"></script>
+<script src="{% static 'resource_management/validate.js' %}" type="module"></script>
 {% block extra_scripts %}
 {% endblock extra_scripts %}
 {% endblock scripts %}
@@ -118,15 +119,49 @@
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </li>
+                                {# A template can only be downloaded once its current data has been validated. #}
+                                {% if resource_id|stringformat:'s' in validated_resource_ids %}
+                                <li>
+                                    <button
+                                        type="button"
+                                        class="btn btn-success"
+                                        aria-label="Validated"
+                                        title="Validated"
+                                        disabled>
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </li>
                                 <li>
                                     <a
                                         href="{% url tosca_template_download_reverse_base resource_id %}"
                                         class="btn btn-light"
-                                        aria-label="Download"
-                                        title="Download">
+                                        aria-label="Download {{ template_kind }}"
+                                        title="Download {{ template_kind }}">
                                         <i class="bi bi-download"></i>
                                     </a>
                                 </li>
+                                {% else %}
+                                <li>
+                                    <button
+                                        type="submit"
+                                        form="validate-{{ resource_id }}-form"
+                                        class="btn btn-light"
+                                        aria-label="Validate"
+                                        title="Validate">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <span class="d-inline-block" tabindex="0" title="Validate before downloading the {{ template_kind }}">
+                                        <span
+                                            class="btn btn-light disabled"
+                                            aria-disabled="true"
+                                            aria-label="Download {{ template_kind }}, after validating">
+                                            <i class="bi bi-download"></i>
+                                        </span>
+                                    </span>
+                                </li>
+                                {% endif %}
                             </ul>
                         </td>
                     </tr>
@@ -153,6 +188,18 @@
 {% with dialog_id='delete-multiple-dialog' %}
 {% include 'resource_management/dialogs/delete_multiple_dialog.html' %}
 {% endwith %}
+{# Outside the table: the rows are already inside the deletion form, and forms cannot nest. #}
+<div hidden>
+    {% for resource_id in resources %}
+    <form
+        id="validate-{{ resource_id }}-form"
+        class="validate-form"
+        method="POST"
+        action="{% url tosca_template_validate_reverse_base resource_id %}">
+        {% csrf_token %}
+    </form>
+    {% endfor %}
+</div>
 <div id="extra-dialogs">
     {% block extra_dialogs %}
     {% endblock extra_dialogs %}

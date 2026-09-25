@@ -267,6 +267,10 @@ class FormConfig:
         "created_at",
         "updated_at",
     ]
+    # Set by validating a capacity or application, never by a user.
+    PROPERTIES_SET_BY_VALIDATION = [
+        "validated_fingerprint",
+    ]
     PROPERTIES_SET_THROUGH_URL = [
         TableNames.APPLICATION,
         TableNames.APPLICATION_NEW,
@@ -297,6 +301,7 @@ class FormConfig:
         # wizard is received by another view).
         return [
             *self.PROPERTIES_SET_AT_SAVE_TIME,
+            *self.PROPERTIES_SET_BY_VALIDATION,
             *self.PROPERTIES_SET_THROUGH_URL,
             *self._additional_disabled_properties,
         ]
