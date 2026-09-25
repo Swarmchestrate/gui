@@ -96,15 +96,16 @@
                             -
                             {% endif %}
                         </td>
-                        <td class="align-middle text-center px-3">
+                        <td class="align-middle text-end px-3">
                             <ul class="d-inline-flex column-gap-2 list-unstyled my-auto">
                                 <li>
                                     {% block edit_button %}
                                     <a
                                         href="{% url editor_reverse_base resource_id %}"
                                         class="btn btn-light edit-btn"
-                                        aria-label="Edit"
-                                        title="Edit">
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Edit">
+                                        <span class="visually-hidden">Edit</span>
                                         <i class="bi bi-pencil-fill"></i>
                                     </a>
                                     {% endblock edit_button %}
@@ -114,29 +115,36 @@
                                         class="btn btn-light delete-btn"
                                         data-dialog-id="delete-{{ resource_id }}-dialog"
                                         type="button"
-                                        aria-label="Delete"
-                                        title="Delete">
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Delete">
+                                        <span class="visually-hidden">Delete</span>
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </li>
                                 {# A template can only be downloaded once its current data has been validated. #}
                                 {% if resource_id|stringformat:'s' in validated_resource_ids %}
                                 <li>
-                                    <button
-                                        type="button"
-                                        class="btn btn-success"
-                                        aria-label="Validated"
-                                        title="Validated"
-                                        disabled>
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
+                                    <span
+                                        class="d-inline-block"
+                                        tabindex="0"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Validated">
+                                        <button
+                                            type="button"
+                                            class="btn btn-success"
+                                            disabled>
+                                            <span class="visually-hidden">Validated</span>
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </span>
                                 </li>
                                 <li>
                                     <a
                                         href="{% url tosca_template_download_reverse_base resource_id %}"
                                         class="btn btn-light"
-                                        aria-label="Download {{ template_kind }}"
-                                        title="Download {{ template_kind }}">
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Download {{ template_kind }}">
+                                        <span class="visually-hidden">Download {{ template_kind }}</span>
                                         <i class="bi bi-download"></i>
                                     </a>
                                 </li>
@@ -146,17 +154,20 @@
                                         type="submit"
                                         form="validate-{{ resource_id }}-form"
                                         class="btn btn-light"
-                                        aria-label="Validate"
-                                        title="Validate">
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Validate">
+                                        <span class="visually-hidden">Validate</span>
                                         <i class="bi bi-check2-circle"></i>
                                     </button>
                                 </li>
                                 <li>
-                                    <span class="d-inline-block" tabindex="0" title="Validate before downloading the {{ template_kind }}">
-                                        <span
-                                            class="btn btn-light disabled"
-                                            aria-disabled="true"
-                                            aria-label="Download {{ template_kind }}, after validating">
+                                    <span
+                                        class="d-inline-block"
+                                        tabindex="0"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Validate before downloading the {{ template_kind }}">
+                                        <span class="btn btn-light disabled">
+                                            <span class="visually-hidden">Download {{ template_kind }}, after validating</span>
                                             <i class="bi bi-download"></i>
                                         </span>
                                     </span>

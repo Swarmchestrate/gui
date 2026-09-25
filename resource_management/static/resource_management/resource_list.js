@@ -17,4 +17,7 @@ window.addEventListener("DOMContentLoaded", () => {
             updatedAtColumnIndex: 3,
         }
     );
+    document.querySelectorAll("[data-bs-toggle='tooltip']").forEach(
+        (tooltipTriggerElement) => new bootstrap.Tooltip(tooltipTriggerElement)
+    );
 });
