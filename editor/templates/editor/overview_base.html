@@ -34,7 +34,7 @@
             class="d-inline-block"
             {% if not template_validated %}tabindex="0"{% endif %}
             data-bs-toggle="tooltip"
-            title="{% if template_validated %}Download{% block download_type__button_title %}{% endblock download_type__button_title %}{% else %}Validate before downloading the {{ template_kind }}{% endif %}">
+            title="{% if template_validated %}Download{% block download_type__button_title %}{% endblock download_type__button_title %}{% else %}Validate before downloading this {{ template_kind }}{% endif %}">
             <a
                 {% if template_validated %}href="{% url tosca_template_download_reverse_base resource_id %}?redirect={{ request.path }}"{% else %}aria-disabled="true"{% endif %}
                 class="btn btn-light download-btn rounded-circle{% if not template_validated %} disabled{% endif %}"
