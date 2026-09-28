@@ -20,7 +20,8 @@ class EditorTableOfContents:
         self.category_names = [
             category_name
             for category_name in category_names
-            if not len(category_name.strip()) == 0
+            if (category_name is not None
+                and not len(category_name.strip()) == 0)
         ]
         self.is_unknown_category_needed = is_unknown_category_needed
 
