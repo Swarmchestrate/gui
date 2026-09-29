@@ -384,8 +384,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         form_config = get_form_config_for_table(
             form_config_table_name,
             self.openapi_spec,
-            self.column_metadata,
-            column_metadata_table_name=column_metadata_table_name
+            self.column_metadata
         )
         return sorted(
             list(form_config.get_fields(
@@ -426,11 +425,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
             ]
         )
         form_config_table_name = self.column_metadata_table_name
-        if self.column_metadata_table_name == TableNames.APPLICATION_NEW:
-            self.column_metadata_table_name = TableNames.APPLICATION
-        elif self.column_metadata_table_name == TableNames.CAPACITY_NEW:
-            self.column_metadata_table_name = TableNames.CAPACITY
-        elif self.column_metadata_table_name == TableNames.APPLICATION:
+        if self.column_metadata_table_name == TableNames.APPLICATION:
             # Column metadata table name should be "APPLICATION"
             # but the wizard fields should come from "APPLICATION_NEW".
             form_config_table_name = TableNames.APPLICATION_NEW

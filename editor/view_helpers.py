@@ -6,6 +6,7 @@ from postgrest.forms.form_config import (
 )
 from postgrest.api import OpenApiSpecification, Resource
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from utils.helpers import get_column_metadata_table_name_for_table
 from .field_choices import choices_for
 from .field_widgets import widget_for
 
@@ -178,13 +179,11 @@ def get_form_config_for_table(
         openapi_spec: OpenApiSpecification,
         column_metadata_as_list: list[Resource],
         infer_one_to_many_properties: bool = True,
-        column_metadata_table_name: str = None,
         disabled_properties: list[str] = None,
         choices_context: dict = None) -> FormConfig:
-    if not column_metadata_table_name:
-        column_metadata_table_name = table_name
     if not disabled_properties:
         disabled_properties = list()
+    column_metadata_table_name = get_column_metadata_table_name_for_table(table_name)
     column_metadata = ColumnMetadata(column_metadata_as_list)
     properties = Properties(
         table_name,

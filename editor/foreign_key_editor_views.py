@@ -11,6 +11,7 @@ from postgrest.api import ApiClient
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from utils.helpers import get_column_metadata_table_name_for_table
 from utils.humanise import humanise_resource_type, resource_label
 
 
@@ -43,7 +44,7 @@ class ForeignKeyEditorView(FormView):
         resource_dicts = list(
             resource.as_dict()
             for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         )
         DEFAULT_ORDER_NUMBER = 999999
@@ -135,8 +136,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
         if self.fk_resource is None or self.fk_resource.as_dict() is None:
             raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -145,7 +144,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
             self.table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
@@ -155,7 +153,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
@@ -196,7 +193,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=self.disabled_properties
         )
         kwargs.update({
@@ -255,8 +251,6 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -265,7 +259,6 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
             self.table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         self.category = self.form_config.get_fields().get(
@@ -275,7 +268,6 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=self.disabled_properties
         )
         return super().dispatch(request, *args, **kwargs)
@@ -418,8 +410,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
         if self.fk_resource is None or self.fk_resource.as_dict() is None:
             raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -428,7 +418,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
             self.table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -441,7 +430,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -491,7 +479,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *foreign_key_properties,
@@ -555,8 +542,6 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
@@ -565,7 +550,6 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
             self.table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,
@@ -578,7 +562,6 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
             self.fk_table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.fk_table_name,
             disabled_properties=[
                 TableNames.APPLICATION_MICROSERVICE,
                 *self.disabled_properties,

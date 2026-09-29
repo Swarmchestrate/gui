@@ -702,13 +702,10 @@ class OneToOneFieldOverviewSubsectionView(TemplateView):
         # Get the titles for the FK table column names so the properties (and their values)
         # can be listed out in a more readable way in the overview page.
         column_metadata = api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         fk_table_form_config = get_form_config_for_table(
             self.fk_table_name,
             api_client.openapi_spec,
             column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             infer_one_to_many_properties=False
         )
         self.properties_as_dict = fk_table_form_config.get_properties()

@@ -24,6 +24,7 @@ from postgrest.api import (
 from postgrest.table_names import TableNames
 from resource_management.validation import validated_fingerprint
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
+from utils.helpers import get_column_metadata_table_name_for_table
 from utils.humanise import humanise_resource_type, resource_label
 
 
@@ -51,8 +52,6 @@ class EditorView(TemplateView):
         self.resource_id = self.kwargs["resource_id"]
         self.category = request.GET.get("category")
         
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
@@ -72,7 +71,6 @@ class EditorView(TemplateView):
             self.table_name,
             self.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
@@ -86,7 +84,7 @@ class EditorView(TemplateView):
         resource_dicts = list(
             resource.as_dict()
             for resource in column_metadata
-            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         )
         DEFAULT_ORDER_NUMBER = 999999
@@ -178,8 +176,6 @@ class UpdateResourceByCategoryView(FormView):
         self.category = self.request.GET.get("category")
         if not self.category:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
@@ -242,7 +238,6 @@ class UpdateResourceByCategoryView(FormView):
             self.openapi_spec,
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
@@ -271,8 +266,6 @@ class EditorAutosaveView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         self.api_client = ApiClient()
         self.api_client.initialise_openapi_spec()
         self.openapi_spec = self.api_client.openapi_spec
@@ -351,7 +344,6 @@ class EditorAutosaveView(FormView):
             self.openapi_spec,
             column_metadata_endpoint.get_resources(),
             infer_one_to_many_properties=False,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         submitted_form = dict(self.request.POST)
@@ -396,8 +388,7 @@ class EditorStartFormView(FormView):
         self.form_config = get_form_config_for_table(
             self.table_name,
             self.openapi_spec,
-            self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
+            self.column_metadata
         )
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
@@ -424,12 +415,10 @@ class EditorStartFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         resource_dicts = list(
             resource.as_dict()
             for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         )
         DEFAULT_ORDER_NUMBER = 999999
@@ -489,15 +478,12 @@ class EditorOverviewTemplateView(TemplateView):
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
         self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "column_metadata_table_name"):
-            self.column_metadata_table_name = self.table_name
         if not hasattr(self, "disabled_properties"):
             self.disabled_properties = list()
         form_config = get_form_config_for_table(
             self.table_name,
             self.api_client.openapi_spec,
             self.column_metadata,
-            column_metadata_table_name=self.column_metadata_table_name,
             disabled_properties=self.disabled_properties
         )
         self.properties_as_dict = form_config.get_properties()
@@ -510,7 +496,7 @@ class EditorOverviewTemplateView(TemplateView):
         resource_dicts = list(
             resource.as_dict()
             for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == self.column_metadata_table_name
+            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
                 and resource.as_dict().get("column_name", "") not in self.disabled_properties)
         )
         DEFAULT_ORDER_NUMBER = 999999
