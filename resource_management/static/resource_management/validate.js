@@ -9,6 +9,7 @@ document.addEventListener("submit", (event) => {
         return;
     }
     button.disabled = true;
+    button.classList.add("loading");
     const spinner = document.createElement("span");
     spinner.classList.add("spinner-border", "spinner-border-sm", "border-1");
     spinner.setAttribute("aria-hidden", "true");

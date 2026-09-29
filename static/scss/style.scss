@@ -433,6 +433,10 @@ label:has(~ .field-wrapper.required)::after,
     cursor: grabbing;
 }
 
+.btn-light.loading:disabled {
+    color: var(--bs-tertiary-color);
+}
+
 /* DataTables */
 // The .dt-container rules allow the table to scroll, but not
 // the other controls (search box, "x" entries per page).
