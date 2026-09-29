@@ -116,7 +116,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
     success_reverse_base: str
 
     table_name: str
-    column_metadata_table_name: str
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -235,7 +234,6 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
     success_reverse_base: str
 
     table_name: str
-    column_metadata_table_name: str
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -388,7 +386,6 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
     success_reverse_base: str
 
     table_name: str
-    column_metadata_table_name: str
     disabled_properties: list[str]
 
     editor_reverse_base: str
@@ -524,7 +521,6 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
     success_reverse_base: str
 
     table_name: str
-    column_metadata_table_name: str
     disabled_properties: list[str]
 
     editor_reverse_base: str

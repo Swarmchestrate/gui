@@ -54,28 +54,24 @@ class CloudCapacityOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, CloudCa
 class CloudCapacityNewOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
 class CloudCapacityOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
 class CloudCapacityNewOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
 class CloudCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyForeignKeyEditorView):
     template_name = "capacities/cloud_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:cloud_capacity_editor"
 
 
@@ -83,14 +79,12 @@ class CloudCapacityOneToOneFieldOverviewSubsectionView(
         CloudCapacityViewMixin,
         OneToOneFieldOverviewSubsectionView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
 
 class CloudCapacityOneToManyFieldOverviewSubsectionView(
         CloudCapacityViewMixin,
         OneToManyFieldOverviewSubsectionView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
 
 # Edge Capacity views
@@ -126,28 +120,24 @@ class EdgeCapacityOneToManyFieldSectionView(CapacitySubtypeFieldsMixin, EdgeCapa
 class EdgeCapacityNewOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "capacities/edge_capacity_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
 class EdgeCapacityOneToOneForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneForeignKeyEditorView):
     template_name = "capacities/edge_capacity_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
 class EdgeCapacityNewOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "capacities/edge_capacity_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
 class EdgeCapacityOneToManyForeignKeyEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyForeignKeyEditorView):
     template_name = "capacities/edge_capacity_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     success_reverse_base = "capacities:edge_capacity_editor"
 
 
@@ -155,11 +145,9 @@ class EdgeCapacityOneToOneFieldOverviewSubsectionView(
         EdgeCapacityViewMixin,
         OneToOneFieldOverviewSubsectionView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
 
 class EdgeCapacityOneToManyFieldOverviewSubsectionView(
         EdgeCapacityViewMixin,
         OneToManyFieldOverviewSubsectionView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY

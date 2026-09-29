@@ -21,7 +21,6 @@ from postgrest.api import (
     OpenApiSpecification,
     Resource,
 )
-from postgrest.table_names import TableNames
 from resource_management.validation import validated_fingerprint
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.helpers import get_column_metadata_table_name_for_table
@@ -33,7 +32,6 @@ logger = logging.getLogger(__name__)
 
 class EditorView(TemplateView):
     table_name: str
-    column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
     column_metadata: list[Resource]
     referring_tables: dict[str, str]
@@ -163,7 +161,6 @@ class UpdateResourceByCategoryView(FormView):
 
     openapi_spec: OpenApiSpecification
     table_name: str
-    column_metadata_table_name: str
     # Sync properties disabled when the form is first loaded
     # with properties allowed to be sent through an update.
     disabled_properties: list[str]
@@ -256,7 +253,6 @@ class EditorAutosaveView(FormView):
     
     openapi_spec: OpenApiSpecification
     table_name: str
-    column_metadata_table_name: str
     # Sync properties disabled when the form is first loaded
     # with properties allowed to be sent through an update.
     disabled_properties: list[str]
@@ -374,7 +370,6 @@ class EditorStartFormView(FormView):
     form_class = FormWithDynamicallyPopulatedFields
 
     table_name: str
-    column_metadata_table_name: str
     openapi_spec: OpenApiSpecification
 
     editor_reverse_base: str
@@ -460,7 +455,6 @@ class EditorOverviewTemplateView(TemplateView):
     template_name = "editor/overview_base.html"
 
     table_name: str
-    column_metadata_table_name: str
     disabled_properties: list[str]
 
     editor_reverse_base: str

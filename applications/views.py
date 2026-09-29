@@ -56,7 +56,6 @@ class ApplicationViewMixin:
 class ApplicationEditorView(ApplicationViewMixin, EditorView):
     template_name = "applications/application_editor.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     editor_form_reverse = "applications:application_autosave"
 
 
@@ -79,18 +78,15 @@ class UpdateApplicationByCategoryView(
         ApplicationViewMixin,
         UpdateResourceByCategoryView):
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationEditorAutosaveView(ApplicationViewMixin, EditorAutosaveView):
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationEditorStartFormView(ApplicationViewMixin, EditorStartFormView):
     template_name = "applications/new_application_start.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     success_url = reverse_lazy("applications:new_application")
 
 
@@ -118,7 +114,6 @@ class ApplicationEditorOverviewTemplateView(
         EditorOverviewTemplateView):
     template_name = "applications/application_overview.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     one_to_one_field_subsection_reverse_base = "applications:application_overview_one_to_one_field"
     one_to_many_field_subsection_reverse_base = "applications:application_overview_one_to_many_field"
 
@@ -127,14 +122,12 @@ class ApplicationOneToOneFieldOverviewSubsectionView(
         ApplicationViewMixin,
         OneToOneFieldOverviewSubsectionView):
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationOneToManyFieldOverviewSubsectionView(
         ApplicationViewMixin,
         OneToManyFieldOverviewSubsectionView):
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
 
 
 class ApplicationDescriptionTemplateDownloadView(
@@ -172,28 +165,24 @@ class ApplicationOneToManyFieldSectionView(ApplicationViewMixin, OneToManyFieldS
 class ApplicationNewOneToOneForeignKeyEditorView(ApplicationViewMixin, NewOneToOneForeignKeyEditorView):
     template_name = "applications/application_new_one_to_one_fk_resource_editor.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
 class ApplicationOneToOneForeignKeyEditorView(ApplicationViewMixin, OneToOneForeignKeyEditorView):
     template_name = "applications/application_one_to_one_fk_resource_update_editor.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
 class ApplicationNewOneToManyForeignKeyEditorView(ApplicationViewMixin, NewOneToManyForeignKeyEditorView):
     template_name = "applications/application_new_one_to_many_fk_resource_editor.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 
 class ApplicationOneToManyForeignKeyEditorView(ApplicationViewMixin, OneToManyForeignKeyEditorView):
     template_name = "applications/application_one_to_many_fk_resource_update_editor.html"
     table_name = TableNames.APPLICATION_NEW
-    column_metadata_table_name = TableNames.APPLICATION
     success_reverse_base = "applications:application_editor"
 
 

@@ -30,14 +30,12 @@ from resource_management.views import (
 class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorView):
     template_name = "capacities/cloud_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:cloud_capacity_autosave"
 
 
 class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -49,7 +47,6 @@ class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacit
 
 class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorAutosaveView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
@@ -62,7 +59,6 @@ class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityV
 class CloudCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -89,7 +85,6 @@ class CloudCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFiel
 class CloudCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/cloud_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     one_to_one_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_one_field"
     one_to_many_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_many_field"
 
@@ -139,14 +134,12 @@ class CloudCapacityDescriptionTemplateValidateView(
 class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorView):
     template_name = "capacities/edge_capacity_editor.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:edge_capacity_autosave"
 
 
 class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -158,7 +151,6 @@ class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityV
 
 class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorAutosaveView):
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
@@ -171,7 +163,6 @@ class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityVie
 class EdgeCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -184,7 +175,6 @@ class EdgeCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeField
 class EdgeCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorOverviewTemplateView):
     template_name = "capacities/edge_capacity_overview.html"
     table_name = TableNames.CAPACITY_NEW
-    column_metadata_table_name = TableNames.CAPACITY
     one_to_one_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_one_field"
     one_to_many_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_many_field"
 
