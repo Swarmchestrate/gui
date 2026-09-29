@@ -29,6 +29,7 @@ from .view_helpers import (
 
 from editor.forms import FormWithDynamicallyPopulatedFields
 from editor.view_helpers import get_form_config_for_table
+from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.humanise import (
     humanise_resource_type,
@@ -373,30 +374,25 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
 
     def get_field_names_for_table_name(
             self,
-            column_metadata_table_name: str,
-            form_config_table_name: str,
+            table_name_to_customise: str,
+            form_config: FormConfig,
             updatable_resource_pks: list[str]) -> list[str]:
-        if column_metadata_table_name in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
+        if table_name_to_customise in DISABLED_TABLE_NAMES_IN_COLUMN_METADATA_MANAGEMENT:
             return list()
         # We want to include the column metadata table's PK fields as these
         # are made up by the "table_name" column and the "column_name" column.
-        include_pk_fields = (column_metadata_table_name == "column_metadata")
-        form_config = get_form_config_for_table(
-            form_config_table_name,
-            self.openapi_spec,
-            self.column_metadata
-        )
+        include_pk_fields = (table_name_to_customise == "column_metadata")
         return sorted(
             list(form_config.get_fields(
                 include_pk_fields=include_pk_fields
             ).keys()),
-            key=lambda field_name: f"{column_metadata_table_name}__{field_name}" in updatable_resource_pks
+            key=lambda field_name: f"{table_name_to_customise}__{field_name}" in updatable_resource_pks
         )
 
     def get_data_for_resource_update_forms(self) -> dict[str, dict]:
         data = dict()
         for resource in self.resource_list:
-            if not (resource.as_dict().get("table_name") == self.column_metadata_table_name):
+            if not (resource.as_dict().get("table_name") == self.table_name_to_customise):
                 continue
             data.update({
                 get_composite_pk(resource): resource.as_dict(),
@@ -404,7 +400,7 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
         return data
 
     def get(self, request, *args, **kwargs):
-        self.column_metadata_table_name = kwargs.get("table_name") or None
+        self.table_name_to_customise = kwargs.get("table_name") or None
         column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
         self.resource_list = column_metadata
         self.column_metadata = column_metadata
@@ -424,22 +420,25 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 "order",
             ]
         )
-        form_config_table_name = self.column_metadata_table_name
-        if self.column_metadata_table_name == TableNames.APPLICATION:
+        table_name_to_customise_for_form_config = self.table_name_to_customise
+        if self.table_name_to_customise == TableNames.APPLICATION:
             # Column metadata table name should be "APPLICATION"
-            # but the wizard fields should come from "APPLICATION_NEW".
-            form_config_table_name = TableNames.APPLICATION_NEW
-        elif self.column_metadata_table_name == TableNames.CAPACITY:
+            # but the wizard fields should come from "APPLICATION_NEW"
+            # (retrieved from get_form_config_for_table()).
+            table_name_to_customise_for_form_config = TableNames.APPLICATION_NEW
+        elif self.table_name_to_customise == TableNames.CAPACITY:
             # Column metadata table name should be "CAPACITY"
-            # but the wizard fields should come from "CAPACITY_NEW".
-            form_config_table_name = TableNames.CAPACITY_NEW
+            # but the wizard fields should come from "CAPACITY_NEW"
+            # (retrieved from get_form_config_for_table()).
+            table_name_to_customise_for_form_config = TableNames.CAPACITY_NEW
+        form_config_for_table_to_customise = get_form_config_for_table(
+            table_name_to_customise_for_form_config,
+            self.openapi_spec,
+            self.column_metadata
+        )
         ordered_fields_and_categories_for_table_name = get_ordered_fields_and_categories_for_table_name(
-            self.column_metadata_table_name,
-            get_form_config_for_table(
-                form_config_table_name,
-                self.openapi_spec,
-                self.column_metadata
-            ),
+            self.table_name_to_customise,
+            form_config_for_table_to_customise,
             self.openapi_spec,
             self.resources_by_id
         )
@@ -460,18 +459,18 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
                 resource_ids=[
                     get_composite_pk(resource)
                     for resource in self.resource_list
-                    if resource.as_dict().get("table_name") == self.column_metadata_table_name
+                    if resource.as_dict().get("table_name") == self.table_name_to_customise
                 ]
             ),
             # "resources" are records from the column_metadata table
             "resources": self.resources_by_id,
             "field_names_for_table_name": self.get_field_names_for_table_name(
-                self.column_metadata_table_name,
-                form_config_table_name,
+                self.table_name_to_customise,
+                form_config_for_table_to_customise,
                 [
                     get_composite_pk(resource)
                     for resource in self.resource_list
-                    if resource.as_dict().get("table_name") == self.column_metadata_table_name
+                    if resource.as_dict().get("table_name") == self.table_name_to_customise
                 ]
             ),
             "ordered_fields_and_categories_for_table_name": ordered_fields_and_categories_for_table_name,
