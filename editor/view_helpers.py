@@ -1,3 +1,7 @@
+from collections import OrderedDict
+from django.forms import Field
+
+from postgrest.api import ApiClient
 from postgrest.forms.form_config import (
     ColumnMetadata,
     FormConfig,
@@ -5,6 +9,7 @@ from postgrest.forms.form_config import (
     OneToManyProperties,
 )
 from postgrest.api import OpenApiSpecification, Resource
+from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.helpers import get_column_metadata_table_name_for_table
 from .field_choices import choices_for
@@ -174,6 +179,77 @@ class EditorTableOfContents:
         return table_of_contents
 
 
+class FormConfigViewMixin:
+    table_name: str
+    api_client: ApiClient
+    openapi_spec: OpenApiSpecification
+    form_config: FormConfig
+    column_metadata: list[Resource]
+
+    def setup(self, request, *args, **kwargs):
+        self.api_client = ApiClient()
+        self.api_client.initialise_openapi_spec()
+        self.openapi_spec = self.api_client.openapi_spec
+        self.column_metadata = self.api_client.get_endpoint(
+            TableNames.COLUMN_METADATA
+        ).get_resources()
+        return super().setup(request, *args, **kwargs)
+
+    def get_form_config(self) -> FormConfig:
+        return get_form_config_for_table(
+            self.table_name,
+            self.api_client.openapi_spec,
+            self.column_metadata,
+            **self.get_form_config_kwargs()
+        )
+
+    def get_form_config_kwargs(self) -> dict:
+        return dict()
+
+
+class EditorViewMixin(FormConfigViewMixin):
+    _fields_for_toc_generation: list[Field]
+
+    def _is_column_metadata_resource_fit_for_toc(self, resource: Resource) -> bool:
+        return resource.as_dict().get(
+            "table_name",
+            ""
+        ) == get_column_metadata_table_name_for_table(self.table_name)
+
+    def get_toc_list_items(self) -> dict:
+        resource_dicts = list(
+            resource.as_dict()
+            for resource in self.column_metadata
+            if self._is_column_metadata_resource_fit_for_toc(resource)
+        )
+        DEFAULT_ORDER_NUMBER = 999999
+        category_names = list(OrderedDict.fromkeys(
+            resource_dict.get("category")
+            for resource_dict in sorted(
+                resource_dicts,
+                key=lambda resource_dict: (
+                    resource_dict.get("order")
+                    if resource_dict.get("order") is not None
+                    else DEFAULT_ORDER_NUMBER
+                )
+            )
+        ).keys())
+        self._fields_for_toc_generation = self.form_config.get_fields()
+        return EditorTableOfContents(
+            self.table_name,
+            category_names,
+            **self.get_toc_kwargs()
+        ).as_dict()
+
+    def get_toc_kwargs(self) -> dict:
+        return {
+            "is_unknown_category_needed": any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self._fields_for_toc_generation.values()
+            )
+        }
+
+
 def get_form_config_for_table(
         table_name: str,
         openapi_spec: OpenApiSpecification,
@@ -181,6 +257,8 @@ def get_form_config_for_table(
         infer_one_to_many_properties: bool = True,
         disabled_properties: list[str] = None,
         choices_context: dict = None) -> FormConfig:
+    # A list of additional disabled property names that is passed to the
+    # FormConfig and is best specified when inside a view.
     if not disabled_properties:
         disabled_properties = list()
     column_metadata_table_name = get_column_metadata_table_name_for_table(table_name)

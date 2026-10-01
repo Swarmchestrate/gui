@@ -28,7 +28,7 @@ from .view_helpers import (
 )
 
 from editor.forms import FormWithDynamicallyPopulatedFields
-from editor.view_helpers import get_form_config_for_table
+from editor.view_helpers import FormConfigViewMixin, get_form_config_for_table
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.humanise import (
@@ -361,7 +361,7 @@ class ColumnMetadataManagementListView(TemplateView):
         return context
 
 
-class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
+class ColumnMetadataManagementForTableView(FormConfigViewMixin, ColumnMetadataManagementListView):
     template_name = "resource_management/column_metadata_management_for_table.html"
     resource_deletion_form_class = ResourceDeletionForm
     multi_resource_deletion_form_class = MultiResourceDeletionForm
@@ -401,25 +401,23 @@ class ColumnMetadataManagementForTableView(ColumnMetadataManagementListView):
 
     def get(self, request, *args, **kwargs):
         self.table_name_to_customise = kwargs.get("table_name") or None
-        column_metadata = self.api_client.get_endpoint(TableNames.COLUMN_METADATA).get_resources()
-        self.resource_list = column_metadata
-        self.column_metadata = column_metadata
+        self.resource_list = self.column_metadata
         self.resources_by_id = {
             get_composite_pk(resource): resource
             for resource in self.resource_list
         }
         return super().get(request, *args, **kwargs)
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": ["order"],
+        })
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                "order",
-            ]
-        )
+        form_config = self.get_form_config()
         table_name_to_customise_for_form_config = self.table_name_to_customise
         if self.table_name_to_customise == TableNames.APPLICATION:
             # Column metadata table name should be "APPLICATION"
@@ -526,22 +524,18 @@ class ColumnMetadataFormView(FormView):
         return self.redirect_to_resource_list_or_index()
 
 
-class NewColumnMetadataFormView(ColumnMetadataFormView):
+class NewColumnMetadataFormView(FormConfigViewMixin, ColumnMetadataFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
 
     def dispatch(self, request, *args, **kwargs):
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        table_name = self.kwargs["table_name"]
+        table_name_to_customise = self.kwargs["table_name"]
         column_name = self.kwargs["column_name"]
         # Ensure current category order isn't affected by the updated column metadata
         # record by recalculating field order for the current table.
@@ -553,9 +547,9 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
                 for resource in self.column_metadata
             }
             order_before_registration = get_ordered_fields_and_categories_for_table_name(
-                table_name,
+                table_name_to_customise,
                 get_form_config_for_table(
-                    table_name,
+                    table_name_to_customise,
                     self.openapi_spec,
                     self.column_metadata
                 ),
@@ -565,7 +559,7 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
             field_order_bulk_update_data = get_update_data_for_new_field_order(
                 order_before_registration,
                 column_metadata_by_id,
-                table_name,
+                table_name_to_customise,
                 column_name,
                 submitted_category_name
             )
@@ -573,14 +567,14 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
         # order.
         registration_data = form.cleaned_data
         registration_data.update({
-            "table_name": table_name,
+            "table_name": table_name_to_customise,
             "column_name": column_name,
         })
         self.api_client.get_endpoint(
             self.table_name
         ).register_with_composite_key(
             {
-                "table_name": table_name,
+                "table_name": table_name_to_customise,
                 "column_name": column_name,
             },
             registration_data
@@ -602,32 +596,23 @@ class NewColumnMetadataFormView(ColumnMetadataFormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            self.column_metadata,
-        )
         kwargs.update({
-            "fields": form_config.get_fields()
+            "fields": self.get_form_config().get_fields()
         })
         return kwargs
 
 
-class UpdateColumnMetadataFormView(ColumnMetadataFormView):
+class UpdateColumnMetadataFormView(FormConfigViewMixin, ColumnMetadataFormView):
     form_class = FormWithDynamicallyPopulatedFields
     success_url = reverse_lazy("resource_management:manage_column_metadata")
     table_name = TableNames.COLUMN_METADATA
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = kwargs["resource_id"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        table_name, column_name = self.resource_id.split("__")
+        table_name_to_customise, column_name = self.resource_id.split("__")
         field_order_bulk_update_data = list()
         submitted_category_name = form.cleaned_data.get("category")
         if submitted_category_name:
@@ -636,9 +621,9 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
                 for resource in self.column_metadata
             }
             order_before_update = get_ordered_fields_and_categories_for_table_name(
-                table_name,
+                table_name_to_customise,
                 get_form_config_for_table(
-                    table_name,
+                    table_name_to_customise,
                     self.openapi_spec,
                     self.column_metadata
                 ),
@@ -648,7 +633,7 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
             field_order_bulk_update_data = get_update_data_for_new_field_order(
                 order_before_update,
                 column_metadata_by_id,
-                table_name,
+                table_name_to_customise,
                 column_name,
                 submitted_category_name
             )
@@ -656,7 +641,7 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
         try:
             self.api_client.get_endpoint(self.table_name).update_by_composite_key(
                 {
-                    "table_name": table_name,
+                    "table_name": table_name_to_customise,
                     "column_name": column_name,
                 },
                 update_data
@@ -680,13 +665,8 @@ class UpdateColumnMetadataFormView(ColumnMetadataFormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            self.column_metadata,
-        )
         kwargs.update({
-            "fields": form_config.get_fields()
+            "fields": self.get_form_config().get_fields()
         })
         return kwargs
 
@@ -713,9 +693,9 @@ class ColumnMetadataDeletionFormView(ColumnMetadataFormView):
         resource_id_to_delete = form.cleaned_data.get("resource_id_to_delete")
         api_client = ApiClient()
         api_client.initialise_openapi_spec()
-        table_name, column_name = resource_id_to_delete.split("__")
+        table_name_to_customise, column_name = resource_id_to_delete.split("__")
         api_client.get_endpoint(self.table_name).delete_by_composite_key({
-            "table_name": table_name,
+            "table_name": table_name_to_customise,
             "column_name": column_name,
         })
         success_msg = f"Deleted {humanise_resource_type(self.resource_type)}."
@@ -758,9 +738,9 @@ class MultiColumnMetadataDeletionFormView(ColumnMetadataFormView):
     def form_valid(self, form):
         delete_conditions = list()
         for resource_id in form.cleaned_data.get("resource_ids_to_delete", []):
-            table_name, column_name = resource_id.split("__")
+            table_name_to_customise, column_name = resource_id.split("__")
             delete_conditions.append({
-                "table_name": table_name,
+                "table_name": table_name_to_customise,
                 "column_name": column_name,
             })
         self.api_client.get_endpoint(self.table_name).delete_many_by_composite_key(
@@ -782,7 +762,7 @@ class CategoryOrderFormView(ColumnMetadataFormView):
 
     def get_updated_field_order_for_table_by_category_order(
             self,
-            table_name: str,
+            table_name_to_customise: str,
             category_order: list[str]) -> list[dict]:
         update_data = list()
         endpoint = self.api_client.get_endpoint(self.table_name)
@@ -792,7 +772,7 @@ class CategoryOrderFormView(ColumnMetadataFormView):
             if not category_name:
                 continue
             resources = endpoint.get_resources_by_params({
-                "table_name": table_name,
+                "table_name": table_name_to_customise,
                 "category": category_name,
             })
             resources_sorted = sorted(
@@ -853,7 +833,7 @@ class FieldOrderFormView(ColumnMetadataFormView):
 
     def get_updated_field_order_for_table(
             self,
-            table_name: str,
+            table_name_to_customise: str,
             field_order_by_category: dict[str, list[str]]) -> dict[str, list]:
         update_data = list()
         registration_data = list()
@@ -863,7 +843,7 @@ class FieldOrderFormView(ColumnMetadataFormView):
             if not category_name:
                 continue
             resources = endpoint.get_resources_by_params({
-                "table_name": table_name,
+                "table_name": table_name_to_customise,
             })
             resources_by_pk = {
                 get_composite_pk(resource): resource
@@ -872,7 +852,7 @@ class FieldOrderFormView(ColumnMetadataFormView):
             for field_pk in field_pks:
                 _table_name, column_name = field_pk.split("__")
                 data_for_postgrest = {
-                    "table_name": table_name,
+                    "table_name": table_name_to_customise,
                     "column_name": column_name,
                     "order": order_number,
                 }
