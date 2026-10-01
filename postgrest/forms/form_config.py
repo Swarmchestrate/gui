@@ -417,7 +417,7 @@ class FormConfig:
 
     def get_fields(self, include_pk_fields: bool = False) -> dict:
         """Returns a dictionary of typed Django Field instances mapped to their
-        field names. Excludes any disabled properties and, optionally, primary keys.
+        field names. Excludes disabled properties and primary keys, if specified.
         """
         return self._get_fields(include_pk_fields=include_pk_fields)
     
