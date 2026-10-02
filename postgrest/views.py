@@ -8,7 +8,7 @@ from django.views.generic import FormView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
 from postgrest.api import ApiClient, Resource
-from postgrest.view_helpers import get_form_config_for_table
+from postgrest.view_helpers import ForeignKeyTableFormConfigViewMixin, get_form_config_for_table
 from resource_management.forms import ResourceDeletionForm
 from utils.humanise import humanise_resource_type
 
@@ -18,19 +18,13 @@ logger = logging.getLogger(__name__)
 
 # Views for managing one-to-one relations between tables.
 # E.g., A cloud capacity (locality_id) -> locality.
-class NewOneToOneRelationFormView(FormView):
-    table_name: str
-    fk_table_name: str
+class NewOneToOneRelationFormView(ForeignKeyTableFormConfigViewMixin, FormView):
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
 
     def dispatch(self, request, *args, **kwargs):
         self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_column_name = self.kwargs["fk_column_name"]
-        # API client is instantiated here so it doesn't
-        # fetch the OpenAPI spec twice.
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
         definition = self.api_client.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         if not self.fk_table_name:
@@ -69,35 +63,31 @@ class NewOneToOneRelationFormView(FormView):
             return super().form_invalid(form)
         return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "infer_one_to_many_properties": False,
+        })
+        return kwargs
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False
-        )
+        fk_table_form_config = self.get_fk_table_form_config()
         kwargs.update({
-            "fields": form_config.get_fields(),
+            "fields": fk_table_form_config.get_fields(),
         })
         return kwargs
 
 
-class UpdateOneToOneRelationFormView(FormView):
+class UpdateOneToOneRelationFormView(ForeignKeyTableFormConfigViewMixin, FormView):
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
-    
-    table_name: str
+
     resource: Resource
 
     def dispatch(self, request, *args, **kwargs):
         self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_column_name = self.kwargs["fk_column_name"]
-        # API client is instantiated here so it doesn't
-        # fetch the OpenAPI spec twice.
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
         definition = self.api_client.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         if not self.fk_table_name:
@@ -129,17 +119,18 @@ class UpdateOneToOneRelationFormView(FormView):
             return super().form_invalid(form)
         return JsonResponse({"feedback": json.loads(form.errors.as_json())})
 
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "infer_one_to_many_properties": False,
+        })
+        return kwargs
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False
-        )
+        fk_table_form_config = self.get_fk_table_form_config()
         kwargs.update({
-            "fields": form_config.get_fields(),
+            "fields": fk_table_form_config.get_fields(),
         })
         return kwargs
 
@@ -191,21 +182,17 @@ class DeleteOneToOneRelationFormView(FormView):
 # E.g., A cloud capacity -> capacity instance types (e.g.,
 # referencing a capacity by a "capacity_id" column).
 
-class NewOneToManyRelationFormView(FormView):
+class NewOneToManyRelationFormView(ForeignKeyTableFormConfigViewMixin, FormView):
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
-    table_name: str
     possible_fk_table_column_name: str
 
     def dispatch(self, request, *args, **kwargs):
         self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_table_name = self.kwargs["fk_table_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        openapi_spec = self.api_client.openapi_spec
         if not hasattr(self, "possible_fk_table_column_name"):
             self.possible_fk_table_column_name = f"{self.table_name.replace("_new", "")}_id"
-        referring_tables = openapi_spec.find_references_to_table(
+        referring_tables = self.openapi_spec.find_references_to_table(
             self.table_name,
             possible_column_name=self.possible_fk_table_column_name
         )
@@ -248,42 +235,37 @@ class NewOneToManyRelationFormView(FormView):
             status=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False,
-            # The choices offered must match what the dialog rendered.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "infer_one_to_many_properties": False,
             # The column tying the row to its parent is set by this view rather
             # than by the user, so the dialog never renders it. Asking the form
             # for it rejects every submission where the column is NOT NULL.
-            disabled_properties=[self.fk_table_column_name],
-        )
+            "disabled_properties": [self.fk_table_column_name],
+        })
+        return kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        fk_table_form_config = self.get_fk_table_form_config()
         kwargs.update({
-            "fields": form_config.get_fields(),
+            "fields": fk_table_form_config.get_fields(),
         })
         return kwargs
 
 
-class UpdateOneToManyRelationFormView(FormView):
+class UpdateOneToManyRelationFormView(ForeignKeyTableFormConfigViewMixin, FormView):
     form_class = ForeignKeyFormWithDynamicallyPopulatedFields
-    table_name: str
 
     def dispatch(self, request, *args, **kwargs):
         self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_resource_id = int(self.kwargs["fk_resource_id"])
         self.fk_table_name = self.kwargs["fk_table_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        openapi_spec = self.api_client.openapi_spec
         if not hasattr(self, "possible_fk_table_column_name"):
             self.possible_fk_table_column_name = f"{self.table_name.replace("_new", "")}_id"
-        referring_tables = openapi_spec.find_references_to_table(
+        referring_tables = self.openapi_spec.find_references_to_table(
             self.table_name,
             possible_column_name=self.possible_fk_table_column_name
         )
@@ -339,23 +321,22 @@ class UpdateOneToManyRelationFormView(FormView):
             status=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False,
-            # The choices offered must match what the dialog rendered.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "infer_one_to_many_properties": False,
             # The column tying the row to its parent is set by this view rather
             # than by the user, so the dialog never renders it. Asking the form
             # for it rejects every submission where the column is NOT NULL.
-            disabled_properties=[self.fk_table_column_name],
-        )
+            "disabled_properties": [self.fk_table_column_name],
+        })
+        return kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        fk_table_form_config = self.get_fk_table_form_config()
         kwargs.update({
-            "fields": form_config.get_fields(),
+            "fields": fk_table_form_config.get_fields(),
         })
         return kwargs
 

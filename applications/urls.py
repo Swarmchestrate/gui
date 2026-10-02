@@ -105,4 +105,14 @@ urlpatterns = [
         views.ApplicationDescriptionTemplateValidateView.as_view(),
         name="adt_validate",
     ),
+    path(
+        "<table_name>/<resource_id>/one-to-many-relation/<fk_table_name>/new/",
+        views.ApplicationNewOneToManyRelationFormView.as_view(),
+        name="application_new_one_to_many_relation",
+    ),
+    path(
+        "<table_name>/<resource_id>/one-to-many-relation/<fk_table_name>/<fk_resource_id>/edit/",
+        views.ApplicationUpdateOneToManyRelationFormView.as_view(),
+        name="application_update_one_to_many_relation",
+    ),
 ]

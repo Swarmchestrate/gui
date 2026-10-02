@@ -25,9 +25,6 @@ from postgrest.table_names import TableNames
 # Cloud Capacity views
 class CloudCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
-    new_one_to_one_relation_reverse_base = "capacities:new_cloud_capacity_one_to_one_relation"
-    update_one_to_one_relation_reverse_base = "capacities:update_cloud_capacity_one_to_one_relation"
-    delete_one_to_one_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_one_relation"
 
     def get_form_config_kwargs(self):
         kwargs = super().get_form_config_kwargs()
@@ -47,9 +44,6 @@ class CloudCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, Clo
 class CloudCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_one_to_many_relation_reverse_base = "capacities:new_cloud_capacity_one_to_many_relation"
-    update_one_to_many_relation_reverse_base = "capacities:update_cloud_capacity_one_to_many_relation"
-    delete_one_to_many_relation_reverse_base = "capacities:delete_cloud_capacity_one_to_many_relation"
 
     def get_form_config_kwargs(self):
         kwargs = super().get_form_config_kwargs()
@@ -203,9 +197,6 @@ class CloudCapacityOneToManyFieldOverviewSubsectionView(
 # Edge Capacity views
 class EdgeCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
-    new_one_to_one_relation_reverse_base = "capacities:new_edge_capacity_one_to_one_relation"
-    update_one_to_one_relation_reverse_base = "capacities:update_edge_capacity_one_to_one_relation"
-    delete_one_to_one_relation_reverse_base = "capacities:delete_edge_capacity_one_to_one_relation"
 
     def get_form_config_kwargs(self):
         kwargs = super().get_form_config_kwargs()
@@ -225,9 +216,6 @@ class EdgeCapacityOneToOneFieldPopupSectionView(CapacitySubtypeFieldsMixin, Edge
 class EdgeCapacityOneToManyFieldPopupSectionView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.CAPACITY_NEW
     possible_fk_table_column_name = "capacity_id"
-    new_one_to_many_relation_reverse_base = "capacities:new_edge_capacity_one_to_many_relation"
-    update_one_to_many_relation_reverse_base = "capacities:update_edge_capacity_one_to_many_relation"
-    delete_one_to_many_relation_reverse_base = "capacities:delete_edge_capacity_one_to_many_relation"
 
     def get_form_config_kwargs(self):
         kwargs = super().get_form_config_kwargs()

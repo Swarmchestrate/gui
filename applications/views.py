@@ -25,6 +25,10 @@ from editor.views import (
     EditorView,
     UpdateResourceByCategoryView,
 )
+from postgrest.views import (
+    NewOneToManyRelationFormView,
+    UpdateOneToManyRelationFormView,
+)
 from postgrest.table_names import TableNames
 from resource_management.views import (
     MultiResourceDeletionFormView,
@@ -61,9 +65,6 @@ class ApplicationEditorView(ApplicationViewMixin, EditorView):
 
 class ApplicationOneToOneFieldPopupSectionView(ApplicationViewMixin, OneToOneFieldPopupSectionView):
     table_name = TableNames.APPLICATION_NEW
-    new_one_to_one_relation_reverse_base = "applications:new_application_one_to_one_relation"
-    update_one_to_one_relation_reverse_base = "applications:update_application_one_to_one_relation"
-    delete_one_to_one_relation_reverse_base = "applications:delete_application_one_to_one_relation"
 
     def get_fk_table_form_config_kwargs(self):
         kwargs = super().get_fk_table_form_config_kwargs()
@@ -77,9 +78,14 @@ class ApplicationOneToOneFieldPopupSectionView(ApplicationViewMixin, OneToOneFie
 class ApplicationOneToManyFieldPopupSectionView(ApplicationViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
-    new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
-    update_one_to_many_relation_reverse_base = "applications:update_application_one_to_many_relation"
-    delete_one_to_many_relation_reverse_base = "applications:delete_application_one_to_many_relation"
+    
+    @property
+    def new_one_to_many_relation_reverse_base(self):
+        return "applications:application_new_one_to_many_relation"
+    
+    @property
+    def update_one_to_many_relation_reverse_base(self):
+        return "applications:application_update_one_to_many_relation"
 
     def get_fk_table_form_config_kwargs(self):
         kwargs = super().get_fk_table_form_config_kwargs()
@@ -230,3 +236,24 @@ class NodeFilterOperatorsView(View):
         from .field_choices import operators_by_target
 
         return JsonResponse({"operatorsByTarget": operators_by_target()})
+
+
+class ApplicationNewOneToManyRelationFormView(NewOneToManyRelationFormView):
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # The choices offered must match what the dialog rendered.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
+
+
+class ApplicationUpdateOneToManyRelationFormView(UpdateOneToManyRelationFormView):
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # The choices offered must match what the dialog rendered.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
+

@@ -200,6 +200,14 @@ class OneToOneFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategori
 class OneToManyFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategoriesMixin, View):
     resource_type: str
 
+    @property
+    def new_one_to_many_relation_reverse_base(self):
+        return "postgrest:new_one_to_many_relation"
+
+    @property
+    def update_one_to_many_relation_reverse_base(self):
+        return "postgrest:update_one_to_many_relation"
+
     def get_fk_table_form_config_kwargs(self):
         kwargs = super().get_fk_table_form_config_kwargs()
         kwargs.update({
@@ -273,7 +281,7 @@ class OneToManyFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategor
                 ),
                 "form_id": f"new-form-{generate_random_string()}",
                 "new_resource_url": reverse_lazy(
-                    "postgrest:new_one_to_many_relation",
+                    self.new_one_to_many_relation_reverse_base,
                     kwargs={
                         "table_name": self.table_name,
                         "resource_id": self.resource_id,
@@ -310,7 +318,7 @@ class OneToManyFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategor
                 "form_id": f"update-form-{generate_random_string()}",
                 "resource_id": fk_resource_id,
                 "update_resource_url": reverse_lazy(
-                    "postgrest:update_one_to_many_relation",
+                    self.update_one_to_many_relation_reverse_base,
                     kwargs={
                         "table_name": self.table_name,
                         "resource_id": self.resource_id,
