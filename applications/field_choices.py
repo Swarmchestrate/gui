@@ -12,10 +12,10 @@ from typing import Any, Dict, List, Tuple
 import requests
 from django.core.cache import cache
 
-from editor.field_choices import register_field_choices
-from editor.field_widgets import KEY_VALUE, TEXTAREA, register_field_widget
 from postgrest.api import ApiClient
 from postgrest.api_configs.base_config import build_api_url
+from postgrest.forms.field_choices import register_field_choices
+from postgrest.forms.field_widgets import KEY_VALUE, TEXTAREA, register_field_widget
 from postgrest.table_names import TableNames
 
 logger = logging.getLogger(__name__)

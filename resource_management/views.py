@@ -28,15 +28,15 @@ from .view_helpers import (
 )
 
 from editor.forms import FormWithDynamicallyPopulatedFields
-from editor.view_helpers import FormConfigViewMixin, get_form_config_for_table
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
+from postgrest.view_helpers import FormConfigViewMixin, get_form_config_for_table
 from utils.humanise import (
     humanise_resource_type,
     humanise_resource_type_plural,
     resource_label,
 )
-from postgrest.api import ApiClient, Resource
+from postgrest.api import ApiClient
 
 
 logger = logging.getLogger(__name__)

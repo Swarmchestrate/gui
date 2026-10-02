@@ -24,7 +24,7 @@ from postgrest.api import (
     Resource
 )
 from postgrest.table_names import TableNames
-from editor.field_widgets import KEY_VALUE, TEXTAREA
+from postgrest.forms.field_widgets import KEY_VALUE, TEXTAREA
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
 from utils.humanise import humanise_enum_value, humanise_resource_type_plural
 

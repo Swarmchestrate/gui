@@ -7,8 +7,8 @@ from django.http import JsonResponse
 from django.views.generic import FormView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.view_helpers import get_form_config_for_table
 from postgrest.api import ApiClient, Resource
+from postgrest.view_helpers import get_form_config_for_table
 from resource_management.forms import ResourceDeletionForm
 from utils.humanise import humanise_resource_type
 
