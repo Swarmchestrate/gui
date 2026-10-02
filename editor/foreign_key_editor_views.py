@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from django.contrib import messages
 from django.http import Http404
 from django.urls import reverse_lazy
@@ -6,17 +5,18 @@ from django.template.loader import render_to_string
 from django.views.generic import FormView
 
 from .forms import FormWithDynamicallyPopulatedFields
-from .view_helpers import EditorTableOfContents, get_form_config_for_table
-from postgrest.api import ApiClient
+from .view_helpers import ForeignKeyEditorViewMixin
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
-from utils.helpers import get_column_metadata_table_name_for_table
 from utils.humanise import humanise_resource_type, resource_label
 
 
-class ForeignKeyEditorView(FormView):
-    def get_form_fields_for_category(self, form_config, category):
+class ForeignKeyEditorView(ForeignKeyEditorViewMixin, FormView):
+    def get_form_fields_for_category(
+            self,
+            form_config: FormConfig,
+            category: str):
         fields = form_config.get_fields_for_category(category)
         return fields
 
@@ -40,62 +40,6 @@ class ForeignKeyEditorView(FormView):
             })
         return forms_by_category
 
-    def get_toc_list_items(self):
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
-                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        return EditorTableOfContents(
-            self.table_name,
-            category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in self.form_config.get_fields().values()
-            )
-        ).as_dict()
-
-    def get_fk_table_toc_list_items(self):
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == self.fk_table_name
-                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        return EditorTableOfContents(
-            self.fk_table_name,
-            category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in self.fk_table_form_config.get_fields().values()
-            )
-        ).as_dict()
-
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs.update({
@@ -115,9 +59,6 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
     template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
 
-    table_name: str
-    disabled_properties: list[str]
-
     editor_reverse_base: str
     resource_type: str
 
@@ -125,35 +66,19 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
         self.resource_id = self.kwargs["resource_id"]
         self.fk_table_name = self.kwargs["fk_table_name"]
         self.fk_resource_id = self.kwargs["fk_resource_id"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         self.fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(self.fk_resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
         if self.fk_resource is None or self.fk_resource.as_dict() is None:
             raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        self.form_config = self.get_form_config()
         self.category = self.form_config.get_fields().get(
             self.fk_table_name
         ).category
-        self.fk_table_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -188,12 +113,7 @@ class OneToManyForeignKeyEditorView(ForeignKeyEditorView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        update_only_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        update_only_form_config = self.get_fk_table_form_config()
         kwargs.update({
             "fields": update_only_form_config.get_fields(),
         })
@@ -233,41 +153,22 @@ class NewOneToManyForeignKeyEditorView(ForeignKeyEditorView):
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
 
-    table_name: str
-    disabled_properties: list[str]
-
     editor_reverse_base: str
     resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
         self.fk_table_name = self.kwargs["fk_table_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        self.form_config = self.get_form_config()
         self.category = self.form_config.get_fields().get(
             self.fk_table_name
         ).category
-        self.fk_table_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -385,53 +286,35 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
     template_name = "editor/editor_for_foreign_key_fields/fk_update_editor.html"
     success_reverse_base: str
 
-    table_name: str
-    disabled_properties: list[str]
-
     editor_reverse_base: str
     resource_type: str
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [TableNames.APPLICATION_MICROSERVICE],
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
         self.fk_column_name = self.kwargs["fk_column_name"]
         self.fk_resource_id = self.kwargs["fk_resource_id"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         definition = self.openapi_spec.get_definition(self.table_name)
-        self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
+        self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.fk_resource = self.api_client.get_endpoint(self.fk_table_name).get(self.fk_resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
         if self.fk_resource is None or self.fk_resource.as_dict() is None:
             raise Http404(f"No {self.fk_table_name} with id {self.fk_resource_id}")
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                TableNames.APPLICATION_MICROSERVICE,
-                *self.disabled_properties,
-            ]
-        )
+        self.form_config = self.get_form_config()
         self.category = self.form_config.get_fields().get(
             self.fk_column_name
         ).category
-        self.fk_table_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                TableNames.APPLICATION_MICROSERVICE,
-                *self.disabled_properties,
-            ]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -466,20 +349,24 @@ class OneToOneForeignKeyEditorView(ForeignKeyEditorView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        # Since FKs are updated separately to this resource, there's no point
+        # in passing any update data for them. It's update only as the FK properties
+        # still need to be present when rendering the form.
         foreign_key_properties = [
             property_name
             for property_name, metadata in self.fk_table_form_config.get_properties().items()
             if (metadata.refers_to_table_name
                 or metadata.created_from_table_name)
         ]
-        update_only_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                TableNames.APPLICATION_MICROSERVICE,
-                *foreign_key_properties,
-            ]
+        update_only_form_config = self.get_fk_table_form_config(
+            extra_form_config_kwargs={
+                "disabled_properties": [
+                    *self.get_fk_table_form_config_kwargs().get(
+                        "disabled_properties"
+                    , []),
+                    *foreign_key_properties,
+                ]
+            }
         )
         kwargs.update({
             "fields": update_only_form_config.get_fields(),
@@ -520,49 +407,31 @@ class NewOneToOneForeignKeyEditorView(ForeignKeyEditorView):
     form_class = FormWithDynamicallyPopulatedFields
     success_reverse_base: str
 
-    table_name: str
-    disabled_properties: list[str]
-
     editor_reverse_base: str
     resource_type: str
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [TableNames.APPLICATION_MICROSERVICE],
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
         self.fk_column_name = self.kwargs["fk_column_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         definition = self.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                TableNames.APPLICATION_MICROSERVICE,
-                *self.disabled_properties,
-            ]
-        )
+        self.form_config = self.get_form_config()
         self.category = self.form_config.get_fields().get(
             self.fk_column_name
         ).category
-        self.fk_table_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=[
-                TableNames.APPLICATION_MICROSERVICE,
-                *self.disabled_properties,
-            ]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_fields_for_category(self, form_config, category):

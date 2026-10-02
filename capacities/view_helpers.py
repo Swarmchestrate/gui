@@ -126,6 +126,17 @@ class CapacityIdFieldMixin:
         return kwargs
 
 
+def merge_with_disabled_properties_in_kwargs(kwargs: dict, extra_disabled_properties: list[str]):
+    disabled_properties_in_kwargs = kwargs.get("disabled_properties", [])
+    kwargs.update({
+        "disabled_properties": [
+            *disabled_properties_in_kwargs,
+            *extra_disabled_properties
+        ]
+    })
+    return kwargs
+
+
 class CapacitySubtypeFieldsMixin:
     """Restricts the form to the properties of the capacity's own subtype."""
 

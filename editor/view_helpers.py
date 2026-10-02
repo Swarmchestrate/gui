@@ -207,6 +207,26 @@ class FormConfigViewMixin:
         return dict()
 
 
+class ForeignKeyTableFormConfigViewMixin(FormConfigViewMixin):
+    fk_table_name: str
+
+    def get_fk_table_form_config(self, extra_form_config_kwargs: dict = None) -> FormConfig:
+        kwargs = self.get_fk_table_form_config_kwargs()
+        if not extra_form_config_kwargs:
+            extra_form_config_kwargs = dict()
+        if extra_form_config_kwargs:
+            kwargs.update(extra_form_config_kwargs)
+        return get_form_config_for_table(
+            self.fk_table_name,
+            self.api_client.openapi_spec,
+            self.column_metadata,
+            **kwargs
+        )
+
+    def get_fk_table_form_config_kwargs(self) -> dict:
+        return dict()
+
+
 class EditorViewMixin(FormConfigViewMixin):
     _fields_for_toc_generation: list[Field]
 
@@ -222,30 +242,49 @@ class EditorViewMixin(FormConfigViewMixin):
             for resource in self.column_metadata
             if self._is_column_metadata_resource_fit_for_toc(resource)
         )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        self._fields_for_toc_generation = self.form_config.get_fields()
-        return EditorTableOfContents(
+        self._fields_for_toc_generation = self.get_form_config().get_fields()
+        return get_toc_list_items_for_table(
             self.table_name,
-            category_names,
+            resource_dicts,
             **self.get_toc_kwargs()
-        ).as_dict()
+        )
 
     def get_toc_kwargs(self) -> dict:
         return {
             "is_unknown_category_needed": any(
                 field.category == UNKNOWN_ATTRIBUTE_CATEGORY
                 for field in self._fields_for_toc_generation.values()
+            )
+        }
+
+
+class ForeignKeyEditorViewMixin(ForeignKeyTableFormConfigViewMixin, EditorViewMixin):
+    _fk_table_fields_for_toc_generation: list[Field]
+
+    def _is_column_metadata_resource_fit_for_fk_table_toc(self, resource: Resource) -> bool:
+        return resource.as_dict().get(
+            "table_name",
+            ""
+        ) == get_column_metadata_table_name_for_table(self.fk_table_name)
+
+    def get_fk_table_toc_list_items(self) -> dict:
+        fk_table_resource_dicts = list(
+            resource.as_dict()
+            for resource in self.column_metadata
+            if self._is_column_metadata_resource_fit_for_fk_table_toc(resource)
+        )
+        self._fk_table_fields_for_toc_generation = self.get_fk_table_form_config().get_fields()
+        return get_toc_list_items_for_table(
+            self.fk_table_name,
+            fk_table_resource_dicts,
+            **self.get_fk_table_toc_kwargs()
+        )
+
+    def get_fk_table_toc_kwargs(self) -> dict:
+        return {
+            "is_unknown_category_needed": any(
+                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
+                for field in self._fk_table_fields_for_toc_generation.values()
             )
         }
 
@@ -302,3 +341,26 @@ def get_form_config_for_table(
         one_to_many_properties=one_to_many_properties.as_dict(),
         additional_disabled_properties=disabled_properties
     )
+
+
+def get_toc_list_items_for_table(
+        table_name: str,
+        resource_dicts: list[dict],
+        is_unknown_category_needed: bool = True):
+    DEFAULT_ORDER_NUMBER = 999999
+    category_names = list(OrderedDict.fromkeys(
+        resource_dict.get("category")
+        for resource_dict in sorted(
+            resource_dicts,
+            key=lambda resource_dict: (
+                resource_dict.get("order")
+                if resource_dict.get("order") is not None
+                else DEFAULT_ORDER_NUMBER
+            )
+        )
+    ).keys())
+    return EditorTableOfContents(
+        table_name,
+        category_names,
+        is_unknown_category_needed=is_unknown_category_needed
+    ).as_dict()

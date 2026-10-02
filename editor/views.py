@@ -1,6 +1,5 @@
 import json
 import logging
-from collections import OrderedDict
 from http import HTTPStatus
 
 from django.contrib import messages
@@ -13,13 +12,10 @@ from django.views.generic import (
 )
 
 from .forms import FormWithDynamicallyPopulatedFields
-from .view_helpers import EditorTableOfContents
 
-from editor.view_helpers import get_form_config_for_table
-from postgrest.api import (
-    ApiClient,
-    OpenApiSpecification,
-    Resource,
+from editor.view_helpers import (
+    EditorViewMixin,
+    FormConfigViewMixin,
 )
 from resource_management.validation import validated_fingerprint
 from utils.constants import UNKNOWN_ATTRIBUTE_CATEGORY
@@ -30,12 +26,7 @@ from utils.humanise import humanise_resource_type, resource_label
 logger = logging.getLogger(__name__)
 
 
-class EditorView(TemplateView):
-    table_name: str
-    openapi_spec: OpenApiSpecification
-    column_metadata: list[Resource]
-    referring_tables: dict[str, str]
-    disabled_properties: list[str]
+class EditorView(EditorViewMixin, TemplateView):
     resource_type: str
 
     editor_overview_reverse_base: str
@@ -50,11 +41,7 @@ class EditorView(TemplateView):
         self.resource_id = self.kwargs["resource_id"]
         self.category = request.GET.get("category")
         
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         resource_endpoint = self.api_client.get_endpoint(self.table_name)
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
         self.resource = resource_endpoint.get(self.resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
@@ -62,50 +49,12 @@ class EditorView(TemplateView):
         self.editor_form_url = reverse_lazy(
             self.editor_form_reverse, kwargs={"resource_id": self.resource_id}
         )
-        self.column_metadata = column_metadata_endpoint.get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
+        self.form_config = self.get_form_config()
         # Named rather than numbered: "TEST" reads better than "Cloud Capacity 306382".
         self.title_base = resource_label(
             self.resource.as_dict(), self.resource_type, self.resource_id
         )
         return super().dispatch(request, *args, **kwargs)
-    
-    def get_toc_list_items(self):
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in column_metadata
-            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
-                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        form_fields = self.form_config.get_fields()
-        return EditorTableOfContents(
-            self.table_name,
-            category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in form_fields.values()
-            )
-        ).as_dict()
 
     def get_forms_by_category(self):
         forms_by_category = dict()
@@ -130,55 +79,51 @@ class EditorView(TemplateView):
         context = super().get_context_data(**kwargs)
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        context.update(
-            {
-                "title": self.title_base,
-                "resource_name": resource_label(
-                    self.resource.as_dict(), self.resource_type, self.resource_id
-                ),
-                "main_heading": self.title_base,
-                "resource": self.resource,
-                "resource_id": self.resource_id,
-                "initial_category": self.category,
-                "resource_type": self.resource_type,
-                "editor_form_url": self.editor_form_url,
-                "editor_overview_reverse_base": self.editor_overview_reverse_base,
-                "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
-                "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
-                "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
-                "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
-                "toc_list_items": self.get_toc_list_items(),
-                "forms_by_category": self.get_forms_by_category(),
-                "toast_template": render_to_string("editor/toast_template.html", {}),
-                "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
-            }
-        )
+        context.update({
+            "title": self.title_base,
+            "resource_name": resource_label(
+                self.resource.as_dict(), self.resource_type, self.resource_id
+            ),
+            "main_heading": self.title_base,
+            "resource": self.resource,
+            "resource_id": self.resource_id,
+            "initial_category": self.category,
+            "resource_type": self.resource_type,
+            "editor_form_url": self.editor_form_url,
+            "editor_overview_reverse_base": self.editor_overview_reverse_base,
+            "one_to_one_field_popup_section_reverse_base": self.one_to_one_field_popup_section_reverse_base,
+            "one_to_many_field_popup_section_reverse_base": self.one_to_many_field_popup_section_reverse_base,
+            "editor_one_to_one_section_reverse_base": self.editor_one_to_one_section_reverse_base,
+            "editor_one_to_many_section_reverse_base": self.editor_one_to_many_section_reverse_base,
+            "toc_list_items": self.get_toc_list_items(),
+            "forms_by_category": self.get_forms_by_category(),
+            "toast_template": render_to_string("editor/toast_template.html", {}),
+            "text_array_field_list_item_template": render_to_string("editor/field_templates/text_array_field_list_item_template.html", {}),
+        })
         return context
 
 
-class UpdateResourceByCategoryView(FormView):
+class UpdateResourceByCategoryView(FormConfigViewMixin, FormView):
     form_class = FormWithDynamicallyPopulatedFields
-
-    openapi_spec: OpenApiSpecification
-    table_name: str
-    # Sync properties disabled when the form is first loaded
-    # with properties allowed to be sent through an update.
-    disabled_properties: list[str]
     
     editor_overview_reverse_base: str
     resource_type: str
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        kwargs.update({
+            # One-to-many fields aren't saved through this view,
+            # so it makes sense to disable them.
+            "infer_one_to_many_properties": False,
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
         self.category = self.request.GET.get("category")
         if not self.category:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -229,14 +174,7 @@ class UpdateResourceByCategoryView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False,
-            disabled_properties=self.disabled_properties
-        )
+        form_config = self.get_form_config()
         if self.category == UNKNOWN_ATTRIBUTE_CATEGORY:
             kwargs.update({
                 "fields": form_config.get_fields_for_category(None),
@@ -248,26 +186,24 @@ class UpdateResourceByCategoryView(FormView):
         return kwargs
 
 
-class EditorAutosaveView(FormView):
+class EditorAutosaveView(FormConfigViewMixin, FormView):
     form_class = FormWithDynamicallyPopulatedFields
-    
-    openapi_spec: OpenApiSpecification
-    table_name: str
-    # Sync properties disabled when the form is first loaded
-    # with properties allowed to be sent through an update.
-    disabled_properties: list[str]
     
     editor_overview_reverse_base: str
     resource_type: str
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        kwargs.update({
+            # One-to-many fields aren't saved through this view,
+            # so it makes sense to disable them.
+            "infer_one_to_many_properties": False,
+        })
+        return kwargs
+
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         self.success_url = reverse_lazy(
             self.editor_overview_reverse_base,
             kwargs={
@@ -334,14 +270,7 @@ class EditorAutosaveView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        column_metadata_endpoint = self.api_client.get_endpoint("column_metadata")
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            column_metadata_endpoint.get_resources(),
-            infer_one_to_many_properties=False,
-            disabled_properties=self.disabled_properties
-        )
+        form_config = self.get_form_config()
         submitted_form = dict(self.request.POST)
         submitted_form.pop("csrfmiddlewaretoken", None)
         allowed_fields = form_config.get_fields()
@@ -366,29 +295,16 @@ class EditorAutosaveView(FormView):
         return kwargs
 
 
-class EditorStartFormView(FormView):
+class EditorStartFormView(EditorViewMixin, FormView):
     form_class = FormWithDynamicallyPopulatedFields
-
-    table_name: str
-    openapi_spec: OpenApiSpecification
 
     editor_reverse_base: str
     resource_type: str
 
     def dispatch(self, request, *args, **kwargs):
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        self.form_config = get_form_config_for_table(
-            self.table_name,
-            self.openapi_spec,
-            self.column_metadata
-        )
+        self.form_config = self.get_form_config()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
         return super().dispatch(request, *args, **kwargs)
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
@@ -408,33 +324,17 @@ class EditorStartFormView(FormView):
         )
         return super().form_valid(form)
 
+    def get_toc_kwargs(self):
+        kwargs = super().get_toc_kwargs()
+        kwargs.update({
+            "is_unknown_category_needed": False,
+        })
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
-                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        categories = EditorTableOfContents(
-            self.table_name,
-            category_names,
-            is_unknown_category_needed=False
-        ).as_dict()
         context.update({
-            "toc_list_items": categories,
+            "toc_list_items": self.get_toc_list_items(),
             "title": f"New {humanise_resource_type(self.resource_type).title()}",
         })
         return context
@@ -442,20 +342,12 @@ class EditorStartFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         fields = self.form_config.get_required_fields()
-        # A field the page itself determines is not the user's to choose. The
-        # view sets it in apply_changes_to_registration_data_before_save, so
-        # offering it would let a choice be made and then silently overruled.
-        for name in getattr(self, "disabled_properties", []):
-            fields.pop(name, None)
         kwargs.update({"fields": fields})
         return kwargs
 
 
-class EditorOverviewTemplateView(TemplateView):
+class EditorOverviewTemplateView(EditorViewMixin, TemplateView):
     template_name = "editor/overview_base.html"
-
-    table_name: str
-    disabled_properties: list[str]
 
     editor_reverse_base: str
     tosca_template_download_reverse_base: str
@@ -465,59 +357,20 @@ class EditorOverviewTemplateView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = self.kwargs["resource_id"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        self.openapi_spec = self.api_client.openapi_spec
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
         if self.resource is None or self.resource.as_dict() is None:
             raise Http404(f"No {self.table_name} with id {self.resource_id}")
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        if not hasattr(self, "disabled_properties"):
-            self.disabled_properties = list()
-        form_config = get_form_config_for_table(
-            self.table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            disabled_properties=self.disabled_properties
-        )
-        self.properties_as_dict = form_config.get_properties()
-        self.form_fields = form_config.get_fields()
+        self.form_config = self.get_form_config()
+        self.properties_as_dict = self.form_config.get_properties()
         if not hasattr(self, "resource_type"):
             self.resource_type = self.table_name
         return super().dispatch(request, *args, **kwargs)
-    
-    def get_toc(self):
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if (resource.as_dict().get("table_name", "") == get_column_metadata_table_name_for_table(self.table_name)
-                and resource.as_dict().get("column_name", "") not in self.disabled_properties)
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        return EditorTableOfContents(
-            self.table_name,
-            category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in self.form_fields.values()
-            )
-        ).as_dict()
 
     def organise_data_for_overview(self) -> dict:
         overview_data = dict()
+        fields_in_final_form = self.form_config.get_fields()
         for property_name, metadata in self.properties_as_dict.items():
-            if property_name not in self.form_fields:
+            if property_name not in fields_in_final_form:
                 # If the property name isn't included in the final form for the
                 # wizard, then don't include it in the overview.
                 continue
@@ -547,7 +400,7 @@ class EditorOverviewTemplateView(TemplateView):
             ),
             "resource": self.resource.as_dict(),
             "overview_data_by_category": self.organise_data_for_overview(),
-            "toc_list_items": self.get_toc(),
+            "toc_list_items": self.get_toc_list_items(),
             "properties": self.properties_as_dict,
             "editor_reverse_base": self.editor_reverse_base,
             "one_to_one_field_subsection_reverse_base": self.one_to_one_field_subsection_reverse_base,

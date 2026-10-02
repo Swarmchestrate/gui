@@ -1,5 +1,4 @@
 import logging
-from collections import OrderedDict
 from http import HTTPStatus
 
 from django.http import JsonResponse
@@ -8,7 +7,10 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, View
 
 from editor.forms import ForeignKeyFormWithDynamicallyPopulatedFields
-from editor.view_helpers import EditorTableOfContents, get_form_config_for_table
+from editor.view_helpers import (
+    ForeignKeyEditorViewMixin,
+    ForeignKeyTableFormConfigViewMixin,
+)
 from postgrest.api import ApiClient, Resource
 from postgrest.forms.form_config import FormConfig
 from postgrest.table_names import TableNames
@@ -22,34 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class PopupFormCategoriesMixin:
-    def get_fk_table_toc_list_items(self) -> dict:
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if resource.as_dict().get("table_name", "") == self.fk_table_name
-        )
-        DEFAULT_ORDER_NUMBER = 999999
-        category_names = list(OrderedDict.fromkeys(
-            resource_dict.get("category")
-            for resource_dict in sorted(
-                resource_dicts,
-                key=lambda resource_dict: (
-                    resource_dict.get("order")
-                    if resource_dict.get("order") is not None
-                    else DEFAULT_ORDER_NUMBER
-                )
-            )
-        ).keys())
-        return EditorTableOfContents(
-            self.fk_table_name,
-            category_names,
-            is_unknown_category_needed=any(
-                field.category == UNKNOWN_ATTRIBUTE_CATEGORY
-                for field in self.form_config.get_fields().values()
-            )
-        ).as_dict()
-
-    def get_form_fields_for_category(self, form_config, category):
+    def get_form_fields_for_category(
+            self,
+            form_config: FormConfig,
+            category: str):
         fields = form_config.get_fields_for_category(category)
         return fields
 
@@ -82,30 +60,22 @@ class PopupFormCategoriesMixin:
         return forms_by_category
 
 
-class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
-    table_name: str
+class OneToOneFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategoriesMixin, View):
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [TableNames.APPLICATION_MICROSERVICE],
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self, "table_name"):
             self.table_name = kwargs["table_name"]
         self.resource_id = int(kwargs["resource_id"])
         self.fk_column_name = self.kwargs["fk_column_name"]
-        # API client is instantiated here so it doesn't
-        # fetch the OpenAPI spec twice.
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
         definition = self.api_client.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        self.form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            infer_one_to_many_properties=True,
-            # Some choices depend on the row this one hangs off.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[TableNames.APPLICATION_MICROSERVICE]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def get_fk_resource(self):
@@ -128,7 +98,7 @@ class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
             "field_name": self.fk_column_name,
             "resource": self.get_fk_resource(),
             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                fields=self.form_config.get_fields(),
+                fields=self.fk_table_form_config.get_fields(),
                 initial=initial
             ),
             "resource_type": self.fk_table_name,
@@ -151,7 +121,7 @@ class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
                 "resource_type": self.fk_table_name,
                 "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(
-                    self.form_config,
+                    self.fk_table_form_config,
                     id_prefix=f'new_{self.fk_column_name}'
                 ),
             },
@@ -181,7 +151,7 @@ class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
                 "resource_type": self.fk_table_name,
                 "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(
-                    self.form_config,
+                    self.fk_table_form_config,
                     initial=initial,
                     id_suffix=f"{self.fk_column_name}",
                 ),
@@ -227,44 +197,36 @@ class OneToOneFieldPopupSectionView(View, PopupFormCategoriesMixin):
         })
 
 
-class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
-    table_name: str
+class OneToManyFieldPopupSectionView(ForeignKeyEditorViewMixin, PopupFormCategoriesMixin, View):
     resource_type: str
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [f"{TableNames.APPLICATION_MICROSERVICE}_id"]
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self, "table_name"):
             self.table_name = self.kwargs["table_name"]
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_table_name = self.kwargs["fk_table_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        openapi_spec = self.api_client.openapi_spec
         if not hasattr(self, "possible_fk_table_column_name"):
             self.possible_fk_table_column_name = f"{self.table_name}_id"
-        referring_tables = openapi_spec.find_references_to_table(
+        referring_tables = self.openapi_spec.find_references_to_table(
             self.table_name,
             possible_column_name=self.possible_fk_table_column_name
         )
         self.fk_table_column_name = referring_tables.get(self.fk_table_name)
         if not self.fk_table_column_name:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        self.column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         # The row this section hangs off. A view that hides fields by what that
         # row is - an edge capacity's flavours lose the cloud-only fields - reads
-        # it through its disabled_properties, so it must be loaded first.
+        # it through its disabled_properties, so it must be loaded first (to the
+        # FK table FormConfig via get_fk_table_form_config_kwargs()).
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        self.form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            self.column_metadata,
-            infer_one_to_many_properties=True,
-            # Some choices depend on the row this one hangs off.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                f"{TableNames.APPLICATION_MICROSERVICE}_id",
-                *getattr(self, "disabled_properties", []),
-            ]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def get_resources(self) -> list[Resource]:
@@ -287,7 +249,7 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
             "editor/foreign_key_fields/popup_based/one_to_many_field_popup_list_item.html",
             {
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
+                    fields=self.fk_table_form_config.get_fields(),
                     id_suffix="__resource_id__",
                 ),
                 "resource_id": "__resource_id__",
@@ -306,7 +268,7 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
             "editor/dialogs/new_dialog.html",
             {
                 "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                    fields=self.form_config.get_fields(),
+                    fields=self.fk_table_form_config.get_fields(),
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
                 "form_id": f"new-form-{generate_random_string()}",
@@ -322,7 +284,7 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
                 "resource_type": self.fk_table_name,
                 "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(
-                    self.form_config,
+                    self.fk_table_form_config,
                     id_prefix=f'new_{self.fk_table_name}'
                 ),
             },
@@ -331,7 +293,7 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
 
     def get_update_form(self, fk_resource_id: int | str, initial: dict):
         return ForeignKeyFormWithDynamicallyPopulatedFields(
-            fields=self.form_config.get_fields(),
+            fields=self.fk_table_form_config.get_fields(),
             id_suffix=f"{self.fk_table_name}_{fk_resource_id}",
             initial=initial,
         )
@@ -361,7 +323,7 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
                 "resource_type": self.fk_table_name,
                 "fk_table_toc_list_items": self.get_fk_table_toc_list_items(),
                 "forms_by_category": self.get_forms_by_category(
-                    self.form_config,
+                    self.fk_table_form_config,
                     initial=initial,
                     id_suffix=f"{self.fk_table_name}_{fk_resource_id}",
                 ),
@@ -467,33 +429,25 @@ class OneToManyFieldPopupSectionView(View, PopupFormCategoriesMixin):
         })
 
 
-class OneToOneFieldSectionView(View):
-    table_name: str
-    
+class OneToOneFieldSectionView(ForeignKeyEditorViewMixin, View):
     new_foreign_key_editor_reverse_base: str
     foreign_key_update_editor_reverse_base: str
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [TableNames.APPLICATION_MICROSERVICE],
+        })
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self, "table_name"):
             self.table_name = kwargs["table_name"]
         self.resource_id = int(kwargs["resource_id"])
         self.fk_column_name = self.kwargs["fk_column_name"]
-        # API client is instantiated here so it doesn't
-        # fetch the OpenAPI spec twice.
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
         definition = self.api_client.openapi_spec.get_definition(self.table_name)
         self.fk_table_name = definition.get_foreign_key_table_name_for_column(self.fk_column_name)
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
-        self.form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata,
-            infer_one_to_many_properties=True,
-            # Some choices depend on the row this one hangs off.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[TableNames.APPLICATION_MICROSERVICE]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def get_fk_resource(self):
@@ -520,7 +474,7 @@ class OneToOneFieldSectionView(View):
             "resource": fk_resource,
             "fk_resource_id": fk_resource_id,
             "form": ForeignKeyFormWithDynamicallyPopulatedFields(
-                fields=self.form_config.get_fields(),
+                fields=self.fk_table_form_config.get_fields(),
                 initial=initial
             ),
             "resource_type": self.fk_table_name,
@@ -564,45 +518,37 @@ class OneToOneFieldSectionView(View):
         })
 
 
-class OneToManyFieldSectionView(View):
-    table_name: str
+class OneToManyFieldSectionView(ForeignKeyEditorViewMixin, View):
     resource_type: str
     
     new_foreign_key_editor_reverse_base: str
     foreign_key_update_editor_reverse_base: str
 
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "disabled_properties": [f"{TableNames.APPLICATION_MICROSERVICE}_id"],
+        })
+        return kwargs
+
     def dispatch(self, request, *args, **kwargs):
         self.resource_id = int(self.kwargs["resource_id"])
         self.fk_table_name = self.kwargs["fk_table_name"]
-        self.api_client = ApiClient()
-        self.api_client.initialise_openapi_spec()
-        openapi_spec = self.api_client.openapi_spec
         if not hasattr(self, "possible_fk_table_column_name"):
             self.possible_fk_table_column_name = f"{self.table_name}_id"
-        referring_tables = openapi_spec.find_references_to_table(
+        referring_tables = self.openapi_spec.find_references_to_table(
             self.table_name,
             possible_column_name=self.possible_fk_table_column_name
         )
         self.fk_table_column_name = referring_tables.get(self.fk_table_name)
         if not self.fk_table_column_name:
             return JsonResponse({}, status=HTTPStatus.UNPROCESSABLE_ENTITY)
-        column_metadata = self.api_client.get_endpoint("column_metadata").get_resources()
         # The row this section hangs off. A view that hides fields by what that
         # row is - an edge capacity's flavours lose the cloud-only fields - reads
-        # it through its disabled_properties, so it must be loaded first.
+        # it through its disabled_properties, so it must be loaded first (to the
+        # FK table FormConfig via get_fk_table_form_config_kwargs()).
         self.resource = self.api_client.get_endpoint(self.table_name).get(self.resource_id)
-        self.form_config = get_form_config_for_table(
-            self.fk_table_name,
-            self.api_client.openapi_spec,
-            column_metadata,
-            infer_one_to_many_properties=True,
-            # Some choices depend on the row this one hangs off.
-            choices_context={"parent_table": self.table_name, "parent_id": self.resource_id},
-            disabled_properties=[
-                f"{TableNames.APPLICATION_MICROSERVICE}_id",
-                *getattr(self, "disabled_properties", []),
-            ]
-        )
+        self.fk_table_form_config = self.get_fk_table_form_config()
         return super().dispatch(request, *args, **kwargs)
 
     def get_resources(self) -> list[Resource]:
@@ -686,8 +632,15 @@ class OneToManyFieldSectionView(View):
         })
 
 
-class OneToOneFieldOverviewSubsectionView(TemplateView):
+class OneToOneFieldOverviewSubsectionView(ForeignKeyTableFormConfigViewMixin, TemplateView):
     template_name = "editor/overview/foreign_key_fields/one_to_one_field_overview_subsection.html"
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            "infer_one_to_many_properties": False,
+        })
+        return kwargs
 
     def get(self, request, *args, **kwargs):
         fk_column_name = kwargs["fk_column_name"]
@@ -701,13 +654,7 @@ class OneToOneFieldOverviewSubsectionView(TemplateView):
         self.fk_resource = fk_table_endpoint.get(fk_resource_id)
         # Get the titles for the FK table column names so the properties (and their values)
         # can be listed out in a more readable way in the overview page.
-        column_metadata = api_client.get_endpoint("column_metadata").get_resources()
-        fk_table_form_config = get_form_config_for_table(
-            self.fk_table_name,
-            api_client.openapi_spec,
-            column_metadata,
-            infer_one_to_many_properties=False
-        )
+        fk_table_form_config = self.get_fk_table_form_config()
         self.properties_as_dict = fk_table_form_config.get_properties()
         return super().get(request, *args, **kwargs)
 
@@ -730,7 +677,7 @@ class OneToOneFieldOverviewSubsectionView(TemplateView):
         return kwargs
 
 
-class OneToManyFieldOverviewSubsectionView(TemplateView):
+class OneToManyFieldOverviewSubsectionView(ForeignKeyTableFormConfigViewMixin, TemplateView):
     template_name = "editor/overview/foreign_key_fields/one_to_many_field_overview_subsection.html"
 
     def get(self, request, *args, **kwargs):

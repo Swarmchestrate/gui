@@ -5,6 +5,7 @@ from .view_helpers import (
     CapacityIdFieldMixin,
     CapacitySubtypeFieldsMixin,
     CloudCapacityViewMixin,
+    merge_with_disabled_properties_in_kwargs,
     EdgeCapacityViewMixin,
 )
 
@@ -33,9 +34,23 @@ class CloudCapacityEditorView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin
     resource_type = "cloud_capacity"
     editor_form_reverse = "capacities:cloud_capacity_autosave"
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
+
 
 class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -48,6 +63,13 @@ class UpdateCloudCapacityByCategoryView(CapacitySubtypeFieldsMixin, CloudCapacit
 class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorAutosaveView):
     table_name = TableNames.CAPACITY_NEW
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
+
     def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
         data.update({
@@ -59,6 +81,13 @@ class CloudCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, CloudCapacityV
 class CloudCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, CloudCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_cloud_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -87,6 +116,13 @@ class CloudCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, CloudC
     table_name = TableNames.CAPACITY_NEW
     one_to_one_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_one_field"
     one_to_many_field_subsection_reverse_base = "capacities:cloud_capacity_overview_one_to_many_field"
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
 
 # Resource management views (CC)
@@ -137,9 +173,23 @@ class EdgeCapacityEditorView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, 
     resource_type = "edge_capacity"
     editor_form_reverse = "capacities:edge_capacity_autosave"
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
+
 
 class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, UpdateResourceByCategoryView):
     table_name = TableNames.CAPACITY_NEW
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
     def apply_changes_to_update_data_before_save(self, data: dict) -> dict:
         data = super().apply_changes_to_update_data_before_save(data)
@@ -152,6 +202,13 @@ class UpdateEdgeCapacityByCategoryView(CapacitySubtypeFieldsMixin, EdgeCapacityV
 class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorAutosaveView):
     table_name = TableNames.CAPACITY_NEW
 
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
+
     def apply_changes_to_update_data_before_save(self, data):
         data = super().apply_changes_to_update_data_before_save(data)
         data.update({
@@ -163,6 +220,13 @@ class EdgeCapacityEditorAutosaveView(CapacitySubtypeFieldsMixin, EdgeCapacityVie
 class EdgeCapacityEditorStartFormView(CapacityIdFieldMixin, CapacitySubtypeFieldsMixin, EdgeCapacityViewMixin, EditorStartFormView):
     template_name = "capacities/new_edge_capacity_start.html"
     table_name = TableNames.CAPACITY_NEW
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
     def apply_changes_to_registration_data_before_save(self, data: dict) -> dict:
         registration_data = super().apply_changes_to_registration_data_before_save(data)
@@ -177,6 +241,13 @@ class EdgeCapacityEditorOverviewTemplateView(CapacitySubtypeFieldsMixin, EdgeCap
     table_name = TableNames.CAPACITY_NEW
     one_to_one_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_one_field"
     one_to_many_field_subsection_reverse_base = "capacities:edge_capacity_overview_one_to_many_field"
+
+    def get_form_config_kwargs(self):
+        kwargs = super().get_form_config_kwargs()
+        return merge_with_disabled_properties_in_kwargs(
+            kwargs,
+            self.disabled_properties
+        )
 
 
 # Resource management views (EC)

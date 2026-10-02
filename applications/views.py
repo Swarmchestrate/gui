@@ -65,6 +65,14 @@ class ApplicationOneToOneFieldPopupSectionView(ApplicationViewMixin, OneToOneFie
     update_one_to_one_relation_reverse_base = "applications:update_application_one_to_one_relation"
     delete_one_to_one_relation_reverse_base = "applications:delete_application_one_to_one_relation"
 
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # Some choices depend on the row this one hangs off.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
+
 
 class ApplicationOneToManyFieldPopupSectionView(ApplicationViewMixin, OneToManyFieldPopupSectionView):
     table_name = TableNames.APPLICATION_NEW
@@ -72,6 +80,14 @@ class ApplicationOneToManyFieldPopupSectionView(ApplicationViewMixin, OneToManyF
     new_one_to_many_relation_reverse_base = "applications:new_application_one_to_many_relation"
     update_one_to_many_relation_reverse_base = "applications:update_application_one_to_many_relation"
     delete_one_to_many_relation_reverse_base = "applications:delete_application_one_to_many_relation"
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # Some choices depend on the row this one hangs off.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
 
 
 class UpdateApplicationByCategoryView(
@@ -154,12 +170,28 @@ class ApplicationOneToOneFieldSectionView(ApplicationViewMixin, OneToOneFieldSec
     new_foreign_key_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_editor"
     foreign_key_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_update_editor"
 
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # Some choices depend on the row this one hangs off.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
+
 
 class ApplicationOneToManyFieldSectionView(ApplicationViewMixin, OneToManyFieldSectionView):
     table_name = TableNames.APPLICATION_NEW
     possible_fk_table_column_name = "application_id"
     new_foreign_key_editor_reverse_base = "applications:application_new_one_to_many_foreign_key_editor"
     foreign_key_update_editor_reverse_base = "applications:application_one_to_many_foreign_key_update_editor"
+
+    def get_fk_table_form_config_kwargs(self):
+        kwargs = super().get_fk_table_form_config_kwargs()
+        kwargs.update({
+            # Some choices depend on the row this one hangs off.
+            "choices_context": {"parent_table": self.table_name, "parent_id": self.resource_id},
+        })
+        return kwargs
 
 
 class ApplicationNewOneToOneForeignKeyEditorView(ApplicationViewMixin, NewOneToOneForeignKeyEditorView):
