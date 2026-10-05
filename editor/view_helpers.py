@@ -2,6 +2,7 @@ from collections import OrderedDict
 from django.forms import Field
 
 from postgrest.api import Resource
+from postgrest.forms.form_config import FormConfig
 from postgrest.view_helpers import (
     ForeignKeyTableFormConfigViewMixin,
     FormConfigViewMixin,
@@ -183,15 +184,11 @@ class EditorViewMixin(FormConfigViewMixin):
         ) == get_column_metadata_table_name_for_table(self.table_name)
 
     def get_toc_list_items(self) -> dict:
-        resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if self._is_column_metadata_resource_fit_for_toc(resource)
-        )
-        self._fields_for_toc_generation = self.get_form_config().get_fields()
+        form_config = self.get_form_config()
+        self._fields_for_toc_generation = form_config.get_fields()
         return get_toc_list_items_for_table(
             self.table_name,
-            resource_dicts,
+            form_config,
             **self.get_toc_kwargs()
         )
 
@@ -214,15 +211,11 @@ class ForeignKeyEditorViewMixin(ForeignKeyTableFormConfigViewMixin, EditorViewMi
         ) == get_column_metadata_table_name_for_table(self.fk_table_name)
 
     def get_fk_table_toc_list_items(self) -> dict:
-        fk_table_resource_dicts = list(
-            resource.as_dict()
-            for resource in self.column_metadata
-            if self._is_column_metadata_resource_fit_for_fk_table_toc(resource)
-        )
-        self._fk_table_fields_for_toc_generation = self.get_fk_table_form_config().get_fields()
+        fk_table_form_config = self.get_fk_table_form_config()
+        self._fk_table_fields_for_toc_generation = fk_table_form_config.get_fields()
         return get_toc_list_items_for_table(
             self.fk_table_name,
-            fk_table_resource_dicts,
+            fk_table_form_config,
             **self.get_fk_table_toc_kwargs()
         )
 
@@ -237,16 +230,16 @@ class ForeignKeyEditorViewMixin(ForeignKeyTableFormConfigViewMixin, EditorViewMi
 
 def get_toc_list_items_for_table(
         table_name: str,
-        resource_dicts: list[dict],
+        form_config: FormConfig,
         is_unknown_category_needed: bool = True):
     DEFAULT_ORDER_NUMBER = 999999
     category_names = list(OrderedDict.fromkeys(
-        resource_dict.get("category")
-        for resource_dict in sorted(
-            resource_dicts,
-            key=lambda resource_dict: (
-                resource_dict.get("order")
-                if resource_dict.get("order") is not None
+        field.metadata.category
+        for field in sorted(
+            form_config.get_fields().values(),
+            key=lambda field: (
+                field.metadata.order
+                if field.metadata.order is not None
                 else DEFAULT_ORDER_NUMBER
             )
         )
